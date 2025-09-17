@@ -1,13 +1,15 @@
 @import "tailwindcss";
 
 @theme {
-    --color-gray-numixs: #312F2F;
+    --color-gray-numixs: #312f2f;
     /* #373736 */
     --color-black-numixs: #2c3344;
     --color-gray-input-border-numixs: #b6bcc8;
     --color-gray-input-numixs: #d9d5d5;
     --color-green-numixs: #d5d916;
-    --color-dark-green-numixs: oklch(from var(--color-green-numixs) calc(l * .90) c h);
+    --color-dark-green-numixs: oklch(
+        from var(--color-green-numixs) calc(l * 0.9) c h
+    );
 
     --color-lime-*: initial;
     --color-fuchsia-*: initial;
@@ -25,6 +27,43 @@
         background-color: rgb(from var(--color-gray-input-numixs) r g b / 83%);
         padding: --spacing(2);
     }
+
+    .error-container {
+        border: solid 1px var(--color-red-800);
+        background-color: var(--color-red-50);
+        padding: --spacing(4);
+        color: var(--color-red-800);
+        list-style-type: disc;
+        list-style-position: inside;
+        border-radius: var(--radius-lg);
+
+        &:empty {
+            padding: 0;
+            margin: 0;
+            border: none;
+        }
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-delay: -1ms !important;
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        background-attachment: initial !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0s !important;
+        transition-delay: 0s !important;
+        view-transition-name: unset !important;
+    }
+
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+        animation: none !important;
+    }
 }
 
 :root {
@@ -40,4 +79,10 @@
 
 html {
     background-color: var(--color-gray-numixs);
+    scroll-behavior: smooth;
+}
+
+/* :not([type="checkbox"], [type="radio"]) */
+input.error {
+    border: solid 1px var(--color-red-800);
 }

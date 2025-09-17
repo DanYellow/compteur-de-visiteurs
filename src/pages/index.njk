@@ -4,7 +4,7 @@
     <script type="module" src="/src/assets/scripts/sign-in-form.ts" defer></script>
 {% endblock %}
 {% block content %}
-    <header class="text-center mb-10 max-w-2xl mx-auto">
+    <header class="text-center mb-10 max-w-2xl mx-auto px-3">
         <h1 class="text-5xl text-black-numixs font-bold title-font mb-2.5">
    Formulaire d'inscription FacLab<sup>®</sup> numixs
 </h1>
@@ -13,14 +13,16 @@
 enregistrement.</p>
     </header>
     <hr class="bg-gray-input-border-numixs">
-    <div class="mt-8">
-        <form class="grid grid-cols-2 gap-6 max-w-2xl mx-auto" action="" method="post" data-sign-in-form>
+    <div class="mt-8 px-3">
+        <form class="grid grid-cols-2 gap-6 max-w-2xl mx-auto" novalidate action="" method="post" data-sign-in-form>
+            <ul class="error-container col-span-full" data-form-errors id="error-container"></ul>
+
             <div class="flex flex-col">
-                <label for="prenom">Prénom</label>
+                <label for="prenom">Prénom<span class="text-red-500">*</span></label>
                 <input type="text" id="prenom" placeholder="Jean" name="prenom" class="input">
             </div>
             <div class="flex flex-col">
-                <label for="nom">Nom</label>
+                <label for="nom">Nom<span class="text-red-500">*</span></label>
                 <input type="text" placeholder="Dubeau" id="nom" name="nom" class="input">
             </div>
 
@@ -29,30 +31,30 @@ enregistrement.</p>
                 <input type="tel" placeholder="01 33 33 33 33" id="numero_telephone" name="numero_telephone" class="input">
             </div>
             <div class="flex flex-col">
-                <label for="email">E-mail</label>
+                <label for="email">E-mail<span class="text-red-500">*</span></label>
                 <input type="email" placeholder="hello@numixs.com" id="email" name="email" class="input">
             </div>
             <div class="flex flex-col col-span-full">
                 <label for="adresse">Adresse</label>
-                <input type="text" placeholder="hello@numixs.com" id="adresse" name="adresse" class="input">
+                <input type="text" placeholder="Rue Jacques-Henri Labourdette" id="adresse" name="adresse" class="input">
             </div>
             <div class="flex flex-col">
                 <label for="ville">Ville</label>
-                <input type="text" placeholder="hello@numixs.com" id="ville" name="ville" class="input">
+                <input type="text" placeholder="Sarcelles" id="ville" name="ville" class="input">
             </div>
             {# <div class="flex flex-col">
                 <label for="region">Région</label>
                 <input type="text" id="region" name="region" class="input">
             </div> #}
             <div class="flex flex-col">
-                <label for="code_postal">Code postal</label>
-                <input type="text" id="code_postal" maxlength="6" inputmode="numeric" name="code_postal" class="input">
+                <label for="code_postal">Code postal<span class="text-red-500">*</span></label>
+                <input type="text" id="code_postal" maxlength="6" inputmode="numeric" placeholder='95200' name="code_postal" class="input">
             </div>
             <div class="flex flex-col col-span-full gap-3">
-                <p>Quels sont vos secteurs d'activité ?</p>
+                <p>Quels sont vos secteurs d'activité ?<span class="text-red-500">*</span></p>
                 {% for sector in list_business_sector %}
                     <div class="flex flex-row gap-2.5 items-center">
-                        <input type="checkbox" value="{{ sector.value }}" name="{{ sector.value }}" id="{{ sector.value }}" class="aspect-square h-full accent-green-numixs">
+                        <input switch type="checkbox" value="{{ sector.value }}" name="{{ sector.value }}" id="{{ sector.value }}" class="aspect-square h-full accent-green-numixs">
                         <label for="{{ sector.value }}">{{ sector.name }}</label>
                     </div>
                 {% endfor %}
@@ -63,18 +65,17 @@ enregistrement.</p>
             </div>
 
             <p class="text-black-numixs font-bold title-font col-span-full text-4xl">
-                Règlement intérieur du FacLab® de la Station numixs
+                Règlement intérieur du FacLab<sup>®</sup> de la Station numixs
             </p>
-
             <div class="col-span-full">
-                <input class="aspect-square accent-green-numixs" type="checkbox" name="reglement" id="reglement">
+                <input class="aspect-square accent-green-numixs mr-2.5" type="checkbox" name="reglement" id="reglement">
                 <label for="reglement">En cochant cette case, je déclare avoir lu et accepté l’intégralité du règlement
-disponible ci-dessus.</label>
+disponible ci-dessus.<span class="text-red-500">*</span></label>
             </div>
             <div class="col-span-full">
-                <input class="aspect-square accent-green-numixs" type="checkbox" name="donnees_personnelles" id="donnees_personnelles">
+                <input class="aspect-square accent-green-numixs mr-2.5" type="checkbox" name="donnees_personnelles" id="donnees_personnelles">
                 <label for="donnees_personnelles">J’accepte que mes données soient utilisées pour les inscriptions et participations
-au FacLab<sup>®</sup> numixs.</label>
+au FacLab® numixs.<span class="text-red-500">*</span></label>
             </div>
 
             <div class="col-span-full">
