@@ -14,5 +14,8 @@
     "tailwindcss": "^4.1.13",
     "typescript": "~5.8.3",
     "vite": "^7.1.2"
+  },
+  "dependencies": {
+    "zod": "^4.1.9"
   }
 }

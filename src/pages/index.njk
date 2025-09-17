@@ -1,5 +1,8 @@
 {% extends "layouts/page.njk" %}
 
+{% block scripts %}
+    <script type="module" src="/src/assets/scripts/sign-in-form.ts" defer></script>
+{% endblock %}
 {% block content %}
     <header class="text-center mb-10 max-w-2xl mx-auto">
         <h1 class="text-5xl text-black-numixs font-bold title-font mb-2.5">
@@ -11,7 +14,7 @@ enregistrement.</p>
     </header>
     <hr class="bg-gray-input-border-numixs">
     <div class="mt-8">
-        <form class="grid grid-cols-2 gap-6 max-w-2xl mx-auto" action="" method="post">
+        <form class="grid grid-cols-2 gap-6 max-w-2xl mx-auto" action="" method="post" data-sign-in-form>
             <div class="flex flex-col">
                 <label for="prenom">Prénom</label>
                 <input type="text" id="prenom" placeholder="Jean" name="prenom" class="input">
@@ -37,10 +40,10 @@ enregistrement.</p>
                 <label for="ville">Ville</label>
                 <input type="text" placeholder="hello@numixs.com" id="ville" name="ville" class="input">
             </div>
-            <div class="flex flex-col">
+            {# <div class="flex flex-col">
                 <label for="region">Région</label>
                 <input type="text" id="region" name="region" class="input">
-            </div>
+            </div> #}
             <div class="flex flex-col">
                 <label for="code_postal">Code postal</label>
                 <input type="text" id="code_postal" maxlength="6" inputmode="numeric" name="code_postal" class="input">
@@ -49,8 +52,8 @@ enregistrement.</p>
                 <p>Quels sont vos secteurs d'activité ?</p>
                 {% for sector in list_business_sector %}
                     <div class="flex flex-row gap-2.5 items-center">
-                        <input type="checkbox" value="{{ sector }}" name="secteur_activite" id="secteur_activite_{{loop.index}}" class="aspect-square h-full accent-green-numixs">
-                        <label for="secteur_activite_{{loop.index}}">{{ sector }}</label>
+                        <input type="checkbox" value="{{ sector.value }}" name="{{ sector.value }}" id="{{ sector.value }}" class="aspect-square h-full accent-green-numixs">
+                        <label for="{{ sector.value }}">{{ sector.name }}</label>
                     </div>
                 {% endfor %}
             </div>
@@ -75,7 +78,7 @@ au FacLab<sup>®</sup> numixs.</label>
             </div>
 
             <div class="col-span-full">
-                <button type="submit" class="bg-green-numixs w-fit px-16 py-4 mx-auto block active:bg-">Envoyer</button>
+                <button type="submit" class="bg-green-numixs w-fit px-16 py-4 mx-auto block active:bg-dark-green-numixs">Envoyer</button>
             </div>
         </form>
     </div>

@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
 @theme {
-    --color-gray-numixs: #e0e0e0;
+    --color-gray-numixs: #312F2F;
+    /* #373736 */
     --color-black-numixs: #2c3344;
     --color-gray-input-border-numixs: #b6bcc8;
     --color-gray-input-numixs: #d9d5d5;
     --color-green-numixs: #d5d916;
+    --color-dark-green-numixs: oklch(from var(--color-green-numixs) calc(l * .90) c h);
 
     --color-lime-*: initial;
     --color-fuchsia-*: initial;

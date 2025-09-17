@@ -1,11 +1,32 @@
 {
     "list_business_sector": [
-        "Éducation / formation (ateliers pédagogiques)",
-        "Entrepreneur",
-        "Artisan / Artiste",
-        "Collectivité",
-        "FacLab",
-        "Association",
-        "Habitant"
+        {
+            "name": "Éducation / formation (ateliers pédagogiques)",
+            "value": "education"
+        },
+        {
+            "name": "Entrepreneur",
+            "value": "entrepreneur"
+        },
+        {
+            "name": "Artisan / Artiste",
+            "value": "artisan_artiste"
+        },
+        {
+            "name": "Collectivité",
+            "value": "collectivite"
+        },
+        {
+            "name": "FacLab",
+            "value": "faclab"
+        },
+        {
+            "name": "Association",
+            "value": "association"
+        },
+        {
+            "name": "Habitant",
+            "value": "habitant"
+        }
     ]
 }
