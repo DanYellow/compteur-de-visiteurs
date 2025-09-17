@@ -1,7 +1,53 @@
-{% extends "layouts/base.njk" %}
+{% extends "layouts/page.njk" %}
 
 {% block content %}
-<h1 class="text-3xl text-red-300 font-bold underline">
-    Hello world!
+    <header class="text-center mb-10 max-w-2xl mx-auto">
+        <h1 class="text-5xl text-black-numixs font-bold title-font mb-2.5">
+   Formulaire d'inscription FacLab<sup>®</sup> numixs
 </h1>
+        <p>Bienvenue ! Merci de prendre quelques instants pour vous inscrire au FacLab® numixs.</p>
+        <p>Merci de remplir les informations demandées et de lire le règlement avant de valider votre
+enregistrement.</p>
+    </header>
+<hr class="bg-gray-input-border-numixs">
+    <div class="mt-8">
+        <form class="grid grid-cols-2 gap-6 max-w-2xl mx-auto" action="" method="post">
+            <div class="flex flex-col">
+                <label for="prenom">Prénom</label>
+                <input type="text" id="prenom" placeholder="Jean" name="prenom" class="input">
+            </div>
+            <div class="flex flex-col">
+                <label for="nom">Nom</label>
+                <input type="text" placeholder="Dubeau" id="nom" name="nom" class="input">
+            </div>
+
+            <div class="flex flex-col">
+                <label for="numero_telephone">Numéro de téléphone</label>
+                <input type="tel" placeholder="01 33 33 33 33" id="numero_telephone" name="numero_telephone" class="input">
+            </div>
+            <div class="flex flex-col">
+                <label for="email">E-mail</label>
+                <input type="email" placeholder="hello@numixs.com" id="email" name="email" class="input">
+            </div>
+            <div class="flex flex-col col-span-full">
+                <label for="adresse">Adresse</label>
+                <input type="text" placeholder="hello@numixs.com" id="adresse" name="adresse" class="input">
+            </div>
+            <div class="flex flex-col">
+                <label for="ville">Ville</label>
+                <input type="text" placeholder="hello@numixs.com" id="ville" name="ville" class="input">
+            </div>
+            <div class="flex flex-col">
+                <label for="region">Région</label>
+                <input type="text" id="region" name="region" class="input">
+            </div>
+            <div class="flex flex-col">
+                <label for="code_postal">Code postal</label>
+                <input type="text" id="code_postal" name="code_postal" class="input">
+            </div>
+            <div class="flex flex-col col-span-full">
+                <label for="code_postal">Quel est votre secteur d'activité ?</label>
+            </div>
+        </form>
+    </div>
 {% endblock %}

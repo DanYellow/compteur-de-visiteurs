@@ -1,0 +1,18 @@
+@font-face {
+    font-family: "Agency FB";
+    font-weight: normal;
+    font-style: normal;
+    src: local("Agency FB"),
+        url("/fonts/agency/agencyr-webfont.woff") format("woff"),
+        url("/fonts/agency/agencyr-webfont.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: "Agency FB";
+    font-weight: bold;
+    font-style: normal;
+    src: local("Agency FB"),
+        url("/fonts/agency/agencyb-webfont.woff") format("woff"),
+        url("/fonts/agency/agencyb-webfont.woff2") format("woff2");
+}
+

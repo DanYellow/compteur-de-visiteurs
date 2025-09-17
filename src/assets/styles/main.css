@@ -1,7 +1,26 @@
 @import "tailwindcss";
 
+@theme {
+    --color-gray-numixs: #e0e0e0;
+    --color-black-numixs: #2c3344;
+    --color-gray-input-border-numixs: #B6BCC8;
+    --color-gray-input-numixs: #D9D5D5;
+}
+
+@utility title-font {
+    font-family: "Agency FB", sans-serif;
+}
+
+@layer components {
+  .input {
+    border: solid 1px var(--color-gray-input-border-numixs);
+    background-color: rgb(from var(--color-gray-input-numixs) r g b / 83%);
+    padding: --spacing(2);
+  }
+}
+
 :root {
-    font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+    font-family: Calibri, sans-serif;
 
     --color-gray-numixs: #e0e0e0;
 
@@ -9,4 +28,8 @@
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    background-color: var(--color-gray-numixs);
 }

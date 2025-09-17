@@ -1,0 +1,18 @@
+{
+    "list_business_sector": [
+        "Agritech / environnement (agriculture durable, écologie)",
+        "Architecture / urbanisme (maquettes, conception urbaine)",
+        "Art / création artistique (sculpture, installations numériques)",
+        "Automobile / mobilité (prototypes mécaniques, mobilité)",
+        "Design produit / industriel (prototypage d’objets)",
+        "Éducation / formation (ateliers pédagogiques)",
+        "Électronique / robotique (montages, drones)",
+        "Innovation sociale / ESS (projets à impact social)",
+        "Jeux vidéo / réalité virtuelle / augmentée (accessoires immersifs)",
+        "Multimédia / audiovisuel (supports numériques)",
+        "Mode / textile (créations textiles, accessoires)",
+        "Santé / biotech (appareils médicaux)",
+        "Startup technologique (smart city, greentech)",
+        "Autre"
+    ]
+}
