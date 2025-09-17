@@ -9,6 +9,9 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.13",
+    "@vituum/vite-plugin-nunjucks": "^1.1.0",
+    "tailwindcss": "^4.1.13",
     "typescript": "~5.8.3",
     "vite": "^7.1.2"
   }
