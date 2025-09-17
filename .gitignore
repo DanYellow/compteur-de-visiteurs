@@ -23,4 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 
-*.t(e)mp.*
+*.tmp.*
+*.temp.*
