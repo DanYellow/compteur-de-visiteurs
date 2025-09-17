@@ -16,3 +16,11 @@
         url("/fonts/agency/agencyb-webfont.woff2") format("woff2");
 }
 
+@font-face {
+    font-family: "Calibri";
+    font-weight: normal;
+    font-style: normal;
+    src: local("Calibri"),
+        url("/fonts/agency/calibri-webfont.woff") format("woff"),
+        url("/fonts/agency/calibri-webfont.woff2") format("woff2");
+}

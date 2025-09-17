@@ -3,8 +3,14 @@
 @theme {
     --color-gray-numixs: #e0e0e0;
     --color-black-numixs: #2c3344;
-    --color-gray-input-border-numixs: #B6BCC8;
-    --color-gray-input-numixs: #D9D5D5;
+    --color-gray-input-border-numixs: #b6bcc8;
+    --color-gray-input-numixs: #d9d5d5;
+    --color-green-numixs: #d5d916;
+
+    --color-lime-*: initial;
+    --color-fuchsia-*: initial;
+    --color-cyan-*: initial;
+    --color-orange-*: initial;
 }
 
 @utility title-font {
@@ -12,11 +18,11 @@
 }
 
 @layer components {
-  .input {
-    border: solid 1px var(--color-gray-input-border-numixs);
-    background-color: rgb(from var(--color-gray-input-numixs) r g b / 83%);
-    padding: --spacing(2);
-  }
+    .input {
+        border: solid 1px var(--color-gray-input-border-numixs);
+        background-color: rgb(from var(--color-gray-input-numixs) r g b / 83%);
+        padding: --spacing(2);
+    }
 }
 
 :root {
