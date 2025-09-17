@@ -4,4 +4,32 @@
 ## A propos du projet
 Projet inspiré par le projet compteur social développé au FabLab Numixs de Sarcelles en Python.
 
-Le but du projet est de permettre de compter le nombre de visiteurs quotidiens aux FacLab de Sarcelles (Val-d'Oise) et Gennevilliers (Hauts-de-Seine).
+Le but du projet est de permettre de compter le nombre de visiteurs quotidiens aux FacLab de Sarcelles (Val-d'Oise) et Gennevilliers (Hauts-de-Seine) et de faire signer la charte du FabLab aux utilisateurs qui souhaitent utiliser les machines des locaux.
+
+## Pré-requis
+
+- nodejs > 22.X.X
+
+## Installation
+- Cloner le projet : `git clone https://github.com/DanYellow/compteur-de-visiteurs.git`
+  - Il est aussi possible de télécharger le zip
+- Installer les dépendances : `npm install` dans le dossier du projet
+
+## Utilisation
+
+**Développement**
+- Lancer le serveur : `npm run dev`
+- Ouvrir le lien: http://localhost:5173/
+
+**Production**
+- Compiler les ressources : `npm run build`
+- Lancer le serveur de prévisualisation : `npm run preview`
+
+
+## Construit avec
+- tailwindcss
+- zod
+
+## Licence
+
+Projet distribué sous licence MIT. Voir fichier LICENCE pour plus d'informations.
