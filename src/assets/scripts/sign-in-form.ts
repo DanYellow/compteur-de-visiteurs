@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { listBusinessSector } from "#scripts/utils.ts"
+import { listBusinessSector, getCurrentFormattedTime } from "#scripts/utils.ts"
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
@@ -94,6 +94,8 @@ const submitForm = async (e: SubmitEvent) => {
             formData.append(value, "non")
         }
     });
+
+    formData.append("Date d'inscription", getCurrentFormattedTime())
 
     const req = await fetch("/", {
         method: "POST",

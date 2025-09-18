@@ -19,6 +19,7 @@
         "vite": "^7.1.2"
     },
     "dependencies": {
+        "csv-parse": "^6.1.0",
         "csv-stringify": "^6.6.0",
         "express": "^5.1.0",
         "signature_pad": "^5.1.1",

@@ -1,0 +1,52 @@
+{% extends "layouts/page.njk" %}
+
+{% block content %}
+    <header class="text-center mb-10 max-w-2xl mx-auto px-3">
+        <h1 class="text-5xl text-black-numixs font-bold title-font mb-2.5">
+   Liste des membres du FacLab<sup>®</sup> numixs
+</h1>
+    </header>
+    <hr class="bg-gray-input-border-numixs">
+    <div class="mt-8 px-3">
+        <table class="w-full bg-white border-collapse">
+            <caption>
+    Nombre de membres : {{ members_list|length }}
+  </caption>
+            <thead>
+                <tr class="">
+                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Prénom</td>
+                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Nom de famille</td>
+                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Numéro de téléphone</td>
+                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">E-mail</td>
+                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Adresse</td>
+                    {# <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Ville</td> #}
+                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Code postal</td>
+                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Informations supplémentaires</td>
+                    {% for business in list_business_sector %}
+                        <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">{{ business.name }}</td>
+                    {% endfor %}
+                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Date d'inscription</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members_list %}
+                    <tr class="even:bg-gray-200">
+                        <td class="font-bold px-6 py-3 text-left" data-label="Prénom">{{ member.prenom }}</td>
+                        <td class="font-bold px-6 py-3 text-left" data-label="Nom">{{ member.nom }}</td>
+                        <td class="font-bold px-6 py-3 text-left" data-label="Numéro de téléphone">{{ member.numero_telephone }}</td>
+                        <td class="font-bold px-6 py-3 text-left" data-label="E-mail">{{ member.email }}</td>
+                        <td class="font-bold px-6 py-3 text-left" data-label="Adresse">{{ member.adresse }}</td>
+                        {# <td class="font-bold px-6 py-3 text-left">{{ member.ville }}</td> #}
+                        <td class="font-bold px-6 py-3 text-left" data-label="Code postal">{{ member.code_postal }}</td>
+                        <td class="font-bold px-6 py-3 text-left" data-label="Informations supplémentaires">{{ member.extra_infos }}</td>
+                        {% for business in list_business_sector %}
+                            <td class="font-bold px-6 py-3 text-left" data-label="{{ business.name }}">{{ member[business.value] }}</td>
+                        {% endfor %}
+                        <td class="font-bold px-6 py-3 text-left" data-label="Date d'inscription">{{ member["Date d'inscription"] }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

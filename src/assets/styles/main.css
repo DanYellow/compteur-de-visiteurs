@@ -7,9 +7,9 @@
     --color-gray-input-border-numixs: #b6bcc8;
     --color-gray-input-numixs: #d9d5d5;
     --color-green-numixs: #d5d916;
-    --color-dark-green-numixs: #ACB115;
-    --color-disabled: #F5F5F5;
-    --color-white-numixs: #F5F5F5;
+    --color-dark-green-numixs: #acb115;
+    --color-disabled: #f5f5f5;
+    --color-white-numixs: #f5f5f5;
 
     --color-lime-*: initial;
     --color-fuchsia-*: initial;
@@ -110,5 +110,42 @@ input.error {
         translate: -50% -50%;
         pointer-events: none;
         opacity: 0.3;
+    }
+}
+
+@media screen and (width <= 1024px) {
+    table {
+        border: 0;
+
+        thead {
+            border: none;
+            clip: rect(0 0 0 0);
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            padding: 0;
+            position: absolute;
+            width: 1px;
+        }
+
+        tr {
+            border-bottom: 1px solid var(--color-slate-200);
+            display: block;
+
+            &:last-child {
+                border-bottom-color: transparent;
+            }
+        }
+
+        td {
+            display: block;
+            text-align: left;
+
+            &::before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: block;
+            }
+        }
     }
 }
