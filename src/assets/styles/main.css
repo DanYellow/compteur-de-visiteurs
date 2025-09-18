@@ -7,9 +7,9 @@
     --color-gray-input-border-numixs: #b6bcc8;
     --color-gray-input-numixs: #d9d5d5;
     --color-green-numixs: #d5d916;
-    --color-dark-green-numixs: oklch(
-        from var(--color-green-numixs) calc(l * 0.9) c h
-    );
+    --color-dark-green-numixs: #ACB115;
+    --color-disabled: #F5F5F5;
+    --color-white-numixs: #F5F5F5;
 
     --color-lime-*: initial;
     --color-fuchsia-*: initial;

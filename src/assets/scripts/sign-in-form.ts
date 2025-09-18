@@ -72,7 +72,7 @@ const submitForm = (e: SubmitEvent) => {
     if (!validForm(e)) {
         return;
     }
-
+    console.log("ffzfe")
     dialog.showModal();
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
