@@ -1,5 +1,9 @@
-{
-    "list_business_sector": [
+import express from "express";
+
+const router = express.Router();
+
+router.get("/", async (req, res) => {
+    const listBusinessSector = [
         {
             "name": "Éducation / formation (ateliers pédagogiques)",
             "value": "education"
@@ -29,4 +33,11 @@
             "value": "habitant"
         }
     ]
-}
+
+    res.render("pages/index.njk", {
+        "list_business_sector": listBusinessSector,
+    });
+});
+
+
+export default router;

@@ -1,21 +1,29 @@
 {
-  "name": "compteur-de-visiteurs",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "@tailwindcss/vite": "^4.1.13",
-    "@vituum/vite-plugin-nunjucks": "^1.1.0",
-    "tailwindcss": "^4.1.13",
-    "typescript": "~5.8.3",
-    "vite": "^7.1.2"
-  },
-  "dependencies": {
-    "zod": "^4.1.9"
-  }
+    "name": "compteur-de-visiteurs",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "cross-env NODE_ENV=development node --watch-path=./server server/index.ts",
+        "build": "tsc && vite build",
+        "prod": "cross-env NODE_ENV=production node server/index.ts"
+    },
+    "devDependencies": {
+        "@tailwindcss/vite": "^4.1.13",
+        "@types/express": "^5.0.3",
+        "@types/nunjucks": "^3.2.6",
+        "cross-env": "^10.0.0",
+        "nunjucks": "^3.2.4",
+        "tailwindcss": "^4.1.13",
+        "typescript": "~5.8.3",
+        "vite": "^7.1.2"
+    },
+    "dependencies": {
+        "express": "^5.1.0",
+        "zod": "^4.1.9"
+    },
+    "imports": {
+        "#server/utils/*.ts": "./server/utils/*.ts",
+        "#server/*.ts": "./server/*.ts"
+    }
 }

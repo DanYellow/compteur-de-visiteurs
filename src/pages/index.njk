@@ -19,11 +19,11 @@ enregistrement.</p>
 
             <div class="flex flex-col">
                 <label for="prenom">Prénom<span class="text-red-500">*</span></label>
-                <input type="text" id="prenom" placeholder="Jean" name="prenom" class="input">
+                <input type="text" required id="prenom" placeholder="Jean" name="prenom" class="input">
             </div>
             <div class="flex flex-col">
                 <label for="nom">Nom<span class="text-red-500">*</span></label>
-                <input type="text" placeholder="Dubeau" id="nom" name="nom" class="input">
+                <input type="text" required placeholder="Dubeau" id="nom" name="nom" class="input">
             </div>
 
             <div class="flex flex-col">
@@ -32,7 +32,7 @@ enregistrement.</p>
             </div>
             <div class="flex flex-col">
                 <label for="email">E-mail<span class="text-red-500">*</span></label>
-                <input type="email" placeholder="hello@numixs.com" id="email" name="email" class="input">
+                <input type="email" required placeholder="hello@numixs.com" id="email" name="email" class="input">
             </div>
             <div class="flex flex-col col-span-full">
                 <label for="adresse">Adresse</label>
@@ -48,7 +48,7 @@ enregistrement.</p>
             </div> #}
             <div class="flex flex-col">
                 <label for="code_postal">Code postal<span class="text-red-500">*</span></label>
-                <input type="text" id="code_postal" maxlength="5" inputmode="numeric" placeholder='95200' name="code_postal" class="input">
+                <input type="text" required id="code_postal" maxlength="5" inputmode="numeric" placeholder='95200' name="code_postal" class="input">
             </div>
             <div class="flex flex-col col-span-full gap-3">
                 <p>Quels sont vos secteurs d'activité ?<span class="text-red-500">*</span></p>
@@ -61,7 +61,7 @@ enregistrement.</p>
             </div>
             <div class="flex flex-col col-span-full">
                 <label for="extra_infos">Une information à rajouter ?</label>
-                <textarea name="extra_infos" id="extra_infos" placeholder="Écrire ici..." class="input"></textarea>
+                <textarea name="extra_infos" id="extra_infos" rows="5" placeholder="Écrire ici..." class="input"></textarea>
             </div>
 
             <p class="text-black-numixs font-bold title-font col-span-full text-4xl">
@@ -73,9 +73,9 @@ enregistrement.</p>
 disponible ci-dessus.<span class="text-red-500">*</span></label>
             </div>
             <div class="col-span-full">
-                <input class="aspect-square accent-green-numixs mr-2.5" type="checkbox" name="donnees_personnelles" id="donnees_personnelles">
+                <input required class="aspect-square accent-green-numixs mr-2.5" type="checkbox" name="donnees_personnelles" id="donnees_personnelles">
                 <label for="donnees_personnelles">J’accepte que mes données soient utilisées pour les inscriptions et participations
-au FacLab® numixs.<span class="text-red-500">*</span></label>
+au FacLab® numixs.</label>
             </div>
 
             <div class="col-span-full">

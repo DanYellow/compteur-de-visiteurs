@@ -2,7 +2,6 @@ import * as z from "zod";
 
 const PHONE_NUMBER_REGEX = /(\d{2}\s?){5}|\d{2}\+\s?\d{1}\s?(\d{2}\s?){3}/;
 const ZIP_CODE_REGEX = /^\d{4,5}$/;
-const NON_EMPTY_MESSAGE = "please check this field"
 
 type BusinessSectorPayload = {
     habitant?: string;
@@ -14,7 +13,7 @@ type BusinessSectorPayload = {
     education?: string;
 }
 
-const hasSelectABusinessSector = (data: BusinessSectorPayload) => {
+const hasSelectedABusinessSector = (data: BusinessSectorPayload) => {
     return (
         "habitant" in data ||
         "association" in data ||
@@ -46,10 +45,8 @@ const MemberSchema = z.object({
     education: z.string().optional().or(z.literal('')),
 
     reglement: z.string().optional().or(z.literal('')),
-    // donnees_personnelles: z.string().optional().or(z.literal('')),
-    // donnees_personnelles: z.string().min(1, { message: "Vous devez accepter " }),
 }).refine((data) => {
-    return hasSelectABusinessSector(data);
+    return hasSelectedABusinessSector(data);
 }, {
     error: "Vous devez choisir au moins un secteur d'activité",
 }).refine((data) => {
@@ -73,6 +70,7 @@ const submitForm = (e: SubmitEvent) => {
 };
 
 const validForm = (e: Event) => {
+    console.log("ffff")
     if(!("isDirty" in (e.currentTarget as HTMLFormElement).dataset)) {
         return
     }

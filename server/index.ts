@@ -1,0 +1,69 @@
+import { fileURLToPath } from "url";
+import path from "path";
+
+import nunjucks from "nunjucks";
+import express from "express";
+
+import router from "./router.ts";
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+const app = express();
+
+if (process.env.NODE_ENV === "development") {
+    const viteConfig = await import("../vite.config.ts");
+    const { createServer: createViteServer } = await import("vite");
+    const vite = await createViteServer(viteConfig);
+    app.use(vite.middlewares);
+}
+
+const publicPath = path.join(path.resolve(), "public");
+
+app.use(express.static(publicPath));
+app.set("view engine", "nunjucks");
+app.set("views", path.join(__dirname, "..", "/src"));
+
+app.use((req, res, next) => {
+    const context = {
+        NODE_ENV: process.env.NODE_ENV,
+    };
+
+    res.locals = {
+        ...context,
+    };
+
+    next();
+});
+
+app.use(router);
+
+const nunjucksConfig = nunjucks.configure(app.get("views"), {
+    autoescape: true,
+    express: app,
+    noCache: process.env.NODE_ENV === "development",
+    web: {
+        useCache: process.env.NODE_ENV !== "development",
+    },
+});
+
+const listDomains: string[] = ["::"];
+const port = 3900;
+app.listen(port, listDomains, () => {
+    console.log("---------------------------");
+    console.log(
+        "Express server running at (ctrl/cmd + click to open in your browser):"
+    );
+    ["localhost", ...listDomains]
+        .filter(Boolean)
+        .filter((item) => item !== "::")
+        .forEach((item) => {
+            let prefix = "Network";
+            if (item.includes("localhost")) {
+                prefix = "Local";
+            }
+            console.log(`\x1b[35m➜\x1b[0m  ${prefix}: \x1b[35mhttp://${item}:${port}/\x1b[0m`);
+        });
+});

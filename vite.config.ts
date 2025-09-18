@@ -1,15 +1,16 @@
 import type { UserConfig } from "vite";
 
-import vituum from "vituum";
-import nunjucks from "@vituum/vite-plugin-nunjucks";
 import tailwindcss from "@tailwindcss/vite";
 
 export default {
     plugins: [
-        vituum(),
-        nunjucks({
-            root: "./src",
-        }),
         tailwindcss(),
     ],
+    appType: "custom",
+    server: {
+        // Expose the server to the network allowing access from ip address
+        host: true,
+        hmr: true,
+        middlewareMode: true,
+    },
 } satisfies UserConfig;
