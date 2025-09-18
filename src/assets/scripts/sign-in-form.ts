@@ -5,17 +5,16 @@ const ZIP_CODE_REGEX = /^\d{4,5}$/;
 const NON_EMPTY_MESSAGE = "please check this field"
 
 type BusinessSectorPayload = {
-    habitant: string;
-    faclab: string;
-    association: string;
-    entrepreneur: string;
-    artisan_artiste: string;
-    collectivite: string;
-    education: string;
+    habitant?: string;
+    faclab?: string;
+    association?: string;
+    entrepreneur?: string;
+    artisan_artiste?: string;
+    collectivite?: string;
+    education?: string;
 }
 
 const hasSelectABusinessSector = (data: BusinessSectorPayload) => {
-    console.log(data)
     return (
         "habitant" in data ||
         "association" in data ||
@@ -25,12 +24,6 @@ const hasSelectABusinessSector = (data: BusinessSectorPayload) => {
         "collectivite" in data ||
         "collectivite" in data ||
         "education" in data
-        // data.association !== undefined ||
-        // data.faclab !== undefined ||
-        // data.entrepreneur !== undefined ||
-        // data.artisan_artiste !== undefined ||
-        // data.collectivite !== undefined ||
-        // data.education !== undefined
     )
 }
 
@@ -52,14 +45,17 @@ const MemberSchema = z.object({
     collectivite: z.string().optional().or(z.literal('')),
     education: z.string().optional().or(z.literal('')),
 
-    // reglement: z.string().min(1, { message: "Vous devez accepter les règles du FacLab® numixs" }),
-    // donnees_personnelles: z.string().min(1),
+    reglement: z.string().optional().or(z.literal('')),
+    // donnees_personnelles: z.string().optional().or(z.literal('')),
     // donnees_personnelles: z.string().min(1, { message: "Vous devez accepter " }),
 }).refine((data) => {
     return hasSelectABusinessSector(data);
 }, {
-    error: "Les mots de passe ne correspondent pas",
-    // path: ['association']
+    error: "Vous devez choisir au moins un secteur d'activité",
+}).refine((data) => {
+    return "reglement" in data;
+}, {
+    error: "Vous devez accepter le règlement intérieur du FacLab® numixs",
 })
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
@@ -68,10 +64,21 @@ const errorsContainer = document.querySelector("[data-form-errors]") as HTMLULis
 const submitForm = (e: SubmitEvent) => {
     e.preventDefault();
 
-    const formData = new FormData(e.target);
+    (e.currentTarget as HTMLFormElement).dataset.isDirty = "";
 
+    if (!validForm(e)) {
+        return;
+    }
+
+};
+
+const validForm = (e: Event) => {
+    if(!("isDirty" in (e.currentTarget as HTMLFormElement).dataset)) {
+        return
+    }
+
+    const formData = new FormData(e.currentTarget);
     const validator = MemberSchema.safeParse(Object.fromEntries(formData));
-    // console.log("dada", Object.fromEntries(formData))
 
     form.querySelectorAll(`input.error`).forEach((item) => {
         item.classList.remove("error")
@@ -86,7 +93,7 @@ const submitForm = (e: SubmitEvent) => {
             const li = document.createElement('li');
             li.textContent = item.message;
 
-            const inputRelated = form.querySelector(`input[name="${item.path[0]}"]`);
+            const inputRelated = form.querySelector(`input[name="${String(item.path[0])}"]`);
             if (inputRelated) {
                 inputRelated.classList.add("error")
             }
@@ -94,10 +101,15 @@ const submitForm = (e: SubmitEvent) => {
             errorsContainer.appendChild(li);
         })
 
-        errorsContainer.scrollIntoView({ behavior: "auto" })
+        if (e.type === "submit") {
+            errorsContainer.scrollIntoView({ behavior: "auto" });
+        }
 
-        return;
+        return false;
     }
-};
+
+    return true;
+}
 
 form?.addEventListener("submit", submitForm);
+form?.addEventListener("input", validForm);
