@@ -3,6 +3,7 @@ import * as z from "zod";
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
 const dialog = document.querySelector("[data-dialog='form-submitted']") as HTMLDialogElement;
+const formSuccessTplRaw = document.querySelector("[data-template-id='form-success'") as HTMLTemplateElement;
 
 const PHONE_NUMBER_REGEX = /(\d{2}\s?){5}|\d{2}\+\s?\d{1}\s?(\d{2}\s?){3}/;
 const ZIP_CODE_REGEX = /^\d{4,5}$/;
@@ -72,8 +73,11 @@ const submitForm = (e: SubmitEvent) => {
     if (!validForm(e)) {
         return;
     }
-    console.log("ffzfe")
     dialog.showModal();
+
+    const dialogSwapContainer = dialog.querySelector("[data-swap-content]") as HTMLDivElement;
+    dialogSwapContainer.innerHTML = "";
+    dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true))
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
     console.log(Object.fromEntries(formData))
@@ -90,6 +94,8 @@ const validForm = (e: Event) => {
 
     form.querySelectorAll(`input.error`).forEach((item) => {
         item.classList.remove("error");
+        item.removeAttribute("aria-invalid");
+        item.removeAttribute("aria-errormessage");
     })
 
     errorsContainer.innerHTML = "";
@@ -101,7 +107,8 @@ const validForm = (e: Event) => {
 
             const inputRelated = form.querySelector(`input[name="${String(item.path[0])}"]`);
             if (inputRelated) {
-                inputRelated.classList.add("error")
+                inputRelated.classList.add("error");
+                inputRelated.ariaInvalid = "true";
             }
 
             errorsContainer.appendChild(li);

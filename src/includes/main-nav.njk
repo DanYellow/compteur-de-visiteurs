@@ -15,7 +15,12 @@
 ] %}
 
 <nav class="sticky top-2 mt-4">
-    <ul class="flex flex-row gap-2.5 w-fit mx-auto bg-white-numixs py-1 px-4 rounded-4xl">
+    <ul class="flex flex-row gap-2.5 w-fit items-center mx-auto bg-white-numixs py-1 px-4 rounded-4xl">
+        <li>
+            <a href="">
+                <img src="/images/faclab-logo.svg" class="w-12 mx-auto block" alt="">
+            </a>
+        </li>
         {% for nav_item in navigation %}
             <li>
                 <a class="block py-1 px-2.25 rounded-4xl" href="{{ nav_item.url }}">{{ nav_item.label }}</a>

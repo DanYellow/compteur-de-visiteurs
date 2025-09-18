@@ -17,7 +17,7 @@ enregistrement.</p>
     <hr class="bg-gray-input-border-numixs">
     <div class="mt-8 px-3">
         <form class="grid grid-cols-2 gap-6 max-w-2xl mx-auto" type="mul" novalidate action="" method="post" data-sign-in-form>
-            <ul class="error-container col-span-full" data-form-errors id="error-container"></ul>
+            <ul class="error-container col-span-full" role="alert" data-form-errors id="error-container"></ul>
             <p class="col-span-full">
                 <span class="text-red-500 ">*</span> : Champ obligatoire</p>
             <div class="flex flex-col">
@@ -97,14 +97,16 @@ au FacLab® numixs.</label>
 
     <dialog data-dialog="form-submitted" class="backdrop:bg-[#F5F5F5] m-auto max-w-2xl w-full bg-transparent ">
         <div class="flex gap-2 flex-col py-4">
-            <img src="/images/faclab-logo.svg" alt="">
-            <div class="flex justify-center" data-swap-content>
-                <img src="/images/loading.svg" class="animate-spin" alt="">
+            <img src="/images/faclab-logo.svg" class="w-44 mx-auto block" alt="">
+            <div class="flex justify-center flex-col items-center" data-swap-content>
+                <img src="/images/loading.svg" class="animate-spin w-16" alt="">
             </div>
         </div>
     </dialog>
     <template data-template-id="form-success">
-        <img src="/images/valide.svg" class="animate-spin" alt="">
-        <p>Votre inscription a bien été effectuée</p>
+        <img src="/images/valide.svg" class="w-16" alt="">
+        <p class="text-center w-44 mx-auto">Votre inscription a bien été effectuée</p>
+
+        <button type="submit" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 active:bg-dark-green-numixs">Continuer</button>
     </template>
 {% endblock %}

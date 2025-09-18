@@ -36,6 +36,7 @@
         list-style-type: disc;
         list-style-position: inside;
         border-radius: var(--radius-lg);
+        scroll-margin: 60px;
 
         &:empty {
             padding: 0;
