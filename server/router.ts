@@ -14,11 +14,16 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    const output = stringify([Object.keys(req.body), Object.values(req.body)]);
-    fs.writeFileSync("./message.tmp.csv", output);
+    if (fs.existsSync("./message.tmp.csv")) {
+        const payload = stringify([Object.values(req.body)]);
+        fs.appendFileSync("./message.tmp.csv", payload);
+    } else {
+        const payload = stringify([Object.keys(req.body), Object.values(req.body)]);
+        fs.writeFileSync("./message.tmp.csv", payload);
+    }
 
     console.log(
-        output,
+        "output",
             // file: req.file,
     )
     res.send('hello world')

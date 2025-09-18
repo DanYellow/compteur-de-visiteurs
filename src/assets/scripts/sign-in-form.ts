@@ -47,6 +47,7 @@ const listBusinessSectorValidator: BusinessSectorSchema = listBusinessSector.map
     return { ...obj, ...item }
 }, {})
 
+
 const NewMemberSchema = z.object({
     prenom: z.string().min(1, { message: "Vous devez mettre votre prénom" }),
     nom: z.string().min(1, { message: "Vous devez mettre votre nom de famille" }),
@@ -85,13 +86,21 @@ const submitForm = async (e: SubmitEvent) => {
     }
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const formJSON = Object.fromEntries(formData);
+    listBusinessSector.forEach(({ value }) => {
+        if (formData.has(value)) {
+            formData.delete(value);
+            formData.append(value, "oui")
+        } else {
+            formData.append(value, "non")
+        }
+    });
+
     const req = await fetch("/", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formJSON),
+        body: JSON.stringify(Object.fromEntries(Array.from(formData.entries()))),
     })
     const res = await req.text();
     console.log(res)
@@ -109,7 +118,6 @@ const validForm = (e: Event) => {
     }
 
     const formData = new FormData(form);
-    console.log("------------", Object.fromEntries(formData))
     const validator = NewMemberSchema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll(`input.error`).forEach((item) => {
