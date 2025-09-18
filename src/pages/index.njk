@@ -1,4 +1,5 @@
 {% extends "layouts/page.njk" %}
+{% import "includes/forms.njk" as forms %}
 
 {% block scripts %}
     <script type="module" src="/src/assets/scripts/sign-in-form.ts" defer></script>
@@ -17,7 +18,8 @@ enregistrement.</p>
     <div class="mt-8 px-3">
         <form class="grid grid-cols-2 gap-6 max-w-2xl mx-auto" type="mul" novalidate action="" method="post" data-sign-in-form>
             <ul class="error-container col-span-full" data-form-errors id="error-container"></ul>
-            <p class="col-span-full"><span class="text-red-500 ">*</span> : Champ obligatoire</p>
+            <p class="col-span-full">
+                <span class="text-red-500 ">*</span> : Champ obligatoire</p>
             <div class="flex flex-col">
                 <label for="prenom">Prénom<span class="text-red-500">*</span></label>
                 <input type="text" required id="prenom" placeholder="Jean" name="prenom" class="input">
@@ -54,10 +56,7 @@ enregistrement.</p>
             <div class="flex flex-col col-span-full gap-3">
                 <p>Quels sont vos secteurs d'activité ?<span class="text-red-500">*</span></p>
                 {% for sector in list_business_sector %}
-                    <div class="flex flex-row gap-2.5 items-center">
-                        <input switch type="checkbox" value="{{ sector.value }}" name="{{ sector.value }}" id="{{ sector.value }}" class="aspect-square h-full accent-green-numixs">
-                        <label for="{{ sector.value }}">{{ sector.name }}</label>
-                    </div>
+                    {{ forms.switch(sector.name, value = sector.value, color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30") }}
                 {% endfor %}
             </div>
             <div class="flex flex-col col-span-full">
@@ -81,8 +80,8 @@ au FacLab® numixs.</label>
 
             <div class="flex flex-col col-span-full">
                 <p>Signature<span class="text-red-500">*</span></p>
-                <div class="relative border border-black-numixs overflow-hidden border-solid rounded-md aspect-[658/113]">
-                <input type="checkbox" name="signature" class="absolute -left-5000 opacity-0">
+                <div class="relative border border-black-numixs overflow-hidden border-solid rounded-md aspect-[658/113] signature-placeholder">
+                    <input type="checkbox" name="signature" class="absolute -left-5000 opacity-0">
                     <canvas class="bg-white"></canvas>
                     <button data-clear-signature-button type="button" class="w-10 aspect-square rounded-full bg-green-numixs absolute right-2 bottom-2 flex justify-center items-center fill-black-numixs hocus:bg-dark-green-numixs">
                         {% include "includes/icon-eraser.svg" %}
@@ -95,4 +94,13 @@ au FacLab® numixs.</label>
             </div>
         </form>
     </div>
+
+    <dialog data-dialog="form-submitted" class="backdrop:bg-[#F5F5F5] m-auto max-w-2xl w-full bg-transparent ">
+        <div class="flex gap-2 flex-col py-4">
+            <img src="/images/faclab-logo.svg" alt="">
+            <div class="flex justify-center" data-swap-content>
+                <img src="/images/loading.svg" class="animate-spin" alt="">
+            </div>
+        </div>
+    </dialog>
 {% endblock %}

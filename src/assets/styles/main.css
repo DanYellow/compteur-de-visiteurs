@@ -98,3 +98,16 @@ html {
 input.error {
     border: solid 1px var(--color-red-800);
 }
+
+.signature-placeholder {
+    &::after {
+        content: url("/images/signature-placeholder.svg");
+        position: absolute;
+        pointer-events: none;
+        left: 50%;
+        top: 50%;
+        translate: -50% -50%;
+        pointer-events: none;
+        opacity: 0.3;
+    }
+}

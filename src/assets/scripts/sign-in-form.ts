@@ -1,5 +1,9 @@
 import * as z from "zod";
 
+const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
+const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
+const dialog = document.querySelector("[data-dialog='form-submitted']") as HTMLDialogElement;
+
 const PHONE_NUMBER_REGEX = /(\d{2}\s?){5}|\d{2}\+\s?\d{1}\s?(\d{2}\s?){3}/;
 const ZIP_CODE_REGEX = /^\d{4,5}$/;
 
@@ -26,7 +30,7 @@ const hasSelectedABusinessSector = (data: BusinessSectorPayload) => {
     )
 }
 
-const MemberSchema = z.object({
+const NewMemberSchema = z.object({
     prenom: z.string().min(1, { message: "Vous devez mettre votre prénom" }),
     nom: z.string().min(1, { message: "Vous devez mettre votre nom de famille" }),
     numero_telephone: z.string().regex(new RegExp(PHONE_NUMBER_REGEX), { message: "Vous devez mettre un numéro de téléphone valide" }).optional().or(z.literal('')),
@@ -60,9 +64,6 @@ const MemberSchema = z.object({
     error: "Vous devez signer le formulaire",
 })
 
-const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
-const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
-
 const submitForm = (e: SubmitEvent) => {
     e.preventDefault();
 
@@ -71,15 +72,21 @@ const submitForm = (e: SubmitEvent) => {
     if (!validForm(e)) {
         return;
     }
+
+    dialog.showModal();
+
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    console.log(Object.fromEntries(formData))
 };
 
 const validForm = (e: Event) => {
-    if (!("isDirty" in (e.currentTarget as HTMLFormElement).dataset)) {
+    const form = (e.currentTarget as HTMLFormElement)
+    if (!("isDirty" in form.dataset)) {
         return
     }
 
-    const formData = new FormData(e.currentTarget);
-    const validator = MemberSchema.safeParse(Object.fromEntries(formData));
+    const formData = new FormData(form);
+    const validator = NewMemberSchema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll(`input.error`).forEach((item) => {
         item.classList.remove("error");
