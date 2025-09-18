@@ -29,7 +29,9 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 ## Construit avec
 - tailwindcss
 - zod
-- nunjuncks
+- nunjucks
+- signature_pad
+- expressjs
 
 ## Licence
 

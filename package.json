@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "express": "^5.1.0",
+        "signature_pad": "^5.1.1",
         "zod": "^4.1.9"
     },
     "imports": {

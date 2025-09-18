@@ -45,6 +45,7 @@ const MemberSchema = z.object({
     education: z.string().optional().or(z.literal('')),
 
     reglement: z.string().optional().or(z.literal('')),
+    signature: z.string().optional().or(z.literal('')),
 }).refine((data) => {
     return hasSelectedABusinessSector(data);
 }, {
@@ -53,6 +54,10 @@ const MemberSchema = z.object({
     return "reglement" in data;
 }, {
     error: "Vous devez accepter le règlement intérieur du FacLab® numixs",
+}).refine((data) => {
+    return "signature" in data;
+}, {
+    error: "Vous devez signer le formulaire",
 })
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
@@ -66,12 +71,10 @@ const submitForm = (e: SubmitEvent) => {
     if (!validForm(e)) {
         return;
     }
-
 };
 
 const validForm = (e: Event) => {
-    console.log("ffff")
-    if(!("isDirty" in (e.currentTarget as HTMLFormElement).dataset)) {
+    if (!("isDirty" in (e.currentTarget as HTMLFormElement).dataset)) {
         return
     }
 
@@ -79,14 +82,12 @@ const validForm = (e: Event) => {
     const validator = MemberSchema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll(`input.error`).forEach((item) => {
-        item.classList.remove("error")
+        item.classList.remove("error");
     })
 
     errorsContainer.innerHTML = "";
 
     if (!validator.success) {
-        // errorsContainer
-        // item.message
         validator.error.issues.forEach((item) => {
             const li = document.createElement('li');
             li.textContent = item.message;

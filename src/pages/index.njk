@@ -2,6 +2,7 @@
 
 {% block scripts %}
     <script type="module" src="/src/assets/scripts/sign-in-form.ts" defer></script>
+    <script type="module" src="/src/assets/scripts/user-signature.ts" defer></script>
 {% endblock %}
 {% block content %}
     <header class="text-center mb-10 max-w-2xl mx-auto px-3">
@@ -14,9 +15,9 @@ enregistrement.</p>
     </header>
     <hr class="bg-gray-input-border-numixs">
     <div class="mt-8 px-3">
-        <form class="grid grid-cols-2 gap-6 max-w-2xl mx-auto" novalidate action="" method="post" data-sign-in-form>
+        <form class="grid grid-cols-2 gap-6 max-w-2xl mx-auto" type="mul" novalidate action="" method="post" data-sign-in-form>
             <ul class="error-container col-span-full" data-form-errors id="error-container"></ul>
-
+            <p class="col-span-full"><span class="text-red-500 ">*</span> : Champ obligatoire</p>
             <div class="flex flex-col">
                 <label for="prenom">Prénom<span class="text-red-500">*</span></label>
                 <input type="text" required id="prenom" placeholder="Jean" name="prenom" class="input">
@@ -78,8 +79,19 @@ disponible ci-dessus.<span class="text-red-500">*</span></label>
 au FacLab® numixs.</label>
             </div>
 
+            <div class="flex flex-col col-span-full">
+                <p>Signature<span class="text-red-500">*</span></p>
+                <div class="relative border border-black-numixs overflow-hidden border-solid rounded-md aspect-[658/113]">
+                <input type="checkbox" name="signature" class="absolute -left-5000 opacity-0">
+                    <canvas class="bg-white"></canvas>
+                    <button data-clear-signature-button type="button" class="w-10 aspect-square rounded-full bg-green-numixs absolute right-2 bottom-2 flex justify-center items-center fill-black-numixs hocus:bg-dark-green-numixs">
+                        {% include "includes/icon-eraser.svg" %}
+                    </button>
+                </div>
+            </div>
+
             <div class="col-span-full">
-                <button type="submit" class="bg-green-numixs w-fit px-16 py-4 mx-auto block active:bg-dark-green-numixs">Envoyer</button>
+                <button type="submit" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block active:bg-dark-green-numixs">Envoyer</button>
             </div>
         </form>
     </div>
