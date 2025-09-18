@@ -17,10 +17,26 @@
 }
 
 @font-face {
-    font-family: "Calibri";
+    font-family: Calibri;
     font-weight: normal;
     font-style: normal;
-    src: local("Calibri"),
-        url("/fonts/agency/calibri-webfont.woff") format("woff"),
-        url("/fonts/agency/calibri-webfont.woff2") format("woff2");
+    src: local("Calibri Regular"),
+        url("/fonts/calibri/calibri-webfont.woff") format("woff"),
+        url("/fonts/calibri/calibri-webfont.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: Calibri;
+    font-weight: bold;
+    font-style: normal;
+    src: local("Calibri Bold"),
+        url("/fonts/calibri/calibrib.woff2") format("woff2");
+}
+
+@font-face {
+    font-family: Calibri;
+    font-weight: bold;
+    font-style: italic;
+    src: local("Calibri Bold Italic"),
+        url("/fonts/calibri/calibriz.woff2") format("woff2");
 }

@@ -31,18 +31,18 @@
             <tbody>
                 {% for member in members_list %}
                     <tr class="even:bg-gray-200">
-                        <td class="font-bold px-6 py-3 text-left" data-label="Prénom">{{ member.prenom }}</td>
-                        <td class="font-bold px-6 py-3 text-left" data-label="Nom">{{ member.nom }}</td>
-                        <td class="font-bold px-6 py-3 text-left" data-label="Numéro de téléphone">{{ member.numero_telephone }}</td>
-                        <td class="font-bold px-6 py-3 text-left" data-label="E-mail">{{ member.email }}</td>
-                        <td class="font-bold px-6 py-3 text-left" data-label="Adresse">{{ member.adresse }}</td>
-                        {# <td class="font-bold px-6 py-3 text-left">{{ member.ville }}</td> #}
-                        <td class="font-bold px-6 py-3 text-left" data-label="Code postal">{{ member.code_postal }}</td>
-                        <td class="font-bold px-6 py-3 text-left" data-label="Informations supplémentaires">{{ member.extra_infos }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Prénom">{{ member.prenom }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Nom">{{ member.nom }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Numéro de téléphone">{{ member.numero_telephone|default("/") }}</td>
+                        <td class="px-6 py-3 text-left" data-label="E-mail">{{ member.email }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Adresse">{{ member.adresse|default("/") }}</td>
+                        {# <td class="px-6 py-3 text-left">{{ member.ville }}</td> #}
+                        <td class="px-6 py-3 text-left" data-label="Code postal">{{ member.code_postal }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Informations supplémentaires">{{ member.extra_infos|default("/") }}</td>
                         {% for business in list_business_sector %}
-                            <td class="font-bold px-6 py-3 text-left" data-label="{{ business.name }}">{{ member[business.value] }}</td>
+                            <td class="px-6 py-3 text-left" data-label="{{ business.name }}">{{ member[business.value] }}</td>
                         {% endfor %}
-                        <td class="font-bold px-6 py-3 text-left" data-label="Date d'inscription">{{ member["Date d'inscription"] }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Date d'inscription">{{ member["Date d'inscription"] }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

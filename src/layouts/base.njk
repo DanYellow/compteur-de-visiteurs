@@ -6,6 +6,8 @@
         <title>
             {% block title %}{% endblock %} – Faclab Numixs</title>
 
+            <link rel="stylesheet" href="/fonts/fonts.css">
+
         {% if NODE_ENV == "development" %}
             <script type="module" src="/src/assets/scripts/main.ts" defer></script>
         {% else %}

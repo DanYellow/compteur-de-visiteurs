@@ -36,7 +36,7 @@
         list-style-type: disc;
         list-style-position: inside;
         border-radius: var(--radius-lg);
-        scroll-margin: 60px;
+        scroll-margin: 105px; /* 60px */
 
         &:empty {
             padding: 0;
@@ -80,7 +80,7 @@
 }
 
 :root {
-    font-family: Calibri, sans-serif;
+    font-family: "Calibri", sans-serif;
 
     --color-gray-numixs: #e0e0e0;
 
