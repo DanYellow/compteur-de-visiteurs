@@ -54,9 +54,13 @@ enregistrement.</p>
                 <input type="text" required id="code_postal" maxlength="5" inputmode="numeric" placeholder='95200' name="code_postal" class="input">
             </div>
             <div class="flex flex-col col-span-full gap-3">
-                <p>Quels sont vos secteurs d'activité ?<span class="text-red-500">*</span></p>
+                <div>
+                    <p>Quels sont vos secteurs d'activité ?<span class="text-red-500">*</span></p>
+                    <p class="text-sm opacity-70 -mt-1">Choisir au moins un secteur</p>
+                </div>
                 {% for sector in list_business_sector %}
-                    {{ forms.switch(sector.name, value = sector.value, color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30") }}
+
+                    {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30") }}
                 {% endfor %}
             </div>
             <div class="flex flex-col col-span-full">

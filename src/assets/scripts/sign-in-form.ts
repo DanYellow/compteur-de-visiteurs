@@ -1,5 +1,7 @@
 import * as z from "zod";
 
+import { listBusinessSector } from "#scripts/utils.ts"
+
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
 const dialog = document.querySelector("[data-dialog='form-submitted']") as HTMLDialogElement;
@@ -18,6 +20,16 @@ type BusinessSectorPayload = {
     education?: string;
 }
 
+type BusinessSectorSchema = {
+    habitant?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    faclab?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    association?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    entrepreneur?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    artisan_artiste?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    collectivite?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    education?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+}
+
 const hasSelectedABusinessSector = (data: BusinessSectorPayload) => {
     return (
         "habitant" in data ||
@@ -31,6 +43,10 @@ const hasSelectedABusinessSector = (data: BusinessSectorPayload) => {
     )
 }
 
+const listBusinessSectorValidator: BusinessSectorSchema = listBusinessSector.map(({ value }) => ({ [value]: z.string().optional().or(z.literal('')) })).reduce((obj, item) => {
+    return { ...obj, ...item }
+}, {})
+
 const NewMemberSchema = z.object({
     prenom: z.string().min(1, { message: "Vous devez mettre votre prénom" }),
     nom: z.string().min(1, { message: "Vous devez mettre votre nom de famille" }),
@@ -41,13 +57,7 @@ const NewMemberSchema = z.object({
     // region: z.string(),
     code_postal: z.string().regex(new RegExp(ZIP_CODE_REGEX), { message: "Vous devez un code postal valide" }),
     // Secteur activité
-    habitant: z.string().optional().or(z.literal('')),
-    association: z.string().optional().or(z.literal('')),
-    faclab: z.string().optional().or(z.literal('')),
-    entrepreneur: z.string().optional().or(z.literal('')),
-    artisan_artiste: z.string().optional().or(z.literal('')),
-    collectivite: z.string().optional().or(z.literal('')),
-    education: z.string().optional().or(z.literal('')),
+    ...listBusinessSectorValidator,
 
     reglement: z.string().optional().or(z.literal('')),
     signature: z.string().optional().or(z.literal('')),
@@ -65,7 +75,7 @@ const NewMemberSchema = z.object({
     error: "Vous devez signer le formulaire",
 })
 
-const submitForm = (e: SubmitEvent) => {
+const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
 
     (e.currentTarget as HTMLFormElement).dataset.isDirty = "";
@@ -73,14 +83,23 @@ const submitForm = (e: SubmitEvent) => {
     if (!validForm(e)) {
         return;
     }
-    dialog.showModal();
-
-    const dialogSwapContainer = dialog.querySelector("[data-swap-content]") as HTMLDivElement;
-    dialogSwapContainer.innerHTML = "";
-    dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true))
 
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    console.log(Object.fromEntries(formData))
+    const formJSON = Object.fromEntries(formData);
+    const req = await fetch("/", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formJSON),
+    })
+    const res = await req.text();
+    console.log(res)
+    // dialog.showModal();
+
+    // const dialogSwapContainer = dialog.querySelector("[data-swap-content]") as HTMLDivElement;
+    // dialogSwapContainer.innerHTML = "";
+    // dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true))
 };
 
 const validForm = (e: Event) => {
@@ -90,6 +109,7 @@ const validForm = (e: Event) => {
     }
 
     const formData = new FormData(form);
+    console.log("------------", Object.fromEntries(formData))
     const validator = NewMemberSchema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll(`input.error`).forEach((item) => {

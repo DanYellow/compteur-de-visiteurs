@@ -1,42 +1,27 @@
+import fs from "fs";
+
 import express from "express";
+import { stringify } from "csv-stringify/sync";
+
+import { listBusinessSector } from "#scripts/utils.ts"
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-    const listBusinessSector = [
-        {
-            "name": "Éducation / formation (ateliers pédagogiques)",
-            "value": "education"
-        },
-        {
-            "name": "Entrepreneur",
-            "value": "entrepreneur"
-        },
-        {
-            "name": "Artisan / Artiste",
-            "value": "artisan_artiste"
-        },
-        {
-            "name": "Collectivité",
-            "value": "collectivite"
-        },
-        {
-            "name": "FacLab",
-            "value": "faclab"
-        },
-        {
-            "name": "Association",
-            "value": "association"
-        },
-        {
-            "name": "Habitant",
-            "value": "habitant"
-        }
-    ]
-
+router.get("/", (req, res) => {
     res.render("pages/index.njk", {
         "list_business_sector": listBusinessSector,
     });
+});
+
+router.post("/", async (req, res) => {
+    const output = stringify([Object.keys(req.body), Object.values(req.body)]);
+    fs.writeFileSync("./message.tmp.csv", output);
+
+    console.log(
+        output,
+            // file: req.file,
+    )
+    res.send('hello world')
 });
 
 

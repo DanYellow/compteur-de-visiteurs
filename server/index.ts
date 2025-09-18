@@ -26,6 +26,17 @@ app.use(express.static(publicPath));
 app.set("view engine", "nunjucks");
 app.set("views", path.join(__dirname, "..", "/src"));
 
+app.use(
+    express.json({
+        type: [
+            "application/json",
+            "application/csp-report",
+            "application/reports+json",
+            "application/importmap+json",
+        ],
+    })
+);
+
 app.use((req, res, next) => {
     const context = {
         NODE_ENV: process.env.NODE_ENV,
