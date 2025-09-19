@@ -26,16 +26,7 @@ const PHONE_NUMBER_REGEX = /(\d{2}\s?){5}|\d{2}\+\s?\d{1}\s?(\d{2}\s?){3}/;
 const ZIP_CODE_REGEX = /^\d{4,5}$/;
 
 const hasSelectedABusinessSector = (data: BusinessSectorPayload) => {
-    return (
-        "habitant" in data ||
-        "association" in data ||
-        "faclab" in data ||
-        "entrepreneur" in data ||
-        "artisan_artiste" in data ||
-        "collectivite" in data ||
-        "collectivite" in data ||
-        "education" in data
-    )
+    return listBusinessSector.map((item) => item.value).some((item) => item in data)
 }
 
 const listBusinessSectorValidator: BusinessSectorSchema = listBusinessSector.map(({ value }) => ({ [value]: z.string().optional().or(z.literal('')) })).reduce((obj, item) => {
@@ -61,12 +52,15 @@ export const NewMemberSchema = z.object({
     return hasSelectedABusinessSector(data);
 }, {
     error: "Vous devez choisir au moins un secteur d'activité",
+    path: listBusinessSector.map((item) => item.value)
 }).refine((data) => {
     return "reglement" in data;
 }, {
     error: "Vous devez accepter le règlement intérieur du FacLab® numixs",
+    path: ["reglement"],
 }).refine((data) => {
     return "signature" in data;
 }, {
     error: "Vous devez signer le formulaire",
+    path: ["signature"],
 })

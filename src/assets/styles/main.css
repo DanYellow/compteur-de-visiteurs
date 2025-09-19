@@ -28,7 +28,7 @@
         padding: --spacing(2);
     }
 
-    .error-container {
+    .form-errors-list-container {
         border: solid 1px var(--color-red-800);
         background-color: var(--color-red-50);
         padding: --spacing(4);
@@ -97,7 +97,7 @@ html {
 
 /* :not([type="checkbox"], [type="radio"]) */
 input.error {
-    border: solid 1px var(--color-red-800);
+    border: solid 1px var(--color-red-800) !important;
 }
 
 .signature-placeholder {
@@ -147,5 +147,11 @@ input.error {
                 display: block;
             }
         }
+    }
+}
+
+.switch-container {
+    &:has(.error) .switch {
+        border-color: var(--color-red-800);
     }
 }

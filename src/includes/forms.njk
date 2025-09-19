@@ -1,7 +1,7 @@
 {% macro switch(label, name = "", value = "", color = "", ring_color = "") %}
-    <label class="inline-flex items-center cursor-pointer w-fit">
+    <label class="inline-flex items-center cursor-pointer w-fit switch-container">
         <input type="checkbox" value="{{ value }}" name="{{ name }}" class="sr-only peer">
-        <div class="relative border-solid border-black-numixs/30 border w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 {{ ring_color }} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all {{ color }}"></div>
+        <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 {{ ring_color }} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all {{ color }}"></div>
         <span class="ms-3">{{ label }}</span>
     </label>
 {% endmacro %}

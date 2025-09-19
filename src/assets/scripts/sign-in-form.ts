@@ -46,7 +46,7 @@ const submitForm = async (e: SubmitEvent) => {
     listFormKeys.forEach((key) => {
         if (formData.has(key)) {
             formDataComputed.append(key, formData.get(key) as string)
-         } else {
+        } else {
             formDataComputed.append(key, "");
         }
     })
@@ -92,11 +92,14 @@ const validForm = (e: Event) => {
             const li = document.createElement('li');
             li.textContent = item.message;
 
-            const inputRelated = form.querySelector(`input[name="${String(item.path[0])}"]`);
-            if (inputRelated) {
-                inputRelated.classList.add("error");
-                inputRelated.ariaInvalid = "true";
-            }
+            item.path.forEach((path) => {
+                const inputRelated = form.querySelector(`input[name="${String(path)}"]`);
+
+                if (inputRelated) {
+                    inputRelated.classList.add("error");
+                    inputRelated.ariaInvalid = "true";
+                }
+            })
 
             errorsContainer.appendChild(li);
         })
