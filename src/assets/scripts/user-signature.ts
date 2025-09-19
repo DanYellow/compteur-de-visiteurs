@@ -1,6 +1,6 @@
 import SignaturePad from "signature_pad";
 
-const canvas = document.querySelector("canvas") as HTMLCanvasElement;
+const canvas = document.querySelector("canvas[data-user-signature]") as HTMLCanvasElement;
 const container = canvas.parentElement;
 const input = container?.querySelector("input") as HTMLInputElement;
 

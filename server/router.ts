@@ -35,13 +35,13 @@ router.post("/", async (req, res) => {
 
         wss.clients.forEach((client) => {
             if (client.readyState === client.OPEN) {
-                client.send(JSON.stringify({type: "MEMBER_ADDED", payload: req.body}));
+                client.send(JSON.stringify({ type: "MEMBER_ADDED", payload: req.body }));
             }
         });
 
-        res.json({ "success": true })
+        res.status(200).json({ "success": true })
     } catch (err) {
-        res.json({ "success": false })
+        res.status(500).json({ "success": false })
     }
 });
 
@@ -57,6 +57,14 @@ router.get("/membres", (req, res) => {
         "members_list": records,
         "list_business_sector": listBusinessSector,
     });
+});
+
+router.get("/reglement", (req, res) => {
+    res.setHeader("x-frame-options", "SAMEORIGIN");
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename=foo.pdf`);
+
+    res.sendFile("file.tmp.pdf", { root: "public" });
 });
 
 

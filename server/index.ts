@@ -3,7 +3,8 @@ import path from "path";
 
 import nunjucks from "nunjucks";
 import express from "express";
-import WebSocket, { WebSocketServer } from 'ws';
+import cors from "cors";
+import { WebSocketServer } from 'ws';
 
 import router from "./router.ts";
 
@@ -23,10 +24,11 @@ if (process.env.NODE_ENV === "development") {
 
 const publicPath = path.join(path.resolve(), "public");
 
-app.use(express.static(publicPath));
 app.set("view engine", "nunjucks");
 app.set("views", path.join(__dirname, "..", "/src"));
 
+app.use(express.static(publicPath));
+app.use(cors());
 app.use(
     express.json({
         type: [
