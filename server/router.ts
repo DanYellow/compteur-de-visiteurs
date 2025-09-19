@@ -5,6 +5,7 @@ import { stringify } from "csv-stringify/sync";
 import { parse } from "csv-parse/sync";
 
 import { listBusinessSector } from "#scripts/utils.ts"
+import { NewMemberSchema } from "#scripts/schemas.ts";
 
 const router = express.Router();
 
@@ -15,19 +16,24 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    if (fs.existsSync("./message.tmp.csv")) {
-        const payload = stringify([Object.values(req.body)]);
-        fs.appendFileSync("./message.tmp.csv", payload);
-    } else {
-        const payload = stringify([Object.keys(req.body), Object.values(req.body)]);
-        fs.writeFileSync("./message.tmp.csv", payload);
+    const validator = NewMemberSchema.safeParse(req.body);
+    if (!validator.success) {
+        return res.send('hello world')
     }
 
-    console.log(
-        "output",
-        // file: req.file,
-    )
-    res.send('hello world')
+    try {
+        if (fs.existsSync("./message.tmp.csv")) {
+            const payload = stringify([Object.values(req.body)]);
+            fs.appendFileSync("./message.tmp.csv", payload);
+        } else {
+            const payload = stringify([Object.keys(req.body), Object.values(req.body)]);
+            fs.writeFileSync("./message.tmp.csv", payload);
+        }
+        await new Promise(r => setTimeout(r, 2000));
+        res.json({ "success": true })
+    } catch (err) {
+        res.json({ "success": false })
+    }
 });
 
 router.get("/membres", (req, res) => {

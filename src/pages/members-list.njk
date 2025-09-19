@@ -33,12 +33,12 @@
                     <tr class="even:bg-gray-200">
                         <td class="px-6 py-3 text-left" data-label="Prénom">{{ member.prenom }}</td>
                         <td class="px-6 py-3 text-left" data-label="Nom">{{ member.nom }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Numéro de téléphone">{{ member.numero_telephone|default("/") }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Numéro de téléphone">{{ member.numero_telephone|default("/", true) }}</td>
                         <td class="px-6 py-3 text-left" data-label="E-mail">{{ member.email }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Adresse">{{ member.adresse|default("/") }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Adresse">{{ member.adresse|default("/", true) }}</td>
                         {# <td class="px-6 py-3 text-left">{{ member.ville }}</td> #}
                         <td class="px-6 py-3 text-left" data-label="Code postal">{{ member.code_postal }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Informations supplémentaires">{{ member.extra_infos|default("/") }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Informations supplémentaires">{{ member.extra_infos|default("/", true) }}</td>
                         {% for business in list_business_sector %}
                             <td class="px-6 py-3 text-left" data-label="{{ business.name }}">{{ member[business.value] }}</td>
                         {% endfor %}
