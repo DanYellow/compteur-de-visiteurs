@@ -1,5 +1,9 @@
 {% extends "layouts/page.njk" %}
 
+{% block scripts %}
+    <script type="module" src="/src/assets/scripts/members-poll.ts" defer></script>
+{% endblock %}
+
 {% block content %}
     <header class="text-center mb-10 max-w-2xl mx-auto px-3">
         <h1 class="text-5xl text-black-numixs font-bold title-font mb-2.5">
@@ -11,7 +15,7 @@
         <table class="w-full bg-white border-collapse">
             <caption>
     Nombre de membres : {{ members_list|length }}
-  </caption>
+            </caption>
             <thead>
                 <tr class="">
                     <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Prénom</td>
@@ -30,23 +34,22 @@
             </thead>
             <tbody>
                 {% for member in members_list %}
-                    <tr class="even:bg-gray-200">
-                        <td class="px-6 py-3 text-left" data-label="Prénom">{{ member.prenom }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Nom">{{ member.nom }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Numéro de téléphone">{{ member.numero_telephone|default("/", true) }}</td>
-                        <td class="px-6 py-3 text-left" data-label="E-mail">{{ member.email }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Adresse">{{ member.adresse|default("/", true) }}</td>
+                    <tr class="even:bg-gray-200" data-member-row>
+                        <td class="px-6 py-3 text-left" data-label="Prénom" data-row-key="prenom">{{ member.prenom }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Nom" data-row-key="nom">{{ member.nom }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Numéro de téléphone" data-row-key="numero_telephone">{{ member.numero_telephone|default("/", true) }}</td>
+                        <td class="px-6 py-3 text-left" data-label="E-mail" data-row-key="email">{{ member.email }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Adresse" data-row-key="adresse">{{ member.adresse|default("/", true) }}</td>
                         {# <td class="px-6 py-3 text-left">{{ member.ville }}</td> #}
-                        <td class="px-6 py-3 text-left" data-label="Code postal">{{ member.code_postal }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Informations supplémentaires">{{ member.extra_infos|default("/", true) }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Code postal" data-row-key="code_postal">{{ member.code_postal }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Informations supplémentaires" data-row-key="extra_infos">{{ member.extra_infos|default("/", true) }}</td>
                         {% for business in list_business_sector %}
-                            <td class="px-6 py-3 text-left" data-label="{{ business.name }}">{{ member[business.value] }}</td>
+                            <td class="px-6 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
                         {% endfor %}
-                        <td class="px-6 py-3 text-left" data-label="Date d'inscription">{{ member["Date d'inscription"] }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Date d'inscription" data-row-key="Date d'inscription">{{ member["Date d'inscription"] }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
-
 {% endblock %}

@@ -6,6 +6,7 @@ import { parse } from "csv-parse/sync";
 
 import { listBusinessSector } from "#scripts/utils.ts"
 import { NewMemberSchema } from "#scripts/schemas.ts";
+import { wss } from "./index.ts";
 
 const router = express.Router();
 
@@ -14,6 +15,7 @@ router.get("/", (req, res) => {
         "list_business_sector": listBusinessSector,
     });
 });
+
 
 router.post("/", async (req, res) => {
     const validator = NewMemberSchema.safeParse(req.body);
@@ -30,6 +32,13 @@ router.post("/", async (req, res) => {
             fs.writeFileSync("./message.tmp.csv", payload);
         }
         await new Promise(r => setTimeout(r, 2000));
+
+        wss.clients.forEach((client) => {
+            if (client.readyState === client.OPEN) {
+                client.send(JSON.stringify({type: "MEMBER_ADDED", payload: req.body}));
+            }
+        });
+
         res.json({ "success": true })
     } catch (err) {
         res.json({ "success": false })
@@ -43,7 +52,6 @@ router.get("/membres", (req, res) => {
         columns: true,
         skip_empty_lines: true,
     });
-    console.log(records)
 
     res.render("pages/members-list.njk", {
         "members_list": records,

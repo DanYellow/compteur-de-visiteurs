@@ -3,6 +3,7 @@ import path from "path";
 
 import nunjucks from "nunjucks";
 import express from "express";
+import WebSocket, { WebSocketServer } from 'ws';
 
 import router from "./router.ts";
 
@@ -60,9 +61,13 @@ const nunjucksConfig = nunjucks.configure(app.get("views"), {
     },
 });
 
+
+
+
+
 const listDomains: string[] = ["::"];
 const port = 3900;
-app.listen(port, listDomains, () => {
+const server = app.listen(port, listDomains, () => {
     console.log("---------------------------");
     console.log(
         "Express server running at (ctrl/cmd + click to open in your browser):"
@@ -77,4 +82,19 @@ app.listen(port, listDomains, () => {
             }
             console.log(`\x1b[35m➜\x1b[0m  ${prefix}: \x1b[35mhttp://${item}:${port}/\x1b[0m`);
         });
+});
+
+export const wss = new WebSocketServer({
+    // port: 8080,
+    server,
+})
+
+wss.on('connection', (ws) => {
+    ws.on('error', console.error);
+
+    // ws.on('message', function message(data) {
+    //     console.log('received: %s', data);
+    // });
+
+    // ws.send('something');
 });

@@ -4,8 +4,8 @@ import { listBusinessSector, getCurrentFormattedTime } from "#scripts/utils.ts"
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
 const dialog = document.querySelector("[data-dialog='form-submitted']") as HTMLDialogElement;
-const formSuccessTplRaw = document.querySelector("[data-template-id='form-success'") as HTMLTemplateElement;
-const formErrorTplRaw = document.querySelector("[data-template-id='form-error'") as HTMLTemplateElement;
+const formSuccessTplRaw = document.querySelector("[data-template-id='form-success']") as HTMLTemplateElement;
+const formErrorTplRaw = document.querySelector("[data-template-id='form-error']") as HTMLTemplateElement;
 
 const listFormKeys = [
     "prenom",
