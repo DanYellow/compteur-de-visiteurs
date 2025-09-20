@@ -1,0 +1,22 @@
+services:
+    compteur-de-visiteurs:
+        image: node:22.18.0
+        container_name: compteur-de-visiteurs-dev
+        command: sh -c "npm install --verbose && npm run dev"
+        working_dir: '/home/node/app'
+        volumes:
+            # - .:/home/node/app/
+            - ./src/:/home/node/app/
+            # - ./server:/home/node/app/
+            # - ./package.json:/home/node/app/
+            # - ./package-lock.json:/home/node/app/
+            # - ./vite.config.ts:/home/node/app/
+            # - ./tsconfig.json:/home/node/app/
+            - /home/node/app/node_modules
+        ports:
+            - 80:3900
+            - 3900:3900
+            - 24678:24678
+        restart: no
+        environment:
+            - VITE_USE_POLLING=true
