@@ -47,7 +47,15 @@
                         {% for business in list_business_sector %}
                             <td class="px-6 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
                         {% endfor %}
-                        <td class="px-6 py-3 text-left" data-label="Date d'inscription" data-row-key="Date d'inscription">{{ member["Date d'inscription"] }}</td>
+                        <td class="px-6 py-3 text-left" data-label="Date d'inscription" data-row-key="Date d'inscription">
+                            <time datetime="{{ member['Date d\'inscription'] }}">
+                                {{ member["Date d'inscription"] }}
+                            </time>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr class="even:bg-gray-200">
+                        <td colspan="15" class="px-6 py-3 text-center" data-label="Date d'inscription" data-row-key="Date d'inscription">Pas de membres pour le moment</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -62,7 +70,7 @@
                 </svg>
                 <span class="sr-only">Check icon</span>
             </div>
-            <p class="ms-3 text-sm font-normal" data-notification-text>Item moved successfully.</p>
+            <p class="ms-3 text-sm font-normal pr-1.5" data-notification-text>Item moved successfully.</p>
             <button type="button" class="ms-auto -mx-1.5 -my-1.5 bg-white text-gray-400 rounded-lg focus:ring-2 focus:ring-gray-300 p-1.5 hover:bg-gray-100 inline-flex items-center justify-center h-8 w-8" data-dismiss-notification-btn aria-label="Close">
                 <span class="sr-only">Close</span>
                 <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">

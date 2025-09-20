@@ -8,11 +8,12 @@ services:
             - "8080:8080"
         volumes:
             - "/var/run/docker.sock:/var/run/docker.sock"
+
     compteur-de-visiteurs:
         # image: node:22.19.0-alpine
-        image: node:22.18.0
+        image: node:24.8.0
         container_name: compteur-de-visiteurs-dev
-        command: sh -c "npm install && npm run dev" # --verbose
+        command: sh -c "npm install && npm run dev2" # --verbose
         working_dir: "/home/node/app"
         depends_on:
             - traefik
@@ -23,13 +24,14 @@ services:
             - ./server:/home/node/app/server
             - ./package.json:/home/node/app/package.json
             - ./package-lock.json:/home/node/app/package-lock.json
+            - ./message.tmp.csv:/home/node/app/message.tmp.csv
             - ./vite.config.ts:/home/node/app/vite.config.ts
             - ./tsconfig.json:/home/node/app/tsconfig.json
             - /home/node/app/node_modules
         ports:
             - 3900:3900
             - 24678:24678
-        # restart: no
+        # restart: always
         environment:
             - VITE_USE_POLLING=true
             - NODE_ENV=development
@@ -37,4 +39,11 @@ services:
         labels:
             - "traefik.enable=true"
             - traefik.http.routers.compteur-de-visiteurs.rule=Host(`faclab.localhost`)
+        # develop:
+        #     watch:
+        #         - action: rebuild # 'build' is another action type
+        #           path: ./server # host directory path
+        #           target: /home/node/app/server # container directory path to map
+        #           ignore:
+        #             - node_modules/
 

@@ -10,26 +10,27 @@ import { wss } from "./index.ts";
 
 const router = express.Router();
 
+const csvFile = "/message.tmp.csv";
+
 router.get("/", (req, res) => {
     res.render("pages/index.njk", {
         "list_business_sector": listBusinessSector,
     });
 });
 
-
 router.post("/", async (req, res) => {
     const validator = NewMemberSchema.safeParse(req.body);
     if (!validator.success) {
-        return res.send('hello world')
+        res.status(500).json({ "success": false })
     }
 
     try {
-        if (fs.existsSync("./message.tmp.csv")) {
+        if (fs.existsSync(csvFile)) {
             const payload = stringify([Object.values(req.body)]);
-            fs.appendFileSync("./message.tmp.csv", payload);
+            fs.appendFileSync(csvFile, payload);
         } else {
             const payload = stringify([Object.keys(req.body), Object.values(req.body)]);
-            fs.writeFileSync("./message.tmp.csv", payload);
+            fs.writeFileSync(csvFile, payload);
         }
         await new Promise(r => setTimeout(r, 2000));
 
@@ -46,12 +47,15 @@ router.post("/", async (req, res) => {
 });
 
 router.get("/membres", (req, res) => {
-    const content = fs.readFileSync(`./message.tmp.csv`);
+    let records: unknown[] = []
 
-    const records = parse(content, {
-        columns: true,
-        skip_empty_lines: true,
-    });
+    if (fs.existsSync(csvFile)) {
+        const content = fs.readFileSync(csvFile);
+        records = parse(content, {
+            columns: true,
+            skip_empty_lines: true,
+        });
+    }
 
     res.render("pages/members-list.njk", {
         "members_list": records,
@@ -60,7 +64,7 @@ router.get("/membres", (req, res) => {
 });
 
 router.get("/reglement", (req, res) => {
-    res.setHeader("x-frame-options", "SAMEORIGIN");
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `inline; filename=foo.pdf`);
 
