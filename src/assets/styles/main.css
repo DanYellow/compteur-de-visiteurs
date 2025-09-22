@@ -29,7 +29,7 @@
     }
 
     .form-errors-list-container {
-        border: solid 1px var(--color-red-800);
+        border: solid 1px var(--color-red-500);
         background-color: var(--color-red-50);
         padding: --spacing(4);
         color: var(--color-red-800);
@@ -155,7 +155,7 @@ input.error {
 
 .switch-container {
     &:has(.error) .switch {
-        border-color: var(--color-red-800);
+        border-color: var(--color-red-500);
     }
 }
 

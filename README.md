@@ -18,8 +18,9 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 ## Utilisation
 
 **Développement**
+- Copier et renommer le fichier ".env.dist" en ".env.local"
 - Lancer le serveur : `npm run dev`
-- Ouvrir le lien: http://localhost:5173/
+- Ouvrir le lien: http://localhost:3900/ (ou le port que vous aurez défini via la variable d'environnement `VITE_PORT`)
 
 **Production**
 - Compiler les ressources : `npm run build`
