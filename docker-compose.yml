@@ -1,18 +1,26 @@
 services:
     traefik:
         image: traefik:v3
-        hostname: traefik
-        command: --api.insecure=true --providers.docker=true
+        container_name: traefik
+        command:
+            - --api.insecure=true
+            - --providers.docker=true
+            - --providers.docker.exposedByDefault=false
+            # - --providers.file.filename=/traefik-dynamic.yml
         ports:
             - "80:80"
             - "8080:8080"
         volumes:
-            - "/var/run/docker.sock:/var/run/docker.sock"
+            - "/var/run/docker.sock:/var/run/docker.sock:ro"
+        # configs:
+        #     - traefik-dynamic.yml
+        networks:
+            - web
 
     compteur-de-visiteurs:
         # image: node:22.19.0-alpine
         image: node:24.8.0
-        container_name: compteur-de-visiteurs-dev
+        container_name: compteur-social-dev
         command: sh -c "npm install && npm run dev2" # --verbose
         working_dir: "/home/node/app"
         depends_on:
@@ -36,9 +44,13 @@ services:
             - VITE_USE_POLLING=true
             - NODE_ENV=development
             - CHOKIDAR_USEPOLLING=true
+        env_file:
+            - .env.local
         labels:
             - "traefik.enable=true"
             - traefik.http.routers.compteur-de-visiteurs.rule=Host(`faclab.localhost`)
+        networks:
+            - web
         # develop:
         #     watch:
         #         - action: rebuild # 'build' is another action type
@@ -47,3 +59,6 @@ services:
         #           ignore:
         #             - node_modules/
 
+networks:
+  web:
+    external: true
