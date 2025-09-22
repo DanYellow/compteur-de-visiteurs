@@ -29,7 +29,7 @@ export const listBusinessSector = [
     }
 ]
 
-export const getCurrentFormattedTime = () => {
+export const getCurrentDay = () => {
     const now = Date.now();
 
     const dateTime = new Date(now);
@@ -38,4 +38,16 @@ export const getCurrentFormattedTime = () => {
     const year = dateTime.getFullYear();
 
     return `${day}/${month}/${year}`
+}
+
+
+export const getCurrentTime = (sep = "-") => {
+    const now = Date.now();
+
+    const dateTime = new Date(now - new Date().getTimezoneOffset());
+    const hours = String(dateTime.getHours());
+    const minutes = String(dateTime.getMinutes());
+    const seconds = String(dateTime.getSeconds());
+
+    return `${hours}${sep}${minutes}${sep}${seconds}`
 }

@@ -8,6 +8,7 @@ import { parse } from "csv-parse/sync";
 import { listBusinessSector } from "#scripts/utils.ts"
 import { NewMemberSchema } from "#scripts/schemas.ts";
 import { wss } from "./index.ts";
+import { getCurrentDay, getCurrentTime } from "#scripts/utils.ts";
 
 const router = express.Router();
 
@@ -65,6 +66,12 @@ router.get("/membres", (req, res) => {
         "members_list": records,
         "list_business_sector": listBusinessSector,
     });
+});
+
+router.get('/membres/telecharger', (req, res) => {
+    let timestamp = getCurrentDay().replaceAll("/", "-");
+    timestamp = timestamp.split("-").reverse().join("-")
+    res.download(csvFile, `${timestamp}-${getCurrentTime()}-liste-membres.csv`);
 });
 
 router.get("/reglement", (req, res) => {

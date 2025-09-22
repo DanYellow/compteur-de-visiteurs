@@ -17,8 +17,13 @@ Liste des membres
     <hr class="bg-gray-input-border-numixs">
     <div class="mt-8 px-3 mb-5">
         <table class="w-full bg-white border-collapse">
-            <caption class="text-start px-4 text-xl">
-                Nombre de membres : <span data-nb-members>{{ members_list|length }}</span>
+            <caption class="mb-2">
+                <div class="flex justify-between px-4">
+                    <p class="text-start text-xl">
+                    Nombre de membres : <span data-nb-members>{{ members_list|length }}</span>
+                    </p>
+                    <a href="/membres/telecharger" download class="inline-block bg-green-700 px-2.5 py-1 rounded-xl text-white hocus:bg-green-900">Télécharger (.csv)</a>
+                </div>
             </caption>
             <thead>
                 <tr class="bg-gray-200">
@@ -49,7 +54,7 @@ Liste des membres
             </thead>
             <tbody>
                 {% for member in members_list %}
-                    <tr class="even:bg-green-numixs/50" data-member-row>
+                    <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
                         <td class="px-4 py-3 text-left" data-label="Prénom" data-row-key="prenom">{{ member.prenom }}</td>
                         <td class="px-4 py-3 text-left" data-label="Nom" data-row-key="nom">{{ member.nom }}</td>
                         <td class="px-4 py-3 text-left" data-label="Numéro de téléphone" data-row-key="numero_telephone">{{ member.numero_telephone|default("/", true) }}</td>
@@ -59,7 +64,7 @@ Liste des membres
                         <td class="px-4 py-3 text-left" data-label="Code postal" data-row-key="code_postal">{{ member.code_postal }}</td>
                         <td class="px-4 py-3 text-left" data-label="Informations supplémentaires" data-row-key="extra_infos">{{ member.extra_infos|default("/", true) }}</td>
                         {% for business in list_business_sector %}
-                            <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} px-4 py-3 text-left bg-gray-100" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
+                            <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
                         {% endfor %}
                         <td class="px-4 py-3 text-left" data-label="Date d'inscription" data-row-key="Date d'inscription">
                             <time datetime="{{ member['Date d\'inscription'] }}">
