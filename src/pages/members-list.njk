@@ -1,5 +1,8 @@
 {% extends "layouts/page.njk" %}
 
+{% block title %}
+Liste des membres
+{% endblock %}
 {% block scripts %}
     <script type="module" src="/src/assets/scripts/members-poll.ts" defer></script>
 {% endblock %}
@@ -14,51 +17,78 @@
     <hr class="bg-gray-input-border-numixs">
     <div class="mt-8 px-3 mb-5">
         <table class="w-full bg-white border-collapse">
-            <caption class="text-start px-6 text-lg">
+            <caption class="text-start px-4 text-xl">
                 Nombre de membres : <span data-nb-members>{{ members_list|length }}</span>
             </caption>
             <thead>
-                <tr class="">
-                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Prénom</td>
-                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Nom de famille</td>
-                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Numéro de téléphone</td>
-                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">E-mail</td>
-                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Adresse</td>
-                    {# <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Ville</td> #}
-                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Code postal</td>
-                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Informations supplémentaires</td>
+                <tr class="bg-gray-200">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <th class="px-4 py-3 border-l border-r border-gray-500 bg-gray-300 text-lg" colspan="7" scope="colgroup">Secteur d'activité</th>
+                    <td></td>
+                </tr>
+                <tr class="bg-gray-200">
+                    <td class="font-bold px-4 py-3 text-left border-solid">Prénom</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid">Nom de famille</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid">Numéro de téléphone</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid">E-mail</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid">Adresse</td>
+                    {# <td class="font-bold px-4 py-3 text-left border-solid">Ville</td> #}
+                    <td class="font-bold px-4 py-3 text-left border-solid">Code postal</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid">Informations supplémentaires</td>
                     {% for business in list_business_sector %}
-                        <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">{{ business.name }}</td>
+                        <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} bg-gray-300 font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
                     {% endfor %}
-                    <td class="font-bold px-6 py-3 text-left border-solid border-slate-200">Date d'inscription</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid">Date d'inscription</td>
                 </tr>
             </thead>
             <tbody>
                 {% for member in members_list %}
-                    <tr class="even:bg-gray-200" data-member-row>
-                        <td class="px-6 py-3 text-left" data-label="Prénom" data-row-key="prenom">{{ member.prenom }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Nom" data-row-key="nom">{{ member.nom }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Numéro de téléphone" data-row-key="numero_telephone">{{ member.numero_telephone|default("/", true) }}</td>
-                        <td class="px-6 py-3 text-left" data-label="E-mail" data-row-key="email">{{ member.email }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Adresse" data-row-key="adresse">{{ member.adresse|default("/", true) }}</td>
-                        {# <td class="px-6 py-3 text-left">{{ member.ville }}</td> #}
-                        <td class="px-6 py-3 text-left" data-label="Code postal" data-row-key="code_postal">{{ member.code_postal }}</td>
-                        <td class="px-6 py-3 text-left" data-label="Informations supplémentaires" data-row-key="extra_infos">{{ member.extra_infos|default("/", true) }}</td>
+                    <tr class="even:bg-green-numixs/50" data-member-row>
+                        <td class="px-4 py-3 text-left" data-label="Prénom" data-row-key="prenom">{{ member.prenom }}</td>
+                        <td class="px-4 py-3 text-left" data-label="Nom" data-row-key="nom">{{ member.nom }}</td>
+                        <td class="px-4 py-3 text-left" data-label="Numéro de téléphone" data-row-key="numero_telephone">{{ member.numero_telephone|default("/", true) }}</td>
+                        <td class="px-4 py-3 text-left" data-label="E-mail" data-row-key="email">{{ member.email }}</td>
+                        <td class="px-4 py-3 text-left" data-label="Adresse" data-row-key="adresse">{{ member.adresse|default("/", true) }}</td>
+                        {# <td class="px-4 py-3 text-left">{{ member.ville }}</td> #}
+                        <td class="px-4 py-3 text-left" data-label="Code postal" data-row-key="code_postal">{{ member.code_postal }}</td>
+                        <td class="px-4 py-3 text-left" data-label="Informations supplémentaires" data-row-key="extra_infos">{{ member.extra_infos|default("/", true) }}</td>
                         {% for business in list_business_sector %}
-                            <td class="px-6 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
+                            <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} px-4 py-3 text-left bg-gray-100" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
                         {% endfor %}
-                        <td class="px-6 py-3 text-left" data-label="Date d'inscription" data-row-key="Date d'inscription">
+                        <td class="px-4 py-3 text-left" data-label="Date d'inscription" data-row-key="Date d'inscription">
                             <time datetime="{{ member['Date d\'inscription'] }}">
                                 {{ member["Date d'inscription"] }}
                             </time>
                         </td>
                     </tr>
                 {% else %}
-                    <tr class="even:bg-gray-200">
-                        <td colspan="15" class="px-6 py-3 text-center" data-label="Date d'inscription" data-row-key="Date d'inscription">Pas de membres pour le moment</td>
+                    <tr class="">
+                        <td colspan="15" class="px-4 py-3 text-center">Pas de membres pour le moment</td>
                     </tr>
                 {% endfor %}
             </tbody>
+            <tfoot>
+                <tr class="bg-gray-200">
+                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Prénom</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Nom de famille</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Numéro de téléphone</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">E-mail</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Adresse</td>
+                    {# <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Ville</td> #}
+                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Code postal</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Informations supplémentaires</td>
+                    {% for business in list_business_sector %}
+                        <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} bg-gray-300 font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
+                    {% endfor %}
+                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Date d'inscription</td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 

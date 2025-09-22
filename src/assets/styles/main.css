@@ -113,11 +113,11 @@ input.error {
     }
 }
 
-@media screen and (width <= 1024px) {
+@media screen and (width <= 1536px) {
     table {
         border: 0;
 
-        thead {
+        thead, tfoot {
             border: none;
             clip: rect(0 0 0 0);
             height: 1px;
@@ -140,6 +140,9 @@ input.error {
         td {
             display: block;
             text-align: left;
+            border-left: 0;
+            border-right: 0;
+            background-color: transparent;
 
             &::before {
                 content: attr(data-label);

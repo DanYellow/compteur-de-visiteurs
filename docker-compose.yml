@@ -21,7 +21,7 @@ services:
         # image: node:22.19.0-alpine
         image: node:24.8.0
         container_name: compteur-social-dev
-        command: sh -c "npm install && npm run dev2" # --verbose
+        command: sh -c "npm install && npm run dev:docker" # --verbose
         working_dir: "/home/node/app"
         depends_on:
             - traefik
@@ -31,8 +31,9 @@ services:
             - ./src/:/home/node/app/src
             - ./server:/home/node/app/server
             - ./package.json:/home/node/app/package.json
+            - ./.env.local:/home/node/app/.env.local
             - ./package-lock.json:/home/node/app/package-lock.json
-            - ./message.tmp.csv:/home/node/app/message.tmp.csv
+            # - ./message.tmp.csv:/home/node/app/message.tmp.csv
             - ./vite.config.ts:/home/node/app/vite.config.ts
             - ./tsconfig.json:/home/node/app/tsconfig.json
             - /home/node/app/node_modules
@@ -51,13 +52,6 @@ services:
             - traefik.http.routers.compteur-de-visiteurs.rule=Host(`faclab.localhost`)
         networks:
             - web
-        # develop:
-        #     watch:
-        #         - action: rebuild # 'build' is another action type
-        #           path: ./server # host directory path
-        #           target: /home/node/app/server # container directory path to map
-        #           ignore:
-        #             - node_modules/
 
 networks:
   web:

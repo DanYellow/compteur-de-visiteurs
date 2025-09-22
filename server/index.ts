@@ -1,6 +1,6 @@
 import { fileURLToPath } from "url";
 import path from "path";
-
+import dotenv from 'dotenv'
 import nunjucks from "nunjucks";
 import express from "express";
 import cors from "cors";
@@ -8,14 +8,14 @@ import { WebSocketServer } from 'ws';
 
 import router from "./router.ts";
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 const app = express();
 
 if (process.env.NODE_ENV === "development") {
+    dotenv.config({ path: './.env.dist' })
+
     const viteConfig = await import("../vite.config.ts");
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer(viteConfig);
@@ -52,6 +52,12 @@ app.use((req, res, next) => {
     next();
 });
 
+app.all('/', function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "X-Requested-With");
+    next();
+});
+
 app.use(router);
 
 const nunjucksConfig = nunjucks.configure(app.get("views"), {
@@ -63,13 +69,9 @@ const nunjucksConfig = nunjucks.configure(app.get("views"), {
     },
 });
 
-
-
-
-
-const listDomains: string[] = ["::"];
-const port = 3900;
-const server = app.listen(port, listDomains, () => {
+const listDomains: string[] = ["0.0.0.0"]; // "192.168.0.169"
+const port = Number(process.env.VITE_PORT || 3900);
+const server = app.listen(port, ["::"], () => {
     console.log("---------------------------");
     console.log(
         "Express server running at (ctrl/cmd + click to open in your browser):"

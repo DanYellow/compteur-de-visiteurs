@@ -1,9 +1,13 @@
 {% extends "layouts/page.njk" %}
 {% import "includes/forms.njk" as forms %}
 
+{% block title %}
+Formulaire d'inscription
+{% endblock %}
 {% block scripts %}
     <script type="module" src="/src/assets/scripts/sign-in-form.ts" defer></script>
     <script type="module" src="/src/assets/scripts/user-signature.ts" defer></script>
+    <script type="module" src="/src/assets/scripts/terms-of-service.ts" defer></script>
 {% endblock %}
 {% block content %}
     <header class="text-center mb-10 max-w-2xl mx-auto px-3">
@@ -72,7 +76,10 @@ enregistrement.</p>
                 Règlement intérieur du FacLab<sup>®</sup> de la Station numixs
             </p>
             <div class="col-span-full h-120">
-                <iframe src="/file.tmp.pdf" class="w-full h-full" frameborder="0"></iframe>
+                {# <canvas id="pdf-canvas"></canvas> #}
+
+                <iframe src="/reglement" class="w-full h-full" data-terms-of-service frameborder="0"></iframe>
+                {# <iframe src="/file.tmp.pdf" class="w-full h-full" data-terms-of-service frameborder="0"></iframe> #}
             </div>
             <div class="col-span-full">
                 <input class="aspect-square accent-green-numixs mr-2.5" type="checkbox" name="reglement" id="reglement">

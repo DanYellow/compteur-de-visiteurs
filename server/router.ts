@@ -1,5 +1,6 @@
 import fs from "fs";
-
+import path from "path";
+import { fileURLToPath } from "url";
 import express from "express";
 import { stringify } from "csv-stringify/sync";
 import { parse } from "csv-parse/sync";
@@ -10,7 +11,10 @@ import { wss } from "./index.ts";
 
 const router = express.Router();
 
-const csvFile = "/message.tmp.csv";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
 
 router.get("/", (req, res) => {
     res.render("pages/index.njk", {

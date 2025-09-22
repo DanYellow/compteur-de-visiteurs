@@ -1,4 +1,4 @@
-const ws = new WebSocket(`ws://localhost:${import.meta.env.VITE_PORT}`);
+const ws = new WebSocket(`ws://localhost:${import.meta.env.VITE_PORT || 3900}`);
 
 const rowTplRaw = document.querySelector("tr[data-member-row]") as HTMLTableRowElement;
 const notificationTplRaw = document.querySelector("[data-template-id='new-member-notification']") as HTMLTemplateElement;
@@ -7,7 +7,7 @@ const nbMembers = document.querySelector("[data-nb-members]");
 
 const createNotification = (member: { nom: string, prenom: string }) => {
     const notification = notificationTplRaw.content.cloneNode(true) as HTMLDivElement;
-    (notification.querySelector("[data-notification-text]") as HTMLParagraphElement).textContent = `${member.prenom} ${member.nom.toUpperCase()} vient de souscrire à la charte du FacLab®`;
+    (notification.querySelector("[data-notification-text]") as HTMLParagraphElement).textContent = `${member.prenom} ${member.nom.toUpperCase()} vient de signer la charte du FacLab®`;
     (notification.querySelector("[data-dismiss-notification-btn]") as HTMLButtonElement).addEventListener("click", (e) => {
         const element = e.target as HTMLButtonElement;
         element?.closest("[data-notification]")?.classList.add("close")
@@ -24,7 +24,11 @@ ws.addEventListener("message", (event) => {
     const { payload, type } = JSON.parse(event.data);
 
     if (type === "MEMBER_ADDED") {
+        if (!rowTplRaw) {
+            window.location.reload();
+        }
         const tbody = rowTplRaw.parentElement;
+
         const rowTpl = rowTplRaw.cloneNode(true) as HTMLTableRowElement;
 
         Object.entries(payload).forEach(([key, value]) => {
