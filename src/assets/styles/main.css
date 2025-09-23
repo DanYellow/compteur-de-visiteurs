@@ -117,7 +117,8 @@ input.error {
     table {
         border: 0;
 
-        thead, tfoot {
+        thead,
+        tfoot {
             border: none;
             clip: rect(0 0 0 0);
             height: 1px;
@@ -159,17 +160,13 @@ input.error {
     }
 }
 
-.notification {
-    transition: opacity 0.3s ease, translate 0.3s ease, display 0.3s ease allow-discrete;
+[data-input-switch-toggle-recipient] {
+    transition: opacity 0.6s ease, display 0.3s ease allow-discrete;
     opacity: 1;
+    display: block;
 
     @starting-style {
         opacity: 0;
-        translate: -120% 0;
-    }
-
-    &.close {
-        translate: -120% 0;
-        opacity: 0;
+        display: none;
     }
 }
