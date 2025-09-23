@@ -16,6 +16,29 @@ Liste des membres
     </header>
     <hr class="bg-gray-input-border-numixs">
     <div class="mt-8 px-3 mb-5">
+
+        <div class="overflow-auto">
+            <table class="w-full bg-white border-collapse">
+                {% for header in header_list %}
+                    <tr>
+                        {% if header == "habitant" %}
+                            <th rowspan="12" class="px-4 py-1.5 vertical-label border-gray-500 bg-gray-300 text-lg sticky left-0">Secteur d'activité</th>
+                        {% elif header == "education" or header == "entreprise" or header == "artiste" or header == "artisan" or header == "collectivité" or header == "agent_carpf" or header == "numixs_lab" or header == "fablab" or header == "association" or header == "retraité" or header == "autre" %}
+                        {% else %}
+                            <th class="bg-gray-200" ></th>
+                        {% endif %}
+                        <th class="font-bold px-4 py-3 text-left border-solid bg-gray-200 sticky left-0" scope="row">{{ header }}</th>
+                        {% for member in members_list %}
+                            <td class="px-4 py-3 text-left" data-row-key="{{ header }}">{{ member[header] }}</td>
+                        {% endfor %}
+                    </tr>
+                {% else %}
+                    <tr class="">
+                        <td colspan="15" class="px-4 py-3 text-center">Pas de membres pour le moment</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
         <table class="w-full bg-white border-collapse">
             <caption class="mb-2">
                 <div class="flex justify-between px-4">

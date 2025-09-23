@@ -1,5 +1,5 @@
 import { NewMemberSchema } from "#scripts/schemas.ts";
-import { listBusinessSector, getCurrentDay } from "#scripts/utils.ts"
+import { listBusinessSector } from "#scripts/utils.ts"
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
@@ -53,7 +53,7 @@ const submitForm = async (e: SubmitEvent) => {
         }
     })
 
-    formDataComputed.append("Date d'inscription", getCurrentDay())
+    formDataComputed.append("date_inscription", new Date(Date.now()).toISOString());
 
     const req = await fetch("/", {
         method: "POST",

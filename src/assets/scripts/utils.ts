@@ -12,34 +12,41 @@ export const listBusinessSector = [
         "value": "entreprise"
     },
     {
+        "name": "Artiste",
+        "value": "artiste"
+    },
+    {
         "name": "Artisan",
         "value": "artisan"
+    },
+    {
+        "name": "Collectivité",
+        "value": "collectivité"
+    },
+    {
+        "name": "Agent CARPF",
+        "value": "agent_carpf"
+    },
+    {
+        "name": "Numixs Lab",
+        "value": "numixs_lab"
     },
     {
         "name": "FabLab",
         "value": "fablab"
     },
     {
+        "name": "Association",
+        "value": "association"
+    },
+    {
         "name": "Retraité",
         "value": "retraité"
     },
     {
-        "name": "Artiste",
-        "value": "artiste"
+        "name": "Autre",
+        "value": "autre"
     },
-    {
-        "name": "Collectivité",
-        "value": "collectivite"
-    },
-    {
-        "name": "FacLab",
-        "value": "faclab"
-    },
-    {
-        "name": "Association",
-        "value": "association"
-    },
-
 ]
 
 export const getCurrentDay = () => {

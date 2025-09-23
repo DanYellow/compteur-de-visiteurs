@@ -17,6 +17,10 @@
     --color-orange-*: initial;
     --color-pink-*: initial;
     --color-amber-*: initial;
+    --color-teal-*: initial;
+    --color-emerald-*: initial;
+    --color-purple-*: initial;
+    --color-orange-*: initial;
 }
 
 @utility title-font {

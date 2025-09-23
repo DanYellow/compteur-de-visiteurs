@@ -65,6 +65,7 @@ router.get("/membres", (req, res) => {
     res.render("pages/members-list.njk", {
         "members_list": records,
         "list_business_sector": listBusinessSector,
+        "header_list": records?.[0] ? Object.keys(records[0]) : [],
     });
 });
 

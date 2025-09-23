@@ -1,4 +1,22 @@
-@media screen and (width <= 1536px) {
+/* table th:nth-child(1) {
+    position: sticky;
+    left: 0;
+    z-index: 5;
+}
+
+th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+} */
+
+.vertical-label {
+    writing-mode: sideways-lr;
+    white-space: nowrap;
+    text-orientation: mixed;
+}
+
+/* @media screen and (width <= 1536px) {
     table {
         border: 0;
 
@@ -37,4 +55,4 @@
             }
         }
     }
-}
+} */
