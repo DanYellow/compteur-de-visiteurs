@@ -23,6 +23,10 @@ signaturePad.addEventListener("endStroke", () => {
     }
 });
 
+document.addEventListener("formreset", (e) => {
+    signaturePad.clear();
+});
+
 const clearButton = document.querySelector('[data-clear-signature-button]')
 clearButton?.addEventListener("click", () => {
     if (input.checked) {

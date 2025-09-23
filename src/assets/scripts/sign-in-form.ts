@@ -6,6 +6,7 @@ const errorsContainer = document.querySelector("[data-form-errors]") as HTMLULis
 const dialog = document.querySelector("[data-dialog='form-submitted']") as HTMLDialogElement;
 const formSuccessTplRaw = document.querySelector("[data-template-id='form-success']") as HTMLTemplateElement;
 const formErrorTplRaw = document.querySelector("[data-template-id='form-error']") as HTMLTemplateElement;
+const formResetEvent = new Event("formreset", { bubbles: true });
 
 const listFormKeys = [
     "prenom",
@@ -31,7 +32,8 @@ const submitForm = async (e: SubmitEvent) => {
         return;
     }
     dialog.showModal();
-    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const form = (e.currentTarget as HTMLFormElement);
+    const formData = new FormData(form);
 
     listBusinessSector.forEach(({ value }) => {
         if (formData.has(value)) {
@@ -65,6 +67,8 @@ const submitForm = async (e: SubmitEvent) => {
     dialogSwapContainer.innerHTML = "";
     if (res.success) {
         dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true))
+        form.reset();
+        document.dispatchEvent(formResetEvent);
     } else {
         dialogSwapContainer.append(formErrorTplRaw.content.cloneNode(true))
     }
