@@ -1,5 +1,6 @@
 import "../styles/main.css";
 import "../styles/notification.css";
+import "../styles/responsive-table.css";
 
 import "./input-switch.ts";
 

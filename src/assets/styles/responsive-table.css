@@ -1,0 +1,40 @@
+@media screen and (width <= 1536px) {
+    table {
+        border: 0;
+
+        thead,
+        tfoot {
+            border: none;
+            clip: rect(0 0 0 0);
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            padding: 0;
+            position: absolute;
+            width: 1px;
+        }
+
+        tr {
+            border-bottom: 1px solid var(--color-slate-200);
+            display: block;
+
+            &:last-child {
+                border-bottom-color: transparent;
+            }
+        }
+
+        td {
+            display: block;
+            text-align: left;
+            border-left: 0;
+            border-right: 0;
+            background-color: transparent;
+
+            &::before {
+                content: attr(data-label);
+                font-weight: bold;
+                display: block;
+            }
+        }
+    }
+}

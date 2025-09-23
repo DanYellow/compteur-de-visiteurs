@@ -54,6 +54,11 @@ export const NewMemberSchema = z.object({
     error: "Vous devez choisir au moins un secteur d'activité",
     path: listBusinessSector.map((item) => item.value)
 }).refine((data) => {
+    return hasSelectedABusinessSector(data);
+}, {
+    error: "Vous devez choisir votre type d'entrepreneur",
+    path: ["entrepreneur"],
+}).refine((data) => {
     return "reglement" in data;
 }, {
     error: "Vous devez accepter le règlement intérieur du FacLab® numixs",

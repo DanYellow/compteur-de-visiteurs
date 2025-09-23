@@ -15,6 +15,8 @@
     --color-fuchsia-*: initial;
     --color-cyan-*: initial;
     --color-orange-*: initial;
+    --color-pink-*: initial;
+    --color-amber-*: initial;
 }
 
 @utility title-font {
@@ -113,47 +115,6 @@ input.error {
     }
 }
 
-@media screen and (width <= 1536px) {
-    table {
-        border: 0;
-
-        thead,
-        tfoot {
-            border: none;
-            clip: rect(0 0 0 0);
-            height: 1px;
-            margin: -1px;
-            overflow: hidden;
-            padding: 0;
-            position: absolute;
-            width: 1px;
-        }
-
-        tr {
-            border-bottom: 1px solid var(--color-slate-200);
-            display: block;
-
-            &:last-child {
-                border-bottom-color: transparent;
-            }
-        }
-
-        td {
-            display: block;
-            text-align: left;
-            border-left: 0;
-            border-right: 0;
-            background-color: transparent;
-
-            &::before {
-                content: attr(data-label);
-                font-weight: bold;
-                display: block;
-            }
-        }
-    }
-}
-
 .switch-container {
     &:has(.error) .switch {
         border-color: var(--color-red-500);
@@ -161,12 +122,19 @@ input.error {
 }
 
 [data-input-switch-toggle-recipient] {
-    transition: opacity 0.6s ease, display 0.3s ease allow-discrete;
+    transition-property: opacity, display;
+    transition-duration: 0.45s, 0.3s;
+    transition-behavior: allow-discrete;
     opacity: 1;
     display: block;
 
-    @starting-style {
+    /* @starting-style {
         opacity: 0;
         display: none;
+    } */
+
+    &.hidden {
+        display: none;
+        opacity: 0;
     }
 }

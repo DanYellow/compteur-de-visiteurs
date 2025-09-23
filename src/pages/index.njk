@@ -62,14 +62,33 @@ enregistrement.</p>
                     <p>Quels sont vos secteurs d'activité ?<span class="text-red-500">*</span></p>
                     <p class="text-sm opacity-70 -mt-1">Choisir au moins un secteur</p>
                 </div>
-                {% for sector in list_business_sector %}
-                    {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30") }}
-                {% endfor %}
-                <div data-input-switch-toggle-recipient="entrepreneur">
-                    <div class="pl-4 flex flex-col gap-3">
-                        {{ forms.switch("Station Numixs", "station_numixs", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30") }}
-                        {{ forms.switch("Externe", "externe", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30") }}
-                    </div>
+                {# {{ forms.switch("Station Numixs", "station_numixs", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30") }}
+                                {{ forms.switch("Externe", "externe", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30") }} #}
+
+                <div class="grid grid-cols-2 gap-3">
+                    {% for sector in list_business_sector %}
+                     {% set children = null %}
+                        {% if sector.value == "entreprise" %}
+                            {% set children %}
+                            <div data-input-switch-toggle-recipient="entreprise" class="col-span-full">
+                                <div class="pl-4 flex flex-col gap-3">
+                                    <label for="station_numixs">
+                                        <input type="radio" class="accent-green-numixs" name="entreprise_type" id="station_numixs">
+                                    Station Numixs
+                                </label>
+                                    <label for="externe">
+                                        <input type="radio" class="accent-green-numixs" name="entreprise_type" id="externe">
+                                    Externe
+                                </label>
+                                </div>
+                            </div>
+                            {% endset %}
+                        {% endif %}
+                        {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", child = children) }}
+                        {# {% if sector.value == "entreprise" %}
+
+                        {% endif %} #}
+                    {% endfor %}
                 </div>
             </div>
             <div class="flex flex-col col-span-full">

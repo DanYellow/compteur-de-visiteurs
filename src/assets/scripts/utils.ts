@@ -1,15 +1,31 @@
 export const listBusinessSector = [
     {
-        "name": "Éducation / formation (ateliers pédagogiques)",
+        "name": "Habitant",
+        "value": "habitant"
+    },
+    {
+        "name": "Éducation",
         "value": "education"
     },
     {
-        "name": "Entrepreneur",
-        "value": "entrepreneur"
+        "name": "Entreprise",
+        "value": "entreprise"
     },
     {
-        "name": "Artisan / Artiste",
-        "value": "artisan_artiste"
+        "name": "Artisan",
+        "value": "artisan"
+    },
+    {
+        "name": "FabLab",
+        "value": "fablab"
+    },
+    {
+        "name": "Retraité",
+        "value": "retraité"
+    },
+    {
+        "name": "Artiste",
+        "value": "artiste"
     },
     {
         "name": "Collectivité",
@@ -23,10 +39,7 @@ export const listBusinessSector = [
         "name": "Association",
         "value": "association"
     },
-    {
-        "name": "Habitant",
-        "value": "habitant"
-    }
+
 ]
 
 export const getCurrentDay = () => {
