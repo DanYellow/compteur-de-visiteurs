@@ -83,7 +83,7 @@ const validForm = (e: Event) => {
     const formData = new FormData(form);
     const validator = NewMemberSchema.safeParse(Object.fromEntries(formData));
 
-    form.querySelectorAll(`input.error`).forEach((item) => {
+    form.querySelectorAll("input.error").forEach((item) => {
         item.classList.remove("error");
         item.removeAttribute("aria-invalid");
         item.removeAttribute("aria-errormessage");

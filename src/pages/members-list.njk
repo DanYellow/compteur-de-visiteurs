@@ -25,11 +25,17 @@ Liste des membres
                             <th rowspan="12" class="px-4 py-1.5 vertical-label border-gray-500 bg-gray-300 text-lg sticky left-0">Secteur d'activité</th>
                         {% elif header == "education" or header == "entreprise" or header == "artiste" or header == "artisan" or header == "collectivité" or header == "agent_carpf" or header == "numixs_lab" or header == "fablab" or header == "association" or header == "retraité" or header == "autre" %}
                         {% else %}
-                            <th class="bg-gray-200" ></th>
+                            <td class="bg-gray-200 sticky left-0" inert></td>
                         {% endif %}
                         <th class="font-bold px-4 py-3 text-left border-solid bg-gray-200 sticky left-0" scope="row">{{ header }}</th>
                         {% for member in members_list %}
-                            <td class="px-4 py-3 text-left" data-row-key="{{ header }}">{{ member[header] }}</td>
+                            <td class="px-4 py-3 text-left" data-row-key="{{ header }}">
+                                {% if header == "Date d'inscription" %}
+                                <time datetime="{{ member[header] }}">{{ member[header] }}</time>
+                                {% else %}
+                                {{ member[header]|default("/", true) }}
+                                {% endif %}
+                            </td>
                         {% endfor %}
                     </tr>
                 {% else %}

@@ -127,15 +127,16 @@ input.error {
 
 [data-input-switch-toggle-recipient] {
     transition-property: opacity, display;
-    transition-duration: 0.45s, 0.3s;
+    transition-duration: 0.25s, 0.25s;
+    transition-timing-function: ease-in;
     transition-behavior: allow-discrete;
     opacity: 1;
     display: block;
 
-    /* @starting-style {
+    @starting-style {
         opacity: 0;
-        display: none;
-    } */
+        /* display: none; */
+    }
 
     &.hidden {
         display: none;

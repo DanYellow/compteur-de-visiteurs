@@ -67,27 +67,24 @@ enregistrement.</p>
 
                 <div class="grid grid-cols-2 gap-3">
                     {% for sector in list_business_sector %}
-                     {% set children = null %}
+                        {% set children = null %}
                         {% if sector.value == "entreprise" %}
                             {% set children %}
-                            <div data-input-switch-toggle-recipient="entreprise" class="col-span-full">
-                                <div class="pl-4 flex flex-col gap-3">
+                            <div data-input-switch-toggle-recipient="entreprise">
+                                <div class="ml-12 flex flex-col gap-3 mt-2">
                                     <label for="station_numixs">
                                         <input type="radio" class="accent-green-numixs" name="entreprise_type" id="station_numixs">
-                                    Station Numixs
-                                </label>
+                                        Station Numixs
+                                    </label>
                                     <label for="externe">
                                         <input type="radio" class="accent-green-numixs" name="entreprise_type" id="externe">
-                                    Externe
-                                </label>
+                                        Externe
+                                    </label>
                                 </div>
                             </div>
                             {% endset %}
                         {% endif %}
                         {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", child = children) }}
-                        {# {% if sector.value == "entreprise" %}
-
-                        {% endif %} #}
                     {% endfor %}
                 </div>
             </div>
@@ -119,10 +116,13 @@ au FacLab® numixs.</label>
             <div class="flex flex-col col-span-full">
                 <p>Signature<span class="text-red-500">*</span></p>
                 <div class="relative border border-black-numixs overflow-hidden border-solid rounded-md aspect-[658/113] signature-placeholder">
-                    <input type="checkbox" name="signature" class="absolute -left-5000 opacity-0">
+                    <input type="checkbox" name="signature" class="absolute -left-5000 opacity-0" tabindex="-1">
                     <canvas data-user-signature class="bg-white"></canvas>
-                    <button data-clear-signature-button type="button" class="w-10 aspect-square rounded-full bg-green-numixs absolute right-2 bottom-2 flex justify-center items-center fill-black-numixs hocus:bg-dark-green-numixs">
-                        {% include "includes/icon-eraser.svg" %}
+                    <button data-clear-signature-button type="button" class="rounded-full px-2 py-1 gap-1.5 absolute right-2 bottom-2 flex justify-center items-center bg-black-numixs text-green-numixs fill-green-numixs hocus:bg-black">
+                        <span class="scale-75">
+                            {% include "includes/icon-eraser.svg" %}
+                        </span>
+                        Effacer
                     </button>
                 </div>
             </div>
