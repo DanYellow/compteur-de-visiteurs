@@ -31,7 +31,6 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 - tailwindcss
 - zod
 - nunjucks
-- signature_pad
 - expressjs
 
 ## Licence

@@ -3,7 +3,7 @@
         <label class="w-full justify-between rounded-md inline-flex p-3 items-center cursor-pointer text-2xl text-black switch-container title-font font-bold bg-[#F5F5F5]">
             <input type="checkbox" value="{{ value }}" name="{{ name }}" class="sr-only peer" data-input-switch-toggle="{{ name }}">
             <span>{{ label }}</span>
-            <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 {{ ring_color }} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all {{ color }}"></div>
+            <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 {{ ring_color }} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:border-black-numixs/30 after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all {{ color }}"></div>
         </label>
         {{ child | safe }}
     </div>

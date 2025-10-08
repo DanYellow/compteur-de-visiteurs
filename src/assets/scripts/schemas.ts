@@ -3,23 +3,29 @@ import * as z from "zod";
 import { listBusinessSector } from "#scripts/utils.ts"
 
 type BusinessSectorPayload = {
-    habitant?: string;
-    faclab?: string;
-    association?: string;
-    entrepreneur?: string;
-    artisan_artiste?: string;
-    collectivite?: string;
+    entreprise?: string;
     education?: string;
+    artisan?: string;
+    artiste?: string;
+    agent_carpf?: string;
+    collectivité?: string;
+    numixs_lab?: string;
+    retraité?: string;
+    réinsertion_pro?: string;
+    autre?: string;
 }
 
 type BusinessSectorSchema = {
-    habitant?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
-    faclab?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
-    association?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
-    entrepreneur?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
-    artisan_artiste?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
-    collectivite?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    entreprise?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
     education?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    artisan?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    artiste?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    agent_carpf?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    collectivité?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    numixs_lab?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    retraité?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    réinsertion_pro?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    autre?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
 }
 
 const hasSelectedABusinessSector = (data: BusinessSectorPayload) => {
@@ -38,7 +44,7 @@ export const VisitorSchema = z.object({
     reglement: z.string().optional().or(z.literal('')),
     signature: z.string().optional().or(z.literal('')),
 }).refine((data) => {
-    return hasSelectedABusinessSector(data);
+    return hasSelectedABusinessSector(data as BusinessSectorPayload);
 }, {
     error: "Vous devez choisir au moins un secteur d'activité",
     path: listBusinessSector.map((item) => item.value)

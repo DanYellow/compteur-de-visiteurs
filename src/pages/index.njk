@@ -5,8 +5,7 @@
 Compteur de visiteurs
 {% endblock %}
 {% block scripts %}
-    <script type="module" src="/src/assets/scripts/sign-in-form.ts" defer></script>
-    <script type="module" src="/src/assets/scripts/terms-of-service.ts" defer></script>
+    <script type="module" src="/src/assets/scripts/register-form.ts" defer></script>
 {% endblock %}
 {% block content %}
     <div class="mt-8 px-3 flex flex-row justify-center gap-24">
@@ -55,7 +54,7 @@ Compteur de visiteurs
         <img class="hidden lg:block" src="/images/compteur-deco-image.png" alt="">
     </div>
 
-    <dialog data-dialog="form-submitted" class="backdrop:bg-[#F5F5F5] m-auto max-w-2xl w-full bg-transparent ">
+    <dialog data-dialog="form-submitted" class="backdrop:bg-[#312f2f] m-auto max-w-2xl w-full bg-transparent ">
         <div class="flex gap-2 flex-col py-4">
             <img src="/images/faclab-logo.svg" class="w-44 mx-auto block" alt="">
             <div class="flex justify-center flex-col items-center" data-swap-content>
@@ -65,7 +64,7 @@ Compteur de visiteurs
     </dialog>
     <template data-template-id="form-success">
         <img src="/images/valide.svg" class="w-16" alt="">
-        <p class="text-center w-44 mx-auto">Votre inscription a bien été effectuée</p>
+        <p class="title-font w-44 mx-auto ">Merci de votre retour, excellent passage au <span class="text-green-numixs">FacLab numixs®.</span></p>
 
         <button type="button" data-close-dialog class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 active:bg-dark-green-numixs">Continuer</button>
     </template>
