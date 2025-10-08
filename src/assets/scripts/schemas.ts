@@ -36,13 +36,9 @@ const listBusinessSectorValidator: BusinessSectorSchema = listBusinessSector.map
     return { ...obj, ...item }
 }, {})
 
-
 export const VisitorSchema = z.object({
     // Secteur activité
     ...listBusinessSectorValidator,
-
-    reglement: z.string().optional().or(z.literal('')),
-    signature: z.string().optional().or(z.literal('')),
 }).refine((data) => {
     return hasSelectedABusinessSector(data as BusinessSectorPayload);
 }, {

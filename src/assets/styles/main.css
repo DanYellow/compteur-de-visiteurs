@@ -53,7 +53,7 @@
 }
 
 @custom-variant hocus {
-    &:is(:hover, :focus-within) {
+    &:is(:hover, :focus-within, :active) {
         @slot;
     }
 }
