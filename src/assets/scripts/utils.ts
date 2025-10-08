@@ -1,47 +1,47 @@
 export const listBusinessSector = [
     {
-        "name": "Habitant",
-        "value": "habitant"
+        "name": "Entreprise",
+        "value": "entreprise"
     },
     {
         "name": "Éducation",
         "value": "education"
     },
     {
-        "name": "Entreprise",
-        "value": "entreprise"
+        "name": "Artisan",
+        "value": "artisan"
     },
     {
         "name": "Artiste",
         "value": "artiste"
     },
     {
-        "name": "Artisan",
-        "value": "artisan"
+        "name": "Agent CARPF",
+        "value": "agent_carpf"
     },
     {
         "name": "Collectivité",
         "value": "collectivité"
     },
     {
-        "name": "Agent CARPF",
-        "value": "agent_carpf"
+        "name": "FabLab",
+        "value": "fablab"
     },
     {
         "name": "Numixs Lab",
         "value": "numixs_lab"
     },
     {
-        "name": "FabLab",
-        "value": "fablab"
+        "name": "Retraité",
+        "value": "retraité"
     },
     {
         "name": "Association",
         "value": "association"
     },
     {
-        "name": "Retraité",
-        "value": "retraité"
+        "name": "En réinsertion pro",
+        "value": "réinsertion_pro"
     },
     {
         "name": "Autre",

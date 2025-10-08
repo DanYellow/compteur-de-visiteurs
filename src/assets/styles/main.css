@@ -97,9 +97,11 @@
 }
 
 html {
-    background-color: var(--color-black-numixs);
+    /* background-color: var(--color-black-numixs); */
     scroll-behavior: smooth;
     color: white;
+
+    background: url("/images/bottom-left-pattern.svg") no-repeat left bottom, url("/images/top-right-pattern.svg") no-repeat right top, var(--color-black-numixs);
 }
 
 /* :not([type="checkbox"], [type="radio"]) */

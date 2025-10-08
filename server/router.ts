@@ -6,7 +6,7 @@ import { stringify } from "csv-stringify/sync";
 import { parse } from "csv-parse/sync";
 
 import { listBusinessSector } from "#scripts/utils.ts"
-import { NewMemberSchema } from "#scripts/schemas.ts";
+import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "./index.ts";
 import { getCurrentDay, getCurrentTime } from "#scripts/utils.ts";
 
@@ -24,7 +24,7 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    const validator = NewMemberSchema.safeParse(req.body);
+    const validator = VisitorSchema.safeParse(req.body);
     if (!validator.success) {
         res.status(500).json({ "success": false })
     }

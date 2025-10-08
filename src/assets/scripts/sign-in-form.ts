@@ -1,4 +1,4 @@
-import { NewMemberSchema } from "#scripts/schemas.ts";
+import { VisitorSchema } from "#scripts/schemas.ts";
 import { listBusinessSector } from "#scripts/utils.ts"
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
@@ -9,18 +9,7 @@ const formErrorTplRaw = document.querySelector("[data-template-id='form-error']"
 const formResetEvent = new Event("formreset", { bubbles: true });
 
 const listFormKeys = [
-    "prenom",
-    "nom",
-    "numero_telephone",
-    "email",
-    "adresse",
-    "ville",
-    "code_postal",
     ...listBusinessSector.map((item) => item.value),
-    "extra_infos",
-    "reglement",
-    "donnees_personnelles",
-    "signature",
 ]
 
 const submitForm = async (e: SubmitEvent) => {
@@ -81,7 +70,7 @@ const validForm = (e: Event) => {
     }
 
     const formData = new FormData(form);
-    const validator = NewMemberSchema.safeParse(Object.fromEntries(formData));
+    const validator = VisitorSchema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll("input.error").forEach((item) => {
         item.classList.remove("error");
