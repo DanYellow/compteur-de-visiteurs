@@ -14,8 +14,8 @@ services:
             - "/var/run/docker.sock:/var/run/docker.sock:ro"
         # configs:
         #     - traefik-dynamic.yml
-        networks:
-            - web
+        # networks:
+        #     - web
 
     compteur-de-visiteurs:
         image: node:24.8.0
@@ -49,9 +49,9 @@ services:
         labels:
             - "traefik.enable=true"
             - "traefik.http.routers.compteur-de-visiteurs.rule=Host(`faclab.localhost`)"
-        networks:
-            - web
+        # networks:
+        #     - web
 
-networks:
-  web:
-    external: true
+# networks:
+#   web:
+#     external: true

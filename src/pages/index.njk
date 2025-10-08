@@ -2,70 +2,23 @@
 {% import "includes/forms.njk" as forms %}
 
 {% block title %}
-Formulaire d'inscription
+Compteur de visiteurs
 {% endblock %}
 {% block scripts %}
     <script type="module" src="/src/assets/scripts/sign-in-form.ts" defer></script>
-    <script type="module" src="/src/assets/scripts/user-signature.ts" defer></script>
     <script type="module" src="/src/assets/scripts/terms-of-service.ts" defer></script>
 {% endblock %}
 {% block content %}
-    <header class="mb-10 max-w-3xl mx-auto px-3">
-        <h1 class="text-5xl text-black-numixs font-bold title-font mb-2.5">
-   Formulaire d'inscription FacLab<sup>®</sup> numixs
-</h1>
-        <p>Bienvenue ! Merci de prendre quelques instants pour vous inscrire au FacLab® numixs.</p>
-        <p>Merci de remplir les informations demandées et de lire le règlement avant de valider votre
-enregistrement.</p>
-    </header>
-    <hr class="border-gray-input-border-numixs">
     <div class="mt-8 px-3">
         <form class="grid grid-cols-2 gap-6 max-w-3xl mx-auto" type="mul" novalidate action="" method="post" data-sign-in-form>
             <ul class="form-errors-list-container col-span-full" role="alert" data-form-errors id="error-container"></ul>
-            <p class="col-span-full">
-                <span class="text-red-500 ">*</span> : Champ obligatoire</p>
-            <div class="flex flex-col">
-                <label for="prenom">Prénom<span class="text-red-500">*</span></label>
-                <input type="text" required id="prenom" placeholder="Jean" name="prenom" class="input">
-            </div>
-            <div class="flex flex-col">
-                <label for="nom">Nom<span class="text-red-500">*</span></label>
-                <input type="text" required placeholder="Dubeau" id="nom" name="nom" class="input">
-            </div>
 
-            <div class="flex flex-col">
-                <label for="numero_telephone">Numéro de téléphone</label>
-                <input type="tel" placeholder="01 33 33 33 33" id="numero_telephone" name="numero_telephone" class="input">
-            </div>
-            <div class="flex flex-col">
-                <label for="email">E-mail<span class="text-red-500">*</span></label>
-                <input type="email" required placeholder="hello@numixs.com" id="email" name="email" class="input">
-            </div>
-            <div class="flex flex-col col-span-full">
-                <label for="adresse">Adresse</label>
-                <input type="text" placeholder="Rue Jacques-Henri Labourdette" id="adresse" name="adresse" class="input">
-            </div>
-            <div class="flex flex-col">
-                <label for="ville">Ville</label>
-                <input type="text" placeholder="Sarcelles" id="ville" name="ville" class="input">
-            </div>
-            {# <div class="flex flex-col">
-                <label for="region">Région</label>
-                <input type="text" id="region" name="region" class="input">
-            </div> #}
-            <div class="flex flex-col">
-                <label for="code_postal">Code postal<span class="text-red-500">*</span></label>
-                <input type="text" required id="code_postal" maxlength="5" inputmode="numeric" placeholder='95200' name="code_postal" class="input">
-            </div>
             <div class="flex flex-col col-span-full gap-3">
-                <div>
-                    <p>Quels sont vos secteurs d'activité ?<span class="text-red-500">*</span></p>
-                    <p class="text-sm opacity-70 -mt-1">Choisir au moins un secteur</p>
+                <div class="mb-11">
+                    <p class="title-font leading-none text-7xl uppercase">À quel(s) groupe(s)<br /><span class="text-green-numixs">appartenez-vous</span> ?</p>
+                    <p class="text-sm opacity-70 -mt-1">Vous devez choisir au moins un secteur</p>
                 </div>
-                {# {{ forms.switch("Station Numixs", "station_numixs", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30") }}
-                                {{ forms.switch("Externe", "externe", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30") }} #}
-
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-2 gap-x-14 gap-y-7">
                     {% for sector in list_business_sector %}
                         {% set children = null %}
                         {% if sector.value == "entreprise" %}
@@ -86,44 +39,6 @@ enregistrement.</p>
                         {% endif %}
                         {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", child = children) }}
                     {% endfor %}
-                </div>
-            </div>
-            <div class="flex flex-col col-span-full">
-                <label for="extra_infos">Une information à rajouter ?</label>
-                <textarea name="extra_infos" id="extra_infos" rows="5" placeholder="Écrire ici..." class="input "></textarea>
-            </div>
-            <hr class="col-span-full border-gray-input-border-numixs">
-            <p class="text-black-numixs font-bold title-font col-span-full text-4xl">
-                Règlement intérieur du FacLab<sup>®</sup> de la Station numixs
-            </p>
-            <div class="col-span-full h-120">
-                {# <canvas id="pdf-canvas"></canvas> #}
-
-                <iframe src="/reglement" class="w-full h-full" data-terms-of-service frameborder="0"></iframe>
-                {# <iframe src="/file.tmp.pdf" class="w-full h-full" data-terms-of-service frameborder="0"></iframe> #}
-            </div>
-            <div class="col-span-full">
-                <input class="aspect-square accent-green-numixs mr-2.5" type="checkbox" name="reglement" id="reglement">
-                <label for="reglement">En cochant cette case, je déclare avoir lu et accepté l’intégralité du règlement
-disponible ci-dessus.<span class="text-red-500">*</span></label>
-            </div>
-            <div class="col-span-full">
-                <input required class="aspect-square accent-green-numixs mr-2.5" type="checkbox" name="donnees_personnelles" id="donnees_personnelles">
-                <label for="donnees_personnelles">J’accepte que mes données soient utilisées pour les inscriptions et participations
-au FacLab® numixs.</label>
-            </div>
-
-            <div class="flex flex-col col-span-full">
-                <p>Signature<span class="text-red-500">*</span></p>
-                <div class="relative border border-black-numixs overflow-hidden border-solid rounded-md aspect-[658/113] signature-placeholder">
-                    <input type="checkbox" name="signature" class="absolute -left-5000 opacity-0" tabindex="-1">
-                    <canvas data-user-signature class="bg-white"></canvas>
-                    <button data-clear-signature-button type="button" class="rounded-full px-2 py-1 gap-1.5 absolute right-2 bottom-2 flex justify-center items-center bg-black-numixs text-green-numixs fill-green-numixs hocus:bg-black">
-                        <span class="scale-75">
-                            {% include "includes/icon-eraser.svg" %}
-                        </span>
-                        Effacer
-                    </button>
                 </div>
             </div>
 

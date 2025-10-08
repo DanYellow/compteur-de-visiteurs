@@ -97,8 +97,9 @@
 }
 
 html {
-    background-color: var(--color-white-numixs);
+    background-color: var(--color-black-numixs);
     scroll-behavior: smooth;
+    color: white;
 }
 
 /* :not([type="checkbox"], [type="radio"]) */
