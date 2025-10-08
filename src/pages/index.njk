@@ -9,16 +9,19 @@ Compteur de visiteurs
     <script type="module" src="/src/assets/scripts/terms-of-service.ts" defer></script>
 {% endblock %}
 {% block content %}
-    <div class="mt-8 px-3">
-        <form class="grid grid-cols-2 gap-6 max-w-3xl mx-auto" type="mul" novalidate action="" method="post" data-sign-in-form>
-            <ul class="form-errors-list-container col-span-full" role="alert" data-form-errors id="error-container"></ul>
-
+    <div class="mt-8 px-3 flex flex-row justify-center gap-24">
+        <form class="w-3xl" novalidate action="" method="post" data-sign-in-form>
+            <header class="mb-6">
+                <img src="/images/faclab-logo-light.svg" class="w-20" alt="">
+            </header>
             <div class="flex flex-col col-span-full gap-3">
                 <div class="mb-11">
                     <p class="title-font leading-none text-7xl uppercase">À quel(s) groupe(s)<br /><span class="text-green-numixs">appartenez-vous</span> ?</p>
                     <p class="text-sm opacity-70 -mt-1">Vous devez choisir au moins un secteur</p>
                 </div>
-                <div class="grid grid-cols-2 gap-x-14 gap-y-7">
+                <ul class="form-errors-list-container col-span-full" role="alert" data-form-errors id="error-container"></ul>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-7">
                     {% for sector in list_business_sector %}
                         {% set children = null %}
                         {% if sector.value == "entreprise" %}
@@ -43,9 +46,13 @@ Compteur de visiteurs
             </div>
 
             <div class="col-span-full">
-                <button type="submit" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block hocus:bg-dark-green-numixs">Envoyer</button>
+                <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                    Envoyer
+                    {% include "includes/next-arrow.svg" %}
+                </button>
             </div>
         </form>
+        <img class="hidden lg:block" src="/images/compteur-deco-image.png" alt="">
     </div>
 
     <dialog data-dialog="form-submitted" class="backdrop:bg-[#F5F5F5] m-auto max-w-2xl w-full bg-transparent ">
