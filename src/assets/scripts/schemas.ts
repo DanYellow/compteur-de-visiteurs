@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { listBusinessSector } from "#scripts/utils.ts"
+import { listBusinessSector } from "#scripts/utils.ts";
 
 type BusinessSectorPayload = {
     entreprise?: string;
@@ -42,6 +42,6 @@ export const VisitorSchema = z.object({
 }).refine((data) => {
     return hasSelectedABusinessSector(data as BusinessSectorPayload);
 }, {
-    error: "Vous devez choisir au moins un secteur d'activité",
+    error: "Vous devez choisir au moins un groupe",
     path: listBusinessSector.map((item) => item.value)
 });

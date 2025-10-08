@@ -1,6 +1,8 @@
 {% extends "layouts/page.njk" %}
 {% import "includes/forms.njk" as forms %}
 
+{% set root_class = "register" %}
+
 {% block title %}
 Compteur de visiteurs
 {% endblock %}
@@ -63,7 +65,7 @@ Compteur de visiteurs
         </div>
     </dialog>
     <template data-template-id="form-success">
-        <p class="title-font text-white text-7xl mb-4">Merci de votre retour, excellent passage au<br/> <span class="text-green-numixs">FacLab numixs®</span>.</p>
+        <p class="title-font text-white text-7xl mb-4">Merci de votre retour, excellent passage au<br/> <span class="text-green-numixs">FacLab numixs<sup>®</sup></span>.</p>
         <div>
             <img src="/images/register-complete.jpg" class="rounded-md" alt="">
         </div>

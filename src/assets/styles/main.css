@@ -97,11 +97,29 @@
 }
 
 html {
-    /* background-color: var(--color-black-numixs); */
     scroll-behavior: smooth;
     color: white;
 
-    background: url("/images/bottom-left-pattern.svg") no-repeat left bottom, url("/images/top-right-pattern.svg") no-repeat right top, var(--color-black-numixs);
+    background: #272626;
+    position: relative;
+
+    &.register {
+        background: url("/images/bottom-left-pattern.svg") no-repeat left bottom, url("/images/top-right-pattern.svg") no-repeat right top, #272626;
+        &::after {
+            content: "";
+            position: fixed;
+            width: 700px;
+            aspect-ratio: 1 / 1;
+            display: block;
+            background-color: var(--color-green-numixs);
+            right: -20%;
+            bottom: -20%;
+            z-index: -1;
+            border-radius: 50%;
+            filter: blur(550px);
+            opacity: 0.25;
+        }
+    }
 }
 
 /* :not([type="checkbox"], [type="radio"]) */
