@@ -16,35 +16,6 @@ Liste des membres
     </header>
     <hr class="bg-gray-input-border-numixs">
     <div class="mt-8 px-3 mb-5">
-
-        <div class="overflow-auto">
-            <table class="w-full bg-white border-collapse">
-                {% for header in header_list %}
-                    <tr>
-                        {% if header == "habitant" %}
-                            <th rowspan="12" class="px-4 py-1.5 vertical-label border-gray-500 bg-gray-300 text-lg sticky left-0">Secteur d'activité</th>
-                        {% elif header == "education" or header == "entreprise" or header == "artiste" or header == "artisan" or header == "collectivité" or header == "agent_carpf" or header == "numixs_lab" or header == "fablab" or header == "association" or header == "retraité" or header == "autre" %}
-                        {% else %}
-                            <td class="bg-gray-200 sticky left-0" inert></td>
-                        {% endif %}
-                        <th class="font-bold px-4 py-3 text-left border-solid bg-gray-200 sticky left-0" scope="row">{{ header }}</th>
-                        {% for member in members_list %}
-                            <td class="px-4 py-3 text-left" data-row-key="{{ header }}">
-                                {% if header == "Date d'inscription" %}
-                                <time datetime="{{ member[header] }}">{{ member[header] }}</time>
-                                {% else %}
-                                {{ member[header]|default("/", true) }}
-                                {% endif %}
-                            </td>
-                        {% endfor %}
-                    </tr>
-                {% else %}
-                    <tr class="">
-                        <td colspan="15" class="px-4 py-3 text-center">Pas de membres pour le moment</td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
         <table class="w-full bg-white border-collapse">
             <caption class="mb-2">
                 <div class="flex justify-between px-4">
@@ -56,42 +27,15 @@ Liste des membres
             </caption>
             <thead>
                 <tr class="bg-gray-200">
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <td></td>
-                    <th class="px-4 py-3 border-l border-r border-gray-500 bg-gray-300 text-lg" colspan="7" scope="colgroup">Secteur d'activité</th>
-                    <td></td>
-                </tr>
-                <tr class="bg-gray-200">
-                    <td class="font-bold px-4 py-3 text-left border-solid">Prénom</td>
-                    <td class="font-bold px-4 py-3 text-left border-solid">Nom de famille</td>
-                    <td class="font-bold px-4 py-3 text-left border-solid">Numéro de téléphone</td>
-                    <td class="font-bold px-4 py-3 text-left border-solid">E-mail</td>
-                    <td class="font-bold px-4 py-3 text-left border-solid">Adresse</td>
-                    {# <td class="font-bold px-4 py-3 text-left border-solid">Ville</td> #}
-                    <td class="font-bold px-4 py-3 text-left border-solid">Code postal</td>
-                    <td class="font-bold px-4 py-3 text-left border-solid">Informations supplémentaires</td>
                     {% for business in list_business_sector %}
                         <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} bg-gray-300 font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
                     {% endfor %}
-                    <td class="font-bold px-4 py-3 text-left border-solid">Date d'inscription</td>
+                    <td class="font-bold px-4 py-3 text-left border-solid">Date de passage</td>
                 </tr>
             </thead>
             <tbody>
                 {% for member in members_list %}
                     <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
-                        <td class="px-4 py-3 text-left" data-label="Prénom" data-row-key="prenom">{{ member.prenom }}</td>
-                        <td class="px-4 py-3 text-left" data-label="Nom" data-row-key="nom">{{ member.nom }}</td>
-                        <td class="px-4 py-3 text-left" data-label="Numéro de téléphone" data-row-key="numero_telephone">{{ member.numero_telephone|default("/", true) }}</td>
-                        <td class="px-4 py-3 text-left" data-label="E-mail" data-row-key="email">{{ member.email }}</td>
-                        <td class="px-4 py-3 text-left" data-label="Adresse" data-row-key="adresse">{{ member.adresse|default("/", true) }}</td>
-                        {# <td class="px-4 py-3 text-left">{{ member.ville }}</td> #}
-                        <td class="px-4 py-3 text-left" data-label="Code postal" data-row-key="code_postal">{{ member.code_postal }}</td>
-                        <td class="px-4 py-3 text-left" data-label="Informations supplémentaires" data-row-key="extra_infos">{{ member.extra_infos|default("/", true) }}</td>
                         {% for business in list_business_sector %}
                             <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
                         {% endfor %}
@@ -109,14 +53,6 @@ Liste des membres
             </tbody>
             <tfoot>
                 <tr class="bg-gray-200">
-                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Prénom</td>
-                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Nom de famille</td>
-                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Numéro de téléphone</td>
-                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">E-mail</td>
-                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Adresse</td>
-                    {# <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Ville</td> #}
-                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Code postal</td>
-                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Informations supplémentaires</td>
                     {% for business in list_business_sector %}
                         <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} bg-gray-300 font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
                     {% endfor %}
