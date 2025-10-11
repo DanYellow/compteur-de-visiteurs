@@ -6,7 +6,6 @@ const errorsContainer = document.querySelector("[data-form-errors]") as HTMLULis
 const dialog = document.querySelector("[data-dialog='form-submitted']") as HTMLDialogElement;
 const formSuccessTplRaw = document.querySelector("[data-template-id='form-success']") as HTMLTemplateElement;
 const formErrorTplRaw = document.querySelector("[data-template-id='form-error']") as HTMLTemplateElement;
-const formResetEvent = new Event("formreset", { bubbles: true });
 
 const listFormKeys = [
     ...listBusinessSector.map((item) => item.value),
@@ -27,9 +26,9 @@ const submitForm = async (e: SubmitEvent) => {
     listBusinessSector.forEach(({ value }) => {
         if (formData.has(value)) {
             formData.delete(value);
-            formData.append(value, "oui")
+            formData.append(value, "oui");
         } else {
-            formData.append(value, "non")
+            formData.append(value, "non");
         }
     });
 
@@ -42,7 +41,9 @@ const submitForm = async (e: SubmitEvent) => {
         }
     })
 
-    formDataComputed.append("date_inscription", new Date(Date.now()).toISOString());
+    formDataComputed.append("date_passage", new Date(Date.now()).toISOString());
+
+    return;
 
     const req = await fetch("/", {
         method: "POST",
@@ -50,16 +51,17 @@ const submitForm = async (e: SubmitEvent) => {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify(Object.fromEntries(Array.from(formDataComputed.entries()))),
-    })
+    });
+
     const res = await req.json();
     const dialogSwapContainer = dialog.querySelector("[data-swap-content]") as HTMLDivElement;
     dialogSwapContainer.innerHTML = "";
+
     if (res.success) {
-        dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true))
+        dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true));
         form.reset();
-        document.dispatchEvent(formResetEvent);
     } else {
-        dialogSwapContainer.append(formErrorTplRaw.content.cloneNode(true))
+        dialogSwapContainer.append(formErrorTplRaw.content.cloneNode(true));
     }
 };
 

@@ -18,6 +18,8 @@ const __dirname = path.dirname(__filename);
 const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
 
 router.get("/", (req, res) => {
+    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+    console.log(ip)
     res.render("pages/index.njk", {
         "list_business_sector": listBusinessSector,
     });
@@ -41,7 +43,7 @@ router.post("/", async (req, res) => {
 
         wss.clients.forEach((client) => {
             if (client.readyState === client.OPEN) {
-                client.send(JSON.stringify({ type: "MEMBER_ADDED", payload: req.body }));
+                client.send(JSON.stringify({ type: "VISITOR_REGISTERED", payload: req.body }));
             }
         });
 
@@ -51,7 +53,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.get("/membres", (req, res) => {
+router.get("/visiteurs", (req, res) => {
     let records: unknown[] = []
 
     if (fs.existsSync(csvFile)) {

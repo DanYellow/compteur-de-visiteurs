@@ -9,57 +9,38 @@ Liste des membres
 
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
-    <header class="text-center mb-10 max-w-3xl mx-auto px-3">
-        <h1 class="text-5xl text-black-numixs font-bold title-font mb-2.5">
-   Liste des membres du FacLab<sup>®</sup> numixs
-</h1>
-    </header>
-    <hr class="bg-gray-input-border-numixs">
-    <div class="mt-8 px-3 mb-5">
-        <table class="w-full bg-white border-collapse">
-            <caption class="mb-2">
-                <div class="flex justify-between px-4">
-                    <p class="text-start text-xl">
-                    Nombre de membres : <span data-nb-members>{{ members_list|length }}</span>
-                    </p>
-                    <a href="/membres/telecharger" download class="inline-block bg-green-700 px-2.5 py-1 rounded-xl text-white hocus:bg-green-900">Télécharger (.csv)</a>
-                </div>
-            </caption>
-            <thead>
-                <tr class="bg-gray-200">
-                    {% for business in list_business_sector %}
-                        <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} bg-gray-300 font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
-                    {% endfor %}
-                    <td class="font-bold px-4 py-3 text-left border-solid">Date de passage</td>
-                </tr>
-            </thead>
-            <tbody>
-                {% for member in members_list %}
-                    <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
-                        {% for business in list_business_sector %}
-                            <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
-                        {% endfor %}
-                        <td class="px-4 py-3 text-left" data-label="Date d'inscription" data-row-key="Date d'inscription">
-                            <time datetime="{{ member['Date d\'inscription'] }}">
-                                {{ member["Date d'inscription"] }}
-                            </time>
-                        </td>
-                    </tr>
-                {% else %}
-                    <tr class="">
-                        <td colspan="15" class="px-4 py-3 text-center">Pas de membres pour le moment</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-            <tfoot>
-                <tr class="bg-gray-200">
-                    {% for business in list_business_sector %}
-                        <td class="{{ 'border-l border-gray-500' if loop.index0 == 0 else '' }} {{ 'border-r border-gray-500' if loop.last else '' }} bg-gray-300 font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
-                    {% endfor %}
-                    <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Date d'inscription</td>
-                </tr>
-            </tfoot>
-        </table>
+    <div class="mt-8 px-3 grid grid-cols-[220px_auto] gap-6">
+        <aside>
+            <nav>
+                <header class="mb-6 flex justify-center mt-10">
+                    <img src="/images/faclab-logo-light.svg" class="w-20" alt="">
+                </header>
+
+                <ul>
+                    <li>
+                        <a href="" class="title-font text-3xl block py-2 px-5 text-green-numixs">Visites</a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <div class="bg-slate-50 rounded-md py-10 px-13">
+            <header class="flex justify-between items-center mb-20">
+                <h1 class="text-black title-font font-bold text-6xl">Visites</h1>
+                <a href="/membres/telecharger" download class="inline-flex flex-row gap-2 bg-green-700 px-3.5 py-2.5 rounded-xl text-white hocus:bg-green-900">
+                    Télécharger (.csv)
+                    {% include "includes/download-fill-icon.svg" %}
+                </a>
+            </header>
+            <div class="text-black">
+                <header class="flex gap-4">
+                    <a href=""><</a>
+                    <button commandfor="foo" command="toggle-popover">Test</button>
+                    <input type="date" name="" id="foo">
+                    <a href="">></a>
+                </header>
+                <p>Je suis le contenu</p>
+            </div>
+        </div>
     </div>
 
     <template data-template-id="new-member-notification">
