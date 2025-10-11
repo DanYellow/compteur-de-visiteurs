@@ -9,7 +9,7 @@ Liste des membres
 
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
-    <div class="mt-8 px-3 grid grid-cols-[220px_auto] gap-6">
+    <div class="mt-8 px-3 grid grid-cols-1 xl:grid-cols-[220px_auto] gap-6">
         <aside>
             <nav>
                 <header class="mb-6 flex justify-center mt-10">
@@ -32,23 +32,68 @@ Liste des membres
                 </a>
             </header>
             <div class="text-black">
-                <header class="flex gap-4">
-                    <a href="" class="py-2.5 px-3.5 border-black-numixs border rounded-md">
-                        {% include "includes/arrow-icon.svg" %}
+                <header class="flex gap-4 mb-12">
+                    <a href="" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center">
+                        <span class="flex items-center justify-center w-3.5">
+                            {% include "includes/arrow-icon.svg" %}
+                        </span>
                     </a>
-                    <button commandfor="current-date" command="--open-date-picker" class="relative">
-                        <span class="pointer-events-none">{{ current_date }}</span>
+                    <button class="py-2.5 px-5 border-black-numixs border rounded-md relative" commandfor="current-date" command="--open-date-picker">
+                        <span class="pointer-events-none">{{ "Aujourd'hui" if is_today else current_date|date("EEEE dd LLLL yyyy")  }}</span>
                         <form action="" method="get">
-                            <input type="date" name="current_date" id="current-date" class="absolute inset-0 opacity-0 pointer-events-none">
+                            {% set tomorrow = today|compute_days({func: "plus", days: 1})|date("yyyy-LL-dd") %}
+                            <input type="date" name="current_date" id="current-date" max="{{ tomorrow }}" tabindex="-1" class="absolute inset-0 opacity-0 pointer-events-none">
                         </form>
                     </button>
-                    <a href="" class="py-2.5 px-3.5 border-black-numixs border rounded-md">
-                        <span class="rotate-180 block">
-                        {% include "includes/arrow-icon.svg" %}
+                    <a href="" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center">
+                        <span class="rotate-180 flex items-center justify-center w-3.5">
+                            {% include "includes/arrow-icon.svg" %}
                         </span>
                     </a>
                 </header>
-                <p>Je suis le contenu</p>
+                <table class="w-full bg-white border-collapse">
+                    <caption class="text-start text-lg">
+                        {{ visitors_list|length }} visite(s)
+                    </caption>
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <td class="font-bold px-4 py-3 text-left">#</td>
+                            <td class="font-bold px-4 py-3 text-left">Groupe(s)</td>
+                            {# {% for business in list_business_sector %}
+                                <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
+                            {% endfor %} #}
+                            <td class="font-bold px-4 py-3 text-left">Date de visite</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for member in visitors_list %}
+                            <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">{{ loop.index }}</td>
+                                {# {% for business in list_business_sector %}
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
+                                {% endfor %} #}
+                                <td class="px-4 py-3 text-left" data-label="Date de passage" data-row-key="Date de passage">
+                                    <time datetime="{{ member['date_passage'] }}">
+                                        {{ member["date_passage"]|date("dd/LL/yyyy") }}
+                                    </time>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr class="">
+                                <td colspan="15" class="px-4 py-3 text-center">Pas de visites le {{ current_date }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    {# <tfoot>
+                        <tr class="bg-gray-200">
+                            <td class="font-bold px-4 py-3 text-left">#</td>
+                            {% for business in list_business_sector %}
+                                <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
+                            {% endfor %}
+                            <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Date d'inscription</td>
+                        </tr>
+                    </tfoot> #}
+                </table>
             </div>
         </div>
     </div>

@@ -71,7 +71,16 @@ const nunjucksConfig = nunjucks.configure(app.get("views"), {
 });
 
 nunjucksConfig.addFilter("date", (value, format) => {
-    return DateTime.fromISO(value).toFormat(format);
+    return DateTime.fromISO(value).setLocale('fr').toFormat(format);
+});
+
+enum LuxonFunctions {
+  minus = 'minus',
+  plus = "plus",
+};
+
+nunjucksConfig.addFilter("compute_days", (value, { func, days }: { func: LuxonFunctions, days: number}) => {
+    return DateTime.fromISO(value)[func]({days});
 });
 
 const listDomains: string[] = ["0.0.0.0"]; // "192.168.0.169"

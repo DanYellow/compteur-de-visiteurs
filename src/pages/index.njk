@@ -10,17 +10,17 @@ Compteur de visiteurs
     <script type="module" src="/src/assets/scripts/register-form.ts" defer></script>
 {% endblock %}
 {% block content %}
-    <div class="mt-8 px-3 flex flex-row justify-center gap-24">
-        <form class="w-3xl" novalidate action="" method="post" data-sign-in-form>
+    <div class="max-w-7xl mt-8 px-3 grid grid-cols-1 lg:grid-cols-[1fr_456px] justify-center gap-24 mx-auto">
+        <form class="w-full" novalidate action="" method="post" data-sign-in-form>
             <header class="mb-6">
                 <img src="/images/faclab-logo-light.svg" class="w-20" alt="">
             </header>
-            <div class="flex flex-col col-span-full gap-3">
+            <div class="flex flex-col gap-3">
                 <div class="mb-11">
                     <p class="title-font leading-none text-7xl uppercase">À quel(s) groupe(s)<br /><span class="text-green-numixs">appartenez-vous</span> ?</p>
-                    <p class="text-sm opacity-70 -mt-1">Vous devez choisir au moins un secteur</p>
+                    <p class="text-sm opacity-70 -mt-1">Vous devez choisir au moins un groupe</p>
                 </div>
-                <ul class="form-errors-list-container col-span-full" role="alert" data-form-errors id="error-container"></ul>
+                <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-7">
                     {% for sector in list_business_sector %}
@@ -53,8 +53,8 @@ Compteur de visiteurs
                 </button>
             </div>
         </form>
-        <div class="hidden lg:block rounded-md w-fit overflow-hidden">
-            <img class="block max-w-full h-full object-cover" src="/images/compteur-deco-image.png" alt="">
+        <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full" style="background-image: url('/images/compteur-deco-image.png')">
+            {# <img class="block max-w-full h-full object-cover" src="/images/compteur-deco-image.png" alt=""> #}
         </div>
     </div>
 

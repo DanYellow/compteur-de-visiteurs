@@ -65,30 +65,30 @@ router.get("/visiteurs", (req, res) => {
         });
     }
 
-    var dt = DateTime.now();
-    var f = { month: 'long', day: 'numeric' };
-    const currentDate = dt.setLocale('fr').toLocaleString(f)
+    let daySelected = DateTime.now();
+    const today = daySelected;
+    if (req.query.current_date) {
+        const tmpDate = DateTime.fromISO(req.query.current_date as string);
+        if (tmpDate.isValid) {
+            daySelected = tmpDate;
+        }
+    }
 
     res.render("pages/members-list.njk", {
-        "members_list": records,
+        "visitors_list": records,
         "list_business_sector": listBusinessSector,
         "header_list": records?.[0] ? Object.keys(records[0]) : [],
-        "current_date": currentDate
+        "current_date": daySelected,
+        "today": DateTime.now(),
+        "is_today": daySelected.startOf('day').equals(today.startOf('day')),
     });
 });
 
 router.get('/membres/telecharger', (req, res) => {
+    // req.query.current_date
     let timestamp = getCurrentDay().replaceAll("/", "-");
     timestamp = timestamp.split("-").reverse().join("-")
     res.download(csvFile, `${timestamp}-${getCurrentTime()}-liste-membres.csv`);
-});
-
-router.get("/reglement", (req, res) => {
-    res.setHeader("X-Frame-Options", "SAMEORIGIN");
-    res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename=foo.pdf`);
-
-    res.sendFile("file.tmp.pdf", { root: "public" });
 });
 
 
