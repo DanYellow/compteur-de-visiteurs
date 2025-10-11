@@ -33,10 +33,20 @@ Liste des membres
             </header>
             <div class="text-black">
                 <header class="flex gap-4">
-                    <a href=""><</a>
-                    <button commandfor="foo" command="toggle-popover">Test</button>
-                    <input type="date" name="" id="foo">
-                    <a href="">></a>
+                    <a href="" class="py-2.5 px-3.5 border-black-numixs border rounded-md">
+                        {% include "includes/arrow-icon.svg" %}
+                    </a>
+                    <button commandfor="current-date" command="--open-date-picker" class="relative">
+                        <span class="pointer-events-none">{{ current_date }}</span>
+                        <form action="" method="get">
+                            <input type="date" name="current_date" id="current-date" class="absolute inset-0 opacity-0 pointer-events-none">
+                        </form>
+                    </button>
+                    <a href="" class="py-2.5 px-3.5 border-black-numixs border rounded-md">
+                        <span class="rotate-180 block">
+                        {% include "includes/arrow-icon.svg" %}
+                        </span>
+                    </a>
                 </header>
                 <p>Je suis le contenu</p>
             </div>

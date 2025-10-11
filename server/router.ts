@@ -4,6 +4,7 @@ import { fileURLToPath } from "url";
 import express from "express";
 import { stringify } from "csv-stringify/sync";
 import { parse } from "csv-parse/sync";
+import { DateTime } from "luxon";
 
 import { listBusinessSector } from "#scripts/utils.ts"
 import { VisitorSchema } from "#scripts/schemas.ts";
@@ -64,10 +65,15 @@ router.get("/visiteurs", (req, res) => {
         });
     }
 
+    var dt = DateTime.now();
+    var f = { month: 'long', day: 'numeric' };
+    const currentDate = dt.setLocale('fr').toLocaleString(f)
+
     res.render("pages/members-list.njk", {
         "members_list": records,
         "list_business_sector": listBusinessSector,
         "header_list": records?.[0] ? Object.keys(records[0]) : [],
+        "current_date": currentDate
     });
 });
 

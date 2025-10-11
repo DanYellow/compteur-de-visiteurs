@@ -5,6 +5,7 @@ import nunjucks from "nunjucks";
 import express from "express";
 import cors from "cors";
 import { WebSocketServer } from 'ws';
+import { DateTime } from "luxon";
 
 import router from "./router.ts";
 
@@ -70,7 +71,7 @@ const nunjucksConfig = nunjucks.configure(app.get("views"), {
 });
 
 nunjucksConfig.addFilter("date", (value, format) => {
-    // return DateTime.fromISO(value).toFormat(format);
+    return DateTime.fromISO(value).toFormat(format);
 });
 
 const listDomains: string[] = ["0.0.0.0"]; // "192.168.0.169"
