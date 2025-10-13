@@ -1,11 +1,13 @@
 {% extends "layouts/page.njk" %}
 
 {% block title %}
-Liste des membres
+Liste des visiteurs
 {% endblock %}
 {% block scripts %}
     <script type="module" src="/src/assets/scripts/members-poll.ts" defer></script>
 {% endblock %}
+
+{% set active_menu_item = "visiteurs" %}
 
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
@@ -13,18 +15,18 @@ Liste des membres
         <aside>
             <nav>
                 <header class="mb-6 flex justify-center mt-10">
-                    <img src="/images/faclab-logo-light.svg" class="w-20" alt="">
+                    <img src="/images/faclab-logo-light.svg" class="w-22" alt="">
                 </header>
 
                 <ul>
                     <li>
-                        <a href="/visiteurs" class="title-font text-3xl block py-2 px-5 text-green-numixs">Visites</a>
+                        <a href="/visiteurs" class="{{ 'bg-green-numixs text-black-numixs' if (active_menu_item == "visiteurs") else "text-green-numixs" }} title-font text-3xl block py-2 px-5 rounded-md hocus:bg-[#504F4F] hocus:text-green-numixs">Visites</a>
                     </li>
                 </ul>
             </nav>
         </aside>
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
-            <header class="flex flex-col md:flex-row justify-between md:items-center mb-16">
+            <header class="flex flex-col md:flex-row justify-between md:items-center mb-16 -mt-1.5">
                 <h1 class="text-black title-font font-bold text-6xl">Visites</h1>
                 <a href="/visiteurs/telecharger" download class="justify-center inline-flex flex-row gap-2 bg-green-700 px-3.5 py-2.5 rounded-xl text-white hocus:bg-green-900">
                     Télécharger (.csv)
@@ -33,19 +35,19 @@ Liste des membres
             </header>
             <div class="text-black">
                 <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
-                    <a href="" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center">
+                    <a href="?current_date={{ current_date|add_days(-1)|date("yyyy-LL-dd") }}" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center hocus:bg-green-numixs">
                         <span class="flex items-center justify-center w-3.5">
                             {% include "includes/arrow-icon.svg" %}
                         </span>
                     </a>
-                    <button class="py-2.5 px-5 border-black-numixs border rounded-md relative" commandfor="current-date" command="--open-date-picker">
+                    <button class="py-2.5 px-5 border-black-numixs border rounded-md relative hocus:bg-green-numixs" commandfor="current-date" command="--open-date-picker">
                         <span class="pointer-events-none">{{ "Aujourd'hui" if is_today else current_date|date("EEEE dd LLLL yyyy")  }}</span>
                         <form action="" method="get">
-                            {% set tomorrow = today|compute_days({func: "plus", days: 1})|date("yyyy-LL-dd") %}
-                            <input type="date" name="current_date" id="current-date" max="{{ tomorrow }}" tabindex="-1" class="absolute inset-0 opacity-0 pointer-events-none">
+                            {% set tomorrow = today|add_days(1)|date("yyyy-LL-dd") %}
+                            <input type="date" name="current_date" id="current-date" value="{{ current_date|date("yyyy-LL-dd") }}" max="{{ tomorrow|date("yyyy-LL-dd") }}" tabindex="-1" class="absolute inset-0 opacity-0 pointer-events-none">
                         </form>
                     </button>
-                    <a href="" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center">
+                    <a href="?current_date={{ current_date|add_days(1)|date("yyyy-LL-dd") }}" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center hocus:bg-green-numixs">
                         <span class="rotate-180 flex items-center justify-center w-3.5">
                             {% include "includes/arrow-icon.svg" %}
                         </span>
