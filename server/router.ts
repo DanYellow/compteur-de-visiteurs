@@ -72,10 +72,10 @@ router.get(["/visiteurs", "/liste-visiteurs"], (req, res) => {
     let records: IVisitor[] = [];
     if (fs.existsSync(csvFile)) {
         const content = fs.readFileSync(csvFile);
-        records = parse(content, {
+        records = (parse(content, {
             columns: true,
             skip_empty_lines: true,
-        }).map((item: IVisitor) => {
+        }) as IVisitor[]).map((item) => {
             return {
                 ...item,
                 day: DateTime.fromISO(item.date_passage).toFormat("yyyy-LL-dd")
@@ -97,9 +97,28 @@ router.get(["/visiteurs", "/liste-visiteurs"], (req, res) => {
 
 router.get('/visiteurs/telecharger', (req, res) => {
     // req.query.current_date
-    let timestamp = getCurrentDay().replaceAll("/", "-");
-    timestamp = timestamp.split("-").reverse().join("-")
-    res.download(csvFile, `${timestamp}-${getCurrentTime()}-liste-membres.csv`);
+    const fileContent = fs.readFileSync(csvFile);
+    const fileFormatted = (parse(fileContent, {
+            columns: true,
+            skip_empty_lines: true,
+    }) as IVisitor[]).map((item) => (
+        {
+            ...item,
+            date_passage: DateTime.fromISO(item.date_passage).toFormat("dd-LL-yyyy à HH:mm")
+        }
+    ))
+
+    const timestamp = DateTime.now().toFormat("dd-LL-yyyy-HH'h'mm");
+
+    const payload = [
+        Object.keys(fileFormatted[0]),
+        ...fileFormatted.map((item) => Object.values(item))
+    ];
+
+    const csvFileFormatted = path.join(__dirname, "..", "liste-membres-formatted.tmp.csv");
+
+    fs.writeFileSync(csvFileFormatted, stringify(payload));
+    res.download(csvFileFormatted, `${timestamp}-liste-membres.csv`);
 });
 
 
