@@ -97,21 +97,24 @@ router.get(["/visiteurs", "/liste-visiteurs"], (req, res) => {
 
 router.get('/visiteurs/telecharger', (req, res) => {
     // req.query.current_date
-    const fileContent = fs.readFileSync(csvFile);
-    const fileFormatted = (parse(fileContent, {
+    let fileFormatted = [] as IVisitor[];
+    if (fs.existsSync(csvFile)) {
+        const fileContent = fs.readFileSync(csvFile);
+        fileFormatted = (parse(fileContent, {
             columns: true,
             skip_empty_lines: true,
-    }) as IVisitor[]).map((item) => (
-        {
-            ...item,
-            date_passage: DateTime.fromISO(item.date_passage).toFormat("dd-LL-yyyy à HH:mm")
-        }
-    ))
+        }) as IVisitor[]).map((item) => (
+            {
+                ...item,
+                date_passage: DateTime.fromISO(item.date_passage).toFormat("dd-LL-yyyy à HH:mm")
+            }
+        ))
+    }
 
     const timestamp = DateTime.now().toFormat("dd-LL-yyyy-HH'h'mm");
 
     const payload = [
-        Object.keys(fileFormatted[0]),
+        Object.keys(fileFormatted?.[0] || []),
         ...fileFormatted.map((item) => Object.values(item))
     ];
 
