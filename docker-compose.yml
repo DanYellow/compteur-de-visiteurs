@@ -9,7 +9,7 @@ services:
             # - --providers.file.filename=/traefik-dynamic.yml
         ports:
             - 80:80
-            - 8080:8080
+            - 8081:8081
         volumes:
             - "/var/run/docker.sock:/var/run/docker.sock:ro"
         # configs:
@@ -44,6 +44,7 @@ services:
             - VITE_USE_POLLING=true
             - NODE_ENV=development
             - CHOKIDAR_USEPOLLING=true
+            - NODE_OPTIONS=--max_old_space_size=8192
         env_file:
             - .env.local
         labels:

@@ -18,21 +18,21 @@ Liste des membres
 
                 <ul>
                     <li>
-                        <a href="" class="title-font text-3xl block py-2 px-5 text-green-numixs">Visites</a>
+                        <a href="/visiteurs" class="title-font text-3xl block py-2 px-5 text-green-numixs">Visites</a>
                     </li>
                 </ul>
             </nav>
         </aside>
-        <div class="bg-slate-50 rounded-md py-10 px-13">
-            <header class="flex justify-between items-center mb-20">
+        <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
+            <header class="flex flex-col md:flex-row justify-between md:items-center mb-16">
                 <h1 class="text-black title-font font-bold text-6xl">Visites</h1>
-                <a href="/membres/telecharger" download class="inline-flex flex-row gap-2 bg-green-700 px-3.5 py-2.5 rounded-xl text-white hocus:bg-green-900">
+                <a href="/visiteurs/telecharger" download class="justify-center inline-flex flex-row gap-2 bg-green-700 px-3.5 py-2.5 rounded-xl text-white hocus:bg-green-900">
                     Télécharger (.csv)
                     {% include "includes/download-fill-icon.svg" %}
                 </a>
             </header>
             <div class="text-black">
-                <header class="flex gap-4 mb-12">
+                <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
                     <a href="" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center">
                         <span class="flex items-center justify-center w-3.5">
                             {% include "includes/arrow-icon.svg" %}
@@ -80,7 +80,7 @@ Liste des membres
                             </tr>
                         {% else %}
                             <tr class="">
-                                <td colspan="15" class="px-4 py-3 text-center">Pas de visites le {{ current_date }}</td>
+                                <td colspan="15" class="px-4 py-3 text-center">Pas de visites le {{ current_date|date("dd/LL/yyyy") }}</td>
                             </tr>
                         {% endfor %}
                     </tbody>

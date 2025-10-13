@@ -54,17 +54,12 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.get("/visiteurs", (req, res) => {
-    let records: unknown[] = []
+interface IVisitor {
+    date_passage: string;
+    day: string;
+}
 
-    if (fs.existsSync(csvFile)) {
-        const content = fs.readFileSync(csvFile);
-        records = parse(content, {
-            columns: true,
-            skip_empty_lines: true,
-        });
-    }
-
+router.get(["/visiteurs", "/liste-visiteurs"], (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.current_date) {
@@ -72,6 +67,22 @@ router.get("/visiteurs", (req, res) => {
         if (tmpDate.isValid) {
             daySelected = tmpDate;
         }
+    }
+
+    let records: IVisitor[] = [];
+    if (fs.existsSync(csvFile)) {
+        const content = fs.readFileSync(csvFile);
+        records = parse(content, {
+            columns: true,
+            skip_empty_lines: true,
+        }).map((item: IVisitor) => {
+            return {
+                ...item,
+                day: DateTime.fromISO(item.date_passage).toFormat("yyyy-LL-dd")
+            };
+        }).filter((item) => {
+            return item.day === daySelected.toFormat("yyyy-LL-dd");
+        })
     }
 
     res.render("pages/members-list.njk", {
@@ -84,7 +95,7 @@ router.get("/visiteurs", (req, res) => {
     });
 });
 
-router.get('/membres/telecharger', (req, res) => {
+router.get('/visiteurs/telecharger', (req, res) => {
     // req.query.current_date
     let timestamp = getCurrentDay().replaceAll("/", "-");
     timestamp = timestamp.split("-").reverse().join("-")
