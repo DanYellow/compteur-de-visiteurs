@@ -3,10 +3,14 @@
         <header class="mb-6 flex justify-center mt-10">
             <img src="/images/faclab-logo-light.svg" class="w-22" alt="">
         </header>
-
-        <ul>
+    {% set navItemClasses = "text-white hocus:bg-green-numixs/50 hocus:text-white" %}
+    {% set navItemActiveClasses = "bg-[#504F4F] text-green-numixs hocus:text-white" %}
+        <ul class="flex flex-col gap-1.5">
             <li>
-                <a href="/visiteurs" class="{{ 'bg-green-numixs text-black-numixs' if (active_menu_item == "visiteurs") else "text-green-numixs" }} title-font text-3xl block py-2 px-5 rounded-md hocus:bg-[#504F4F] hocus:text-green-numixs">Visites</a>
+                <a href="/visiteurs" class="{{ navItemActiveClasses if (active_menu_item == "visiteurs") else navItemClasses }} title-font text-3xl block py-2 px-5 rounded-md ">Visites</a>
+            </li>
+            <li>
+                <a href="/visiteurs" class="{{ navItemActiveClasses if (active_menu_item == "") else navItemClasses }} title-font text-3xl block py-2 px-5 rounded-md">Autre</a>
             </li>
         </ul>
     </nav>
