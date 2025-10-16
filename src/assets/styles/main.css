@@ -104,7 +104,8 @@ html {
     position: relative;
 
     &.register {
-        background: url("/images/bottom-left-pattern.svg") no-repeat left bottom, url("/images/top-right-pattern.svg") no-repeat right top, #272626;
+        background: url("/images/bottom-left-pattern.svg") no-repeat left bottom,
+            url("/images/top-right-pattern.svg") no-repeat right top, #272626;
         &::after {
             content: "";
             position: fixed;
@@ -162,5 +163,89 @@ input.error {
     &.hidden {
         display: none;
         opacity: 0;
+    }
+}
+
+.split-button {
+    display: inline-flex;
+    border-radius: var(--radius-xl);
+    fill: currentColor;
+
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+
+    & > :is(a, button) {
+        appearance: none;
+        border: none;
+
+        display: inline-flex;
+        align-items: center;
+        gap: 1ch;
+        white-space: nowrap;
+
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: 500;
+
+        padding-block: 1.25ch;
+        padding-inline: 2.5ch;
+
+        outline-offset: -5px;
+    }
+
+    .popup-button {
+        inline-size: 4ch;
+        cursor: pointer;
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-start-end-radius: var(--radius-xl);
+        border-end-end-radius: var(--radius-xl);
+        border-inline-start: 1px solid white;
+
+        &:is(:focus-within, :hover) {
+            background-color: var(--color-green-900);
+        }
+
+        &:focus-within {
+            & > .split-popup {
+                transition-duration: 350ms;
+                opacity: 1;
+                transform: translateY(0);
+                pointer-events: auto;
+            }
+
+            /* & > svg {
+                transition-duration: 350ms;
+                transform: rotateZ(.5turn);
+            } */
+        }
+    }
+
+    .split-popup {
+        opacity: 0;
+        pointer-events: none;
+        position: absolute;
+        list-style-type: none;
+
+        padding-inline: 0;
+        padding-block: .5ch;
+        border-radius: var(--radius-xl);
+        display: flex;
+        flex-direction: column;
+        font-size: .9em;
+        transition: opacity 350ms ease;
+
+        right: 0;
+        top: 100%;
+
+        @supports (position-anchor: --split-button) {
+            position-anchor: --split-button;
+            right: anchor(right);
+            top: anchor(bottom);
+            margin-top: 0.85rem;
+        }
     }
 }

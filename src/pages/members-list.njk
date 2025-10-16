@@ -16,10 +16,41 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-col md:flex-row justify-between md:items-center mb-16 -mt-1.5">
                 <h1 class="text-black title-font font-bold text-6xl">Visites</h1>
-                <a href="/visiteurs/telecharger" download class="justify-center inline-flex flex-row gap-2 bg-green-700 px-3.5 py-2.5 rounded-xl text-white hocus:bg-green-900">
+                {# <a href="/visiteurs/telecharger" download class="justify-center inline-flex flex-row gap-2 bg-green-700 px-3.5 py-2.5 rounded-xl text-white hocus:bg-green-900">
                     Télécharger (.csv)
                     {% include "includes/download-fill-icon.svg" %}
-                </a>
+                </a> #}
+                <div class="split-button bg-green-700 ">
+                    <a href="/visiteurs/telecharger" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white hocus:bg-green-900">
+                        Télécharger les données du {{ current_date|date("dd/MM/yy") }} (.csv)
+                    </a>
+
+                    <span class="popup-button" aria-haspopup="true" aria-expanded="false" title="Open for more actions">
+                        <svg aria-hidden="true" viewBox="0 0 20 20" style="anchor-name: --split-button;">
+                            <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                        </svg>
+                        <script>
+                            const th = document.querySelector(".popup-button");
+                            th.addEventListener("click", (e) => {
+                                e.currentTarget.querySelector("a, button").focus();
+                            });
+                        </script>
+                        <ul class="split-popup bg-slate-50 shadow-2xl">
+                            <li>
+                                <a href="/visiteurs/telecharger" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black">
+                                    {% include "includes/download-fill-icon.svg" %}
+                                    Télécharger toutes les données de l'année {{ current_date|date("yyyy") }}  (.csv)
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/visiteurs/telecharger" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black">
+                                    {% include "includes/download-fill-icon.svg" %}
+                                    Télécharger toutes les données (.csv)
+                                </a>
+                            </li>
+                        </ul>
+                    </span>
+                </div>
             </header>
             <div class="text-black">
                 <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
@@ -59,6 +90,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                         {% for member in visitors_list %}
                             <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">{{ loop.index }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}"></td>
                                 {# {% for business in list_business_sector %}
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
                                 {% endfor %} #}
