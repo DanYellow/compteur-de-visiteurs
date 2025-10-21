@@ -31,12 +31,15 @@
         "csv-stringify": "^6.6.0",
         "express": "^5.1.0",
         "luxon": "^3.7.2",
+        "sequelize": "^6.37.7",
+        "sqlite3": "^5.1.7",
         "ws": "^8.18.3",
         "zod": "^4.1.9"
     },
     "imports": {
         "#server/utils/*.ts": "./server/utils/*.ts",
         "#server/*.ts": "./server/*.ts",
+        "#models/*.ts": "./models/*.ts",
         "#scripts/*.ts": "./src/assets/scripts/*.ts"
     }
 }
