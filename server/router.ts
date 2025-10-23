@@ -10,6 +10,7 @@ import { listBusinessSector } from "#scripts/utils.ts"
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "./index.ts";
 import { getCurrentDay, getCurrentTime } from "#scripts/utils.ts";
+import VisitorModel from "#models/visitor.ts"
 
 const router = express.Router();
 
@@ -20,7 +21,7 @@ const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
 
 router.get("/", (req, res) => {
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-    console.log(ip)
+    console.log("ip", ip)
     res.render("pages/index.njk", {
         "list_business_sector": listBusinessSector,
     });
@@ -33,14 +34,21 @@ router.post("/", async (req, res) => {
     }
 
     try {
-        if (fs.existsSync(csvFile)) {
-            const payload = stringify([Object.values(req.body)]);
-            fs.appendFileSync(csvFile, payload);
-        } else {
-            const payload = stringify([Object.keys(req.body), Object.values(req.body)]);
-            fs.writeFileSync(csvFile, payload);
+        const payload = {
+            ...req.body,
+            place: res.locals.PLACE,
         }
-        await new Promise(r => setTimeout(r, 2000));
+
+        const jane = await VisitorModel.create(payload);
+        console.log("Jane's auto-generated ID:", jane.id);
+        // if (fs.existsSync(csvFile)) {
+        //     const payload = stringify([Object.values(req.body)]);
+        //     fs.appendFileSync(csvFile, payload);
+        // } else {
+        //     const payload = stringify([Object.keys(req.body), Object.values(req.body)]);
+        //     fs.writeFileSync(csvFile, payload);
+        // }
+        // await new Promise(r => setTimeout(r, 2000));
 
         wss.clients.forEach((client) => {
             if (client.readyState === client.OPEN) {
@@ -50,6 +58,7 @@ router.post("/", async (req, res) => {
 
         res.status(200).json({ "success": true })
     } catch (err) {
+        console.log(err)
         res.status(500).json({ "success": false })
     }
 });

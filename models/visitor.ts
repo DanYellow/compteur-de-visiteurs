@@ -7,11 +7,9 @@ listBusinessSector.forEach((item) => {
   listBusinessSectorKeys[item.value] = DataTypes.STRING;
 })
 
-console.log(listBusinessSectorKeys)
-
 const sequelize = new Sequelize('sqlite::memory:');
-const Visitor = sequelize.define('User', {
-  date: DataTypes.DATE,
+const Visitor = sequelize.define('Visitor', {
+  date_passage: DataTypes.DATE,
   place: DataTypes.STRING,
   ...listBusinessSectorKeys,
 });

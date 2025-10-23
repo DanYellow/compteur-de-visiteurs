@@ -15,7 +15,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 if (process.env.NODE_ENV === "development") {
-    dotenv.config({ path: './.env.dist' })
+    dotenv.config({ path: './.env.local' })
 
     const viteConfig = await import("../vite.config.ts");
     const { createServer: createViteServer } = await import("vite");
@@ -44,6 +44,7 @@ app.use(
 app.use((req, res, next) => {
     const context = {
         NODE_ENV: process.env.NODE_ENV,
+        PLACE: process.env.PLACE,
     };
 
     res.locals = {

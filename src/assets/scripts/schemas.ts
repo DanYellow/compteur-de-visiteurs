@@ -2,8 +2,6 @@ import * as z from "zod";
 
 import { listBusinessSector } from "#scripts/utils.ts";
 
-import VisitorModel from "#models/visitor.ts"
-
 type BusinessSectorPayload = {
     entreprise?: string;
     education?: string;
