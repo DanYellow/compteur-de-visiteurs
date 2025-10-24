@@ -1,4 +1,6 @@
-import { Sequelize, DataTypes } from 'sequelize';
+import { DataTypes } from 'sequelize';
+
+import sequelize from "./index";
 
 import { listBusinessSector } from "#scripts/utils.ts"
 
@@ -7,11 +9,17 @@ listBusinessSector.forEach((item) => {
   listBusinessSectorKeys[item.value] = DataTypes.STRING;
 })
 
-const sequelize = new Sequelize('sqlite::memory:');
-const Visitor = sequelize.define('Visitor', {
+
+const Visitor = sequelize.define('visitor', {
   date_passage: DataTypes.DATE,
   place: DataTypes.STRING,
   ...listBusinessSectorKeys,
 });
+
+(async () => {
+  await sequelize.sync({ force: true });
+  // Code here
+})();
+
 
 export default Visitor;

@@ -39,16 +39,8 @@ router.post("/", async (req, res) => {
             place: res.locals.PLACE,
         }
 
-        const jane = await VisitorModel.create(payload);
-        console.log("Jane's auto-generated ID:", jane.id);
-        // if (fs.existsSync(csvFile)) {
-        //     const payload = stringify([Object.values(req.body)]);
-        //     fs.appendFileSync(csvFile, payload);
-        // } else {
-        //     const payload = stringify([Object.keys(req.body), Object.values(req.body)]);
-        //     fs.writeFileSync(csvFile, payload);
-        // }
-        // await new Promise(r => setTimeout(r, 2000));
+        await VisitorModel.create(payload);
+        await new Promise(r => setTimeout(r, 2000));
 
         wss.clients.forEach((client) => {
             if (client.readyState === client.OPEN) {
