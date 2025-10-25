@@ -1,13 +1,14 @@
 {% extends "layouts/page.njk" %}
 
 {% block title %}
-Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
+{# Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }} #}
 {% endblock %}
 {% block scripts %}
     <script type="module" src="/src/assets/scripts/members-poll.ts" defer></script>
 {% endblock %}
 
 {% set active_menu_item = "visiteurs" %}
+{% set date_format = "dd/LL/yyyy à HH:mm" %}
 
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
@@ -20,12 +21,12 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                     Télécharger (.csv)
                     {% include "includes/download-fill-icon.svg" %}
                 </a> #}
-                <div class="split-button bg-green-700 ">
+                <div class="split-button bg-green-700 self-start md:self-center">
                     <a href="/visiteurs/telecharger" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white hocus:bg-green-900">
                         Télécharger les données du {{ current_date|date("dd/MM/yy") }} (.csv)
                     </a>
 
-                    <span class="popup-button" aria-haspopup="true" aria-expanded="false" title="Open for more actions">
+                    <span class="popup-button z-50" aria-haspopup="true" aria-expanded="false" title="Open for more actions">
                         <svg aria-hidden="true" viewBox="0 0 20 20" style="anchor-name: --split-button;">
                             <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                         </svg>
@@ -94,6 +95,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                                 {# {% for business in list_business_sector %}
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
                                 {% endfor %} #}
+
                                 <td class="px-4 py-3 text-left" data-label="Date de passage" data-row-key="Date de passage">
                                     <time datetime="{{ member['date_passage'] }}">
                                         {{ member["date_passage"]|date("dd/LL/yyyy à HH:mm") }}

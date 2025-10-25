@@ -41,8 +41,6 @@ const submitForm = async (e: SubmitEvent) => {
         }
     })
 
-    formDataComputed.append("date_passage", new Date(Date.now()).toISOString());
-
     const req = await fetch("/", {
         method: "POST",
         headers: {

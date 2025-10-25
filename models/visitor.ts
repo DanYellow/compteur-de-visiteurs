@@ -9,16 +9,16 @@ listBusinessSector.forEach((item) => {
   listBusinessSectorKeys[item.value] = DataTypes.STRING;
 })
 
-
 const Visitor = sequelize.define('visitor', {
   date_passage: DataTypes.DATE,
   place: DataTypes.STRING,
   ...listBusinessSectorKeys,
+}, {
+    createdAt: 'date_passage',
 });
 
 (async () => {
-  await sequelize.sync({ force: true });
-  // Code here
+  await sequelize.sync();
 })();
 
 

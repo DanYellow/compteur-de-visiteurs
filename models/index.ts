@@ -1,6 +1,9 @@
-import { Sequelize, DataTypes } from 'sequelize';
+import { Sequelize } from 'sequelize';
 
-const sequelize = new Sequelize('sqlite::memory:');
+const sequelize = new Sequelize({
+  dialect: 'sqlite',
+  storage: './database.tmp.sqlite'
+});
 
 try {
   await sequelize.authenticate();

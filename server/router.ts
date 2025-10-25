@@ -40,7 +40,7 @@ router.post("/", async (req, res) => {
         }
 
         await VisitorModel.create(payload);
-        await new Promise(r => setTimeout(r, 2000));
+        await new Promise(r => setTimeout(r, 1500));
 
         wss.clients.forEach((client) => {
             if (client.readyState === client.OPEN) {
@@ -60,7 +60,7 @@ interface IVisitor {
     day: string;
 }
 
-router.get(["/visiteurs", "/liste-visiteurs"], (req, res) => {
+router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.current_date) {
@@ -70,21 +70,8 @@ router.get(["/visiteurs", "/liste-visiteurs"], (req, res) => {
         }
     }
 
-    let records: IVisitor[] = [];
-    if (fs.existsSync(csvFile)) {
-        const content = fs.readFileSync(csvFile);
-        records = (parse(content, {
-            columns: true,
-            skip_empty_lines: true,
-        }) as IVisitor[]).map((item) => {
-            return {
-                ...item,
-                day: DateTime.fromISO(item.date_passage).toFormat("yyyy-LL-dd")
-            };
-        }).filter((item) => {
-            return item.day === daySelected.toFormat("yyyy-LL-dd");
-        })
-    }
+    let records: IVisitor[] = await VisitorModel.findAll();
+    console.log(JSON.stringify(records))
 
     res.render("pages/members-list.njk", {
         "visitors_list": records,
