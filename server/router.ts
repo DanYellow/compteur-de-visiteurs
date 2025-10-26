@@ -107,7 +107,7 @@ router.get('/visiteurs/telecharger', (req, res) => {
     ];
 
     const csvFileFormatted = path.join(__dirname, "..", "liste-membres-formatted.tmp.csv");
-
+// https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#the-basics
     fs.writeFileSync(csvFileFormatted, stringify(payload));
     res.download(csvFileFormatted, `${timestamp}-liste-membres.csv`);
 });

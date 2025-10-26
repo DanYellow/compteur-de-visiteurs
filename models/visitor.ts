@@ -6,7 +6,10 @@ import { listBusinessSector } from "#scripts/utils.ts"
 
 const listBusinessSectorKeys = {}
 listBusinessSector.forEach((item) => {
-  listBusinessSectorKeys[item.value] = DataTypes.STRING;
+  listBusinessSectorKeys[item.value] = {
+    type: DataTypes.STRING,
+    defaultValue: 'non',
+  };
 })
 
 const Visitor = sequelize.define('visitor', {
@@ -17,9 +20,6 @@ const Visitor = sequelize.define('visitor', {
     createdAt: 'date_passage',
 });
 
-(async () => {
-  await sequelize.sync();
-})();
-
+await sequelize.sync({ alter: true });
 
 export default Visitor;

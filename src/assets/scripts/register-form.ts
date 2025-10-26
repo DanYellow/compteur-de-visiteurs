@@ -1,15 +1,10 @@
 import { VisitorSchema } from "#scripts/schemas.ts";
-import { listBusinessSector } from "#scripts/utils.ts"
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
 const dialog = document.querySelector("[data-dialog='form-submitted']") as HTMLDialogElement;
 const formSuccessTplRaw = document.querySelector("[data-template-id='form-success']") as HTMLTemplateElement;
 const formErrorTplRaw = document.querySelector("[data-template-id='form-error']") as HTMLTemplateElement;
-
-const listFormKeys = [
-    ...listBusinessSector.map((item) => item.value),
-]
 
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -23,30 +18,12 @@ const submitForm = async (e: SubmitEvent) => {
     const form = (e.currentTarget as HTMLFormElement);
     const formData = new FormData(form);
 
-    listBusinessSector.forEach(({ value }) => {
-        if (formData.has(value)) {
-            formData.delete(value);
-            formData.append(value, "oui");
-        } else {
-            formData.append(value, "non");
-        }
-    });
-
-    const formDataComputed = new FormData();
-    listFormKeys.forEach((key) => {
-        if (formData.has(key)) {
-            formDataComputed.append(key, formData.get(key) as string)
-        } else {
-            formDataComputed.append(key, "");
-        }
-    })
-
     const req = await fetch("/", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(Object.fromEntries(Array.from(formDataComputed.entries()))),
+        body: JSON.stringify(Object.fromEntries(Array.from(formData.entries()))),
     });
 
     const res = await req.json();
