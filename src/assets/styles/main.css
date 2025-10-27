@@ -3,7 +3,8 @@
 @theme {
     --color-gray-numixs: #312f2f;
     /* #373736 */
-    --color-black-numixs: #2c3344;
+    --color-black-numixs: #312f2f;
+    /* --color-black-numixs: #2c3344; */
     --color-gray-input-border-numixs: #b6bcc8;
     --color-gray-input-numixs: #d9d5d5;
     --color-green-numixs: #d5d916;
@@ -100,7 +101,7 @@ html {
     scroll-behavior: smooth;
     color: white;
 
-    background: #272626;
+    background: #312f2f;
     position: relative;
 
     &.register {

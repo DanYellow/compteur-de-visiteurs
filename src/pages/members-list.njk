@@ -73,28 +73,29 @@
                         </span>
                     </a>
                 </header>
-                <table class="w-full bg-white border-collapse">
+                {% include "includes/calendar.njk" %}
+                <table class="w-full bg-white border-collapse block overflow-x-auto whitespace-nowrap">
                     <caption class="text-start text-lg">
                         {{ visitors_list|length }} visite(s)
                     </caption>
-                    <thead>
+                    <thead class="w-full table">
                         <tr class="bg-gray-200">
                             <td class="font-bold px-4 py-3 text-left">#</td>
-                            <td class="font-bold px-4 py-3 text-left">Groupe(s)</td>
-                            {# {% for business in list_business_sector %}
+                            {# <td class="font-bold px-4 py-3 text-left">Groupe(s)</td> #}
+                            {% for business in list_business_sector %}
                                 <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
-                            {% endfor %} #}
+                            {% endfor %}
                             <td class="font-bold px-4 py-3 text-left">Date de visite</td>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="w-full table">
                         {% for member in visitors_list %}
                             <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">{{ loop.index }}</td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}"></td>
-                                {# {% for business in list_business_sector %}
+                                {% for business in list_business_sector %}
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
-                                {% endfor %} #}
+                                {% endfor %}
 
                                 <td class="px-4 py-3 text-left" data-label="Date de passage" data-row-key="Date de passage">
                                     <time datetime="{{ member['date_passage'] }}">
