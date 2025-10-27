@@ -20,6 +20,6 @@ const Visitor = sequelize.define('visitor', {
     createdAt: 'date_passage',
 });
 
-await sequelize.sync({ alter: true });
+await Visitor.sync({ alter: true });
 
 export default Visitor;

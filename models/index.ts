@@ -15,6 +15,4 @@ try {
     console.error('Unable to connect to the database:', error);
 }
 
-await sequelize.sync({ alter: true });
-
 export default sequelize;

@@ -5,11 +5,11 @@ import express from "express";
 import { stringify } from "csv-stringify/sync";
 import { parse } from "csv-parse/sync";
 import { DateTime } from "luxon";
+import { Op, literal } from 'sequelize';
 
 import { listBusinessSector } from "#scripts/utils.ts"
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "./index.ts";
-import { getCurrentDay, getCurrentTime } from "#scripts/utils.ts";
 import VisitorModel from "#models/visitor.ts"
 
 const router = express.Router();
@@ -70,8 +70,18 @@ router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
         }
     }
 
-    let records: IVisitor[] = await VisitorModel.findAll();
-    console.log(JSON.stringify(records))
+    const daySelectedFormatted = daySelected.toFormat("yyyy-MM-dd");
+
+    const records: IVisitor[] = await VisitorModel.findAll({
+        where: {
+            date_passage: {
+                [Op.and]: {
+                    [Op.gte]: `${daySelectedFormatted} 00:00:00`,
+                    [Op.lte]: `${daySelectedFormatted} 23:59:59.999999`,
+                }
+            }
+        }
+    });
 
     res.render("pages/members-list.njk", {
         "visitors_list": records,
