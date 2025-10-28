@@ -60,6 +60,10 @@ interface IVisitor {
     day: string;
 }
 
+router.get(["/dashboard"], async (req, res) => {
+    res.render("pages/dashboard.njk");
+})
+
 router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
