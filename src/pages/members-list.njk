@@ -17,10 +17,7 @@
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-col md:flex-row justify-between md:items-center mb-16 -mt-1.5">
                 <h1 class="text-black title-font font-bold text-6xl">Visites</h1>
-                {# <a href="/visiteurs/telecharger" download class="justify-center inline-flex flex-row gap-2 bg-green-700 px-3.5 py-2.5 rounded-xl text-white hocus:bg-green-900">
-                    Télécharger (.csv)
-                    {% include "includes/download-fill-icon.svg" %}
-                </a> #}
+
                 <div class="split-button bg-green-700 self-start md:self-center">
                     <a href="/visiteurs/telecharger" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white hocus:bg-green-900">
                         Télécharger les données du {{ current_date|date("dd/MM/yy") }} (.csv)
@@ -39,13 +36,13 @@
                         <ul class="split-popup bg-slate-50 shadow-2xl">
                             <li>
                                 <a href="/visiteurs/telecharger" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black">
-                                    {% include "includes/download-fill-icon.svg" %}
+                                    {% include "includes/icons/download-fill-icon.svg" %}
                                     Télécharger toutes les données de l'année {{ current_date|date("yyyy") }}  (.csv)
                                 </a>
                             </li>
                             <li>
                                 <a href="/visiteurs/telecharger" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black">
-                                    {% include "includes/download-fill-icon.svg" %}
+                                    {% include "includes/icons/download-fill-icon.svg" %}
                                     Télécharger toutes les données (.csv)
                                 </a>
                             </li>
@@ -57,7 +54,7 @@
                 <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
                     <a href="?current_date={{ current_date|add_days(-1)|date("yyyy-LL-dd") }}" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center hocus:bg-green-numixs">
                         <span class="flex items-center justify-center w-3.5">
-                            {% include "includes/arrow-icon.svg" %}
+                            {% include "includes/icons/arrow-icon.svg" %}
                         </span>
                     </a>
                     <button class="py-2.5 px-5 border-black-numixs border rounded-md relative hocus:bg-green-numixs" commandfor="current-date" command="--open-date-picker">
@@ -69,7 +66,7 @@
                     </button>
                     <a href="?current_date={{ current_date|add_days(1)|date("yyyy-LL-dd") }}" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center hocus:bg-green-numixs">
                         <span class="rotate-180 flex items-center justify-center w-3.5">
-                            {% include "includes/arrow-icon.svg" %}
+                            {% include "includes/icons/arrow-icon.svg" %}
                         </span>
                     </a>
                 </header>
