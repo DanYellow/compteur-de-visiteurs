@@ -7,7 +7,10 @@
     {% set navItemActiveClasses = "bg-[#504F4F] text-green-numixs hocus:text-white" %}
         <ul class="flex flex-col gap-1.5">
             <li>
-                <a href="/dashboard" class="{{ navItemActiveClasses if (active_menu_item == "") else navItemClasses }} title-font text-3xl block py-2 px-5 rounded-md ">Dashboard</a>
+                <a href="/dashboard" class="{{ navItemActiveClasses if (active_menu_item == "") else navItemClasses }} title-font text-3xl py-2 px-5 rounded-md flex gap-3 items-center">
+                    {% include "includes/icons/home-icon.svg" %}
+                    Dashboard
+                </a>
             </li>
             <li>
                 <a href="/visiteurs" class="{{ navItemActiveClasses if (active_menu_item == "visiteurs") else navItemClasses }} title-font text-3xl block py-2 px-5 rounded-md">Visites</a>
