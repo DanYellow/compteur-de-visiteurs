@@ -14,10 +14,11 @@ listBusinessSector.forEach((item) => {
 
 const Visitor = sequelize.define('visitor', {
   date_passage: DataTypes.DATE,
-  place: DataTypes.STRING,
+  lieu: DataTypes.STRING,
   ...listBusinessSectorKeys,
 }, {
     createdAt: 'date_passage',
+    updatedAt: false,
 });
 
 await Visitor.sync({ alter: true });

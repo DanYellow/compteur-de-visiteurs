@@ -19,8 +19,8 @@
                 <h1 class="text-black title-font font-bold text-6xl">Visites</h1>
 
                 <div class="split-button bg-green-700 self-start md:self-center">
-                    <a href="/visiteurs/telecharger" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white hocus:bg-green-900">
-                        Télécharger les données du {{ current_date|date("dd/MM/yy") }} (.csv)
+                    <a href="/visiteurs/telecharger?jour={{ current_date|date("dd/MM/yyyy") }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white hocus:bg-green-900">
+                        Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)
                     </a>
 
                     <span class="popup-button z-50" aria-haspopup="true" aria-expanded="false" title="Open for more actions">
@@ -28,22 +28,22 @@
                             <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                         </svg>
                         <script>
-                            const th = document.querySelector(".popup-button");
-                            th.addEventListener("click", (e) => {
+                            const popupButton = document.querySelector(".popup-button");
+                            popupButton.addEventListener("click", (e) => {
                                 e.currentTarget.querySelector("a, button").focus();
                             });
                         </script>
                         <ul class="split-popup bg-slate-50 shadow-2xl">
                             <li>
-                                <a href="/visiteurs/telecharger" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black">
+                                <a href="/visiteurs/telecharger?mois={{ current_date|date("MM/yyyy") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                                     {% include "includes/icons/download-fill-icon.svg" %}
-                                    Télécharger toutes les données de l'année {{ current_date|date("yyyy") }}  (.csv)
+                                    Télécharger toutes les données du mois {{ current_date|date("MMMM yyyy") }}  (.csv)
                                 </a>
                             </li>
                             <li>
-                                <a href="/visiteurs/telecharger" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black">
+                                <a href="/visiteurs/telecharger?annee={{ current_date|date("yyyy") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                                     {% include "includes/icons/download-fill-icon.svg" %}
-                                    Télécharger toutes les données (.csv)
+                                    Télécharger toutes les données de l'année {{ current_date|date("yyyy") }}  (.csv)
                                 </a>
                             </li>
                         </ul>

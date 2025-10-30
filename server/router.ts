@@ -17,8 +17,6 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
-
 router.get("/", (req, res) => {
     var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
     console.log("ip", ip)
@@ -36,7 +34,7 @@ router.post("/", async (req, res) => {
     try {
         const payload = {
             ...req.body,
-            place: res.locals.PLACE,
+            lieu: res.locals.PLACE,
         }
 
         await VisitorModel.create(payload);
@@ -97,33 +95,25 @@ router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
     });
 });
 
-router.get('/visiteurs/telecharger', (req, res) => {
-    // req.query.current_date
-    let fileFormatted = [] as IVisitor[];
-    if (fs.existsSync(csvFile)) {
-        const fileContent = fs.readFileSync(csvFile);
-        fileFormatted = (parse(fileContent, {
-            columns: true,
-            skip_empty_lines: true,
-        }) as IVisitor[]).map((item) => (
-            {
-                ...item,
-                date_passage: DateTime.fromISO(item.date_passage).toFormat("dd-LL-yyyy à HH:mm")
-            }
-        ))
-    }
+router.get('/visiteurs/telecharger', async (req, res) => {
+    const records: IVisitor[] = await VisitorModel.findAll({raw: true});
+    console.log(req.query);
+    const values = [Object.keys(records[0])];
+    records.forEach((item) => {
+        const formattedItem = {
+            ...item,
+            date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
+        }
+        values.push(Object.values(formattedItem));
+    })
 
     const timestamp = DateTime.now().toFormat("dd-LL-yyyy-HH'h'mm");
+    const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
 
-    const payload = [
-        Object.keys(fileFormatted?.[0] || []),
-        ...fileFormatted.map((item) => Object.values(item))
-    ];
-
-    const csvFileFormatted = path.join(__dirname, "..", "liste-membres-formatted.tmp.csv");
-// https://sequelize.org/docs/v6/core-concepts/model-querying-basics/#the-basics
-    fs.writeFileSync(csvFileFormatted, stringify(payload));
-    res.download(csvFileFormatted, `${timestamp}-liste-membres.csv`);
+    fs.writeFileSync(csvFile, stringify(values));
+    res.download(csvFile, `${timestamp}-liste-membres.csv`, () => {
+        fs.unlinkSync(csvFile);
+    });
 });
 
 
