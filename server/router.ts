@@ -96,8 +96,53 @@ router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
 });
 
 router.get('/visiteurs/telecharger', async (req, res) => {
-    const records: IVisitor[] = await VisitorModel.findAll({raw: true});
-    console.log(req.query);
+    const today = DateTime.now();
+
+    // let downloadedFileSuffix = "";
+
+    // switch (Object.keys(req.query)[0]) {
+    //     case "jour":
+            
+    //         break;
+    
+    //     default:
+    //         break;
+    // }
+
+    const records: IVisitor[] = await VisitorModel.findAll({
+        raw: true,
+        ...("jour" in req.query ? {
+            where: {
+                date_passage: {
+                    [Op.and]: {
+                        [Op.gte]: today.startOf('day'),
+                        [Op.lte]: today.endOf('day'),
+                    }
+                }
+            }
+        } : {}),
+        ...("mois" in req.query ? {
+            where: {
+                date_passage: {
+                    [Op.and]: {
+                        [Op.gte]: today.startOf('month'),
+                        [Op.lte]: today.endOf('month'),
+                    }
+                }
+            }
+        } : {}),
+        ...("year" in req.query ? {
+            where: {
+                date_passage: {
+                    [Op.and]: {
+                        [Op.gte]: today.startOf('year'),
+                        [Op.lte]: today.endOf('year'),
+                    }
+                }
+            }
+        } : {})
+    });
+
     const values = [Object.keys(records[0])];
     records.forEach((item) => {
         const formattedItem = {
