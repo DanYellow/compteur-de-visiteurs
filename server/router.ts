@@ -3,9 +3,8 @@ import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
 import { stringify } from "csv-stringify/sync";
-import { parse } from "csv-parse/sync";
 import { DateTime } from "luxon";
-import { Op, literal } from 'sequelize';
+import { Op } from 'sequelize';
 
 import { listBusinessSector } from "#scripts/utils.ts"
 import { VisitorSchema } from "#scripts/schemas.ts";
