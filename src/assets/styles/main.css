@@ -129,19 +129,6 @@ input.error {
     border: solid 1px var(--color-red-800) !important;
 }
 
-.signature-placeholder {
-    &::after {
-        content: url("/images/signature-placeholder.svg");
-        position: absolute;
-        pointer-events: none;
-        left: 50%;
-        top: 50%;
-        translate: -50% -50%;
-        pointer-events: none;
-        opacity: 0.3;
-    }
-}
-
 .switch-container {
     &:has(.error) .switch {
         border-color: var(--color-red-500);
@@ -231,8 +218,6 @@ input.error {
         position: absolute;
         list-style-type: none;
 
-        padding-inline: 0;
-        padding-block: .5ch;
         border-radius: var(--radius-xl);
         display: flex;
         flex-direction: column;
@@ -241,6 +226,8 @@ input.error {
 
         right: 0;
         top: 100%;
+        gap: 0.35rem;
+        padding: 0.25rem;
 
         @supports (position-anchor: --split-button) {
             position-anchor: --split-button;
