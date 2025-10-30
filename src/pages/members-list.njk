@@ -71,48 +71,41 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                     </a>
                 </header>
                 {# {% include "includes/calendar.njk" %} #}
-                <table class="w-full bg-white border-collapse whitespace-nowrap">
-                    <caption class="text-start text-lg">
-                        {{ visitors_list|length }} visite(s)
-                    </caption>
-                    <thead>
-                        <tr class="bg-gray-200">
-                            <td class="font-bold px-4 py-3 text-left">#</td>
-                            <td class="font-bold px-4 py-3 text-left">Date de visite</td>
-                            {% for business in list_business_sector %}
-                                <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
-                            {% endfor %}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for member in visitors_list %}
-                            <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
-                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">{{ loop.index }}</td>
-                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Date de passage" data-row-key="Date de passage">
-                                    <time datetime="{{ member['date_passage'] }}">
-                                        {{ member["date_passage"]|date("dd/LL/yyyy à HH:mm") }}
-                                    </time>
-                                </td>
+                <div class="overflow-x-auto">
+                    <table class="w-full bg-white border-collapse whitespace-nowrap">
+                        {# <caption class="text-start text-lg">
+                            {{ visitors_list|length }} visite(s)
+                        </caption> #}
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <td class="font-bold px-4 py-3 text-left">#</td>
+                                <td class="font-bold px-4 py-3 text-left">Date de visite</td>
                                 {% for business in list_business_sector %}
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
+                                    <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
                                 {% endfor %}
                             </tr>
-                        {% else %}
-                            <tr class="">
-                                <td colspan="{{ (list_business_sector | length) + 2 }}" class="px-4 py-3 text-center">Pas de visites le {{ current_date|date("dd/LL/yyyy") }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                    {# <tfoot>
-                        <tr class="bg-gray-200">
-                            <td class="font-bold px-4 py-3 text-left">#</td>
-                            {% for business in list_business_sector %}
-                                <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
+                        </thead>
+                        <tbody>
+                            {% for member in visitors_list %}
+                                <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">{{ loop.index }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Date de passage" data-row-key="Date de passage">
+                                        <time datetime="{{ member['date_passage'] }}">
+                                            {{ member["date_passage"]|date("dd/LL/yyyy à HH:mm") }}
+                                        </time>
+                                    </td>
+                                    {% for business in list_business_sector %}
+                                        <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% else %}
+                                <tr class="">
+                                    <td colspan="{{ (list_business_sector | length) + 2 }}" class="px-4 py-3 text-center">Pas de visites le {{ current_date|date("dd/LL/yyyy") }}</td>
+                                </tr>
                             {% endfor %}
-                            <td class="font-bold px-4 py-3 text-left border-solid border-slate-200">Date d'inscription</td>
-                        </tr>
-                    </tfoot> #}
-                </table>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

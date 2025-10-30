@@ -108,14 +108,14 @@ router.get('/visiteurs/telecharger', async (req, res) => {
     //         break;
     // }
 
-    const records: IVisitor[] = await VisitorModel.findAll({
+    const records = await VisitorModel.findAll({
         raw: true,
         ...("jour" in req.query ? {
             where: {
                 date_passage: {
                     [Op.and]: {
-                        [Op.gte]: today.startOf('day'),
-                        [Op.lte]: today.endOf('day'),
+                        [Op.gte]: today.startOf('day').toString(),
+                        [Op.lte]: today.endOf('day').toString(),
                     }
                 }
             }
@@ -124,8 +124,8 @@ router.get('/visiteurs/telecharger', async (req, res) => {
             where: {
                 date_passage: {
                     [Op.and]: {
-                        [Op.gte]: today.startOf('month'),
-                        [Op.lte]: today.endOf('month'),
+                        [Op.gte]: today.startOf('month').toString(),
+                        [Op.lte]: today.endOf('month').toString(),
                     }
                 }
             }
@@ -134,22 +134,33 @@ router.get('/visiteurs/telecharger', async (req, res) => {
             where: {
                 date_passage: {
                     [Op.and]: {
-                        [Op.gte]: today.startOf('year'),
-                        [Op.lte]: today.endOf('year'),
+                        [Op.gte]: today.startOf('year').toString(),
+                        [Op.lte]: today.endOf('year').toString(),
                     }
                 }
             }
         } : {})
     });
 
-    const values = [Object.keys(records[0])];
+    const values: string[][] = [Object.keys(VisitorModel.getAttributes())];
+    const countVisitorType = {}
+    listBusinessSector.map((item) => item.value).forEach((item) => {
+        countVisitorType[item] = 0;
+    })
+    console.log(countVisitorType)
+
     records.forEach((item) => {
         const formattedItem = {
             ...item,
             date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
         }
+
+        console.log("item", item)
+        if (Object.keys(item)) {
+
+        }
         values.push(Object.values(formattedItem));
-    })
+    });
 
     const timestamp = DateTime.now().toFormat("dd-LL-yyyy-HH'h'mm");
     const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
@@ -159,6 +170,5 @@ router.get('/visiteurs/telecharger', async (req, res) => {
         fs.unlinkSync(csvFile);
     });
 });
-
 
 export default router;
