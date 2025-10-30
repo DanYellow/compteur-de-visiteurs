@@ -4,7 +4,7 @@ import { fileURLToPath } from "url";
 import express from "express";
 import { stringify } from "csv-stringify/sync";
 import { DateTime, DateTimeUnit } from "luxon";
-import { Op } from 'sequelize';
+import { Op, literal } from 'sequelize';
 
 import { listBusinessSector } from "#scripts/utils.ts"
 import { VisitorSchema } from "#scripts/schemas.ts";
@@ -16,9 +16,10 @@ const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+
 router.get("/", (req, res) => {
-    var ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-    console.log("ip", ip)
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
+
     res.render("pages/index.njk", {
         "list_business_sector": listBusinessSector,
     });
@@ -71,20 +72,26 @@ router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
         }
     }
 
-    const daySelectedFormatted = daySelected.toFormat("yyyy-MM-dd");
-
-    const records: IVisitor[] = await VisitorModel.findAll({
+    const records = await VisitorModel.findAll({
         where: {
             date_passage: {
                 [Op.and]: {
-                    [Op.gte]: `${daySelectedFormatted} 00:00:00`,
-                    [Op.lte]: `${daySelectedFormatted} 23:59:59.999999`,
+                    [Op.gte]: daySelected.startOf("day").toString(),
+                    [Op.lte]: daySelected.endOf("day").toString(),
                 }
             }
         }
     });
 
+    const visitorsSummary = await VisitorModel.findAll({
+        raw: true,
+        attributes: [
+            ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER ( WHERE "${item.value}" = 'oui' )` ), item.value]))
+        ]
+    })
+
     res.render("pages/members-list.njk", {
+        visitors_summary: visitorsSummary[0],
         "visitors_list": records,
         "list_business_sector": listBusinessSector,
         "header_list": records?.[0] ? Object.keys(records[0]) : [],
@@ -115,9 +122,11 @@ router.get('/visiteurs/telecharger', async (req, res) => {
     }
 
     let filterPredicate:DateTimeUnit | undefined = undefined;
+    let dateValue = null;
     const queryParam = Object.keys(predicatesDict).filter(value => Object.keys(req.query).includes(value));
     if (queryParam.length > 0) {
         filterPredicate = predicatesDict[queryParam[0]];
+        dateValue = req.query[queryParam[0]]
     }
 
     const records = await VisitorModel.findAll({
@@ -145,11 +154,12 @@ router.get('/visiteurs/telecharger', async (req, res) => {
     if (filterPredicate !== undefined) {
         countVisitorType.date_passage = `${today.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${today.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
     }
-    countVisitorType.place = res.locals.PLACE;
+    countVisitorType.lieu = res.locals.PLACE;
 
-    records.forEach((item) => {
+    records.forEach((item, index) => {
         const formattedItem = {
             ...item,
+            id: index + 1,
             date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
         }
 
@@ -160,12 +170,12 @@ router.get('/visiteurs/telecharger', async (req, res) => {
         values.push(Object.values(formattedItem));
     });
 
-    values[1] = Object.values(countVisitorType);
+    const filePayload = values.toSpliced(1, 0, Object.values(countVisitorType));
 
     const timestamp = DateTime.now().toFormat("dd-LL-yyyy-HH'h'mm");
     const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
 
-    fs.writeFileSync(csvFile, stringify(values));
+    fs.writeFileSync(csvFile, stringify(filePayload));
     res.download(csvFile, `${timestamp}-liste-membres.csv`, () => {
         fs.unlinkSync(csvFile);
     });
