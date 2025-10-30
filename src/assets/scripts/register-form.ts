@@ -36,6 +36,10 @@ const submitForm = async (e: SubmitEvent) => {
     } else {
         dialogSwapContainer.append(formErrorTplRaw.content.cloneNode(true));
     }
+
+    setTimeout(() => {
+        dialog.close();
+    }, Number(import.meta.env.FORM_RESULT_TIMEOUT || 5000));
 };
 
 const validForm = (e: Event) => {
