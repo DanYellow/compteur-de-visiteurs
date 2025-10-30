@@ -19,7 +19,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 <h1 class="text-black title-font font-bold text-6xl">Visites</h1>
 
                 <div class="split-button bg-green-700 self-start md:self-center">
-                    <a href="/visiteurs/telecharger?jour={{ current_date|date("dd/MM/yyyy") }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white hocus:bg-green-900">
+                    <a href="/visiteurs/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white hocus:bg-green-900">
                         Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)
                     </a>
 
@@ -35,7 +35,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                         </script>
                         <ul class="split-popup bg-slate-50 shadow-2xl">
                             <li>
-                                <a href="/visiteurs/telecharger?mois={{ current_date|date("MM/yyyy") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                                <a href="/visiteurs/telecharger?mois={{ current_date|date("yyyy-MM") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                                     {% include "includes/icons/download-fill-icon.svg" %}
                                     Télécharger toutes les données du mois {{ current_date|date("MMMM yyyy") }}  (.csv)
                                 </a>

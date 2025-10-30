@@ -88,7 +88,7 @@ router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
         attributes: [
             ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER ( WHERE "${item.value}" = 'oui' )` ), item.value]))
         ]
-    })
+    });
 
     res.render("pages/members-list.njk", {
         visitors_summary: visitorsSummary[0],
@@ -102,8 +102,6 @@ router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
 });
 
 router.get('/visiteurs/telecharger', async (req, res) => {
-    const today = DateTime.now();
-
     // let downloadedFileSuffix = "";
 
     // switch (Object.keys(req.query)[0]) {
@@ -126,17 +124,17 @@ router.get('/visiteurs/telecharger', async (req, res) => {
     const queryParam = Object.keys(predicatesDict).filter(value => Object.keys(req.query).includes(value));
     if (queryParam.length > 0) {
         filterPredicate = predicatesDict[queryParam[0]];
-        dateValue = req.query[queryParam[0]]
+        dateValue = DateTime.fromISO(new Date(req.query[queryParam[0]]).toISOString())
     }
 
     const records = await VisitorModel.findAll({
         raw: true,
-        ...(filterPredicate !== undefined ? {
+        ...((filterPredicate !== undefined && dateValue !== null && dateValue.isValid) ? {
             where: {
                 date_passage: {
                     [Op.and]: {
-                        [Op.gte]: today.startOf(filterPredicate).toString(),
-                        [Op.lte]: today.endOf(filterPredicate).toString(),
+                        [Op.gte]: dateValue.startOf(filterPredicate).toString(),
+                        [Op.lte]: dateValue.endOf(filterPredicate).toString(),
                     }
                 }
             }
@@ -151,8 +149,10 @@ router.get('/visiteurs/telecharger', async (req, res) => {
 
     countVisitorType.id = "Total";
     countVisitorType.date_passage = "Tout";
-    if (filterPredicate !== undefined) {
-        countVisitorType.date_passage = `${today.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${today.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
+    if (filterPredicate !== undefined && dateValue !== null && dateValue.isValid) {
+        countVisitorType.date_passage = `${dateValue.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${dateValue.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
+    } else {
+        countVisitorType.date_passage = "Tous";
     }
     countVisitorType.lieu = res.locals.PLACE;
 
@@ -165,7 +165,7 @@ router.get('/visiteurs/telecharger', async (req, res) => {
 
         listBusinessSector.map((business) => business.value).forEach((business) => {
             countVisitorType[business] += ((item[business] === "oui") ? 1 : 0) as number
-        })
+        });
 
         values.push(Object.values(formattedItem));
     });
