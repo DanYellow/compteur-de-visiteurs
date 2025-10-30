@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
 import { stringify } from "csv-stringify/sync";
-import { DateTime } from "luxon";
+import { DateTime, DateTimeUnit } from "luxon";
 import { Op } from 'sequelize';
 
 import { listBusinessSector } from "#scripts/utils.ts"
@@ -101,53 +101,51 @@ router.get('/visiteurs/telecharger', async (req, res) => {
 
     // switch (Object.keys(req.query)[0]) {
     //     case "jour":
-            
+
     //         break;
-    
+
     //     default:
     //         break;
     // }
 
+    const predicatesDict = {
+        "jour": "day",
+        "mois": "month",
+        "annee": "year",
+    }
+
+    let filterPredicate:DateTimeUnit | undefined = undefined;
+    const queryParam = Object.keys(predicatesDict).filter(value => Object.keys(req.query).includes(value));
+    if (queryParam.length > 0) {
+        filterPredicate = predicatesDict[queryParam[0]];
+    }
+
     const records = await VisitorModel.findAll({
         raw: true,
-        ...("jour" in req.query ? {
+        ...(filterPredicate !== undefined ? {
             where: {
                 date_passage: {
                     [Op.and]: {
-                        [Op.gte]: today.startOf('day').toString(),
-                        [Op.lte]: today.endOf('day').toString(),
-                    }
-                }
-            }
-        } : {}),
-        ...("mois" in req.query ? {
-            where: {
-                date_passage: {
-                    [Op.and]: {
-                        [Op.gte]: today.startOf('month').toString(),
-                        [Op.lte]: today.endOf('month').toString(),
-                    }
-                }
-            }
-        } : {}),
-        ...("year" in req.query ? {
-            where: {
-                date_passage: {
-                    [Op.and]: {
-                        [Op.gte]: today.startOf('year').toString(),
-                        [Op.lte]: today.endOf('year').toString(),
+                        [Op.gte]: today.startOf(filterPredicate).toString(),
+                        [Op.lte]: today.endOf(filterPredicate).toString(),
                     }
                 }
             }
         } : {})
     });
 
-    const values: string[][] = [Object.keys(VisitorModel.getAttributes())];
-    const countVisitorType = {}
-    listBusinessSector.map((item) => item.value).forEach((item) => {
-        countVisitorType[item] = 0;
+    const values: (string|number)[][] = [Object.keys(VisitorModel.getAttributes())];
+    const countVisitorType:Record<string, string | number> = {}
+    values[0].forEach((key) => {
+        countVisitorType[key] = 0;
     })
-    console.log(countVisitorType)
+
+    countVisitorType.id = "Total";
+    countVisitorType.date_passage = "Tout";
+    if (filterPredicate !== undefined) {
+        countVisitorType.date_passage = `${today.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${today.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
+    }
+    countVisitorType.place = res.locals.PLACE;
 
     records.forEach((item) => {
         const formattedItem = {
@@ -155,12 +153,14 @@ router.get('/visiteurs/telecharger', async (req, res) => {
             date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
         }
 
-        console.log("item", item)
-        if (Object.keys(item)) {
+        listBusinessSector.map((business) => business.value).forEach((business) => {
+            countVisitorType[business] += ((item[business] === "oui") ? 1 : 0) as number
+        })
 
-        }
         values.push(Object.values(formattedItem));
     });
+
+    values[1] = Object.values(countVisitorType);
 
     const timestamp = DateTime.now().toFormat("dd-LL-yyyy-HH'h'mm");
     const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
