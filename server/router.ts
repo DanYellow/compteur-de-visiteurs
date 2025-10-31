@@ -53,11 +53,6 @@ router.post("/", async (req, res) => {
     }
 });
 
-interface IVisitor {
-    date_passage: string;
-    day: string;
-}
-
 router.get(["/dashboard"], async (req, res) => {
     res.render("pages/dashboard.njk");
 })
