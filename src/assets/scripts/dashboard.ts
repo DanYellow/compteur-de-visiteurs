@@ -19,10 +19,10 @@ const chartTitleStyle = {
 (async () => {
     const ctx = document.getElementById('dailyChart');
 
-    const req = await fetch("/api");
+    const req = await fetch("/api?filtre=heure");
     const res = await req.json();
 
-    const listVisitsGrouped = Object.groupBy(res.data, ({ groupe }) => groupe);
+    const listVisitsGrouped = Object.groupBy(res.data, ({ heure }: { heure: string }) => heure);
 
     const chartData = listTimeSlots.map((item) => {
         if (listVisitsGrouped[item]) {

@@ -1,11 +1,8 @@
 import express from "express";
-import { DateTime, DateTimeUnit } from "luxon";
-import { Op, literal, Sequelize, QueryTypes } from 'sequelize';
+import { DateTime } from "luxon";
+import { Op } from 'sequelize';
 
-import sequelize from "#models/index.ts";
 import VisitorModel from "#models/visitor.ts";
-
-import { listTimeSlots } from "#scripts/utils.ts";
 
 const router = express.Router();
 
@@ -13,53 +10,57 @@ router.get("/", async (req, res) => {
     const today = DateTime.now();
 
     const dictGroupType = {
-        "jour": {
+        "heure": {
             "substitution": "%H",
-            "luxon": "day"
+            "luxon": "day",
+            "property": "hour",
+        },
+        "jour": {
+            "substitution": "%u",
+            "luxon": "week",
+            "property": "weekday",
         },
         "semaine": {
-            "substitution": "%u",
-            "luxon": "week"
+            "substitution": "%W",
+            "luxon": "month",
+            "property": "weekNumber",
         },
         "mois": {
-            "substitution": "%U",
-            "luxon": "month"
-        },
-        "annee": {
             "substitution": "%m",
-            "luxon": "year"
+            "luxon": "year",
+            "property": "month",
         },
     }
 
-    const sqliteSubtitution = dictGroupType[req.query?.filtre || "jour"].substitution;
+    const queryStringParam = (req.query?.filtre || "jour") as string;
+    const sqliteSubtitution = (dictGroupType as any)[queryStringParam]?.substitution || "%H";
 
     const listVisitors = await VisitorModel.findAll({
         raw: true,
-        attributes: [
-            [literal(`*, STRFTIME('${sqliteSubtitution}', date_passage)`), "groupe"]
-        ],
+        // attributes: [
+        //     [literal(`*, STRFTIME('${sqliteSubtitution}', date_passage)`), queryStringParam]
+        // ],
         where: {
             date_passage: {
                 [Op.and]: {
-                    [Op.gte]: today.startOf(dictGroupType[req.query?.filtre || "jour"].luxon).toString(),
-                    [Op.lte]: today.endOf(dictGroupType[req.query?.filtre || "jour"].luxon).toString(),
+                    [Op.gte]: today.startOf((dictGroupType as any)[queryStringParam]?.luxon || "day").toString(),
+                    [Op.lte]: today.endOf((dictGroupType as any)[queryStringParam]?.luxon || "day").toString(),
                 }
             }
         }
     });
-
-
-
-    // const listVisitors = await sequelize.query(`
-    //     SELECT *, STRFTIME('%H', date_passage) as groupe FROM visitor
-    // `, {
-    //     type: QueryTypes.SELECT,
-    // });
-
-    console.log(listVisitors)
-
+    // console.log(
+    //     DateTime.fromISO(new Date(listVisitors[0].date_passage).toISOString()).month
+    // )
     res.status(200).json({
-        data: listVisitors
+        data: listVisitors.map((item) => {
+            const date = DateTime.fromISO(new Date(item.date_passage).toISOString())
+            return {
+                ...item,
+                date_passage: date,
+                [queryStringParam]: date[(dictGroupType as any)[queryStringParam]?.property],
+            }
+        })
     });
 });
 
