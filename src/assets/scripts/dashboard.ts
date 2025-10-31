@@ -22,15 +22,14 @@ const chartTitleStyle = {
     const req = await fetch("/api");
     const res = await req.json();
 
-    const foo = Object.groupBy(res.data, ({ heure }) => heure);
+    const listVisitsGrouped = Object.groupBy(res.data, ({ groupe }) => groupe);
 
     const chartData = listTimeSlots.map((item) => {
-        if (foo[item]) {
-            return foo[item].length;
+        if (listVisitsGrouped[item]) {
+            return listVisitsGrouped[item].length;
         }
         return 0;
     });
-
 
     new Chart(
         ctx,
@@ -59,6 +58,7 @@ const chartTitleStyle = {
                     y: {
                         ticks: {
                             color: "white",
+                            stepSize: 1,
                             font: {
                                 size: 12
                             }

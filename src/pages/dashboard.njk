@@ -19,7 +19,13 @@ Tableau de bord
             </header>
             <div class="text-black">
                 <div class="grid grid-cols-3 gap-4">
-                    <div class="bg-black-numixs p-3 rounded-2xl h-72 relative" style="position: relative;">
+                    <div class="bg-black-numixs p-3 rounded-2xl h-72 relative">
+                        <button data-details-chart="daily" type="button" command="show-modal" commandfor="details-chart" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                            </svg>
+                        </button>
+
                         <canvas id="dailyChart" class="w-full h-full"></canvas>
                     </div>
                     <div>
@@ -35,5 +41,7 @@ Tableau de bord
             </div>
         </div>
     </div>
-
+<dialog id="details-chart" closedby="any">
+    Hello
+</dialog>
 {% endblock %}
