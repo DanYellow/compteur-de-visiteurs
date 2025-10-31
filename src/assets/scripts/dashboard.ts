@@ -1,31 +1,102 @@
-import { Chart, BarElement, BarController, CategoryScale, LinearScale   } from 'chart.js';
+import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title } from 'chart.js';
+import { listTimeSlots } from './utils';
 
-Chart.register(BarElement, BarController, CategoryScale, LinearScale);
+Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title);
 
-const ctx = document.getElementById('myChart');
+const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs')
 
-const data = [
-    { year: 2010, count: 10 },
-    { year: 2011, count: 20 },
-    { year: 2012, count: 15 },
-    { year: 2013, count: 25 },
-    { year: 2014, count: 22 },
-    { year: 2015, count: 30 },
-    { year: 2016, count: 28 },
-];
-
-new Chart(
-    ctx,
-    {
-        type: 'bar',
-        data: {
-            labels: data.map(row => row.year),
-            datasets: [
-                {
-                    label: 'Acquisitions by year',
-                    data: data.map(row => row.count)
-                }
-            ]
-        }
+const chartTitleStyle = {
+    display: true,
+    color: greenNumixs,
+    font: {
+        size: 22,
+        style: 'normal',
+        weight: 'normal',
+        family: "Agency FB"
     }
-);
+};
+
+(async () => {
+    const ctx = document.getElementById('dailyChart');
+
+    const req = await fetch("/api");
+    const res = await req.json();
+
+    const foo = Object.groupBy(res.data, ({ heure }) => heure);
+
+    const chartData = listTimeSlots.map((item) => {
+        if (foo[item]) {
+            return foo[item].length;
+        }
+        return 0;
+    });
+
+
+    new Chart(
+        ctx,
+        {
+            type: 'bar',
+            data: {
+                labels: listTimeSlots.map((item) => `${item}h`),
+                datasets: [
+                    {
+                        color: "white",
+                        label: 'Weekly Sales',
+                        data: chartData,
+                        backgroundColor: greenNumixs
+                    }
+                ]
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        text: "Visites quotidiennes",
+                        ...chartTitleStyle
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            color: "white",
+                            font: {
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: "rgba(255, 255, 255, 1)",
+                            drawOnChartArea: true,
+                            lineWidth: 0,
+                        },
+                        title: {
+                            display: true,
+                            text: "Nombre de visites",
+                            color: "white",
+                        },
+                        beginAtZero: true,
+                    },
+                    x: {
+                        ticks: {
+                            color: "white",
+                            font: {
+                                size: 12
+                            }
+                        },
+                        grid: {
+                            color: "rgba(255, 255, 255, 0.05)",
+                            drawOnChartArea: true,
+                            lineWidth: 0,
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tranche horaire',
+                            color: "white",
+                        }
+                    },
+
+                }
+            }
+        }
+    );
+})()
+

@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
     // });
 
     const listVisitors = await sequelize.query(`
-        SELECT *, STRFTIME('%H', date_passage) as hour FROM visitor
+        SELECT *, STRFTIME('%H', date_passage) as heure FROM visitor
     `, {
         type: QueryTypes.SELECT,
     });
