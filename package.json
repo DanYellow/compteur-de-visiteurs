@@ -25,6 +25,7 @@
         "vite": "^7.1.2"
     },
     "dependencies": {
+        "chart.js": "^4.5.1",
         "cors": "^2.8.5",
         "cross-env": "^10.0.0",
         "csv-parse": "^6.1.0",
