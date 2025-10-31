@@ -7,7 +7,7 @@ import cors from "cors";
 import { WebSocketServer } from 'ws';
 import { DateTime } from "luxon";
 
-import router from "./router.ts";
+import router from "./router/index.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

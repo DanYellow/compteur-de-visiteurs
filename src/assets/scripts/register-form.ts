@@ -31,8 +31,8 @@ const submitForm = async (e: SubmitEvent) => {
     dialogSwapContainer.innerHTML = "";
 
     if (res.success) {
-        dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true));
         form.reset();
+        dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true));
     } else {
         dialogSwapContainer.append(formErrorTplRaw.content.cloneNode(true));
     }

@@ -8,14 +8,17 @@ import { Op, literal } from 'sequelize';
 
 import { listBusinessSector } from "#scripts/utils.ts"
 import { VisitorSchema } from "#scripts/schemas.ts";
-import { wss } from "./index.ts";
-import VisitorModel from "#models/visitor.ts"
+import { wss } from "../index.ts";
+import VisitorModel from "#models/visitor.ts";
+
+import ApiRouter from "./api.ts";
 
 const router = express.Router();
 
+router.use("/api", ApiRouter);
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 router.get("/", (req, res) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
@@ -75,7 +78,8 @@ router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
                     [Op.lte]: daySelected.endOf("day").toString(),
                 }
             }
-        }
+        },
+        order: [['date_passage', 'DESC']]
     });
 
     const visitorsSummary = await VisitorModel.findAll({
