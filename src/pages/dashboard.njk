@@ -18,24 +18,28 @@ Tableau de bord
                 <h1 class="text-black title-font font-bold text-6xl">Tableau de bord</h1>
             </header>
             <div class="text-black">
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-3 gap-2">
                     <div class="bg-black-numixs p-3 rounded-2xl h-72 relative">
                         <button data-details-chart="daily" type="button" command="show-modal" commandfor="details-chart" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
                             </svg>
                         </button>
-
                         <canvas id="dailyChart" class="w-full h-full"></canvas>
                     </div>
-                    <div>
-                        <canvas id="weeklyChart" class="bg-red-200"></canvas>
+                    <div class="bg-black-numixs p-3 rounded-2xl h-72 relative">
+                        <button data-details-chart="weekly" type="button" command="show-modal" commandfor="details-chart" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                            </svg>
+                        </button>
+                        <canvas id="weeklyChart"></canvas>
                     </div>
                     <div>
                         <canvas id="myChart3" class="bg-blue-200"></canvas>
                     </div>
-                    <div class="col-span-full">
-                        <canvas id="myChart3" class="bg-green-200"></canvas>
+                    <div class="col-span-full bg-black-numixs p-3 rounded-2xl h-72 relative">
+                        <canvas id="yearlyChart"></canvas>
                     </div>
                 </div>
             </div>

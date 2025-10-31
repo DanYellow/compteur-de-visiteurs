@@ -237,3 +237,7 @@ input.error {
         }
     }
 }
+
+button {
+    cursor: pointer;
+}

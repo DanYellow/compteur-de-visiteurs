@@ -1,5 +1,5 @@
 import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title } from 'chart.js';
-import { listTimeSlots } from './utils';
+import { listTimeSlots, listDays, listMonths } from './utils';
 
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title);
 
@@ -16,87 +16,136 @@ const chartTitleStyle = {
     }
 };
 
-(async () => {
-    const ctx = document.getElementById('dailyChart');
+const listCharts = [
+    {
+        apiKey: "heure",
+        id: "dailyChart",
+        chartTitle: "Visites du jour",
+        xTitle: 'Tranche horaire',
+        xValues: listTimeSlots,
+        xValuesSuffix: "h",
+    },
+    {
+        apiKey: "jour",
+        id: "weeklyChart",
+        chartTitle: "Visites hebdomadaire",
+        xValues: listDays,
+        xTitle: "Jours",
+    },
+    // {
+    //     apiKey: "semaine",
+    //     id: "weeklyChart",
+    //     chartTitle: "Visites mensuelles",
+    //     xValues: listDays,
+    //     xTitle: "Semaines",
+    // },
+    {
+        apiKey: "mois",
+        id: "yearlyChart",
+        chartTitle: "Visites mensuelles",
+        xValues: listMonths,
+        xTitle: "Mois",
+    }
+];
 
-    const req = await fetch("/api?filtre=heure");
-    const res = await req.json();
+;(() => {
+    listCharts.forEach(async ({apiKey, id, chartTitle, xTitle, xValues, xValuesSuffix}) => {
+        const ctx = document.getElementById(id)!;
 
-    const listVisitsGrouped = Object.groupBy(res.data, ({ heure }: { heure: string }) => heure);
+        const req = await fetch(`/api?filtre=${apiKey}`);
+        const res = await req.json();
+        const listVisitsGrouped = Object.groupBy(res.data, (item: { item: Record<string, string|number> }) => {
+            return item[apiKey];
+        });
 
-    const chartData = listTimeSlots.map((item) => {
-        if (listVisitsGrouped[item]) {
-            return listVisitsGrouped[item].length;
-        }
-        return 0;
-    });
+        const chartData = xValues.map((item) => {
+            let key = item;
+            if (typeof key === 'object') {
+                key = item.id;
 
-    new Chart(
-        ctx,
-        {
-            type: 'bar',
-            data: {
-                labels: listTimeSlots.map((item) => `${item}h`),
-                datasets: [
-                    {
-                        color: "white",
-                        label: 'Weekly Sales',
-                        data: chartData,
-                        backgroundColor: greenNumixs
-                    }
-                ]
-            },
-            options: {
-                maintainAspectRatio: false,
-                plugins: {
-                    title: {
-                        text: "Visites quotidiennes",
-                        ...chartTitleStyle
-                    }
+            }
+            if (listVisitsGrouped[key]) {
+                return listVisitsGrouped[key].length;
+            }
+            return 0;
+        });
+
+        const chartLabels = xValues.map((item) => {
+            if (typeof item === 'object') {
+                return `${item.name}${xValuesSuffix || ""}`;
+            }
+
+            return `${item}${xValuesSuffix || ""}`;
+        })
+
+        new Chart(
+            ctx,
+            {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [
+                        {
+                            color: "white",
+                            label: 'Weekly Sales',
+                            data: chartData,
+                            backgroundColor: greenNumixs
+                        }
+                    ]
                 },
-                scales: {
-                    y: {
-                        ticks: {
-                            color: "white",
-                            stepSize: 1,
-                            font: {
-                                size: 12
-                            }
-                        },
-                        grid: {
-                            color: "rgba(255, 255, 255, 1)",
-                            drawOnChartArea: true,
-                            lineWidth: 0,
-                        },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
                         title: {
-                            display: true,
-                            text: "Nombre de visites",
-                            color: "white",
-                        },
-                        beginAtZero: true,
-                    },
-                    x: {
-                        ticks: {
-                            color: "white",
-                            font: {
-                                size: 12
-                            }
-                        },
-                        grid: {
-                            color: "rgba(255, 255, 255, 0.05)",
-                            drawOnChartArea: true,
-                            lineWidth: 0,
-                        },
-                        title: {
-                            display: true,
-                            text: 'Tranche horaire',
-                            color: "white",
+                            text: chartTitle,
+                            ...chartTitleStyle
                         }
                     },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: "white",
+                                stepSize: 1,
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: "rgba(255, 255, 255, 1)",
+                                drawOnChartArea: true,
+                                lineWidth: 0,
+                            },
+                            title: {
+                                display: true,
+                                text: "Nombre de visites",
+                                color: "white",
+                            },
+                            beginAtZero: true,
+                        },
+                        x: {
+                            ticks: {
+                                color: "white",
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: "rgba(255, 255, 255, 0.05)",
+                                drawOnChartArea: true,
+                                lineWidth: 0,
+                            },
+                            title: {
+                                display: true,
+                                text: xTitle,
+                                color: "white",
+                            }
+                        },
 
+                    }
                 }
             }
-        }
-    );
+        );
+    })
 })()
+
 
