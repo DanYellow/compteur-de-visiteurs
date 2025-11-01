@@ -124,14 +124,15 @@ const listCharts = [
         const listVisitsGrouped = Object.groupBy(res.data, (item: { item: Record<string, string | number> }) => {
             return item[apiKey];
         });
+
         ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
 
         const chartData = xLabels.map((item) => {
             let key = item;
             if (typeof key === 'object') {
                 key = item.id;
-
             }
+
             if (listVisitsGrouped[key]) {
                 return listVisitsGrouped[key].length;
             }
@@ -173,10 +174,10 @@ const listCharts = [
                         },
                         legend: {
                             display: false,
-                        }
+                        },
                     },
                     scales: chartScales(xTitle),
-                }
+                },
             }
         );
     })
@@ -189,11 +190,10 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
     if (isOpened) {
         const sourceBtn = e.source! as HTMLButtonElement;
         const chartSelected = sourceBtn.dataset.detailsChart;
-        const chartData = JSON.parse(sourceBtn.parentNode?.querySelector("canvas")?.dataset.chartData || "{}");
+        const chartData = JSON.parse(sourceBtn.closest("div")?.querySelector("canvas")?.dataset.chartData || "{}");
         const {xLabels, xValuesSuffix, chartTitle} = listCharts.find((item) => item.apiKey === chartSelected) || {};
 
         const lineChartDatasets:LineChartEntry[] = [];
-
         listBusinessSector.forEach((business) => {
             const visitorPerTypeAndPeriod = {
                 [business.value]: new Array(xLabels.length).fill(0)
@@ -234,6 +234,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
             labels: chartLabels,
             datasets: lineChartDatasets,
         };
+
         // https://www.youtube.com/watch?v=jlgeG5K6bBg
         new Chart(
             detailsChartCtx,
