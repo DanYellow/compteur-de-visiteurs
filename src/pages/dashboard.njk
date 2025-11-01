@@ -4,6 +4,7 @@
 Tableau de bord
 {% endblock %}
 
+{% set root_class = "admin" %}
 {% set active_menu_item = "dashboard" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% block scripts %}
@@ -57,7 +58,7 @@ Tableau de bord
     </div>
     <dialog id="detailsChartModal" closedby="any" class="max-w-7xl w-full mx-auto text-white-numixs backdrop:bg-white-numixs/20 mt-8 bg-transparent overflow-hidden">
         <div class="bg-black-numixs p-3 border border-green-numixs rounded-2xl  mx-3">
-            <canvas id="detailsChart" class="w-full h-full"></canvas>
+            <canvas id="detailsChart" class="w-full h-full aspect-[2/1]"></canvas>
         </div>
     </dialog>
 {% endblock %}

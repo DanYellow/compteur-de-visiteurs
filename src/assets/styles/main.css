@@ -122,6 +122,10 @@ html {
             opacity: 0.25;
         }
     }
+
+    &.admin {
+        background: url("/images/bottom-left-pattern.svg") no-repeat left bottom, #272626;
+    }
 }
 
 /* :not([type="checkbox"], [type="radio"]) */

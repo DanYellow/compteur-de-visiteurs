@@ -32,9 +32,13 @@ const chartScales = (xTitle: string) => {
                 }
             },
             grid: {
-                color: "rgba(255, 255, 255, 1)",
+                color: (ctx) => {
+                    if (ctx.index === 0) {
+                        return "rgba(255, 255, 255, 1)";
+                    }
+                },
                 drawOnChartArea: true,
-                lineWidth: 0,
+                lineWidth: 1,
             },
             title: {
                 display: true,
@@ -57,9 +61,13 @@ const chartScales = (xTitle: string) => {
                 }
             },
             grid: {
-                color: "rgba(255, 255, 255, 0.05)",
+                color: (ctx) => {
+                    if (ctx.index === 0) {
+                        return "rgba(255, 255, 255, 1)";
+                    }
+                },
                 drawOnChartArea: true,
-                lineWidth: 0,
+                lineWidth: 1,
             },
             title: {
                 display: true,

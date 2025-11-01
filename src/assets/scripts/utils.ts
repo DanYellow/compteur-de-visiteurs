@@ -1,3 +1,4 @@
+import type { WeekMonth } from "#types";
 import { DateTime } from "luxon";
 
 export const listBusinessSector = [
@@ -149,11 +150,11 @@ export const getWeeksRangeMonth = (startDate) => {
     const intervalYear =   firstWeekInYear.until(lastWeekInYear.endOf("week"));
     const intervalWeeks = intervalYear.splitBy({weeks: 1});
 
-    const listWeeks = [];
+    const listWeeks: WeekMonth[] = [];
     intervalWeeks.forEach((item) => {
         listWeeks.push({
             id: item.s.weekNumber,
-            name: `${item.s.toFormat("dd/LL")} - ${item.e.toFormat("dd/LL")}`
+            name: `${item.s.toFormat("dd/LL")} ➜ ${item.e.toFormat("dd/LL")}`
         })
     })
 

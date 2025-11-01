@@ -9,7 +9,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
 
 {% set active_menu_item = "visiteurs" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
-
+{% set root_class = "admin" %}
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
     <div class="mt-8 px-3 grid grid-cols-1 xl:grid-cols-[220px_auto] gap-6">
