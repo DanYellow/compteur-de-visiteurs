@@ -1,4 +1,6 @@
 import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend } from 'chart.js';
+import { DateTime } from "luxon";
+
 import type { LineChartEntry } from "#types";
 import { listBusinessSector, listTimeSlots, listDays, listMonths } from "#scripts/utils.ts"
 
@@ -68,44 +70,45 @@ const chartScales = (xTitle: string) => {
                 }
             }
         },
-
     }
 }
+
+const today = DateTime.now();
 
 const listCharts = [
     {
         apiKey: "heure",
         id: "dailyChart",
-        chartTitle: "Visites du jour",
+        chartTitle: `Visites du ${today.toFormat("dd/LL/yyyy")}`,
         xTitle: 'Tranche horaire',
-        xValues: listTimeSlots,
+        xLabels: listTimeSlots,
         xValuesSuffix: "h",
     },
     {
         apiKey: "jour",
         id: "weeklyChart",
-        chartTitle: "Visites hebdomadaire",
-        xValues: listDays,
+        chartTitle: `Visites du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
+        xLabels: listDays,
         xTitle: "Jours",
     },
     // {
     //     apiKey: "semaine",
     //     id: "weeklyChart",
     //     chartTitle: "Visites mensuelles",
-    //     xValues: listDays,
+    //     xLabels: listDays,
     //     xTitle: "Semaines",
     // },
     {
         apiKey: "mois",
         id: "yearlyChart",
         chartTitle: "Visites mensuelles",
-        xValues: listMonths,
+        xLabels: listMonths,
         xTitle: "Mois",
     }
 ];
 
 ;(() => {
-    listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xValues, xValuesSuffix }) => {
+    listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
         const ctx = document.getElementById(id)!;
 
         const req = await fetch(`/api?filtre=${apiKey}`);
@@ -115,7 +118,7 @@ const listCharts = [
         });
         ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
 
-        const chartData = xValues.map((item) => {
+        const chartData = xLabels.map((item) => {
             let key = item;
             if (typeof key === 'object') {
                 key = item.id;
@@ -127,7 +130,7 @@ const listCharts = [
             return 0;
         });
 
-        const chartLabels = xValues.map((item) => {
+        const chartLabels = xLabels.map((item) => {
             if (typeof item === 'object') {
                 return `${item.name}${xValuesSuffix || ""}`;
             }
@@ -179,59 +182,48 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         const sourceBtn = e.source! as HTMLButtonElement;
         const chartSelected = sourceBtn.dataset.detailsChart;
         const chartData = JSON.parse(sourceBtn.parentNode?.querySelector("canvas")?.dataset.chartData || "{}");
+        const {xLabels, xValuesSuffix, chartTitle} = listCharts.find((item) => item.apiKey === chartSelected) || {};
 
-        const chartConfig = listCharts.find((item) => item.apiKey === chartSelected) || {};
-        const xPlaceholderValues = new Array(chartConfig.xValues.length).fill(0);
-
-        // const payload = {}
-        // Object.entries(chartData).forEach(([key, listVisitors]) => {
-        //     // console.log(key, value)
-        //     const foo = {}
-        //     listBusinessSector.forEach((business) => {
-        //         foo[business.value] = 0
-        //     })
-        //     listVisitors.forEach((visitor) => {
-        //         listBusinessSector.forEach((business) => {
-        //             foo[business.value] += ((visitor[business.value] === "oui") ? 1 : 0) as number
-        //         })
-        //     })
-        //     console.log(foo)
-        // });
-        // window.chartData = chartData;
-        // console.log("chartData", chartData)
         const lineChartDatasets:LineChartEntry[] = [];
 
         listBusinessSector.forEach((business) => {
             const visitorPerTypeAndPeriod = {
-                [business.value]: new Array(chartConfig.xValues.length).fill(0)
+                [business.value]: new Array(xLabels.length).fill(0)
             };
-            Object.entries(chartData).forEach(([xValueIndex, listVisitors]) => {
-                console.log("xValueIndex", xValueIndex)
+            Object.entries(chartData).forEach(([xValueIndex, listVisitors], index) => {
                 const he = listVisitors.reduce(
                     (acc, visitor) => ((acc[business.value] = (acc[business.value] || 0) + ((visitor[business.value] === "oui") ? 1 : 0)), acc),
                 {});
-                visitorPerTypeAndPeriod[business.value][Number(xValueIndex)] = he[[business.value]]
 
-            })
+                const indexArray = xLabels.findIndex((label) => {
+                    if (typeof label === "object") {
+                        return Number(label.id) === Number(xValueIndex)
+                    }
+                    return Number(label) === Number(xValueIndex);
+                })
+
+                visitorPerTypeAndPeriod[business.value][indexArray] = he[[business.value]]
+            });
 
             lineChartDatasets.push({
                 label: business.name,
                 data: visitorPerTypeAndPeriod[business.value],
+                borderColor: business.lineColor,
+                tension: 0.1,
+                fill: true,
             })
         })
-        console.log("hello", lineChartDatasets)
 
-        const labels = [
-            'January',
-            'February',
-            'March',
-            'April',
-            'May',
-            'June',
-            'July',
-        ];
+        const chartLabels = xLabels.map((item) => {
+            if (typeof item === 'object') {
+                return `${item.name}${xValuesSuffix || ""}`;
+            }
+
+            return `${item}${xValuesSuffix || ""}`;
+        })
+
         const data = {
-            labels: labels,
+            labels: chartLabels,
             datasets: lineChartDatasets,
         };
         // https://www.youtube.com/watch?v=jlgeG5K6bBg
@@ -251,7 +243,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                             }
                         },
                         title: {
-                            text: `${chartConfig?.chartTitle || ""} détaillée`,
+                            text: `${chartTitle || ""} détaillée`,
                             ...chartTitleStyle
                         },
                     }
