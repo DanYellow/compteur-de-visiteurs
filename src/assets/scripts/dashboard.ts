@@ -74,7 +74,7 @@ const chartScales = (xTitle: string) => {
 }
 
 const today = DateTime.now();
-getWeeksRangeMonth()
+
 const listCharts = [
     {
         apiKey: "heure",
@@ -91,17 +91,17 @@ const listCharts = [
         xLabels: listDays,
         xTitle: "Jours",
     },
-    // {
-    //     apiKey: "semaine",
-    //     id: "monthlyChart",
-    //     chartTitle: "Visites mensuelles",
-    //     xLabels: listDays,
-    //     xTitle: "Semaines",
-    // },
+    {
+        apiKey: "semaine",
+        id: "monthlyChart",
+        chartTitle: `Visites du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
+        xLabels: getWeeksRangeMonth(),
+        xTitle: "Semaines",
+    },
     {
         apiKey: "mois",
         id: "yearlyChart",
-        chartTitle: "Visites mensuelles",
+        chartTitle: `Visites du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
         xLabels: listMonths,
         xTitle: "Mois",
     }

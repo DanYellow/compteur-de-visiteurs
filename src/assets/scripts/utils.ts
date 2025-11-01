@@ -143,9 +143,6 @@ export const getWeeksRangeMonth = (startDate) => {
     const startMonth = today.startOf("month");
     const endMonth = today.endOf("month");
 
-    // const numberWeeksGap = endMonth.weekNumber - startMonth.weekNumber;
-    // const listWeeksNumberMonth = Array.from(new Array(numberWeeksGap + 1), (_, i) => i + startMonth.weekNumber);
-
     const firstWeekInYear = DateTime.fromObject({weekYear: today.year, weekNumber: startMonth.weekNumber});
     const lastWeekInYear  = DateTime.fromObject({weekYear: today.year, weekNumber: endMonth.weekNumber});
 
@@ -155,8 +152,8 @@ export const getWeeksRangeMonth = (startDate) => {
     const listWeeks = [];
     intervalWeeks.forEach((item) => {
         listWeeks.push({
-            weekNumber: item.s.weekNumber,
-            range: `${item.s.toFormat("dd/LL")} - ${item.e.toFormat("dd/LL")}`
+            id: item.s.weekNumber,
+            name: `${item.s.toFormat("dd/LL")} - ${item.e.toFormat("dd/LL")}`
         })
     })
 
