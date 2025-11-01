@@ -22,7 +22,7 @@ Tableau de bord
                     <div class="bg-black-numixs p-3 rounded-2xl h-72 relative">
                         <button data-details-chart="heure" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                             </svg>
                         </button>
                         <canvas id="dailyChart" class="w-full h-full"></canvas>
@@ -30,7 +30,7 @@ Tableau de bord
                     <div class="bg-black-numixs p-3 rounded-2xl h-72 relative">
                         <button data-details-chart="jour" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                             </svg>
                         </button>
                         <canvas id="weeklyChart"></canvas>
@@ -41,7 +41,7 @@ Tableau de bord
                     <div class="col-span-full bg-black-numixs p-3 rounded-2xl h-86 relative">
                         <button data-details-chart="mois" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                             </svg>
                         </button>
                         <canvas id="yearlyChart"></canvas>
@@ -50,9 +50,9 @@ Tableau de bord
             </div>
         </div>
     </div>
-<dialog id="detailsChartModal" closedby="any" class="max-w-6xl w-full mx-auto text-white-numixs backdrop:bg-white-numixs/20 mt-8 bg-transparent overflow-hidden">
-    <div class="bg-black-numixs p-3 border border-green-numixs rounded-2xl  mx-3">
-        <canvas id="detailsChart" class="w-full h-full"></canvas>
-    </div>
-</dialog>
+    <dialog id="detailsChartModal" closedby="any" class="max-w-6xl w-full mx-auto text-white-numixs backdrop:bg-white-numixs/20 mt-8 bg-transparent overflow-hidden">
+        <div class="bg-black-numixs p-3 border border-green-numixs rounded-2xl  mx-3">
+            <canvas id="detailsChart" class="w-full h-full"></canvas>
+        </div>
+    </dialog>
 {% endblock %}

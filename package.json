@@ -41,6 +41,7 @@
         "#server/utils/*.ts": "./server/utils/*.ts",
         "#server/*.ts": "./server/*.ts",
         "#models/*.ts": "./models/*.ts",
-        "#scripts/*.ts": "./src/assets/scripts/*.ts"
+        "#scripts/*.ts": "./src/assets/scripts/*.ts",
+        "#types": "./types.ts"
     }
 }

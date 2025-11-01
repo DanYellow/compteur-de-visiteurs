@@ -6,7 +6,7 @@ import { stringify } from "csv-stringify/sync";
 import { DateTime, DateTimeUnit } from "luxon";
 import { Op, literal } from 'sequelize';
 
-import { listBusinessSector } from "#scripts/utils.ts"
+import { listBusinessSector } from "#scripts/utils.ts";
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "../index.ts";
 import VisitorModel from "#models/visitor.ts";
@@ -93,7 +93,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
             }
         },
         attributes: [
-            ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER ( WHERE "${item.value}" = 'oui' )` ), item.value]))
+            ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')` ), item.value]))
         ]
     });
 
