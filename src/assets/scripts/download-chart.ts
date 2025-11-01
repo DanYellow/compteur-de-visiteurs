@@ -7,8 +7,9 @@ const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--co
 const SCALE_FACTOR = 1;
 const LOGO_SCALE_FACTOR = 0.65;
 
+const today = DateTime.now();
+
 const getChartFilename = (type: string): string => {
-    const today = DateTime.now();
 
     let filename = "";
     switch (type) {
@@ -18,12 +19,15 @@ const getChartFilename = (type: string): string => {
         case "weeklyChart":
 
             break;
+        case "monthlyChart":
+            filename = `visites-mensuelle-du-${today.startOf("month").toFormat("dd/LL/yyyy")}-au-${today.endOf("month").toFormat("dd/LL/yyyy")}`
+            break;
         case "dailyChart":
             filename = `visites-quotidienne-${today.toFormat(DATE_FORMAT)}`
             break;
 
         default:
-            filename = `visites-quotidienne-${today.toFormat(DATE_FORMAT)}`
+            filename = `visites-detaillees`
             break;
     }
 
@@ -41,31 +45,34 @@ listDownloadButtons.forEach((item) => {
         const chartClone = chart.cloneNode(true) as HTMLCanvasElement;
         const cloneCtx = chartClone.getContext("2d");
         if (cloneCtx) {
-            chartClone.width = chart.width * SCALE_FACTOR + 50;
-            chartClone.height = chart.height * SCALE_FACTOR + 50;
+
+cloneCtx.imageSmoothingEnabled = false;
+            chartClone.width = (chart.width * SCALE_FACTOR) + 50;
+            chartClone.height = (chart.height * SCALE_FACTOR) + 50;
 
             cloneCtx.drawImage(chart,
-                (chartClone.width - chart.width) / 2, 0,
-                chart.width * SCALE_FACTOR, chart.height * SCALE_FACTOR
+                (Math.abs(chart.width - chartClone.width)) / 2, 0,
+                (chart.width * SCALE_FACTOR), (chart.height * SCALE_FACTOR)
             );
 
-            // cloneCtx.fillStyle = grayNumixs;
-            // cloneCtx.globalCompositeOperation = 'destination-over';
-            // cloneCtx.fillRect(0, 0, chartClone.width * SCALE_FACTOR, chartClone.height * SCALE_FACTOR);
+            const logo = new Image();
+            logo.src = '/images/faclab-logo-light.svg';
+            logo.onload = function () {
+                cloneCtx.drawImage(logo, chartClone.width - logo.width, chartClone.height - logo.height, logo.width * LOGO_SCALE_FACTOR, logo.height * LOGO_SCALE_FACTOR);
 
-            const img = new Image();
-            img.src = '/images/faclab-logo-light.svg';
-            img.onload = function () {
-                cloneCtx.drawImage(img, chartClone.width - img.width, chartClone.height - img.height, img.width * LOGO_SCALE_FACTOR, img.height * LOGO_SCALE_FACTOR);
+                cloneCtx.font = "12px sans-serif";
+                cloneCtx.fillStyle = "white";
+                cloneCtx.fillText(`Généré le ${today.toFormat("dd/LL/yyyy à HH:mm")}`, 5, chartClone.height - 7);
 
                 cloneCtx.fillStyle = grayNumixs;
                 cloneCtx.globalCompositeOperation = 'destination-over';
                 cloneCtx.fillRect(0, 0, chartClone.width * SCALE_FACTOR, (chartClone.height * SCALE_FACTOR));
+
                 download();
             }
         }
 
-        function download() {
+        const download = () => {
             link.download = getChartFilename(chartId);
             link.href = chartClone.toDataURL("image/jpeg", 1);
             link.click();

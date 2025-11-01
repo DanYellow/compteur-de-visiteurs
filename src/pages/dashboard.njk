@@ -41,27 +41,60 @@ Tableau de bord
                         <canvas id="dailyChart" class="w-full h-full"></canvas>
                     </div>
                     <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
-                        <button data-details-chart="jour" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                            </svg>
-                        </button>
+                        <menu class="absolute right-3 flex flex-row gap-3">
+                            <li>
+                                <button data-download-chart="weeklyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14 3h2.997v5h-2.997v-5zm9 1v20h-22v-24h17.997l4.003 4zm-17 5h12v-7h-12v7zm14 4h-16v9h16v-9z"/>
+                                    </svg>
+                                </button>
+                            </li>
+                            <li>
+                                <button data-details-chart="jour" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                    </svg>
+                                </button>
+                            </li>
+                        </menu>
                         <canvas id="weeklyChart"></canvas>
                     </div>
                     <div class="bg-black-numixs p-3 rounded-2xl h-80 relative col-span-full lg:col-[initial]">
-                        <button data-details-chart="semaine" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                            </svg>
-                        </button>
+                        <menu class="absolute right-3 flex flex-row gap-3">
+                            <li>
+                                <button data-download-chart="monthlyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14 3h2.997v5h-2.997v-5zm9 1v20h-22v-24h17.997l4.003 4zm-17 5h12v-7h-12v7zm14 4h-16v9h16v-9z"/>
+                                    </svg>
+                                </button>
+                            </li>
+                            <li>
+                                <button data-details-chart="semaine" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                    </svg>
+                                </button>
+                            </li>
+                        </menu>
                         <canvas id="monthlyChart"></canvas>
                     </div>
                     <div class="col-span-full bg-black-numixs p-3 rounded-2xl h-96 relative">
-                        <button data-details-chart="mois" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                            </svg>
-                        </button>
+                        <menu class="absolute right-3 flex flex-row gap-3">
+                            <li>
+                                <button data-download-chart="yearlyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M14 3h2.997v5h-2.997v-5zm9 1v20h-22v-24h17.997l4.003 4zm-17 5h12v-7h-12v7zm14 4h-16v9h16v-9z"/>
+                                    </svg>
+                                </button>
+                            </li>
+                            <li>
+                                <button data-details-chart="mois" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                                    </svg>
+                                </button>
+                            </li>
+                        </menu>
                         <canvas id="yearlyChart"></canvas>
                     </div>
                 </div>
