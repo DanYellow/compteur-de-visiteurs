@@ -60,7 +60,7 @@ router.get(["/dashboard"], async (req, res) => {
     res.render("pages/dashboard.njk");
 })
 
-router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
+router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.current_date) {
@@ -84,6 +84,14 @@ router.get(["/visiteurs", "/liste-visiteurs"], async (req, res) => {
 
     const visitorsSummary = await VisitorModel.findAll({
         raw: true,
+        where: {
+            date_passage: {
+                [Op.and]: {
+                    [Op.gte]: daySelected.startOf("day").toString(),
+                    [Op.lte]: daySelected.endOf("day").toString(),
+                }
+            }
+        },
         attributes: [
             ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER ( WHERE "${item.value}" = 'oui' )` ), item.value]))
         ]
