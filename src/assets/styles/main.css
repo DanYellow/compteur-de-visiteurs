@@ -89,7 +89,7 @@
 :root {
     font-family: "Calibri", sans-serif;
 
-    --color-gray-numixs: #e0e0e0;
+    /* --color-gray-numixs: #e0e0e0; */
 
     font-synthesis: none;
     text-rendering: optimizeLegibility;
