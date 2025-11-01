@@ -69,6 +69,10 @@ export const listDays = [{
 {
     id: 5,
     name: "Vendredi",
+},
+{
+    id: 6,
+    name: "Samedi",
 }];
 
 export const listMonths = [{

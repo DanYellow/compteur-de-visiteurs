@@ -23,7 +23,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                         Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)
                     </a>
 
-                    <span class="popup-button z-50" aria-haspopup="true" aria-expanded="false" title="Open for more actions">
+                    <span class="popup-button z-50" aria-haspopup="true" aria-expanded="false" title="Ouvrir pour plus de choix">
                         <svg aria-hidden="true" viewBox="0 0 20 20" style="anchor-name: --split-button;">
                             <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
                         </svg>
@@ -37,13 +37,13 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                             <li>
                                 <a href="/visiteurs/telecharger?mois={{ current_date|date("yyyy-MM") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                                     {% include "includes/icons/download-fill-icon.svg" %}
-                                    Télécharger toutes les données du mois {{ current_date|date("MMMM yyyy") }}  (.csv)
+                                    Télécharger toutes les données du mois {{ current_date|date("MMMM yyyy") }} (.csv)
                                 </a>
                             </li>
                             <li>
                                 <a href="/visiteurs/telecharger?annee={{ current_date|date("yyyy") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                                     {% include "includes/icons/download-fill-icon.svg" %}
-                                    Télécharger toutes les données de l'année {{ current_date|date("yyyy") }}  (.csv)
+                                    Télécharger toutes les données de l'année {{ current_date|date("yyyy") }} (.csv)
                                 </a>
                             </li>
                         </ul>
@@ -74,8 +74,8 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 <header class="flex mb-3 gap-3">
                     <div class="flex flex-col w-full lg:w-auto lg:mr-4 bg-green-numixs p-3 pr-5 rounded-md text-black-numixs">
                         <p class="text-2xl title-font">Nombre de visites</p>
-                        <p class="text-4xl title-font">{{ visitors_list|length }}</p>
-                        <p>le {{ current_date|date("EEEE dd LLLL yyyy") }}</p>
+                        <p class="text-4xl">{{ visitors_list|length }}</p>
+                        <p>{{ current_date|date("EEEE dd LLLL yyyy") }}</p>
                     </div>
                     <div class="bg-black-numixs p-3 rounded-md text-white-numixs hidden flex-1 lg:grid grid-cols-4 gap-1.5">
                         <p class="col-span-full text-xl">Détails des visites par type de visiteur</p>
