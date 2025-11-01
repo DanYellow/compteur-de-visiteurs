@@ -195,6 +195,10 @@ input.error {
 
         &:is(:focus-within, :hover) {
             background-color: var(--color-green-900);
+
+            & > svg {
+                translate: 0 3px;
+            }
         }
 
         &:focus-within {
@@ -209,6 +213,10 @@ input.error {
                 transition-duration: 350ms;
                 transform: rotateZ(.5turn);
             } */
+        }
+
+        & > svg {
+            transition: 150ms translate;
         }
     }
 

@@ -19,7 +19,7 @@ Tableau de bord
             </header>
             <div class="text-black">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                    <div class="bg-black-numixs p-3 rounded-2xl h-72 relative">
+                    <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
                         <button data-details-chart="heure" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
@@ -27,7 +27,7 @@ Tableau de bord
                         </button>
                         <canvas id="dailyChart" class="w-full h-full"></canvas>
                     </div>
-                    <div class="bg-black-numixs p-3 rounded-2xl h-72 relative">
+                    <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
                         <button data-details-chart="jour" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
@@ -35,8 +35,8 @@ Tableau de bord
                         </button>
                         <canvas id="weeklyChart"></canvas>
                     </div>
-                    <div>
-                        <canvas id="myChart3" class="bg-blue-200"></canvas>
+                    <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
+                        <canvas id="monthlyChart"></canvas>
                     </div>
                     <div class="col-span-full bg-black-numixs p-3 rounded-2xl h-86 relative">
                         <button data-details-chart="mois" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs absolute right-3 hocus:text-green-numixs cursor-pointer">

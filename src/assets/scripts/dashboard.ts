@@ -2,7 +2,7 @@ import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, Li
 import { DateTime } from "luxon";
 
 import type { LineChartEntry } from "#types";
-import { listBusinessSector, listTimeSlots, listDays, listMonths } from "#scripts/utils.ts"
+import { listBusinessSector, listTimeSlots, listDays, listMonths, getWeeksRangeMonth } from "#scripts/utils.ts"
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 
@@ -74,7 +74,7 @@ const chartScales = (xTitle: string) => {
 }
 
 const today = DateTime.now();
-
+getWeeksRangeMonth()
 const listCharts = [
     {
         apiKey: "heure",
@@ -93,7 +93,7 @@ const listCharts = [
     },
     // {
     //     apiKey: "semaine",
-    //     id: "weeklyChart",
+    //     id: "monthlyChart",
     //     chartTitle: "Visites mensuelles",
     //     xLabels: listDays,
     //     xTitle: "Semaines",

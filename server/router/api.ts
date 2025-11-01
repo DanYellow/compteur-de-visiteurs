@@ -33,7 +33,7 @@ router.get("/", async (req, res) => {
     }
 
     const queryStringParam = (req.query?.filtre || "jour") as string;
-    const sqliteSubtitution = (dictGroupType as any)[queryStringParam]?.substitution || "%H";
+    // const sqliteSubtitution = (dictGroupType as any)[queryStringParam]?.substitution || "%H";
 
     const listVisitors = await VisitorModel.findAll({
         raw: true,
@@ -49,12 +49,11 @@ router.get("/", async (req, res) => {
             }
         }
     });
-    // console.log(
-    //     DateTime.fromISO(new Date(listVisitors[0].date_passage).toISOString()).month
-    // )
+
     res.status(200).json({
         data: listVisitors.map((item) => {
-            const date = DateTime.fromISO(new Date(item.date_passage).toISOString())
+            const date = DateTime.fromISO(new Date(item.date_passage).toISOString());
+
             return {
                 ...item,
                 date_passage: date,
