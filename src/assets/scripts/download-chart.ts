@@ -4,7 +4,9 @@ const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
 
 const DATE_FORMAT = "dd-LL-yyyy";
 const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
-console.log(grayNumixs)
+const SCALE_FACTOR = 1;
+const LOGO_SCALE_FACTOR = 0.65;
+
 const getChartFilename = (type: string): string => {
     const today = DateTime.now();
 
@@ -29,7 +31,7 @@ const getChartFilename = (type: string): string => {
 }
 
 listDownloadButtons.forEach((item) => {
-    item.addEventListener("click", (e: MouseEvent) => {
+    item.addEventListener("click", async (e: MouseEvent) => {
         const element = e.currentTarget as HTMLButtonElement;
         const chartId = element.dataset.downloadChart!;
 
@@ -37,17 +39,36 @@ listDownloadButtons.forEach((item) => {
         const chart = document.getElementById(chartId) as HTMLCanvasElement;
 
         const chartClone = chart.cloneNode(true) as HTMLCanvasElement;
-        const canvasCtx = chartClone.getContext("2d");
-        if (canvasCtx) {
-            canvasCtx.drawImage(chart, 0, 0);
+        const cloneCtx = chartClone.getContext("2d");
+        if (cloneCtx) {
+            chartClone.width = chart.width * SCALE_FACTOR + 50;
+            chartClone.height = chart.height * SCALE_FACTOR + 50;
 
-            canvasCtx.fillStyle = grayNumixs;
-            canvasCtx.globalCompositeOperation = 'destination-over';
-            canvasCtx.fillRect(0, 0, chartClone.width, chartClone.height);
+            cloneCtx.drawImage(chart,
+                (chartClone.width - chart.width) / 2, 0,
+                chart.width * SCALE_FACTOR, chart.height * SCALE_FACTOR
+            );
+
+            // cloneCtx.fillStyle = grayNumixs;
+            // cloneCtx.globalCompositeOperation = 'destination-over';
+            // cloneCtx.fillRect(0, 0, chartClone.width * SCALE_FACTOR, chartClone.height * SCALE_FACTOR);
+
+            const img = new Image();
+            img.src = '/images/faclab-logo-light.svg';
+            img.onload = function () {
+                cloneCtx.drawImage(img, chartClone.width - img.width, chartClone.height - img.height, img.width * LOGO_SCALE_FACTOR, img.height * LOGO_SCALE_FACTOR);
+
+                cloneCtx.fillStyle = grayNumixs;
+                cloneCtx.globalCompositeOperation = 'destination-over';
+                cloneCtx.fillRect(0, 0, chartClone.width * SCALE_FACTOR, (chartClone.height * SCALE_FACTOR));
+                download();
+            }
         }
 
-        link.download = getChartFilename(chartId);
-        link.href = chartClone.toDataURL("image/jpeg", 1);
-        link.click();
+        function download() {
+            link.download = getChartFilename(chartId);
+            link.href = chartClone.toDataURL("image/jpeg", 1);
+            link.click();
+        }
     });
 });
