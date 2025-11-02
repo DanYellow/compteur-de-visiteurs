@@ -1,4 +1,6 @@
 import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 import { DateTime } from "luxon";
 
 import type { LineChartEntry } from "#types";
@@ -6,9 +8,10 @@ import { listBusinessSector, listTimeSlots, listDays, listMonths, getWeeksRangeM
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 
-Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend);
+Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels);
 
 const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs')
+const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
 
 const chartTitleStyle = {
     display: true,
@@ -19,6 +22,20 @@ const chartTitleStyle = {
         weight: 'normal',
         family: "Agency FB"
     }
+};
+
+const TotalVisitors = {
+  id: 'totalVisitors',
+  beforeDraw: (chart: Chart, args, options) => {
+    const {ctx} = chart;
+    const { text = "", fontSize = "14px" }: { text: string, fontSize: string} = options;
+    ctx.save();
+    ctx.globalCompositeOperation = 'destination-over';
+    ctx.font = `${fontSize} Calibri`;
+    ctx.fillStyle = "white";
+    ctx.fillText(text, 6, chart.height - 10);
+    ctx.restore();
+  }
 };
 
 const chartScales = (xTitle: string) => {
@@ -175,9 +192,20 @@ const listCharts = [
                         legend: {
                             display: false,
                         },
+                        totalVisitors: {
+                            text: 'Total : ' + res.data.length,
+                        },
+                        // datalabels: {
+                        //     color:  grayNumixs,
+                        //     font: {
+                        //         size: 16
+                        //     },
+                        //     formatter: v => v ? v : ''
+                        // }
                     },
                     scales: chartScales(xTitle),
                 },
+                plugins: [TotalVisitors],
             }
         );
     })
@@ -192,6 +220,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         const chartSelected = sourceBtn.dataset.detailsChart;
         const chartData = JSON.parse(sourceBtn.closest("div")?.querySelector("canvas")?.dataset.chartData || "{}");
         const {xLabels, xValuesSuffix, chartTitle} = listCharts.find((item) => item.apiKey === chartSelected) || {};
+        const totalVisits = Object.values(chartData).flat().length;
 
         const lineChartDatasets:LineChartEntry[] = [];
         listBusinessSector.forEach((business) => {
@@ -235,7 +264,6 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
             datasets: lineChartDatasets,
         };
 
-        // https://www.youtube.com/watch?v=jlgeG5K6bBg
         new Chart(
             detailsChartCtx,
             {
@@ -255,8 +283,20 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                             text: `${chartTitle || ""} détaillée`,
                             ...chartTitleStyle
                         },
+                        totalVisitors: {
+                            text: 'Total : ' + totalVisits,
+                        },
+                        datalabels: {
+                            color: "white",
+                            font: {
+                                size: 16
+                            },
+                            align: "end",
+                            formatter: v => v ? v : ''
+                        }
                     }
-                }
+                },
+                plugins: [TotalVisitors, ChartDataLabels],
             }
         )
     } else {

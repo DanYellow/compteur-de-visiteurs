@@ -5,7 +5,6 @@ const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
 
 const DATE_FORMAT = "dd-LL-yyyy";
 const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
-const SCALE_FACTOR = 1;
 const LOGO_SCALE_FACTOR = 0.65;
 
 const [width, height] = (import.meta.env.CHART_EXPORT_SIZE || "1200x800").split("x");
@@ -41,7 +40,6 @@ const getChartFilename = (type: string): string => {
     return `${filename}_${String(Date.now()).slice(-6)}.jpg`
 }
 
-
 listDownloadButtons.forEach((item) => {
     item.addEventListener("click", async (e: MouseEvent) => {
         const element = e.currentTarget as HTMLButtonElement;
@@ -53,8 +51,15 @@ listDownloadButtons.forEach((item) => {
         // chart.closest("div").style.width = "1200px!important"
         // chart.closest("div").style.height = "780px!important"
         const chartInstance = Chart.getChart(chart)!;
+        const startDatalabelsSize = chartInstance.options.plugins.datalabels.font.size;
         // chartInstance.options.responsive = false;
-        chartInstance.options.maintainAspectRatio = false;
+        // chartInstance.options.maintainAspectRatio = false;
+        chartInstance.options.plugins.totalVisitors.fontSize = "18px";
+        chartInstance.options.plugins.datalabels.font.size = 24;
+
+        // chartInstance.scales.y[0].title.font.size = 50
+        console.log(chartInstance.scales.yA);
+
         chartInstance.resize(SIZE_EXPORT.width, SIZE_EXPORT.height);
 
         const download = () => {
@@ -71,7 +76,7 @@ listDownloadButtons.forEach((item) => {
 
             cloneCtx.drawImage(chart,
                 (Math.abs(chart.width - chartClone.width)) / 2, 0,
-                (chart.width * SCALE_FACTOR), (chart.height * SCALE_FACTOR)
+                chart.width, chart.height
             );
 
             const logo = new Image();
@@ -85,10 +90,12 @@ listDownloadButtons.forEach((item) => {
 
                 cloneCtx.fillStyle = grayNumixs;
                 cloneCtx.globalCompositeOperation = 'destination-over';
-                cloneCtx.fillRect(0, 0, chartClone.width * SCALE_FACTOR, (chartClone.height * SCALE_FACTOR));
+                cloneCtx.fillRect(0, 0, chartClone.width, chartClone.height);
+                download();
+
+                chartInstance.options.plugins.datalabels.font.size = startDatalabelsSize;
                 chartInstance.resize();
                 chart.style.opacity = "1";
-                download();
             }
         }
     });
