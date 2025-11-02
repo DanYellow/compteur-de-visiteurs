@@ -63,7 +63,6 @@ listDownloadButtons.forEach((item) => {
         chartScaleOptions.y!.title!.font!.size = 20;
         chartInstance.config!.options!.plugins!.title!.font!.size = 32;
 
-        // chartInstance.config.options.scales.x
         chartInstance.options!.plugins!.datalabels!.font!.size = 24;
         chartInstance.options.plugins!.tooltip!.enabled = false;
         chartInstance.resize(SIZE_EXPORT.width, SIZE_EXPORT.height);

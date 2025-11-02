@@ -7,6 +7,9 @@ import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } f
 import { listBusinessSector, listTimeSlots, listDays, listMonths, getWeeksRangeMonth } from "#scripts/utils.ts"
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
+const tableTheadRowTemplateRaw = document.getElementById("table-details-chart-thead-row") as HTMLTemplateElement;
+
+const tableDetailsChart = document.getElementById("table-details-chart") as HTMLTemplateElement;
 
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels);
 
@@ -220,8 +223,35 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         const { xLabels, xValuesSuffix, chartTitle } = listCharts.find((item) => item.apiKey === chartSelected) || {};
         const totalVisits = Object.values(chartData).flat().length;
 
+        const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr")! as HTMLTableRowElement;
+        const tableDetailsChartTableBody = tableDetailsChart.querySelector("tbody")! as HTMLTableSectionElement;
+        tableDetailsChartTableHeadRow.innerHTML = "";
+
+        const tableTheadRowTemplate = tableTheadRowTemplateRaw.content.cloneNode(true);
+        tableTheadRowTemplate.querySelector("th")!.textContent = "Groupe"
+        tableDetailsChartTableHeadRow.append(tableTheadRowTemplate)
+
+        xLabels?.forEach((label) => {
+            const tableTheadRowTemplate = tableTheadRowTemplateRaw.content.cloneNode(true);
+            if (typeof label === "object") {
+                tableTheadRowTemplate.querySelector("th").textContent = `${label.name}${xValuesSuffix || ""}`
+            } else {
+                tableTheadRowTemplate.querySelector("th").textContent = `${label}${xValuesSuffix || ""}`
+            }
+
+            tableDetailsChartTableHeadRow.append(tableTheadRowTemplate);
+        })
+
         const lineChartDatasets: LineChartEntry[] = [];
+        tableDetailsChartTableBody.innerHTML = ""
         listBusinessSector.forEach((business) => {
+            const trBody = document.createElement("tr");
+            const td = document.createElement("td");
+            // td.classList.add(...["fixed", "bg-black-numixs"])
+
+            td.textContent = business.name;
+            trBody.append(td);
+
             const visitorPerTypeAndPeriod = {
                 [business.value]: new Array(xLabels?.length || 0).fill(0)
             };
@@ -235,10 +265,20 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                         return Number(label.id) === Number(xValueIndex)
                     }
                     return Number(label) === Number(xValueIndex);
-                })
+                });
 
                 visitorPerTypeAndPeriod[business.value][indexArray] = visitorsReducer[[business.value]]
             });
+
+            visitorPerTypeAndPeriod[business.value].forEach((item) => {
+                const td = document.createElement("td");
+                td.textContent = item;
+                td.classList.add("text-center")
+                td.classList.toggle("text-green-numixs", item > 0)
+                trBody.append(td)
+            })
+
+            tableDetailsChartTableBody.append(trBody)
 
             lineChartDatasets.push({
                 label: business.name,
@@ -246,8 +286,8 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                 borderColor: business.lineColor,
                 tension: 0.1,
                 fill: true,
-            })
-        })
+            });
+        });
 
         const chartLabels = xLabels!.map((item) => {
             if (typeof item === 'object') {
@@ -255,7 +295,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
             }
 
             return `${item}${xValuesSuffix || ""}`;
-        })
+        });
 
         const data = {
             labels: chartLabels,
