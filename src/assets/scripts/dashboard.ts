@@ -274,6 +274,8 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                 const td = document.createElement("td");
                 td.textContent = item;
                 td.classList.add("text-center")
+                td.style.textAlign = "center";
+                td.style.color = item > 0 ? greenNumixs : "";
                 td.classList.toggle("text-green-numixs", item > 0)
                 trBody.append(td)
             })

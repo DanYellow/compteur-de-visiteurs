@@ -144,11 +144,11 @@ export const getWeeksRangeMonth = (startDate) => {
     const startMonth = today.startOf("month");
     const endMonth = today.endOf("month");
 
-    const firstWeekInYear = DateTime.fromObject({weekYear: today.year, weekNumber: startMonth.weekNumber});
-    const lastWeekInYear  = DateTime.fromObject({weekYear: today.year, weekNumber: endMonth.weekNumber});
+    const firstWeekInYear = DateTime.fromObject({ weekYear: today.year, weekNumber: startMonth.weekNumber });
+    const lastWeekInYear = DateTime.fromObject({ weekYear: today.year, weekNumber: endMonth.weekNumber });
 
-    const intervalYear =   firstWeekInYear.until(lastWeekInYear.endOf("week"));
-    const intervalWeeks = intervalYear.splitBy({weeks: 1});
+    const intervalYear = firstWeekInYear.until(lastWeekInYear.endOf("week"));
+    const intervalWeeks = intervalYear.splitBy({ weeks: 1 });
 
     const listWeeks: WeekMonth[] = [];
     intervalWeeks.forEach((item) => {
@@ -159,4 +159,11 @@ export const getWeeksRangeMonth = (startDate) => {
     })
 
     return listWeeks;
+}
+
+export const loadImage = (obj: HTMLImageElement) => {
+    return new Promise((resolve, reject) => {
+        obj.onload = () => resolve(obj);
+        obj.onerror = reject;
+    });
 }

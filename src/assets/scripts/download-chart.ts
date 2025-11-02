@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { Chart } from 'chart.js';
+import { loadImage } from "./utils";
 
 const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
 
@@ -77,7 +78,11 @@ listDownloadButtons.forEach((item) => {
         const cloneCtx = chartClone.getContext("2d");
         if (cloneCtx) {
             chartClone.width = chartClone.width + 75;
+            const table = chart.closest("dialog")?.querySelector("table");
             chartClone.height = chartClone.height + 75;
+            if (table) {
+                chartClone.height += table.offsetHeight;
+            }
 
             cloneCtx.drawImage(chart,
                 (Math.abs(chart.width - chartClone.width)) / 2, 0,
@@ -86,35 +91,56 @@ listDownloadButtons.forEach((item) => {
 
             const watermark = new Image();
             watermark.src = '/images/watermark.svg';
-            watermark.onload = function () {
-                cloneCtx.drawImage(watermark, chartClone.width - watermark.width, chartClone.height - watermark.height, watermark.width * WATERMARK_SCALE_FACTOR, watermark.height * WATERMARK_SCALE_FACTOR);
+            await loadImage(watermark);
 
-                cloneCtx.font = "12px sans-serif";
-                cloneCtx.fillStyle = "white";
-                cloneCtx.fillText(`Généré le ${today.toFormat("dd/LL/yyyy à HH:mm")}`, 5, chartClone.height - 7);
+            cloneCtx.drawImage(watermark, chartClone.width - watermark.width, chartClone.height - watermark.height, watermark.width * WATERMARK_SCALE_FACTOR, watermark.height * WATERMARK_SCALE_FACTOR);
+            cloneCtx.font = "12px Calibri";
+            cloneCtx.fillStyle = "white";
+            cloneCtx.fillText(`Généré le ${today.toFormat("dd/LL/yyyy à HH:mm")}`, 5, chartClone.height - 7);
 
-                cloneCtx.fillStyle = grayNumixs;
-                cloneCtx.globalCompositeOperation = 'destination-over';
-                cloneCtx.fillRect(0, 0, chartClone.width, chartClone.height);
-                download();
+            if (chart.closest("dialog")) {
+                const table = chart.closest("dialog")?.querySelector("table");
+                const data = `
+                    <svg xmlns="http://www.w3.org/2000/svg" width="${chart.width}px" height="${chart?.offsetHeight}">
+                        <foreignObject width="100%" height="100%">
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="color: white; font-family: Calibri;">
+                                ${table?.outerHTML}
+                            </div>
+                        </foreignObject>
+                    </svg>
+                `;
 
-                setTimeout(() => {
-                    chartInstance.options.plugins!.datalabels!.font!.size = startDatalabelsSize;
-                    chartInstance.config.options.scales.x.title.font.size = chartXTitleFontSize;
-                    chartInstance.config.options.scales.y.title.font.size = chartYTitleFontSize;
-                    chartInstance.config.options.plugins.title.font.size = chartTitleFontSize;
-                    chartInstance.options.plugins!.totalVisitors.fontSize = "14px";
+                const tableDetailsImg = new Image();
+                const svg = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });
+                const url = window.URL.createObjectURL(svg);
+                tableDetailsImg.src = url;
+                await loadImage(tableDetailsImg);
 
-                    chartInstance.options.plugins!.tooltip!.enabled = true;
-                    chartInstance.resize();
-                    chartInstance.update();
-                    chartInstance.reset();
-
-                    chart.style.width = originalSize.width;
-                    chart.style.height = originalSize.height;
-                    chart.style.opacity = "1";
-                }, 150)
+                cloneCtx.drawImage(tableDetailsImg, chartClone.width - tableDetailsImg.width, chart.height + 10);
+                window.URL.revokeObjectURL(url);
             }
+
+            // Background
+            cloneCtx.fillStyle = grayNumixs;
+            cloneCtx.globalCompositeOperation = 'destination-over';
+            cloneCtx.fillRect(0, 0, chartClone.width, chartClone.height);
+
+            download();
+
+            chartInstance.options.plugins!.datalabels!.font!.size = startDatalabelsSize;
+            chartInstance.config.options.scales.x.title.font.size = chartXTitleFontSize;
+            chartInstance.config.options.scales.y.title.font.size = chartYTitleFontSize;
+            chartInstance.config.options.plugins.title.font.size = chartTitleFontSize;
+            chartInstance.options.plugins!.totalVisitors.fontSize = "14px";
+
+            chartInstance.options.plugins!.tooltip!.enabled = true;
+            chartInstance.resize();
+            chartInstance.update();
+            chartInstance.reset();
+
+            chart.style.width = originalSize.width;
+            chart.style.height = originalSize.height;
+            chart.style.opacity = "1";
         }
     });
 });
