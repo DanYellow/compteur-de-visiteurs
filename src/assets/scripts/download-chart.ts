@@ -49,14 +49,18 @@ listDownloadButtons.forEach((item) => {
         const chart = document.getElementById(chartId) as HTMLCanvasElement;
         chart.style.opacity = "0";
         const chartInstance = Chart.getChart(chart)!;
+
+        const originalSize = { width: chart.style.width, height: chart.style.height };
         const startDatalabelsSize = chartInstance.options.plugins.datalabels.font.size;
         const chartXTitleFontSize = chartInstance.config!.options.scales.x.title.font.size;
         const chartYTitleFontSize = chartInstance.config!.options!.scales!.y!.title!.font.size;
         const chartTitleFontSize = chartInstance.config.options.plugins.title.font.size;
 
+        const chartScaleOptions = chartInstance!.config!.options!.scales!;
+
         chartInstance.options.plugins!.totalVisitors.fontSize = "18px"
-        chartInstance.config!.options!.scales!.x!.title!.font!.size = 20;
-        chartInstance.config!.options!.scales!.y!.title!.font!.size = 20;
+        chartScaleOptions.x!.title!.font!.size = 20;
+        chartScaleOptions.y!.title!.font!.size = 20;
         chartInstance.config!.options!.plugins!.title!.font!.size = 32;
 
         // chartInstance.config.options.scales.x
@@ -95,15 +99,22 @@ listDownloadButtons.forEach((item) => {
                 cloneCtx.fillRect(0, 0, chartClone.width, chartClone.height);
                 download();
 
-                chartInstance.options.plugins!.datalabels!.font!.size = startDatalabelsSize;
-                chartInstance.config.options.scales.x.title.font.size = chartXTitleFontSize;
-                chartInstance.config.options.scales.y.title.font.size = chartYTitleFontSize;
-                chartInstance.config.options.plugins.title.font.size = chartTitleFontSize;
+                setTimeout(() => {
+                    chartInstance.options.plugins!.datalabels!.font!.size = startDatalabelsSize;
+                    chartInstance.config.options.scales.x.title.font.size = chartXTitleFontSize;
+                    chartInstance.config.options.scales.y.title.font.size = chartYTitleFontSize;
+                    chartInstance.config.options.plugins.title.font.size = chartTitleFontSize;
+                    chartInstance.options.plugins!.totalVisitors.fontSize = "14px";
 
-                chartInstance.options.plugins!.tooltip!.enabled = true;
-                chartInstance.resize();
-                chartInstance.update();
-                chart.style.opacity = "1";
+                    chartInstance.options.plugins!.tooltip!.enabled = true;
+                    chartInstance.resize();
+                    chartInstance.update();
+                    chartInstance.reset();
+
+                    chart.style.width = originalSize.width;
+                    chart.style.height = originalSize.height;
+                    chart.style.opacity = "1";
+                }, 150)
             }
         }
     });

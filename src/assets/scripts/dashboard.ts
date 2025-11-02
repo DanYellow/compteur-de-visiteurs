@@ -3,7 +3,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime } from "luxon";
 
-import type { LineChartEntry, TotalVisitorsPluginOptions } from "#types";
+import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } from "#types";
 import { listBusinessSector, listTimeSlots, listDays, listMonths, getWeeksRangeMonth } from "#scripts/utils.ts"
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
@@ -11,9 +11,8 @@ const detailsChartsDialog = document.getElementById("detailsChartModal") as HTML
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels);
 
 const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs')
-const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
 
-const chartTitleStyle = {
+const chartTitleStyle: CustomTitleOptions = {
     display: true,
     color: greenNumixs,
     font: {
@@ -169,7 +168,6 @@ const listCharts = [
                     labels: chartLabels,
                     datasets: [
                         {
-                            color: "white",
                             label: "Visites",
                             data: chartData,
                             backgroundColor: `rgba(213, 217, 22, 0.5)`,
@@ -211,7 +209,7 @@ const listCharts = [
     })
 })();
 
-const detailsChartCtx = document.getElementById("detailsChart")!;
+const detailsChartCtx = document.getElementById("detailsChart")! as HTMLCanvasElement;
 detailsChartsDialog?.addEventListener("toggle", async (e) => {
     const isOpened = e.newState === "open";
 
@@ -225,21 +223,21 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         const lineChartDatasets: LineChartEntry[] = [];
         listBusinessSector.forEach((business) => {
             const visitorPerTypeAndPeriod = {
-                [business.value]: new Array(xLabels.length).fill(0)
+                [business.value]: new Array(xLabels?.length || 0).fill(0)
             };
-            Object.entries(chartData).forEach(([xValueIndex, listVisitors], index) => {
-                const he = listVisitors.reduce(
+            Object.entries(chartData).forEach(([xValueIndex, listVisitors]) => {
+                const visitorsReducer = listVisitors.reduce(
                     (acc, visitor) => ((acc[business.value] = (acc[business.value] || 0) + ((visitor[business.value] === "oui") ? 1 : 0)), acc),
                     {});
 
-                const indexArray = xLabels.findIndex((label) => {
+                const indexArray = (xLabels || []).findIndex((label) => {
                     if (typeof label === "object") {
                         return Number(label.id) === Number(xValueIndex)
                     }
                     return Number(label) === Number(xValueIndex);
                 })
 
-                visitorPerTypeAndPeriod[business.value][indexArray] = he[[business.value]]
+                visitorPerTypeAndPeriod[business.value][indexArray] = visitorsReducer[[business.value]]
             });
 
             lineChartDatasets.push({
@@ -251,7 +249,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
             })
         })
 
-        const chartLabels = xLabels.map((item) => {
+        const chartLabels = xLabels!.map((item) => {
             if (typeof item === 'object') {
                 return `${item.name}${xValuesSuffix || ""}`;
             }
@@ -281,7 +279,11 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                         },
                         title: {
                             text: `${chartTitle || ""} détaillée`,
-                            ...chartTitleStyle
+                            ...chartTitleStyle,
+                            font: {
+                                ...chartTitleStyle.font,
+                                size: 26,
+                            }
                         },
                         totalVisitors: {
                             text: 'Total : ' + totalVisits,
