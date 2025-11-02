@@ -231,23 +231,28 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         tableTheadRowTemplate.querySelector("th")!.textContent = "Groupe"
         tableDetailsChartTableHeadRow.append(tableTheadRowTemplate)
 
+        const valuesPerPeriod: Record<string, number> = {}
+
         xLabels?.forEach((label) => {
             const tableTheadRowTemplate = tableTheadRowTemplateRaw.content.cloneNode(true);
             if (typeof label === "object") {
+                valuesPerPeriod[label.id] = 0;
                 tableTheadRowTemplate.querySelector("th").textContent = `${label.name}${xValuesSuffix || ""}`
             } else {
+                valuesPerPeriod[label] = 0;
                 tableTheadRowTemplate.querySelector("th").textContent = `${label}${xValuesSuffix || ""}`
             }
 
             tableDetailsChartTableHeadRow.append(tableTheadRowTemplate);
         })
 
+
+        console.log(xLabels)
         const lineChartDatasets: LineChartEntry[] = [];
-        tableDetailsChartTableBody.innerHTML = ""
+        tableDetailsChartTableBody.innerHTML = "";
         listBusinessSector.forEach((business) => {
             const trBody = document.createElement("tr");
             const td = document.createElement("td");
-            // td.classList.add(...["fixed", "bg-black-numixs"])
 
             td.textContent = business.name;
             trBody.append(td);
@@ -266,14 +271,13 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                     }
                     return Number(label) === Number(xValueIndex);
                 });
-
-                visitorPerTypeAndPeriod[business.value][indexArray] = visitorsReducer[[business.value]]
+                visitorPerTypeAndPeriod[business.value][indexArray] = visitorsReducer[[business.value]];
             });
 
             visitorPerTypeAndPeriod[business.value].forEach((item) => {
                 const td = document.createElement("td");
                 td.textContent = item;
-                td.classList.add("text-center")
+                td.classList.add("text-center");
                 td.style.textAlign = "center";
                 td.style.color = item > 0 ? greenNumixs : "";
                 td.classList.toggle("text-green-numixs", item > 0)
@@ -290,6 +294,31 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                 fill: true,
             });
         });
+
+        // Total row
+        const trTotal = document.createElement("tr") as HTMLTableRowElement;
+        trTotal.style.fontSize = "1.25rem";
+        const td = document.createElement("td") as HTMLTableCellElement;
+        td.textContent = "Total";
+        td.style.borderTop = "2px solid white";
+        td.style.paddingTop = "0.35rem";
+        trTotal.append(td);
+
+        Object.entries(chartData).forEach(([key, value]) => {
+            valuesPerPeriod[key] = String(value.length)
+        });
+
+        Object.values(valuesPerPeriod).forEach((item) => {
+            const td = document.createElement("td") as HTMLTableCellElement;
+            td.textContent = String(item);
+            td.style.textAlign = "center";
+            td.style.borderTop = "2px solid white";
+            td.style.paddingTop = "0.35rem";
+            td.style.color = item > 0 ? greenNumixs : "";
+            trTotal.append(td);
+        })
+
+        tableDetailsChartTableBody.append(trTotal);
 
         const chartLabels = xLabels!.map((item) => {
             if (typeof item === 'object') {

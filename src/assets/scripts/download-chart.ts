@@ -79,7 +79,7 @@ listDownloadButtons.forEach((item) => {
         if (cloneCtx) {
             chartClone.width = chartClone.width + 75;
             const table = chart.closest("dialog")?.querySelector("table");
-            chartClone.height = chartClone.height + 75;
+            chartClone.height = chartClone.height + 50;
             if (table) {
                 chartClone.height += table.offsetHeight;
             }
