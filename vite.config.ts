@@ -12,6 +12,8 @@ export default defineConfig(({ mode }) => {
         appType: "custom",
         define: {
             'import.meta.env.FORM_RESULT_TIMEOUT': JSON.stringify(env.FORM_RESULT_TIMEOUT),
+            'import.meta.env.OPENING_HOURS': JSON.stringify(env.OPENING_HOURS),
+            'import.meta.env.CHART_EXPORT_SIZE': JSON.stringify(env.CHART_EXPORT_SIZE),
         },
         server: {
             // Expose the server to the network allowing access from ip address

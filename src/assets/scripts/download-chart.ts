@@ -7,9 +7,11 @@ const DATE_FORMAT = "dd-LL-yyyy";
 const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
 const SCALE_FACTOR = 1;
 const LOGO_SCALE_FACTOR = 0.65;
+
+const [width, height] = (import.meta.env.CHART_EXPORT_SIZE || "1200x800").split("x");
 const SIZE_EXPORT = {
-    width: 1200,
-    height: 800,
+    width,
+    height,
 }
 
 const today = DateTime.now();
@@ -48,40 +50,32 @@ listDownloadButtons.forEach((item) => {
         const link = document.createElement("a");
         const chart = document.getElementById(chartId) as HTMLCanvasElement;
         chart.style.opacity = "0";
+        // chart.closest("div").style.width = "1200px!important"
+        // chart.closest("div").style.height = "780px!important"
         const chartInstance = Chart.getChart(chart)!;
+        // chartInstance.options.responsive = false;
+        chartInstance.options.maintainAspectRatio = false;
         chartInstance.resize(SIZE_EXPORT.width, SIZE_EXPORT.height);
+
+        const download = () => {
+            link.download = getChartFilename(chartId);
+            link.href = chartClone.toDataURL("image/jpeg", 1);
+            link.click();
+        }
 
         const chartClone = chart.cloneNode(true) as HTMLCanvasElement;
         const cloneCtx = chartClone.getContext("2d");
         if (cloneCtx) {
-            // V1
-            cloneCtx.imageSmoothingEnabled = false;
-
-            chartClone.width = (chartClone.width * SCALE_FACTOR) + 50;
-            chartClone.height = (chartClone.height * SCALE_FACTOR) + 50;
+            chartClone.width = chartClone.width + 50;
+            chartClone.height = chartClone.height + 50;
 
             cloneCtx.drawImage(chart,
                 (Math.abs(chart.width - chartClone.width)) / 2, 0,
                 (chart.width * SCALE_FACTOR), (chart.height * SCALE_FACTOR)
             );
 
-            // V2
-            // cloneCtx.imageSmoothingEnabled = false;
-            // chartClone.width = SIZE_EXPORT.width + 50;
-            // chartClone.height = SIZE_EXPORT.height + 50;
-
-            // const hRatio = SIZE_EXPORT.width / chart.width;
-            // const vRatio = SIZE_EXPORT.height / chart.height;
-
-            // const ratio = Math.min(hRatio, vRatio);
-
-            // cloneCtx.drawImage(chart,
-            //     0, 0, chart.width, chart.height,
-            //     (Math.abs((chart.width * ratio) - chartClone.width)) / 2, (Math.abs((chart.height * ratio) - chartClone.height)) / 2, chart.width * ratio, chart.height * ratio
-            // );
-
             const logo = new Image();
-            logo.src = '/images/faclab-logo-light.svg';
+            logo.src = '/images/watermark.svg';
             logo.onload = function () {
                 cloneCtx.drawImage(logo, chartClone.width - logo.width, chartClone.height - logo.height, logo.width * LOGO_SCALE_FACTOR, logo.height * LOGO_SCALE_FACTOR);
 
@@ -96,12 +90,6 @@ listDownloadButtons.forEach((item) => {
                 chart.style.opacity = "1";
                 download();
             }
-        }
-
-        const download = () => {
-            link.download = getChartFilename(chartId);
-            link.href = chartClone.toDataURL("image/jpeg", 1);
-            link.click();
         }
     });
 });
