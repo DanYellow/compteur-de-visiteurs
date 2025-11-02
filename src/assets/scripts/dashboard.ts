@@ -3,7 +3,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime } from "luxon";
 
-import type { LineChartEntry } from "#types";
+import type { LineChartEntry, TotalVisitorsPluginOptions } from "#types";
 import { listBusinessSector, listTimeSlots, listDays, listMonths, getWeeksRangeMonth } from "#scripts/utils.ts"
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
@@ -25,17 +25,17 @@ const chartTitleStyle = {
 };
 
 const TotalVisitors = {
-  id: 'totalVisitors',
-  beforeDraw: (chart: Chart, args, options) => {
-    const {ctx} = chart;
-    const { text = "", fontSize = "14px" }: { text: string, fontSize: string} = options;
-    ctx.save();
-    ctx.globalCompositeOperation = 'destination-over';
-    ctx.font = `${fontSize} Calibri`;
-    ctx.fillStyle = "white";
-    ctx.fillText(text, 6, chart.height - 10);
-    ctx.restore();
-  }
+    id: 'totalVisitors',
+    beforeDraw: (chart: Chart, args, options: TotalVisitorsPluginOptions) => {
+        const { ctx } = chart;
+        const { text = "", fontSize = "14px" } = options;
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.font = `${fontSize} Calibri`;
+        ctx.fillStyle = "white";
+        ctx.fillText(text, 6, chart.height - 10);
+        ctx.restore();
+    }
 };
 
 const chartScales = (xTitle: string) => {
@@ -64,9 +64,6 @@ const chartScales = (xTitle: string) => {
                 font: {
                     size: 12
                 }
-                // font: {
-                //     weight: "bold"
-                // }
             },
             beginAtZero: true,
         },
@@ -132,9 +129,9 @@ const listCharts = [
     }
 ];
 
-;(() => {
+; (() => {
     listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
-        const ctx = document.getElementById(id)!;
+        const ctx = document.getElementById(id)! as HTMLCanvasElement;
 
         const req = await fetch(`/api?filtre=${apiKey}`);
         const res = await req.json();
@@ -175,7 +172,9 @@ const listCharts = [
                             color: "white",
                             label: "Visites",
                             data: chartData,
-                            backgroundColor: greenNumixs
+                            backgroundColor: `rgba(213, 217, 22, 0.5)`,
+                            borderColor: greenNumixs,
+                            borderWidth: 1.5
                         }
                     ]
                 },
@@ -195,13 +194,14 @@ const listCharts = [
                         totalVisitors: {
                             text: 'Total : ' + res.data.length,
                         },
-                        // datalabels: {
-                        //     color:  grayNumixs,
-                        //     font: {
-                        //         size: 16
-                        //     },
-                        //     formatter: v => v ? v : ''
-                        // }
+                        datalabels: {
+                            color: "white",
+                            font: {
+                                size: 0
+                            },
+                            align: "top",
+                            formatter: v => v ? v : ''
+                        }
                     },
                     scales: chartScales(xTitle),
                 },
@@ -219,10 +219,10 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         const sourceBtn = e.source! as HTMLButtonElement;
         const chartSelected = sourceBtn.dataset.detailsChart;
         const chartData = JSON.parse(sourceBtn.closest("div")?.querySelector("canvas")?.dataset.chartData || "{}");
-        const {xLabels, xValuesSuffix, chartTitle} = listCharts.find((item) => item.apiKey === chartSelected) || {};
+        const { xLabels, xValuesSuffix, chartTitle } = listCharts.find((item) => item.apiKey === chartSelected) || {};
         const totalVisits = Object.values(chartData).flat().length;
 
-        const lineChartDatasets:LineChartEntry[] = [];
+        const lineChartDatasets: LineChartEntry[] = [];
         listBusinessSector.forEach((business) => {
             const visitorPerTypeAndPeriod = {
                 [business.value]: new Array(xLabels.length).fill(0)
@@ -230,7 +230,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
             Object.entries(chartData).forEach(([xValueIndex, listVisitors], index) => {
                 const he = listVisitors.reduce(
                     (acc, visitor) => ((acc[business.value] = (acc[business.value] || 0) + ((visitor[business.value] === "oui") ? 1 : 0)), acc),
-                {});
+                    {});
 
                 const indexArray = xLabels.findIndex((label) => {
                     if (typeof label === "object") {
@@ -288,22 +288,22 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                         },
                         datalabels: {
                             color: "white",
-                            font: {
-                                size: 16
-                            },
                             align: "end",
+                            font: {
+                                size: 0
+                            },
                             formatter: v => v ? v : ''
                         }
                     }
                 },
-                plugins: [TotalVisitors, ChartDataLabels],
+                plugins: [TotalVisitors],
             }
         )
     } else {
         try {
             const modalChart = Chart.getChart('detailsChart')
             modalChart?.destroy();
-        } catch(e) {
+        } catch (e) {
         }
     }
 })

@@ -5,7 +5,7 @@ const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
 
 const DATE_FORMAT = "dd-LL-yyyy";
 const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
-const LOGO_SCALE_FACTOR = 0.65;
+const WATERMARK_SCALE_FACTOR = 0.85;
 
 const [width, height] = (import.meta.env.CHART_EXPORT_SIZE || "1200x800").split("x");
 const SIZE_EXPORT = {
@@ -48,18 +48,20 @@ listDownloadButtons.forEach((item) => {
         const link = document.createElement("a");
         const chart = document.getElementById(chartId) as HTMLCanvasElement;
         chart.style.opacity = "0";
-        // chart.closest("div").style.width = "1200px!important"
-        // chart.closest("div").style.height = "780px!important"
         const chartInstance = Chart.getChart(chart)!;
         const startDatalabelsSize = chartInstance.options.plugins.datalabels.font.size;
-        // chartInstance.options.responsive = false;
-        // chartInstance.options.maintainAspectRatio = false;
-        chartInstance.options.plugins.totalVisitors.fontSize = "18px";
-        chartInstance.options.plugins.datalabels.font.size = 24;
+        const chartXTitleFontSize = chartInstance.config!.options.scales.x.title.font.size;
+        const chartYTitleFontSize = chartInstance.config!.options!.scales!.y!.title!.font.size;
+        const chartTitleFontSize = chartInstance.config.options.plugins.title.font.size;
 
-        // chartInstance.scales.y[0].title.font.size = 50
-        console.log(chartInstance.scales.yA);
+        chartInstance.options.plugins!.totalVisitors.fontSize = "18px"
+        chartInstance.config!.options!.scales!.x!.title!.font!.size = 20;
+        chartInstance.config!.options!.scales!.y!.title!.font!.size = 20;
+        chartInstance.config!.options!.plugins!.title!.font!.size = 32;
 
+        // chartInstance.config.options.scales.x
+        chartInstance.options!.plugins!.datalabels!.font!.size = 24;
+        chartInstance.options.plugins!.tooltip!.enabled = false;
         chartInstance.resize(SIZE_EXPORT.width, SIZE_EXPORT.height);
 
         const download = () => {
@@ -71,18 +73,18 @@ listDownloadButtons.forEach((item) => {
         const chartClone = chart.cloneNode(true) as HTMLCanvasElement;
         const cloneCtx = chartClone.getContext("2d");
         if (cloneCtx) {
-            chartClone.width = chartClone.width + 50;
-            chartClone.height = chartClone.height + 50;
+            chartClone.width = chartClone.width + 75;
+            chartClone.height = chartClone.height + 75;
 
             cloneCtx.drawImage(chart,
                 (Math.abs(chart.width - chartClone.width)) / 2, 0,
                 chart.width, chart.height
             );
 
-            const logo = new Image();
-            logo.src = '/images/watermark.svg';
-            logo.onload = function () {
-                cloneCtx.drawImage(logo, chartClone.width - logo.width, chartClone.height - logo.height, logo.width * LOGO_SCALE_FACTOR, logo.height * LOGO_SCALE_FACTOR);
+            const watermark = new Image();
+            watermark.src = '/images/watermark.svg';
+            watermark.onload = function () {
+                cloneCtx.drawImage(watermark, chartClone.width - watermark.width, chartClone.height - watermark.height, watermark.width * WATERMARK_SCALE_FACTOR, watermark.height * WATERMARK_SCALE_FACTOR);
 
                 cloneCtx.font = "12px sans-serif";
                 cloneCtx.fillStyle = "white";
@@ -93,8 +95,14 @@ listDownloadButtons.forEach((item) => {
                 cloneCtx.fillRect(0, 0, chartClone.width, chartClone.height);
                 download();
 
-                chartInstance.options.plugins.datalabels.font.size = startDatalabelsSize;
+                chartInstance.options.plugins!.datalabels!.font!.size = startDatalabelsSize;
+                chartInstance.config.options.scales.x.title.font.size = chartXTitleFontSize;
+                chartInstance.config.options.scales.y.title.font.size = chartYTitleFontSize;
+                chartInstance.config.options.plugins.title.font.size = chartTitleFontSize;
+
+                chartInstance.options.plugins!.tooltip!.enabled = true;
                 chartInstance.resize();
+                chartInstance.update();
                 chart.style.opacity = "1";
             }
         }
