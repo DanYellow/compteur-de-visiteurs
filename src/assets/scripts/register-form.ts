@@ -13,7 +13,8 @@ let sleepController = new AbortController();
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
 
-    (e.currentTarget as HTMLFormElement).dataset.isDirty = "";
+    const form = (e.currentTarget as HTMLFormElement);
+    form.dataset.isDirty = "";
 
     if (!validForm(e)) {
         return;
@@ -24,24 +25,22 @@ const submitForm = async (e: SubmitEvent) => {
     dialogSwapContainer.innerHTML = "";
     dialogSwapContainer.append(formSubmittingTplRaw.content.cloneNode(true));
 
-    const form = (e.currentTarget as HTMLFormElement);
+
     const formData = new FormData(form);
 
-    console.log(formData);
+    const req = await fetch("/", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(Object.fromEntries(Array.from(formData.entries()))),
+    });
 
-    // const req = await fetch("/", {
-    //     method: "POST",
-    //     headers: {
-    //         'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(Object.fromEntries(Array.from(formData.entries()))),
-    // });
-
-    // const res = await req.json();
+    const res = await req.json();
 
     dialogSwapContainer.innerHTML = "";
 
-    if (true) { // res.success
+    if (res.success) {
         form.reset();
         dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true));
     } else {
@@ -53,11 +52,6 @@ const submitForm = async (e: SubmitEvent) => {
         dialog.close();
     } finally {
     }
-    // await new Promise(r => setTimeout(r, Number(import.meta.env.FORM_RESULT_TIMEOUT || 5000)));
-
-    // setTimeout(() => {
-    //     dialog.close();
-    // }, Number(import.meta.env.FORM_RESULT_TIMEOUT || 5000));
 };
 
 const validForm = (e: Event) => {
@@ -108,6 +102,7 @@ dialog.addEventListener("toggle", (e) => {
     const isOpened = e.newState === "open";
 
     if (!isOpened && !sleepController.signal.aborted) {
+        form.removeAttribute('data-is-dirty');
         sleepController.abort();
         sleepController = new AbortController();
     }

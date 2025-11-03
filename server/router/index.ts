@@ -71,7 +71,6 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     }
 
     const records = await VisitorModel.findAll({
-        raw: true,
         where: {
             date_passage: {
                 [Op.and]: {

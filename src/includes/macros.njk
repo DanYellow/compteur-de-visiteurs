@@ -26,9 +26,9 @@
                     e.currentTarget.querySelector("a, button").focus();
                 });
             </script>
-            <ul class="split-popup bg-slate-50 shadow-2xl">
+            <ul class="split-popup bg-slate-50 shadow-2xl" title="">
                 {% for action in list_sub_actions %}
-                    <li class="flex">
+                    <li>
                         {{ action | safe }}
                     </li>
                 {% endfor %}

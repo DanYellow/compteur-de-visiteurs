@@ -107,21 +107,28 @@ Tableau de bord
                         {% endset %}
 
                         {% set split_button_sub_action_1 %}
-                            <a href="/visiteurs/telecharger?mois={{ current_date|date("yyyy-MM") }}" data-download-chart-data download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                            <a href="" data-download-chart-data download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                                 {% include "includes/icons/download-fill-icon.svg" %}
                                 Télécharger les données visite par visite (.csv)
                             </a>
                         {% endset %}
+                        {% set split_button_sub_action_2 %}
+                            <a href="" data-download-chart-data download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                                {% include "includes/icons/download-fill-icon.svg" %}
+                                Télécharger les données groupe par groupe (.csv)
+                            </a>
+                        {% endset %}
 
                         {% set list_sub_actions = [
-                        split_button_sub_action_1
+                            split_button_sub_action_1,
+                            split_button_sub_action_2
                         ] %}
                         {{ macros.split_button(
                             split_button_main_action,
                             list_sub_actions
                         ) }}
                     </li>
-                    <li>
+                    <li class="flex">
                         <button type="button" command="close" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"/>

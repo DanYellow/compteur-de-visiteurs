@@ -9,7 +9,7 @@ export const listBusinessSector = [
         "listInChoices": false,
     },
     {
-        "name": "Station Numixs",
+        "name": "Entreprise Station Numixs",
         "value": "station_numixs",
         "lineColor": 'rgb(213, 217, 22)',
         "listInChoices": false,
