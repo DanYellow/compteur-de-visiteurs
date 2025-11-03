@@ -1,10 +1,9 @@
 import { DateTime } from "luxon";
 import { Chart } from 'chart.js';
-import { loadImage } from "./utils";
+import { loadImage, slugify } from "./utils";
 
 const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
 
-const DATE_FORMAT = "dd-LL-yyyy";
 const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
 const WATERMARK_SCALE_FACTOR = 0.85;
 
@@ -15,31 +14,6 @@ const SIZE_EXPORT = {
 }
 
 const today = DateTime.now();
-
-const getChartFilename = (type: string): string => {
-
-    let filename = "";
-    switch (type) {
-        case "yearlyChart":
-            filename = `visites-annuelle-${today.startOf("year").toFormat("dd/LL/yyyy")}-${today.endOf("year").toFormat("dd/LL/yyyy")}`
-            break;
-        case "weeklyChart":
-            filename = `visites-hebdomadaire-du-${today.startOf("week").toFormat("dd/LL/yyyy")}-au-${today.endOf("week").toFormat("dd/LL/yyyy")}`
-            break;
-        case "monthlyChart":
-            filename = `visites-mensuelle-du-${today.startOf("month").toFormat("dd/LL/yyyy")}-au-${today.endOf("month").toFormat("dd/LL/yyyy")}`
-            break;
-        case "dailyChart":
-            filename = `visites-quotidienne-${today.toFormat(DATE_FORMAT)}`
-            break;
-
-        default:
-            filename = `visites-detaillees`
-            break;
-    }
-
-    return `${filename}_${String(Date.now()).slice(-6)}.jpg`
-}
 
 listDownloadButtons.forEach((item) => {
     item.addEventListener("click", async (e: MouseEvent) => {
@@ -59,17 +33,20 @@ listDownloadButtons.forEach((item) => {
 
         const chartScaleOptions = chartInstance!.config!.options!.scales!;
 
-        chartInstance.options.plugins!.totalVisitors.fontSize = "18px"
+        chartInstance.options.plugins!.totalVisitors.fontSize = "18px";
         chartScaleOptions.x!.title!.font!.size = 20;
         chartScaleOptions.y!.title!.font!.size = 20;
         chartInstance.config!.options!.plugins!.title!.font!.size = 32;
 
         chartInstance.options!.plugins!.datalabels!.font!.size = 24;
+        // chartInstance.options!.plugins!.datalabels!.backgroundColor = grayNumixs;
         chartInstance.options.plugins!.tooltip!.enabled = false;
         chartInstance.resize(SIZE_EXPORT.width, SIZE_EXPORT.height);
 
         const download = () => {
-            link.download = getChartFilename(chartId);
+            const filename = slugify(chartInstance.config!.options!.plugins!.title!.text as string)
+
+            link.download =  `${filename}_${String(Date.now()).slice(-6)}.jpg`;
             link.href = chartClone.toDataURL("image/jpeg", 1);
             link.click();
         }
@@ -100,7 +77,7 @@ listDownloadButtons.forEach((item) => {
 
             if (chart.closest("dialog")) {
                 const table = chart.closest("dialog")?.querySelector("table");
-                const data = `
+                const tableDetailsSVG = `
                     <svg xmlns="http://www.w3.org/2000/svg" width="${chart.width}px" height="${chart?.offsetHeight}">
                         <foreignObject width="100%" height="100%">
                             <div xmlns="http://www.w3.org/1999/xhtml" style="color: white; font-family: Calibri;">
@@ -111,7 +88,7 @@ listDownloadButtons.forEach((item) => {
                 `;
 
                 const tableDetailsImg = new Image();
-                const svg = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });
+                const svg = new Blob([tableDetailsSVG], { type: 'image/svg+xml;charset=utf-8' });
                 const url = window.URL.createObjectURL(svg);
                 tableDetailsImg.src = url;
                 await loadImage(tableDetailsImg);
@@ -128,6 +105,8 @@ listDownloadButtons.forEach((item) => {
             download();
 
             chartInstance.options.plugins!.datalabels!.font!.size = startDatalabelsSize;
+            chartInstance.options!.plugins!.datalabels!.backgroundColor = "";
+
             chartInstance.config.options.scales.x.title.font.size = chartXTitleFontSize;
             chartInstance.config.options.scales.y.title.font.size = chartYTitleFontSize;
             chartInstance.config.options.plugins.title.font.size = chartTitleFontSize;
@@ -138,9 +117,11 @@ listDownloadButtons.forEach((item) => {
             chartInstance.update();
             chartInstance.reset();
 
-            chart.style.width = originalSize.width;
-            chart.style.height = originalSize.height;
-            chart.style.opacity = "1";
+            setTimeout(() => {
+                chart.style.width = originalSize.width;
+                chart.style.height = originalSize.height;
+                chart.style.opacity = "1";
+            }, 300)
         }
     });
 });

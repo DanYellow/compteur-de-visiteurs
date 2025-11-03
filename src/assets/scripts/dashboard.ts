@@ -13,7 +13,8 @@ const tableDetailsChart = document.getElementById("table-details-chart") as HTML
 
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels);
 
-const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs')
+const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs');
+const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs');
 
 const chartTitleStyle: CustomTitleOptions = {
     display: true,
@@ -200,7 +201,9 @@ const listCharts = [
                             font: {
                                 size: 0
                             },
-                            align: "top",
+                            anchor: "end",
+                            align: "end",
+                            offset: 3,
                             formatter: v => v ? v : ''
                         }
                     },
@@ -227,27 +230,32 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         const tableDetailsChartTableBody = tableDetailsChart.querySelector("tbody")! as HTMLTableSectionElement;
         tableDetailsChartTableHeadRow.innerHTML = "";
 
-        const tableTheadRowTemplate = tableTheadRowTemplateRaw.content.cloneNode(true);
+        const tableTheadRowTemplate = tableTheadRowTemplateRaw.content.cloneNode(true) as HTMLElement;
         tableTheadRowTemplate.querySelector("th")!.textContent = "Groupe"
         tableDetailsChartTableHeadRow.append(tableTheadRowTemplate)
 
-        const valuesPerPeriod: Record<string, number> = {}
+        const valuesPerPeriod: Record<string | number, number> = {};
 
-        xLabels?.forEach((label) => {
-            const tableTheadRowTemplate = tableTheadRowTemplateRaw.content.cloneNode(true);
+        [...xLabels!, "Total (Groupe)"].forEach((label, idx, array) => {
+            const tableTheadRowTemplate = tableTheadRowTemplateRaw.content.cloneNode(true) as HTMLElement;
+            const th = tableTheadRowTemplate.querySelector("th")!;
+
             if (typeof label === "object") {
                 valuesPerPeriod[label.id] = 0;
-                tableTheadRowTemplate.querySelector("th").textContent = `${label.name}${xValuesSuffix || ""}`
+                th.textContent = `${label.name}${xValuesSuffix || ""}`;
             } else {
                 valuesPerPeriod[label] = 0;
-                tableTheadRowTemplate.querySelector("th").textContent = `${label}${xValuesSuffix || ""}`
+                th.textContent = `${label}${xValuesSuffix || ""}`;
+            }
+
+            if (idx === array.length - 1) {
+                th.style.borderLeft = "2px solid white";
+                valuesPerPeriod[(label as string)] = totalVisits;
             }
 
             tableDetailsChartTableHeadRow.append(tableTheadRowTemplate);
-        })
+        });
 
-
-        console.log(xLabels)
         const lineChartDatasets: LineChartEntry[] = [];
         tableDetailsChartTableBody.innerHTML = "";
         listBusinessSector.forEach((business) => {
@@ -262,61 +270,69 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
             };
             Object.entries(chartData).forEach(([xValueIndex, listVisitors]) => {
                 const visitorsReducer = listVisitors.reduce(
-                    (acc, visitor) => ((acc[business.value] = (acc[business.value] || 0) + ((visitor[business.value] === "oui") ? 1 : 0)), acc),
+                    (acc: Record<string, number>, visitor) => ((acc[business.value] = (acc[business.value] || 0) + ((visitor[business.value] === "oui") ? 1 : 0)), acc),
                     {});
 
                 const indexArray = (xLabels || []).findIndex((label) => {
                     if (typeof label === "object") {
-                        return Number(label.id) === Number(xValueIndex)
+                        return Number(label.id) === Number(xValueIndex);
                     }
                     return Number(label) === Number(xValueIndex);
                 });
-                visitorPerTypeAndPeriod[business.value][indexArray] = visitorsReducer[[business.value]];
+                visitorPerTypeAndPeriod[business.value][indexArray] = visitorsReducer[business.value];
             });
 
-            visitorPerTypeAndPeriod[business.value].forEach((item) => {
+            const totalBusiness = visitorPerTypeAndPeriod[business.value].reduce((acc, value) => acc + value, 0);
+
+            ;[...visitorPerTypeAndPeriod[business.value], totalBusiness].forEach((item, idx, array) => {
                 const td = document.createElement("td");
                 td.textContent = item;
                 td.classList.add("text-center");
                 td.style.textAlign = "center";
                 td.style.color = item > 0 ? greenNumixs : "";
-                td.classList.toggle("text-green-numixs", item > 0)
-                trBody.append(td)
-            })
+                td.classList.toggle("text-green-numixs", item > 0);
+                if (idx === array.length - 1) {
+                    td.style.borderLeft = "2px solid white";
+                }
+                trBody.append(td);
+            });
 
-            tableDetailsChartTableBody.append(trBody)
+            tableDetailsChartTableBody.append(trBody);
 
             lineChartDatasets.push({
                 label: business.name,
                 data: visitorPerTypeAndPeriod[business.value],
                 borderColor: business.lineColor,
-                tension: 0.1,
+                tension: 0,
                 fill: true,
             });
         });
 
-        // Total row
+        // Total rows
         const trTotal = document.createElement("tr") as HTMLTableRowElement;
         trTotal.style.fontSize = "1.25rem";
         const td = document.createElement("td") as HTMLTableCellElement;
-        td.textContent = "Total";
+        td.textContent = "Total (visites)";
         td.style.borderTop = "2px solid white";
         td.style.paddingTop = "0.35rem";
         trTotal.append(td);
 
         Object.entries(chartData).forEach(([key, value]) => {
-            valuesPerPeriod[key] = String(value.length)
+            valuesPerPeriod[key] = String((value as []).length);
         });
 
-        Object.values(valuesPerPeriod).forEach((item) => {
+        Object.values(valuesPerPeriod).forEach((item, idx, array) => {
             const td = document.createElement("td") as HTMLTableCellElement;
             td.textContent = String(item);
             td.style.textAlign = "center";
             td.style.borderTop = "2px solid white";
             td.style.paddingTop = "0.35rem";
             td.style.color = item > 0 ? greenNumixs : "";
+            if (idx === array.length - 1) {
+                td.style.borderLeft = "2px solid white";
+            }
             trTotal.append(td);
-        })
+        });
 
         tableDetailsChartTableBody.append(trTotal);
 
@@ -362,6 +378,9 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                         datalabels: {
                             color: "white",
                             align: "end",
+                            // borderColor: "white",
+                            // borderRadius: 10,
+                            // borderWidth: 1,
                             font: {
                                 size: 0
                             },
