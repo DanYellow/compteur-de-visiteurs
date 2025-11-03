@@ -24,7 +24,7 @@ router.get("/", (req, res) => {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
 
     res.render("pages/index.njk", {
-        "list_business_sector": listBusinessSector,
+        "list_business_sector": listBusinessSector.filter((item) => (!("listInChoices" in item) || item.listInChoices)),
     });
 });
 

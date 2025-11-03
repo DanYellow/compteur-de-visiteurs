@@ -28,20 +28,14 @@ Compteur de visiteurs
                         {% if sector.value == "entreprise" %}
                             {% set children %}
                             <div data-input-switch-toggle-recipient="entreprise">
-                                <div class="ml-12 flex flex-col gap-3 mt-2">
-                                    <label for="station_numixs">
-                                        <input type="radio" class="accent-green-numixs" name="entreprise_type" id="station_numixs">
-                                        Station Numixs
-                                    </label>
-                                    <label for="externe">
-                                        <input type="radio" class="accent-green-numixs" name="entreprise_type" id="externe">
-                                        Externe
-                                    </label>
+                                <div class="ml-12 flex flex-col mt-2">
+                                    {{ forms.switch("Station Numixs", "station_numixs", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"label_classes": "text-xl" }) }}
+                                    {{ forms.switch("Externe", "entreprise_externe", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"label_classes": "text-xl" }) }}
                                 </div>
                             </div>
                             {% endset %}
                         {% endif %}
-                        {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", child = children) }}
+                        {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"children": children }) }}
                     {% endfor %}
                 </div>
             </div>
@@ -73,6 +67,9 @@ Compteur de visiteurs
         </div>
 
         <button type="button" data-close-dialog class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 active:bg-dark-green-numixs">Retour</button>
+    </template>
+    <template data-template-id="form-submitting">
+        <img src="/images/loading.svg" class="animate-spin w-16" alt="Chargement">
     </template>
     <template data-template-id="form-error">
         <img src="/images/valide.svg" class="w-16" alt="">

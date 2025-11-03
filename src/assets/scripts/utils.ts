@@ -6,6 +6,7 @@ export const listBusinessSector = [
         "name": "Entreprise",
         "value": "entreprise",
         "lineColor": 'rgb(15, 92, 192)',
+        "listInDb": false,
     },
     {
         "name": "Éducation",
@@ -62,7 +63,19 @@ export const listBusinessSector = [
         "value": "autre",
         "lineColor": 'rgb(252, 26, 3)',
     },
-]
+    {
+        "name": "Entreprise externe",
+        "value": "entreprise_externe",
+        "lineColor": 'rgb(252, 26, 3)',
+        "listInChoices": false,
+    },
+    {
+        "name": "Station Numixs",
+        "value": "station_numixs",
+        "lineColor": 'rgb(252, 26, 3)',
+        "listInChoices": false,
+    },
+];
 
 export const listTimeSlots = Array.from(new Array(10), (_, i) => i + 10).map((item) => String(item));
 export const listDays = [{
