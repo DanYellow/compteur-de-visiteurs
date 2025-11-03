@@ -93,7 +93,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
             }
         },
         attributes: [
-            ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')` ), item.value]))
+            ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value]))
         ]
     });
 
@@ -122,16 +122,20 @@ router.get('/visiteurs/telecharger', async (req, res) => {
 
     const predicatesDict = {
         "jour": "day",
+        "semaine": "week",
         "mois": "month",
         "annee": "year",
     }
 
-    let filterPredicate:DateTimeUnit | undefined = undefined;
-    let dateValue = null;
+    let filterPredicate: DateTimeUnit | undefined = undefined;
+    let dateValue = DateTime.now();
+
     const queryParam = Object.keys(predicatesDict).filter(value => Object.keys(req.query).includes(value));
     if (queryParam.length > 0) {
         filterPredicate = predicatesDict[queryParam[0]];
-        dateValue = DateTime.fromISO(new Date(req.query[queryParam[0]]).toISOString())
+        if (req.query[queryParam[0]]) {
+            dateValue = DateTime.fromISO(new Date(req.query[queryParam[0]]).toISOString())
+        }
     }
 
     const records = await VisitorModel.findAll({
@@ -148,8 +152,8 @@ router.get('/visiteurs/telecharger', async (req, res) => {
         } : {})
     });
 
-    const values: (string|number)[][] = [Object.keys(VisitorModel.getAttributes())];
-    const countVisitorType:Record<string, string | number> = {}
+    const values: (string | number)[][] = [Object.keys(VisitorModel.getAttributes())];
+    const countVisitorType: Record<string, string | number> = {}
     values[0].forEach((key) => {
         countVisitorType[key] = 0;
     })
@@ -186,6 +190,8 @@ router.get('/visiteurs/telecharger', async (req, res) => {
     res.download(csvFile, `${timestamp}-liste-membres.csv`, () => {
         fs.unlinkSync(csvFile);
     });
+
+    res.status(200).json({ "success": "Téléchargement réussi" })
 });
 
 export default router;

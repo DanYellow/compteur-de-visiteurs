@@ -3,13 +3,13 @@ import { DateTime } from "luxon";
 
 export const listBusinessSector = [
     {
-        "name": "Entreprise externe",
+        "name": "Entreprise\nexterne",
         "value": "entreprise_externe",
         "lineColor": '#ffc8fa',
         "listInChoices": false,
     },
     {
-        "name": "Entreprise Station Numixs",
+        "name": "Entreprise\nStation Numixs",
         "value": "station_numixs",
         "lineColor": 'rgb(213, 217, 22)',
         "listInChoices": false,

@@ -14,7 +14,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
 {% set root_class = "admin" %}
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
-    <div class="mt-8 px-3 grid grid-cols-1 xl:grid-cols-[220px_auto] gap-6">
+    <div class="mt-8 px-3 grid grid-cols-1 xl:grid-cols-[220px_minmax(0,_1fr)] gap-6">
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-col md:flex-row justify-between md:items-center mb-16 -mt-1.5">
@@ -94,7 +94,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                                 <td class="font-bold px-4 py-3 text-left">#</td>
                                 <td class="font-bold px-4 py-3 text-left">Date de visite</td>
                                 {% for business in list_business_sector %}
-                                    <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name }}</td>
+                                    <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name | striptags(true) | escape | nl2br }}</td>
                                 {% endfor %}
                             </tr>
                         </thead>
