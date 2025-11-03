@@ -3,6 +3,18 @@ import { DateTime } from "luxon";
 
 export const listBusinessSector = [
     {
+        "name": "Entreprise externe",
+        "value": "entreprise_externe",
+        "lineColor": '#ffc8fa',
+        "listInChoices": false,
+    },
+    {
+        "name": "Station Numixs",
+        "value": "station_numixs",
+        "lineColor": 'rgb(213, 217, 22)',
+        "listInChoices": false,
+    },
+    {
         "name": "Entreprise",
         "value": "entreprise",
         "lineColor": 'rgb(15, 92, 192)',
@@ -21,7 +33,7 @@ export const listBusinessSector = [
     {
         "name": "Artiste",
         "value": "artiste",
-        "lineColor": 'rgb(213, 217, 22)',
+        "lineColor": '#ffdc00',
     },
     {
         "name": "Agent CARPF",
@@ -39,7 +51,7 @@ export const listBusinessSector = [
         "lineColor": 'rgb(217, 22, 123)',
     },
     {
-        "name": "Numixs Lab",
+        "name": "numixs Lab",
         "value": "numixs_lab",
         "lineColor": 'rgb(22, 180, 217)',
     },
@@ -62,18 +74,6 @@ export const listBusinessSector = [
         "name": "Autre",
         "value": "autre",
         "lineColor": 'rgb(252, 26, 3)',
-    },
-    {
-        "name": "Entreprise externe",
-        "value": "entreprise_externe",
-        "lineColor": 'rgb(252, 26, 3)',
-        "listInChoices": false,
-    },
-    {
-        "name": "Station Numixs",
-        "value": "station_numixs",
-        "lineColor": 'rgb(252, 26, 3)',
-        "listInChoices": false,
     },
 ];
 
@@ -199,4 +199,22 @@ export const slugify = (input: string): string => {
     slug = slug.replace(/[\s-]+/g, '-');
 
     return slug;
+}
+
+export const cancellableSleep = (duration: number, signal: AbortSignal) => {
+    return new Promise<void>((resolve, reject) => {
+        signal.throwIfAborted();
+
+        const timeout = setTimeout(() => {
+            resolve();
+            signal.removeEventListener('abort', abort);
+        }, duration);
+
+        const abort = () => {
+            clearTimeout(timeout);
+            reject(signal.reason);
+        }
+
+        signal.addEventListener('abort', abort);
+    });
 }

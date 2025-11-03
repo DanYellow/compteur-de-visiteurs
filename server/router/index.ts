@@ -71,6 +71,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     }
 
     const records = await VisitorModel.findAll({
+        raw: true,
         where: {
             date_passage: {
                 [Op.and]: {
@@ -100,7 +101,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     res.render("pages/members-list.njk", {
         visitors_summary: visitorsSummary[0],
         "visitors_list": records,
-        "list_business_sector": listBusinessSector,
+        "list_business_sector": listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)),
         "header_list": records?.[0] ? Object.keys(records[0]) : [],
         "current_date": daySelected,
         "today": DateTime.now(),

@@ -4,7 +4,7 @@
         <label class="w-full justify-between inline-flex items-center cursor-pointer {{ options.label_classes if options.label_classes else default_options.label_classes }}">
             <input type="checkbox" value="{{ value }}" name="{{ name }}" class="sr-only peer" data-input-switch-toggle="{{ name }}">
             <span>{{ label }}</span>
-            <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 {{ ring_color }} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[2px] after:start-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all {{ color }}"></div>
+            <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 {{ ring_color }} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all {{ color }}"></div>
         </label>
         {% set children = options.children if options.children else default_options.children %}
         {{ children | safe }}

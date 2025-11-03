@@ -1,10 +1,14 @@
 import { VisitorSchema } from "#scripts/schemas.ts";
+import { cancellableSleep } from "./utils";
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
 const dialog = document.querySelector("[data-dialog='form-submitted']") as HTMLDialogElement;
 const formSuccessTplRaw = document.querySelector("[data-template-id='form-success']") as HTMLTemplateElement;
 const formErrorTplRaw = document.querySelector("[data-template-id='form-error']") as HTMLTemplateElement;
+const formSubmittingTplRaw = document.querySelector("[data-template-id='form-submitting']") as HTMLTemplateElement;
+
+let sleepController = new AbortController();
 
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -14,32 +18,46 @@ const submitForm = async (e: SubmitEvent) => {
     if (!validForm(e)) {
         return;
     }
+
     dialog.showModal();
+    const dialogSwapContainer = dialog.querySelector("[data-swap-content]") as HTMLDivElement;
+    dialogSwapContainer.innerHTML = "";
+    dialogSwapContainer.append(formSubmittingTplRaw.content.cloneNode(true));
+
     const form = (e.currentTarget as HTMLFormElement);
     const formData = new FormData(form);
 
-    const req = await fetch("/", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(Object.fromEntries(Array.from(formData.entries()))),
-    });
+    console.log(formData);
 
-    const res = await req.json();
-    const dialogSwapContainer = dialog.querySelector("[data-swap-content]") as HTMLDivElement;
+    // const req = await fetch("/", {
+    //     method: "POST",
+    //     headers: {
+    //         'Content-Type': 'application/json'
+    //     },
+    //     body: JSON.stringify(Object.fromEntries(Array.from(formData.entries()))),
+    // });
+
+    // const res = await req.json();
+
     dialogSwapContainer.innerHTML = "";
 
-    if (res.success) {
+    if (true) { // res.success
         form.reset();
         dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true));
     } else {
         dialogSwapContainer.append(formErrorTplRaw.content.cloneNode(true));
     }
 
-    setTimeout(() => {
+    try {
+        await cancellableSleep(3500, sleepController.signal);
         dialog.close();
-    }, Number(import.meta.env.FORM_RESULT_TIMEOUT || 5000));
+    } finally {
+    }
+    // await new Promise(r => setTimeout(r, Number(import.meta.env.FORM_RESULT_TIMEOUT || 5000)));
+
+    // setTimeout(() => {
+    //     dialog.close();
+    // }, Number(import.meta.env.FORM_RESULT_TIMEOUT || 5000));
 };
 
 const validForm = (e: Event) => {
@@ -85,6 +103,15 @@ const validForm = (e: Event) => {
 
     return true;
 }
+
+dialog.addEventListener("toggle", (e) => {
+    const isOpened = e.newState === "open";
+
+    if (!isOpened && !sleepController.signal.aborted) {
+        sleepController.abort();
+        sleepController = new AbortController();
+    }
+})
 
 form?.addEventListener("submit", submitForm);
 form?.addEventListener("input", validForm);

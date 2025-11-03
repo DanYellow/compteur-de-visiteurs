@@ -150,7 +150,7 @@ input.error {
 
 .switch-container {
     &:has(.error) .switch {
-        border-color: var(--color-red-500);
+        border-color: var(--color-red-800);
     }
 }
 
