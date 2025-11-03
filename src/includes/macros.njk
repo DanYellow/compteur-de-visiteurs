@@ -10,3 +10,29 @@
         {{ children | safe }}
     </div>
 {% endmacro %}
+
+
+{% macro split_button(main_action, list_sub_actions = []) %}
+    <div class="split-button bg-green-700 self-start md:self-center">
+        {{ main_action | safe }}
+
+        <span class="popup-button z-50" aria-haspopup="true" aria-expanded="false" title="Ouvrir pour plus de choix">
+            <svg aria-hidden="true" viewBox="0 0 20 20" style="anchor-name: --split-button;">
+                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+            </svg>
+            <script>
+                const popupButton = document.querySelector(".popup-button");
+                popupButton.addEventListener("click", (e) => {
+                    e.currentTarget.querySelector("a, button").focus();
+                });
+            </script>
+            <ul class="split-popup bg-slate-50 shadow-2xl">
+                {% for action in list_sub_actions %}
+                    <li>
+                        {{ action | safe }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </span>
+    </div>
+{% endmacro %}

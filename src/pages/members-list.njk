@@ -7,6 +7,8 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
     <script type="module" src="/src/assets/scripts/members-poll.ts" defer></script>
 {% endblock %}
 
+{% import "includes/macros.njk" as macros %}
+
 {% set active_menu_item = "visiteurs" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
@@ -18,37 +20,35 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
             <header class="flex flex-col md:flex-row justify-between md:items-center mb-16 -mt-1.5">
                 <h1 class="text-black title-font font-bold text-6xl">Visites</h1>
 
-                <div class="split-button bg-green-700 self-start md:self-center">
+                {% set split_button_main_action %}
                     <a href="/visiteurs/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white hocus:bg-green-900">
                         Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)
                     </a>
+                {% endset %}
 
-                    <span class="popup-button z-50" aria-haspopup="true" aria-expanded="false" title="Ouvrir pour plus de choix">
-                        <svg aria-hidden="true" viewBox="0 0 20 20" style="anchor-name: --split-button;">
-                            <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                        </svg>
-                        <script>
-                            const popupButton = document.querySelector(".popup-button");
-                            popupButton.addEventListener("click", (e) => {
-                                e.currentTarget.querySelector("a, button").focus();
-                            });
-                        </script>
-                        <ul class="split-popup bg-slate-50 shadow-2xl">
-                            <li>
-                                <a href="/visiteurs/telecharger?mois={{ current_date|date("yyyy-MM") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
-                                    {% include "includes/icons/download-fill-icon.svg" %}
-                                    Télécharger toutes les données du mois {{ current_date|date("MMMM yyyy") }} (.csv)
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/visiteurs/telecharger?annee={{ current_date|date("yyyy") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
-                                    {% include "includes/icons/download-fill-icon.svg" %}
-                                    Télécharger toutes les données de l'année {{ current_date|date("yyyy") }} (.csv)
-                                </a>
-                            </li>
-                        </ul>
-                    </span>
-                </div>
+                {% set split_button_sub_action_1 %}
+                    <a href="/visiteurs/telecharger?mois={{ current_date|date("yyyy-MM") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                        {% include "includes/icons/download-fill-icon.svg" %}
+                        Télécharger toutes les données du mois {{ current_date|date("MMMM yyyy") }} (.csv)
+                    </a>
+                {% endset %}
+
+                {% set split_button_sub_action_2 %}
+                    <a href="/visiteurs/telecharger?annee={{ current_date|date("yyyy") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                        {% include "includes/icons/download-fill-icon.svg" %}
+                        Télécharger toutes les données de l'année {{ current_date|date("yyyy") }} (.csv)
+                    </a>
+                {% endset %}
+
+                {% set list_sub_actions = [
+                   split_button_sub_action_1,
+                   split_button_sub_action_2
+                ] %}
+
+                {{ macros.split_button(
+                    split_button_main_action,
+                    list_sub_actions
+                 ) }}
             </header>
             <div class="text-black">
                 <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
