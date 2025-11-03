@@ -4,12 +4,13 @@ import { fileURLToPath } from "url";
 import express from "express";
 import { stringify } from "csv-stringify/sync";
 import { DateTime, DateTimeUnit } from "luxon";
-import { Op, literal } from 'sequelize';
+import { Op, literal, fn, col } from 'sequelize';
 
 import { listBusinessSector } from "#scripts/utils.ts";
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "../index.ts";
 import VisitorModel from "#models/visitor.ts";
+import sequelize from "#models/index.ts";
 
 import ApiRouter from "./api.ts";
 
@@ -109,17 +110,6 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 });
 
 router.get('/visiteurs/telecharger', async (req, res) => {
-    // let downloadedFileSuffix = "";
-
-    // switch (Object.keys(req.query)[0]) {
-    //     case "jour":
-
-    //         break;
-
-    //     default:
-    //         break;
-    // }
-
     const predicatesDict = {
         "jour": "day",
         "semaine": "week",
@@ -131,12 +121,29 @@ router.get('/visiteurs/telecharger', async (req, res) => {
     let dateValue = DateTime.now();
 
     const queryParam = Object.keys(predicatesDict).filter(value => Object.keys(req.query).includes(value));
+    const isGrouped = "groupe" in req.query;
+
     if (queryParam.length > 0) {
         filterPredicate = predicatesDict[queryParam[0]];
         if (req.query[queryParam[0]]) {
             dateValue = DateTime.fromISO(new Date(req.query[queryParam[0]]).toISOString())
         }
     }
+
+    console.log(
+        await VisitorModel.findAll({
+            raw: true,
+            // group: [sequelize.fn('date_trunc', 'day', sequelize.col('date_passage'))],
+            group: "foo",
+            attributes: [
+                "date_passage",
+                [sequelize.fn("strftime", '%H', sequelize.col("date_passage")), "foo"],
+                ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value])),
+            ]
+        })
+    )
+
+    return;
 
     const records = await VisitorModel.findAll({
         raw: true,
