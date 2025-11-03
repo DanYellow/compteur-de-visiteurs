@@ -8,7 +8,7 @@ import { listBusinessSector, listTimeSlots, listDays, listMonths, getWeeksRangeM
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const tableTheadRowTemplateRaw = document.getElementById("table-details-chart-thead-row") as HTMLTemplateElement;
-
+const linkDownloadChartData = document.querySelector("[data-download-chart-data]") as HTMLLinkElement;
 const tableDetailsChart = document.getElementById("table-details-chart") as HTMLTemplateElement;
 
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels);
@@ -108,6 +108,7 @@ const listCharts = [
         xTitle: 'Tranche horaire',
         xLabels: listTimeSlots,
         xValuesSuffix: "h",
+        downloadLink: `visiteurs/telecharger?jour=${today.toFormat("yyyy-LL-dd")}`
     },
     {
         apiKey: "jour",
@@ -115,6 +116,7 @@ const listCharts = [
         chartTitle: `Visites du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
         xLabels: listDays,
         xTitle: "Jours",
+        downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`
     },
     {
         apiKey: "semaine",
@@ -122,6 +124,7 @@ const listCharts = [
         chartTitle: `Visites du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
         xLabels: getWeeksRangeMonth(),
         xTitle: "Semaines",
+        downloadLink: `visiteurs/telecharger?mois=${today.toFormat("yyyy-LL")}`
     },
     {
         apiKey: "mois",
@@ -129,6 +132,7 @@ const listCharts = [
         chartTitle: `Visites du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
         xLabels: listMonths,
         xTitle: "Mois",
+        downloadLink: `visiteurs/telecharger?annee=${today.toFormat("yyyy")}`
     }
 ];
 
@@ -220,11 +224,14 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
     const isOpened = e.newState === "open";
 
     if (isOpened) {
+
         const sourceBtn = e.source! as HTMLButtonElement;
         const chartSelected = sourceBtn.dataset.detailsChart;
         const chartData = JSON.parse(sourceBtn.closest("div")?.querySelector("canvas")?.dataset.chartData || "{}");
-        const { xLabels, xValuesSuffix, chartTitle } = listCharts.find((item) => item.apiKey === chartSelected) || {};
+        const { xLabels, xValuesSuffix, chartTitle, downloadLink } = listCharts.find((item) => item.apiKey === chartSelected) || {};
         const totalVisits = Object.values(chartData).flat().length;
+
+        linkDownloadChartData.href = downloadLink;
 
         const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr")! as HTMLTableRowElement;
         const tableDetailsChartTableBody = tableDetailsChart.querySelector("tbody")! as HTMLTableSectionElement;

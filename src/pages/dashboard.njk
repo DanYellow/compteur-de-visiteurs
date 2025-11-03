@@ -4,6 +4,8 @@
 Tableau de bord
 {% endblock %}
 
+{% import "includes/macros.njk" as macros %}
+
 {% set root_class = "admin" %}
 {% set active_menu_item = "dashboard" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
@@ -25,9 +27,7 @@ Tableau de bord
                         <menu class="absolute right-3 flex flex-row gap-3">
                             <li>
                                 <button data-download-chart="dailyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M14 3h2.997v5h-2.997v-5zm9 1v20h-22v-24h17.997l4.003 4zm-17 5h12v-7h-12v7zm14 4h-16v9h16v-9z"/>
-                                    </svg>
+                                    {% include "includes/icons/download-fill-icon.svg" %}
                                 </button>
                             </li>
                             <li>
@@ -44,9 +44,7 @@ Tableau de bord
                         <menu class="absolute right-3 flex flex-row gap-3">
                             <li>
                                 <button data-download-chart="weeklyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M14 3h2.997v5h-2.997v-5zm9 1v20h-22v-24h17.997l4.003 4zm-17 5h12v-7h-12v7zm14 4h-16v9h16v-9z"/>
-                                    </svg>
+                                    {% include "includes/icons/download-fill-icon.svg" %}
                                 </button>
                             </li>
                             <li>
@@ -63,9 +61,7 @@ Tableau de bord
                         <menu class="absolute right-3 flex flex-row gap-3">
                             <li>
                                 <button data-download-chart="monthlyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M14 3h2.997v5h-2.997v-5zm9 1v20h-22v-24h17.997l4.003 4zm-17 5h12v-7h-12v7zm14 4h-16v9h16v-9z"/>
-                                    </svg>
+                                    {% include "includes/icons/download-fill-icon.svg" %}
                                 </button>
                             </li>
                             <li>
@@ -82,9 +78,7 @@ Tableau de bord
                         <menu class="absolute right-3 flex flex-row gap-3">
                             <li>
                                 <button data-download-chart="yearlyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                        <path d="M14 3h2.997v5h-2.997v-5zm9 1v20h-22v-24h17.997l4.003 4zm-17 5h12v-7h-12v7zm14 4h-16v9h16v-9z"/>
-                                    </svg>
+                                    {% include "includes/icons/download-fill-icon.svg" %}
                                 </button>
                             </li>
                             <li>
@@ -106,11 +100,26 @@ Tableau de bord
             <div class="relative">
                 <menu class="absolute right-3 flex flex-row gap-3">
                     <li>
-                        <button data-download-chart="detailsChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M14 3h2.997v5h-2.997v-5zm9 1v20h-22v-24h17.997l4.003 4zm-17 5h12v-7h-12v7zm14 4h-16v9h16v-9z"/>
-                            </svg>
-                        </button>
+                        {% set split_button_main_action %}
+                            <button data-download-chart="detailsChart" type="button" class="text-white-numixs cursor-pointer">
+                                Exporter graphique + tableau (.jpg)
+                            </button>
+                        {% endset %}
+
+                        {% set split_button_sub_action_1 %}
+                            <a href="/visiteurs/telecharger?mois={{ current_date|date("yyyy-MM") }}" data-download-chart-data download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                                {% include "includes/icons/download-fill-icon.svg" %}
+                                Télécharger les données visite par visite (.csv)
+                            </a>
+                        {% endset %}
+
+                        {% set list_sub_actions = [
+                        split_button_sub_action_1
+                        ] %}
+                        {{ macros.split_button(
+                            split_button_main_action,
+                            list_sub_actions
+                        ) }}
                     </li>
                     <li>
                         <button type="button" command="close" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
