@@ -4,7 +4,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { DateTime } from "luxon";
 
 import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } from "#types";
-import { listBusinessSector, listTimeSlots, listDays, listMonths, getWeeksRangeMonth } from "#scripts/utils.ts"
+import { listBusinessSector, listTimeSlots, listDays, listMonths, getWeeksRangeMonth, getPivotTable } from "#scripts/utils.ts"
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const tableTheadRowTemplateRaw = document.getElementById("table-details-chart-thead-row") as HTMLTemplateElement;
@@ -110,30 +110,30 @@ const listCharts = [
         xValuesSuffix: "h",
         downloadLink: `visiteurs/telecharger?jour=${today.toFormat("yyyy-LL-dd")}`
     },
-    {
-        apiKey: "jour",
-        id: "weeklyChart",
-        chartTitle: `Visites du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
-        xLabels: listDays,
-        xTitle: "Jours",
-        downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`
-    },
-    {
-        apiKey: "semaine",
-        id: "monthlyChart",
-        chartTitle: `Visites du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
-        xLabels: getWeeksRangeMonth(),
-        xTitle: "Semaines",
-        downloadLink: `visiteurs/telecharger?mois=${today.toFormat("yyyy-LL")}`
-    },
-    {
-        apiKey: "mois",
-        id: "yearlyChart",
-        chartTitle: `Visites du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
-        xLabels: listMonths,
-        xTitle: "Mois",
-        downloadLink: `visiteurs/telecharger?annee=${today.toFormat("yyyy")}`
-    }
+    // {
+    //     apiKey: "jour",
+    //     id: "weeklyChart",
+    //     chartTitle: `Visites du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
+    //     xLabels: listDays,
+    //     xTitle: "Jours",
+    //     downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`
+    // },
+    // {
+    //     apiKey: "semaine",
+    //     id: "monthlyChart",
+    //     chartTitle: `Visites du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
+    //     xLabels: getWeeksRangeMonth(),
+    //     xTitle: "Semaines",
+    //     downloadLink: `visiteurs/telecharger?mois=${today.toFormat("yyyy-LL")}`
+    // },
+    // {
+    //     apiKey: "mois",
+    //     id: "yearlyChart",
+    //     chartTitle: `Visites du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
+    //     xLabels: listMonths,
+    //     xTitle: "Mois",
+    //     downloadLink: `visiteurs/telecharger?annee=${today.toFormat("yyyy")}`
+    // }
 ];
 
 ; (() => {
@@ -142,6 +142,7 @@ const listCharts = [
 
         const req = await fetch(`/api?filtre=${apiKey}`);
         const res = await req.json();
+
         const listVisitsGrouped = Object.groupBy(res.data, (item: { item: Record<string, string | number> }) => {
             return item[apiKey];
         });
@@ -224,7 +225,6 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
     const isOpened = e.newState === "open";
 
     if (isOpened) {
-
         const sourceBtn = e.source! as HTMLButtonElement;
         const chartSelected = sourceBtn.dataset.detailsChart;
         const chartData = JSON.parse(sourceBtn.closest("div")?.querySelector("canvas")?.dataset.chartData || "{}");
@@ -241,6 +241,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         tableTheadRowTemplate.querySelector("th")!.textContent = "Groupe"
         tableDetailsChartTableHeadRow.append(tableTheadRowTemplate)
 
+        getPivotTable(chartData, xLabels, {columnSuffix: xValuesSuffix})
         const valuesPerPeriod: Record<string | number, number> = {};
 
         [...xLabels!, "Total (Groupe)"].forEach((label, idx, array) => {

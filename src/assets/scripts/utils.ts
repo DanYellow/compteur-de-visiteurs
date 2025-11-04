@@ -218,3 +218,59 @@ export const cancellableSleep = (duration: number, signal: AbortSignal) => {
         signal.addEventListener('abort', abort);
     });
 }
+
+export const getPivotTable = (data, columns = [], options = {}) => {
+    const tableValues = [];
+    const totalVisits = Object.values(data).flat().length;
+
+    const tableHeaderColumns = ["Groupe"];
+    const tableValuesPlaceholder = [];
+
+    ;[...columns].forEach((label) => {
+        tableHeaderColumns.push(`${label}${options.columnSuffix || ""}`);
+        tableValuesPlaceholder.push(0);
+    });
+    tableHeaderColumns.push("Total par groupe")
+
+    tableValues.push(tableHeaderColumns);
+
+    listBusinessSector.forEach((business) => {
+        const rowValues = [
+            business.name,
+        ];
+
+        const visitorPerTypeAndPeriod = {
+            [business.value]: new Array(columns.length || 0).fill(0)
+        };
+
+        Object.entries(data).forEach(([group, listVisits]) => {
+            const totalPerGroup = listVisits.reduce(
+                (acc: Record<string, number>, visit) => ((acc[business.value] = (acc[business.value] || 0) + ((visit[business.value] === "oui") ? 1 : 0)), acc),
+                {});
+        
+            const indexArray = columns.findIndex((label) => {
+                return Number(label) === Number(group);
+            });
+
+            visitorPerTypeAndPeriod[business.value][indexArray] = totalPerGroup[business.value];
+        });
+
+        visitorPerTypeAndPeriod[business.value].forEach((value) => {
+            rowValues.push(value);
+        });
+
+        const totalBusiness = visitorPerTypeAndPeriod[business.value].reduce((acc, value) => acc + value, 0);
+        rowValues.push(totalBusiness);
+
+        tableValues.push(rowValues);
+    })
+
+    const tableFooter = ["Total (visites)"];
+    // const tableValuesPlaceholder = [];
+    // ;[columns, "Total (Groupe)"].forEach((label, idx, array) => {
+    //     tableHeaderColumns.push(`${label}${options.columnSuffix || ""}`);
+    //     tableValuesPlaceholder.push(0);
+    // });
+
+    console.log(tableValues)
+}
