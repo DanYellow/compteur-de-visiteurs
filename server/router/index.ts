@@ -3,7 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import express from "express";
 import { stringify } from "csv-stringify/sync";
-import { DateTime, DateTimeUnit } from "luxon";
+import { DateTime, DateTimeUnit, Info } from "luxon";
 import { Op, literal, fn, col } from 'sequelize';
 
 import { listBusinessSector } from "#scripts/utils.ts";
@@ -110,7 +110,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 });
 
 router.get('/visiteurs/telecharger', async (req, res) => {
-    const predicatesDict = {
+    const predicatesDict: Record<string, string> = {
         "jour": "day",
         "semaine": "week",
         "mois": "month",
@@ -124,69 +124,109 @@ router.get('/visiteurs/telecharger', async (req, res) => {
     const isGrouped = "groupe" in req.query;
 
     if (queryParam.length > 0) {
-        filterPredicate = predicatesDict[queryParam[0]];
+        filterPredicate = predicatesDict[queryParam[0]] as DateTimeUnit;
         if (req.query[queryParam[0]]) {
             dateValue = DateTime.fromISO(new Date(req.query[queryParam[0]]).toISOString())
         }
     }
 
-    console.log(
-        await VisitorModel.findAll({
+    let records = [];
+    if ("groupe" in req.query) {
+        const groupFilter: Record<string, string> = {
+            "jour": "%H",
+            "semaine": "%u",
+            "mois": "%W",
+            "annee": "%m",
+        };
+
+        records = await VisitorModel.findAll({
             raw: true,
-            // group: [sequelize.fn('date_trunc', 'day', sequelize.col('date_passage'))],
-            group: "foo",
+            group: "groupe",
             attributes: [
-                "date_passage",
-                [sequelize.fn("strftime", '%H', sequelize.col("date_passage")), "foo"],
+                [sequelize.col("date_passage"), queryParam[0] || "date_passage"],
+                // "date_passage",
+                [sequelize.fn("strftime", groupFilter[queryParam[0]] || "%m", sequelize.col("date_passage"), "localtime"), "groupe"],
                 ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value])),
-            ]
-        })
-    )
-
-    return;
-
-    const records = await VisitorModel.findAll({
-        raw: true,
-        ...((filterPredicate !== undefined && dateValue !== null && dateValue.isValid) ? {
-            where: {
-                date_passage: {
-                    [Op.and]: {
-                        [Op.gte]: dateValue.startOf(filterPredicate).toString(),
-                        [Op.lte]: dateValue.endOf(filterPredicate).toString(),
+                [literal(`COUNT (distinct "id")`), "total"],
+            ],
+            ...((filterPredicate !== undefined && dateValue !== null && dateValue.isValid) ? {
+                where: {
+                    date_passage: {
+                        [Op.and]: {
+                            [Op.gte]: dateValue.startOf(filterPredicate).toString(),
+                            [Op.lte]: dateValue.endOf(filterPredicate).toString(),
+                        }
                     }
                 }
-            }
-        } : {})
-    });
+            } : {})
+        });
+    } else {
+        records = await VisitorModel.findAll({
+            raw: true,
+            ...((filterPredicate !== undefined && dateValue !== null && dateValue.isValid) ? {
+                where: {
+                    date_passage: {
+                        [Op.and]: {
+                            [Op.gte]: dateValue.startOf(filterPredicate).toString(),
+                            [Op.lte]: dateValue.endOf(filterPredicate).toString(),
+                        }
+                    }
+                }
+            } : {})
+        });
+    }
 
-    const values: (string | number)[][] = [Object.keys(VisitorModel.getAttributes())];
+    console.log(records)
+    return;
+
+    const values: (string | number)[][] = "groupe" in req.query ? [Object.keys(records[0])] : [Object.keys(VisitorModel.getAttributes())];
     const countVisitorType: Record<string, string | number> = {}
     values[0].forEach((key) => {
         countVisitorType[key] = 0;
     })
+    // console.log(countVisitorType)
 
-    countVisitorType.id = "Total";
-    countVisitorType.date_passage = "Tout";
-    if (filterPredicate !== undefined && dateValue !== null && dateValue.isValid) {
-        countVisitorType.date_passage = `${dateValue.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${dateValue.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
-    } else {
-        countVisitorType.date_passage = "Tous";
-    }
-    countVisitorType.lieu = res.locals.PLACE;
+    if ("groupe" in req.query) {
+        countVisitorType.groupe = "Total";
 
-    records.forEach((item, index) => {
-        const formattedItem = {
-            ...item,
-            id: index + 1,
-            date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
-        }
+        records.forEach((item, index) => {
+            const formattedItem = {
+                ...item,
+                date_passage: Info.weekdays('long', {locale: 'fr' })[Number(item.groupe) - 1]
+                // date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
+            }
 
-        listBusinessSector.map((business) => business.value).forEach((business) => {
-            countVisitorType[business] += ((item[business] === "oui") ? 1 : 0) as number
+            values.push(Object.values(formattedItem));
         });
+    } else {
+        countVisitorType.id = "Total";
+        countVisitorType.date_passage = "Tout";
+        if (filterPredicate !== undefined && dateValue !== null && dateValue.isValid) {
+            countVisitorType.date_passage = `${dateValue.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${dateValue.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
+        } else {
+            countVisitorType.date_passage = "Tous";
+        }
+        countVisitorType.lieu = res.locals.PLACE;
 
-        values.push(Object.values(formattedItem));
-    });
+        records.forEach((item, index) => {
+            const formattedItem = {
+                ...item,
+                id: index + 1,
+                // date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
+            }
+
+            listBusinessSector.map((business) => business.value).forEach((business) => {
+                countVisitorType[business] += ((item[business] === "oui") ? 1 : 0) as number
+            });
+
+            values.push(Object.values(formattedItem));
+        });
+    }
+
+
+    // console.log(records);
+    // console.log(values);
+    // return;
 
     const filePayload = values.toSpliced(1, 0, Object.values(countVisitorType));
 
@@ -198,7 +238,7 @@ router.get('/visiteurs/telecharger', async (req, res) => {
         fs.unlinkSync(csvFile);
     });
 
-    res.status(200).json({ "success": "Téléchargement réussi" })
+    // res.status(200).json({ "success": "Téléchargement réussi" })
 });
 
 export default router;
