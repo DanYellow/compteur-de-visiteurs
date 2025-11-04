@@ -151,10 +151,13 @@ export const cancellableSleep = (duration: number, signal: AbortSignal) => {
 
 export const getPivotTable = (data, columns = [], options = {}) => {
     const tableValues = [];
-    const totalVisits = Object.values(data).flat().length;
+    const totalVisits = Object.values(data)
+        .flat()
+        .map((item) => Object.values(item).reduce((total: number, x) => (x === "oui" ? total + 1 : total), 0))
+        .reduce((total: number, val: number) => total + val, 0)
 
     const tableHeaderColumns = ["Groupe"];
-    const tableValuesPlaceholder = [];
+    const tableValuesPlaceholder: number[] = [];
 
     ;[...columns].forEach((label) => {
         tableHeaderColumns.push(`${label}${options.columnSuffix || ""}`);
@@ -164,13 +167,13 @@ export const getPivotTable = (data, columns = [], options = {}) => {
 
     tableValues.push(tableHeaderColumns);
 
+    const tableFooter = ["Total (visites)", ...tableValuesPlaceholder];
+
     listBusinessSector.forEach((business) => {
-        const rowValues = [
-            business.name,
-        ];
+        const rowValues = [business.name];
 
         const visitorPerTypeAndPeriod = {
-            [business.value]: new Array(columns.length || 0).fill(0)
+            [business.value]: new Array(columns.length || 0).fill(0),
         };
 
         Object.entries(data).forEach(([group, listVisits]) => {
@@ -181,8 +184,10 @@ export const getPivotTable = (data, columns = [], options = {}) => {
             const indexArray = columns.findIndex((label) => {
                 return Number(label) === Number(group);
             });
-
-            visitorPerTypeAndPeriod[business.value][indexArray] = totalPerGroup[business.value];
+            if (indexArray >= 0) {
+                tableFooter[indexArray + 1] += totalPerGroup[business.value];
+                visitorPerTypeAndPeriod[business.value][indexArray] = totalPerGroup[business.value];
+            }
         });
 
         visitorPerTypeAndPeriod[business.value].forEach((value) => {
@@ -193,14 +198,10 @@ export const getPivotTable = (data, columns = [], options = {}) => {
         rowValues.push(totalBusiness);
 
         tableValues.push(rowValues);
-    })
+    });
 
-    const tableFooter = ["Total (visites)"];
-    // const tableValuesPlaceholder = [];
-    // ;[columns, "Total (Groupe)"].forEach((label, idx, array) => {
-    //     tableHeaderColumns.push(`${label}${options.columnSuffix || ""}`);
-    //     tableValuesPlaceholder.push(0);
-    // });
+    tableFooter.push(totalVisits);
+    tableValues.push(tableFooter);
 
-    console.log(tableValues)
+    return tableValues;
 }

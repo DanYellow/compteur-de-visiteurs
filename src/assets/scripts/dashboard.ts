@@ -1,14 +1,14 @@
 import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import { DateTime } from "luxon";
+import { DateTime, Info } from "luxon";
 
 import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } from "#types";
-import { listBusinessSector, listTimeSlots, listDays, listMonths, getWeeksRangeMonth, getPivotTable } from "#scripts/utils.ts"
+import { listTimeSlots, listDays, listMonths, getWeeksRangeMonth, getPivotTable } from "#scripts/utils.ts";
+
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
-const tableTheadRowTemplateRaw = document.getElementById("table-details-chart-thead-row") as HTMLTemplateElement;
 const linkDownloadChartData = document.querySelector("[data-download-chart-data]") as HTMLLinkElement;
 const tableDetailsChart = document.getElementById("table-details-chart") as HTMLTemplateElement;
 
@@ -115,7 +115,7 @@ const listCharts = [
     //     apiKey: "jour",
     //     id: "weeklyChart",
     //     chartTitle: `Visites du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
-    //     xLabels: listDays,
+    //     xLabels: Info.weekdays('long', {locale: 'fr' }).map((item) => item.charAt(0).toUpperCase() + String(val).slice(1)),
     //     xTitle: "Jours",
     //     downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`
     // },
@@ -131,7 +131,7 @@ const listCharts = [
     //     apiKey: "mois",
     //     id: "yearlyChart",
     //     chartTitle: `Visites du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
-    //     xLabels: listMonths,
+    //     xLabels: Info.months('long', {locale: 'fr' }).map((item) => item.charAt(0).toUpperCase() + String(val).slice(1)),
     //     xTitle: "Mois",
     //     downloadLink: `visiteurs/telecharger?annee=${today.toFormat("yyyy")}`
     // }
@@ -235,126 +235,67 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         linkDownloadChartData.href = downloadLink;
 
         const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr")! as HTMLTableRowElement;
-        const tableDetailsChartTableBody = tableDetailsChart.querySelector("tbody")! as HTMLTableSectionElement;
         tableDetailsChartTableHeadRow.innerHTML = "";
 
-        const tableTheadRowTemplate = tableTheadRowTemplateRaw.content.cloneNode(true) as HTMLElement;
-        tableTheadRowTemplate.querySelector("th")!.textContent = "Groupe"
-        tableDetailsChartTableHeadRow.append(tableTheadRowTemplate)
-
-        getPivotTable(chartData, xLabels, {columnSuffix: xValuesSuffix})
-        const valuesPerPeriod: Record<string | number, number> = {};
-
-        [...xLabels!, "Total (Groupe)"].forEach((label, idx, array) => {
-            const tableTheadRowTemplate = tableTheadRowTemplateRaw.content.cloneNode(true) as HTMLElement;
-            const th = tableTheadRowTemplate.querySelector("th")!;
-
-            if (typeof label === "object") {
-                valuesPerPeriod[label.id] = 0;
-                th.textContent = `${label.name}${xValuesSuffix || ""}`;
-            } else {
-                valuesPerPeriod[label] = 0;
-                th.textContent = `${label}${xValuesSuffix || ""}`;
-            }
-
-            if (idx === array.length - 1) {
-                th.style.borderLeft = "2px solid white";
-                valuesPerPeriod[(label as string)] = totalVisits;
-            }
-
-            tableDetailsChartTableHeadRow.append(tableTheadRowTemplate);
-        });
+        const tableDetailsChartTableBody = tableDetailsChart.querySelector("tbody")! as HTMLTableSectionElement;
+        tableDetailsChartTableBody.innerHTML = "";
 
         const lineChartDatasets: LineChartEntry[] = [];
-        tableDetailsChartTableBody.innerHTML = "";
-        listBusinessSector.forEach((business) => {
+
+        const chartDataPivotTable = getPivotTable(chartData, xLabels as [], {columnSuffix: xValuesSuffix})
+
+        Object.values(chartDataPivotTable).forEach((row, index, table) => {
             const trBody = document.createElement("tr");
-            const td = document.createElement("td");
+            row.forEach((cell, cellIndex, listRows) => {
+                if (index === 0) {
+                    const th = document.createElement("th");
+                    th.classList.add("px-2")
 
-            td.textContent = business.name;
-            trBody.append(td);
-
-            const visitorPerTypeAndPeriod = {
-                [business.value]: new Array(xLabels?.length || 0).fill(0)
-            };
-            Object.entries(chartData).forEach(([xValueIndex, listVisitors]) => {
-                const visitorsReducer = listVisitors.reduce(
-                    (acc: Record<string, number>, visitor) => ((acc[business.value] = (acc[business.value] || 0) + ((visitor[business.value] === "oui") ? 1 : 0)), acc),
-                    {});
-
-                const indexArray = (xLabels || []).findIndex((label) => {
-                    if (typeof label === "object") {
-                        return Number(label.id) === Number(xValueIndex);
+                    th.textContent = String(cell);
+                    tableDetailsChartTableHeadRow.append(th);
+                } else {
+                    const td = document.createElement("td");
+                    td.textContent = String(cell);
+                    if (cellIndex > 0) {
+                        td.style.textAlign = "center";
                     }
-                    return Number(label) === Number(xValueIndex);
-                });
-                visitorPerTypeAndPeriod[business.value][indexArray] = visitorsReducer[business.value];
-            });
+                    td.style.color = Number(cell) > 0 ? greenNumixs : "";
 
-            const totalBusiness = visitorPerTypeAndPeriod[business.value].reduce((acc, value) => acc + value, 0);
+                    if (cellIndex === listRows.length - 1) {
+                        td.style.borderLeft = "2px solid white";
+                    }
 
-            ;[...visitorPerTypeAndPeriod[business.value], totalBusiness].forEach((item, idx, array) => {
-                const td = document.createElement("td");
-                td.textContent = item;
-                td.classList.add("text-center");
-                td.style.textAlign = "center";
-                td.style.color = item > 0 ? greenNumixs : "";
-                td.classList.toggle("text-green-numixs", item > 0);
-                if (idx === array.length - 1) {
-                    td.style.borderLeft = "2px solid white";
+                    if (index === table.length - 1) {
+                        td.style.borderTop = "2px solid white";
+                        td.style.fontSize = "1.25rem";
+                        td.style.paddingTop = "0.35rem";
+                    }
+
+                    trBody.append(td);
                 }
-                trBody.append(td);
             });
 
-            tableDetailsChartTableBody.append(trBody);
 
-            lineChartDatasets.push({
-                label: business.name,
-                data: visitorPerTypeAndPeriod[business.value],
-                borderColor: business.lineColor,
-                tension: 0,
-                fill: true,
-            });
-        });
+            if (index > 0 && index < table.length - 1) {
+                const lineData = row.slice(1, row.length - 1);
 
-        // Total rows
-        const trTotal = document.createElement("tr") as HTMLTableRowElement;
-        trTotal.style.fontSize = "1.25rem";
-        const td = document.createElement("td") as HTMLTableCellElement;
-        td.textContent = "Total (visites)";
-        td.style.borderTop = "2px solid white";
-        td.style.paddingTop = "0.35rem";
-        trTotal.append(td);
-
-        Object.entries(chartData).forEach(([key, value]) => {
-            valuesPerPeriod[key] = String((value as []).length);
-        });
-
-        Object.values(valuesPerPeriod).forEach((item, idx, array) => {
-            const td = document.createElement("td") as HTMLTableCellElement;
-            td.textContent = String(item);
-            td.style.textAlign = "center";
-            td.style.borderTop = "2px solid white";
-            td.style.paddingTop = "0.35rem";
-            td.style.color = item > 0 ? greenNumixs : "";
-            if (idx === array.length - 1) {
-                td.style.borderLeft = "2px solid white";
-            }
-            trTotal.append(td);
-        });
-
-        tableDetailsChartTableBody.append(trTotal);
-
-        const chartLabels = xLabels!.map((item) => {
-            if (typeof item === 'object') {
-                return `${item.name}${xValuesSuffix || ""}`;
+                lineChartDatasets.push({
+                    label: row[0],
+                    data: lineData,
+                    borderColor: "#fff",
+                    // borderColor: business.lineColor,
+                    tension: 0,
+                    fill: true,
+                });
             }
 
-            return `${item}${xValuesSuffix || ""}`;
-        });
+            if (index > 0) {
+                tableDetailsChartTableBody.append(trBody);
+            }
+        })
 
         const data = {
-            labels: chartLabels,
+            labels: chartDataPivotTable[0].slice(1, chartDataPivotTable.length - 1),
             datasets: lineChartDatasets,
         };
 
