@@ -110,11 +110,12 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 });
 
 router.get('/visiteurs/telecharger', async (req, res) => {
+    // heure, jour, semaine, mois
     const predicatesDict: Record<string, string> = {
-        "jour": "day",
-        "semaine": "week",
-        "mois": "month",
-        "annee": "year",
+        "heure": "day",
+        "jour": "week",
+        "semaine": "month",
+        "mois": "year",
     }
 
     let filterPredicate: DateTimeUnit | undefined = undefined;
@@ -131,23 +132,22 @@ router.get('/visiteurs/telecharger', async (req, res) => {
     }
 
     let records = [];
-    if ("groupe" in req.query) {
+    if (isGrouped) {
         const groupFilter: Record<string, string> = {
-            "jour": "%H",
-            "semaine": "%u",
-            "mois": "%W",
-            "annee": "%m",
+            "heure": "%H",
+            "jour": "%u",
+            "semaine": "%W",
+            "mois": "%m",
         };
 
         records = await VisitorModel.findAll({
             raw: true,
             group: "groupe",
             attributes: [
-                [sequelize.col("date_passage"), queryParam[0] || "date_passage"],
-                // "date_passage",
+                [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), queryParam[0] || "date_passage"],
                 [sequelize.fn("strftime", groupFilter[queryParam[0]] || "%m", sequelize.col("date_passage"), "localtime"), "groupe"],
+                [literal(`COUNT (distinct "id")`), "total_visites"],
                 ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value])),
-                [literal(`COUNT (distinct "id")`), "total"],
             ],
             ...((filterPredicate !== undefined && dateValue !== null && dateValue.isValid) ? {
                 where: {
@@ -160,6 +160,30 @@ router.get('/visiteurs/telecharger', async (req, res) => {
                 }
             } : {})
         });
+
+        // console.log(
+        //     await VisitorModel.findAll({
+        //     raw: true,
+        //     attributes: {
+        //         include: [
+        //         [
+        //             // Note the wrapping parentheses in the call below!
+        //             sequelize.literal(`(
+        //                         SELECT COUNT(*)
+        //                         FROM visitor AS reaction
+        //                         WHERE
+        //                             reaction.postId = post.id
+        //                             AND
+        //                             reaction.type = "Laugh"
+        //                     )`),
+        //             'laughReactionsCount',
+        //             ],
+        //         ],
+        //     },
+        // })
+        // )
+        // console.log(records);
+        // return;
     } else {
         records = await VisitorModel.findAll({
             raw: true,
@@ -176,25 +200,29 @@ router.get('/visiteurs/telecharger', async (req, res) => {
         });
     }
 
-    console.log(records)
-    return;
+    let values: (string | number)[][] = [Object.keys(VisitorModel.getAttributes())];
+    if (isGrouped){
+        const headerRows = {...records[0]}
+        delete headerRows.groupe;
 
-    const values: (string | number)[][] = "groupe" in req.query ? [Object.keys(records[0])] : [Object.keys(VisitorModel.getAttributes())];
+        values = [Object.keys(headerRows)];
+    }
+    
     const countVisitorType: Record<string, string | number> = {}
     values[0].forEach((key) => {
         countVisitorType[key] = 0;
     })
     // console.log(countVisitorType)
 
-    if ("groupe" in req.query) {
-        countVisitorType.groupe = "Total";
-
+    if (isGrouped) {
         records.forEach((item, index) => {
             const formattedItem = {
                 ...item,
-                date_passage: Info.weekdays('long', {locale: 'fr' })[Number(item.groupe) - 1]
+                [queryParam[0] || "date_passage"]: Info.weekdays('long', {locale: 'fr' })[Number(item.groupe) - 1]
                 // date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
             }
+
+            delete formattedItem.groupe;
 
             values.push(Object.values(formattedItem));
         });
@@ -212,7 +240,7 @@ router.get('/visiteurs/telecharger', async (req, res) => {
             const formattedItem = {
                 ...item,
                 id: index + 1,
-                // date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
+                date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
             }
 
             listBusinessSector.map((business) => business.value).forEach((business) => {
@@ -223,20 +251,22 @@ router.get('/visiteurs/telecharger', async (req, res) => {
         });
     }
 
-
-    // console.log(records);
+    // console.log(Object.values(countVisitorType));
     // console.log(values);
     // return;
 
-    const filePayload = values.toSpliced(1, 0, Object.values(countVisitorType));
+    const filePayload = values //.toSpliced(1, 0, Object.values(countVisitorType));
 
     const timestamp = DateTime.now().toFormat("dd-LL-yyyy-HH'h'mm");
     const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
 
     fs.writeFileSync(csvFile, stringify(filePayload));
-    res.download(csvFile, `${timestamp}-liste-membres.csv`, () => {
+    res.download(csvFile, `liste-membres.test.csv`, () => {
         fs.unlinkSync(csvFile);
     });
+    // res.download(csvFile, `${timestamp}-liste-membres.csv`, () => {
+    //     fs.unlinkSync(csvFile);
+    // });
 
     // res.status(200).json({ "success": "Téléchargement réussi" })
 });
