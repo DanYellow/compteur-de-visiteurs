@@ -3,6 +3,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime } from "luxon";
 
+import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } from "#types";
 import { listBusinessSector, listTimeSlots, listDays, listMonths, getWeeksRangeMonth, getPivotTable } from "#scripts/utils.ts"
 

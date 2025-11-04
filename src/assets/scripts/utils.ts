@@ -1,83 +1,13 @@
 import type { WeekMonth } from "#types";
 import { DateTime } from "luxon";
 
-export const listBusinessSector = [
-    {
-        "name": "Entreprise\nexterne",
-        "value": "entreprise_externe",
-        "lineColor": '#ffc8fa',
-        "listInChoices": false,
-    },
-    {
-        "name": "Entreprise\nStation Numixs",
-        "value": "station_numixs",
-        "lineColor": 'rgb(213, 217, 22)',
-        "listInChoices": false,
-    },
-    {
-        "name": "Entreprise",
-        "value": "entreprise",
-        "lineColor": 'rgb(15, 92, 192)',
-        "listInDb": false,
-    },
-    {
-        "name": "Éducation",
-        "value": "education",
-        "lineColor": 'rgb(75, 192, 192)',
-    },
-    {
-        "name": "Artisan",
-        "value": "artisan",
-        "lineColor": 'rgb(255, 255, 255)',
-    },
-    {
-        "name": "Artiste",
-        "value": "artiste",
-        "lineColor": '#ffdc00',
-    },
-    {
-        "name": "Agent CARPF",
-        "value": "agent_carpf",
-        "lineColor": 'rgb(255, 108, 0)',
-    },
-    {
-        "name": "Collectivité",
-        "value": "collectivité",
-        "lineColor": '#00610d',
-    },
-    {
-        "name": "FabLab",
-        "value": "fablab",
-        "lineColor": 'rgb(217, 22, 123)',
-    },
-    {
-        "name": "numixs Lab",
-        "value": "numixs_lab",
-        "lineColor": 'rgb(22, 180, 217)',
-    },
-    {
-        "name": "Retraité",
-        "value": "retraité",
-        "lineColor": '#d901ff',
-    },
-    {
-        "name": "Association",
-        "value": "association",
-        "lineColor": 'rgb(3, 252, 7)',
-    },
-    {
-        "name": "En réinsertion pro",
-        "value": "réinsertion_pro",
-        "lineColor": 'rgb(3, 252, 205)',
-    },
-    {
-        "name": "Autre",
-        "value": "autre",
-        "lineColor": 'rgb(252, 26, 3)',
-    },
-];
+import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 
-export const listTimeSlots = Array.from(new Array(10), (_, i) => i + 10).map((item) => String(item));
+const [openHours, closeHours] = import.meta.env.OPENING_HOURS.split("-").map(Number);
+const rangeOpeningHours = Math.abs(Number(closeHours) - Number(openHours) + 1);
+
+export const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + openHours).map((item) => String(item));
+
 export const listDays = [{
     id: 1,
     name: "Lundi",
@@ -247,7 +177,7 @@ export const getPivotTable = (data, columns = [], options = {}) => {
             const totalPerGroup = listVisits.reduce(
                 (acc: Record<string, number>, visit) => ((acc[business.value] = (acc[business.value] || 0) + ((visit[business.value] === "oui") ? 1 : 0)), acc),
                 {});
-        
+
             const indexArray = columns.findIndex((label) => {
                 return Number(label) === Number(group);
             });

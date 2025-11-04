@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 
 import sequelize from "./index";
 
-import { listBusinessSector } from "#scripts/utils.ts"
+import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 
 const listBusinessSectorKeys = {}
 listBusinessSector

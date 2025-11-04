@@ -6,7 +6,7 @@ import { stringify } from "csv-stringify/sync";
 import { DateTime, DateTimeUnit, Info } from "luxon";
 import { Op, literal, fn, col } from 'sequelize';
 
-import { listBusinessSector } from "#scripts/utils.ts";
+import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "../index.ts";
 import VisitorModel from "#models/visitor.ts";
@@ -207,7 +207,7 @@ router.get('/visiteurs/telecharger', async (req, res) => {
 
         values = [Object.keys(headerRows)];
     }
-    
+
     const countVisitorType: Record<string, string | number> = {}
     values[0].forEach((key) => {
         countVisitorType[key] = 0;
