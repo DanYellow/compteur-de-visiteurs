@@ -37,19 +37,17 @@ router.get('/', async (req, res) => {
         const pivotPayload = Object.groupBy(requestRes.data, (item: { item: Record<string, string | number> }) => {
             return item.groupe;
         });
-
-        csvPayload = getPivotTable(pivotPayload, config.listColumns, {columnSuffix: config?.xValuesSuffix });
-        console.log(csvPayload.at(-1))
+        csvPayload = getPivotTable(pivotPayload, config.listColumns, { columnSuffix: config?.xValuesSuffix });
     } else {
         csvPayload = getLinearCSV(requestRes.data);
     }
 
-    // const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
+    const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
 
-    // fs.writeFileSync(csvFile, stringify(csvPayload));
-    // res.download(csvFile, `liste-membres_${String(Date.now()).slice(-6)}.csv`, () => {
-    //     fs.unlinkSync(csvFile);
-    // });
+    fs.writeFileSync(csvFile, stringify(csvPayload));
+    res.download(csvFile, `liste-membres_${String(Date.now()).slice(-6)}.csv`, () => {
+        fs.unlinkSync(csvFile);
+    });
 });
 
 

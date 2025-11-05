@@ -37,6 +37,14 @@ router.get("/", async (req, res) => {
 
     const queryStringParam = (req.query?.filtre || "jour") as string;
 
+    let startTime = today.startOf((dictGroupType as any)[queryStringParam]?.luxon || "day");
+    let endTime = today.endOf((dictGroupType as any)[queryStringParam]?.luxon || "day");
+    if (queryStringParam === "heure") {
+        const [openHours, closeHours] = (process.env.OPENING_HOURS || "10-19").split("-").map(Number);
+        startTime = startTime.set({ hour: openHours });
+        endTime = endTime.set({ hour: closeHours });
+    }
+
     const listVisitors = await VisitorModel.findAll({
         raw: true,
         attributes: {
@@ -48,8 +56,8 @@ router.get("/", async (req, res) => {
         where: {
             date_passage: {
                 [Op.and]: {
-                    [Op.gte]: today.startOf((dictGroupType as any)[queryStringParam]?.luxon || "day").toString(),
-                    [Op.lte]: today.endOf((dictGroupType as any)[queryStringParam]?.luxon || "day").toString(),
+                    [Op.gte]: startTime.toString(),
+                    [Op.lte]: endTime.toString(),
                 }
             }
         }
