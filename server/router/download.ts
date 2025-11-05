@@ -2,7 +2,6 @@ import express from "express";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
-import { DateTime, DateTimeUnit } from "luxon";
 import { stringify } from "csv-stringify/sync";
 
 import { configData, getLinearCSV, getPivotTable } from "#scripts/utils.shared.ts";
@@ -21,9 +20,6 @@ router.get('/', async (req, res) => {
         "mois": "year",
     }
 
-    let filterPredicate: DateTimeUnit | undefined = undefined;
-    let dateValue = DateTime.now();
-
     const apiKey = Object.keys(predicatesDict).filter(value => Object.keys(req.query).includes(value));
     const isGrouped = "groupe" in req.query;
 
@@ -31,9 +27,11 @@ router.get('/', async (req, res) => {
 
     const request = await fetch(`http://${req.get('host')}/api?filtre=${apiKey}`);
     const requestRes = await request.json();
+    let csvFilename = `liste-visites_${String(Date.now()).slice(-6)}.csv`
 
     if (isGrouped) {
         const config = configData[apiKey];
+        csvFilename = `liste-visites-detaillee_${String(Date.now()).slice(-6)}.csv`
         const pivotPayload = Object.groupBy(requestRes.data, (item: { item: Record<string, string | number> }) => {
             return item.groupe;
         });
@@ -42,11 +40,11 @@ router.get('/', async (req, res) => {
         csvPayload = getLinearCSV(requestRes.data);
     }
 
-    const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
+    const tempCsvFile = path.join(__dirname, "..", "liste-visites.tmp.csv");
 
-    fs.writeFileSync(csvFile, stringify(csvPayload));
-    res.download(csvFile, `liste-membres_${String(Date.now()).slice(-6)}.csv`, () => {
-        fs.unlinkSync(csvFile);
+    fs.writeFileSync(tempCsvFile, stringify(csvPayload));
+    res.download(tempCsvFile, csvFilename, () => {
+        fs.unlinkSync(tempCsvFile);
     });
 });
 

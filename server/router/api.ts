@@ -37,13 +37,13 @@ router.get("/", async (req, res) => {
 
     const queryStringParam = (req.query?.filtre || "jour") as string;
 
-    let startTime = today.startOf((dictGroupType as any)[queryStringParam]?.luxon || "day");
-    let endTime = today.endOf((dictGroupType as any)[queryStringParam]?.luxon || "day");
-    if (queryStringParam === "heure") {
-        const [openHours, closeHours] = (process.env.OPENING_HOURS || "10-19").split("-").map(Number);
-        startTime = startTime.set({ hour: openHours });
-        endTime = endTime.set({ hour: closeHours });
-    }
+    const [openHours, closeHours] = (process.env.OPENING_HOURS || "10-19").split("-").map(Number);
+    const startTime = today.startOf((dictGroupType as any)[queryStringParam]?.luxon || "day").set({ hour: openHours });
+    const endTime = today.endOf((dictGroupType as any)[queryStringParam]?.luxon || "day").set({ hour: closeHours });
+    // if (queryStringParam === "heure") {
+    //     startTime = startTime;
+    //     endTime = endTime;
+    // }
 
     const listVisitors = await VisitorModel.findAll({
         raw: true,

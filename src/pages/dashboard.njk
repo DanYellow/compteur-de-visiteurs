@@ -107,13 +107,13 @@ Tableau de bord
                         {% endset %}
 
                         {% set split_button_sub_action_1 %}
-                            <a href="" data-download-chart-data download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                            <a href="" data-download-chart-data="simple" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                                 {% include "includes/icons/download-fill-icon.svg" %}
                                 Télécharger les données visite par visite (.csv)
                             </a>
                         {% endset %}
                         {% set split_button_sub_action_2 %}
-                            <a href="" data-download-chart-data download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                            <a href="" data-download-chart-data="detailed" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                                 {% include "includes/icons/download-fill-icon.svg" %}
                                 Télécharger les données groupe par groupe (.csv)
                             </a>

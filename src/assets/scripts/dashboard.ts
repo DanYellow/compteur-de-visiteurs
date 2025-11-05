@@ -1,16 +1,16 @@
 import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import { DateTime, Info } from "luxon";
+import { DateTime } from "luxon";
 
 import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } from "#types";
-// import { listTimeSlots, getWeeksRangeMonth, getPivotTable } from "#scripts/utils.ts";
 import { configData, getPivotTable } from './utils.shared';
 
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
-const linkDownloadChartData = document.querySelector("[data-download-chart-data]") as HTMLLinkElement;
+const linkDownloadChartData = document.querySelector("[data-download-chart-data='simple']") as HTMLLinkElement;
+const linkDownloadDetailedChartData = document.querySelector("[data-download-chart-data='detailed']") as HTMLLinkElement;
 const tableDetailsChart = document.getElementById("table-details-chart") as HTMLTemplateElement;
 
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels);
@@ -101,26 +101,12 @@ const chartScales = (xTitle: string) => {
 
 const today = DateTime.now();
 
-const listDays = Info.weekdays('long', {locale: 'fr'})
-    .filter((item) => item !== "samedi" && item !== "dimanche")
-    .map((item, idx) => ({
-        name: item.charAt(0).toUpperCase() + String(item).slice(1),
-        id: idx + 1
-    }));
-
-const listMonths = Info.months('long', {locale: 'fr' })
-    .map((item, idx) => ({
-        name: item.charAt(0).toUpperCase() + String(item).slice(1),
-        id: idx + 1
-    }));
-
-
 const configDataRaw = {
     "heure": {
         ...configData.heure,
         id: "dailyChart",
         chartTitle: `Visites uniques du ${today.toFormat("dd/LL/yyyy")}`,
-        downloadLink: `visiteurs/telecharger?heure=${today.toFormat("yyyy-LL-dd")}`,
+        downloadLink: `telecharger?heure=${today.toFormat("yyyy-LL-dd")}`,
         xTitle: 'Tranche horaire',
         xLabels: configData.heure.listColumns,
     },
@@ -128,7 +114,7 @@ const configDataRaw = {
         ...configData.jour,
         id: "weeklyChart",
         chartTitle: `Visites uniques du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`,
+        downloadLink: `telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`,
         xTitle: 'Jours',
         xLabels: configData.jour.listColumns,
     },
@@ -136,7 +122,7 @@ const configDataRaw = {
         ...configData.semaine,
         id: "monthlyChart",
         chartTitle: `Visites uniques du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `visiteurs/telecharger?mois=${today.toFormat("yyyy-LL-dd")}`,
+        downloadLink: `telecharger?mois=${today.toFormat("yyyy-LL-dd")}`,
         xTitle: 'Semaines',
         xLabels: configData.semaine.listColumns,
     },
@@ -144,48 +130,13 @@ const configDataRaw = {
         ...configData.annee,
         id: "yearlyChart",
         chartTitle: `Visites uniques du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `visiteurs/telecharger?annee=${today.toFormat("yyyy-LL-dd")}`,
+        downloadLink: `telecharger?annee=${today.toFormat("yyyy-LL-dd")}`,
         xTitle: 'Mois',
         xLabels: configData.annee.listColumns,
     }
 }
-console.log(Object.values(configDataRaw))
+
 const listCharts = Object.values(configDataRaw);
-[
-    // {
-    //     apiKey: "heure",
-    //     id: "dailyChart",
-    //     chartTitle: `Visites uniques du ${today.toFormat("dd/LL/yyyy")}`,
-    //     xTitle: 'Tranche horaire',
-    //     xLabels: listTimeSlots,
-    //     xValuesSuffix: "h",
-    //     downloadLink: `visiteurs/telecharger?jour=${today.toFormat("yyyy-LL-dd")}`
-    // },
-    // {
-    //     apiKey: "jour",
-    //     id: "weeklyChart",
-    //     chartTitle: `Visites uniques du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
-    //     xLabels: listDays,
-    //     xTitle: "Jours",
-    //     downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`
-    // },
-    // {
-    //     apiKey: "semaine",
-    //     id: "monthlyChart",
-    //     chartTitle: `Visites uniques du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
-    //     xLabels: getWeeksRangeMonth(),
-    //     xTitle: "Semaines",
-    //     downloadLink: `visiteurs/telecharger?mois=${today.toFormat("yyyy-LL")}`
-    // },
-    {
-        apiKey: "mois",
-        id: "yearlyChart",
-        chartTitle: `Visites uniques du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
-        xLabels: listMonths,
-        xTitle: "Mois",
-        downloadLink: `visiteurs/telecharger?annee=${today.toFormat("yyyy")}`
-    }
-];
 
 ; (() => {
     listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
@@ -250,7 +201,7 @@ const listCharts = Object.values(configDataRaw);
                             display: false,
                         },
                         totalVisitors: {
-                            text: 'Total : ' + res.data.length,
+                            text: 'Visites uniques : ' + res.data.length,
                         },
                         datalabels: {
                             color: "white",
@@ -283,6 +234,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         const totalVisits = Object.values(chartData).flat().length;
 
         linkDownloadChartData.href = downloadLink || "";
+        linkDownloadDetailedChartData.href = `${downloadLink}&groupe` || "";
 
         const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr")! as HTMLTableRowElement;
         tableDetailsChartTableHeadRow.innerHTML = "";
@@ -373,7 +325,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                             }
                         },
                         totalVisitors: {
-                            text: 'Total : ' + totalVisits,
+                            text: 'Visites uniques : ' + totalVisits,
                         },
                         datalabels: {
                             color: "white",
