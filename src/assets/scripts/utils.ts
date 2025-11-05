@@ -192,7 +192,7 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
             });
 
             if (indexArray >= 0) {
-                tableFooter[indexArray + 1] += totalPerGroup[business.value];
+                tableFooter[indexArray] += totalPerGroup[business.value];
                 visitorPerTypeAndPeriod[business.value][indexArray] = totalPerGroup[business.value];
             }
         });

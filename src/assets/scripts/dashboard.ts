@@ -5,8 +5,8 @@ import { DateTime, Info } from "luxon";
 
 import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } from "#types";
-import { listTimeSlots, getWeeksRangeMonth, getPivotTable } from "#scripts/utils.ts";
-import { getLinearCSV } from './utils.shared';
+// import { listTimeSlots, getWeeksRangeMonth, getPivotTable } from "#scripts/utils.ts";
+import { configData, getPivotTable } from './utils.shared';
 
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
@@ -114,7 +114,44 @@ const listMonths = Info.months('long', {locale: 'fr' })
         id: idx + 1
     }));
 
-const listCharts = [
+
+const configDataRaw = {
+    "heure": {
+        ...configData.heure,
+        id: "dailyChart",
+        chartTitle: `Visites uniques du ${today.toFormat("dd/LL/yyyy")}`,
+        downloadLink: `visiteurs/telecharger?heure=${today.toFormat("yyyy-LL-dd")}`,
+        xTitle: 'Tranche horaire',
+        xLabels: configData.heure.listColumns,
+    },
+    "jour": {
+        ...configData.jour,
+        id: "weeklyChart",
+        chartTitle: `Visites uniques du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`,
+        xTitle: 'Jours',
+        xLabels: configData.jour.listColumns,
+    },
+    "semaine": {
+        ...configData.semaine,
+        id: "monthlyChart",
+        chartTitle: `Visites uniques du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `visiteurs/telecharger?mois=${today.toFormat("yyyy-LL-dd")}`,
+        xTitle: 'Semaines',
+        xLabels: configData.semaine.listColumns,
+    },
+    "annee": {
+        ...configData.annee,
+        id: "yearlyChart",
+        chartTitle: `Visites uniques du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `visiteurs/telecharger?annee=${today.toFormat("yyyy-LL-dd")}`,
+        xTitle: 'Mois',
+        xLabels: configData.annee.listColumns,
+    }
+}
+console.log(Object.values(configDataRaw))
+const listCharts = Object.values(configDataRaw);
+[
     // {
     //     apiKey: "heure",
     //     id: "dailyChart",
@@ -156,36 +193,6 @@ const listCharts = [
 
         const req = await fetch(`/api?filtre=${apiKey}`);
         const res = await req.json();
-
-        // const csvHeader = Object.keys(res.data[0]);
-        // csvHeader[1] = "Période";
-        // csvHeader.pop()
-
-        // const csvTotal = ["Total", "/", "/", ...new Array(listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)).length).fill(0)];
-        // const csv = [csvHeader];
-
-        // res.data.forEach((item) => {
-        //     let groupName = xLabels[item.groupe];
-        //     if (typeof groupName === 'object') {
-        //         groupName = groupName.name;
-        //     }
-
-        //     Object.values(item).forEach((value, idx) => {
-        //         if (value === "oui") {
-        //             csvTotal[idx] += 1
-        //         }
-        //     });
-
-        //     const rowData = Object.values({
-        //         ...item,
-        //         groupe: groupName
-        //     })
-        //     rowData.pop()
-        //     csv.push(rowData);
-        // });
-
-        // csv.splice(1, 0, csvTotal);
-        console.log(getLinearCSV(res.data))
 
         const listVisitsGrouped = Object.groupBy(res.data, (item: { item: Record<string, string | number> }) => {
             return item.groupe;

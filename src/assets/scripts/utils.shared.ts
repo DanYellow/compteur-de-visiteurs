@@ -1,4 +1,7 @@
-import type { PivotTableOptions, Result } from "#types";
+import type { PivotTableOptions, Result, WeekMonth } from "#types";
+import { DateTime, Info } from "luxon";
+
+const env = import.meta?.env ? import.meta.env : process.env;
 
 export const listGroups = [
     {
@@ -160,7 +163,7 @@ export const getLinearCSV = (data: Result[]) => {
             }
         });
 
-        const rowData:string[] = Object.values({
+        const rowData: string[] = Object.values({
             ...item,
             // groupe: groupName
         })
@@ -171,4 +174,64 @@ export const getLinearCSV = (data: Result[]) => {
     csvPayload.splice(1, 0, csvTotal);
 
     return csvPayload;
+}
+
+const [openHours, closeHours] = [10, 20] //env.OPENING_HOURS.split("-").map(Number);
+const rangeOpeningHours = Math.abs(Number(closeHours) - Number(openHours) + 1);
+
+const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + openHours).map((item) => String(item));
+
+const listDays = Info.weekdays('long', {locale: 'fr'})
+    .filter((item) => item !== "samedi" && item !== "dimanche")
+    .map((item, idx) => ({
+        name: item.charAt(0).toUpperCase() + String(item).slice(1),
+        id: idx + 1
+    }));
+
+const listMonths = Info.months('long', {locale: 'fr' })
+    .map((item, idx) => ({
+        name: item.charAt(0).toUpperCase() + String(item).slice(1),
+        id: idx + 1
+    }));
+
+const getWeeksRangeMonth = (startDate) => {
+    const today = DateTime.now();
+    const startMonth = today.startOf("month");
+    const endMonth = today.endOf("month");
+
+    const firstWeekInYear = DateTime.fromObject({ weekYear: today.year, weekNumber: startMonth.weekNumber });
+    const lastWeekInYear = DateTime.fromObject({ weekYear: today.year, weekNumber: endMonth.weekNumber });
+
+    const intervalYear = firstWeekInYear.until(lastWeekInYear.endOf("week"));
+    const intervalWeeks = intervalYear.splitBy({ weeks: 1 });
+
+    const listWeeks: WeekMonth[] = [];
+    intervalWeeks.forEach((item) => {
+        listWeeks.push({
+            id: item.s.weekNumber,
+            name: `${item.s.toFormat("dd/LL")} ➜ ${item.e.toFormat("dd/LL")}`
+        })
+    })
+
+    return listWeeks;
+}
+
+export const configData = {
+    "heure": {
+        apiKey: "heure",
+        listColumns: listTimeSlots,
+        xValuesSuffix: "h",
+    },
+    "jour": {
+        apiKey: "jour",
+        listColumns: listDays,
+    },
+    "semaine": {
+        apiKey: "semaine",
+        listColumns: getWeeksRangeMonth(),
+    },
+    "annee": {
+        apiKey: "mois",
+        listColumns: listMonths,
+    }
 }
