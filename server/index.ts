@@ -1,6 +1,6 @@
 import { fileURLToPath } from "url";
 import path from "path";
-import dotenv from 'dotenv'
+import dotenv from 'dotenv';
 import nunjucks from "nunjucks";
 import express from "express";
 import cors from "cors";
@@ -14,7 +14,7 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 if (process.env.NODE_ENV === "development") {
-    dotenv.config({ path: '../.env.local' })
+    dotenv.config({ path: __dirname + '/.env.local' });
 
     const viteConfig = await import("../vite.config.ts");
     const { createServer: createViteServer } = await import("vite");

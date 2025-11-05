@@ -5,7 +5,7 @@ import { DateTime, Info } from "luxon";
 
 import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } from "#types";
-import { listTimeSlots, listDays, listMonths, getWeeksRangeMonth, getPivotTable } from "#scripts/utils.ts";
+import { listTimeSlots, getWeeksRangeMonth, getPivotTable } from "#scripts/utils.ts";
 
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
@@ -15,7 +15,6 @@ const tableDetailsChart = document.getElementById("table-details-chart") as HTML
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels);
 
 const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs');
-const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs');
 
 const chartTitleStyle: CustomTitleOptions = {
     display: true,
@@ -111,14 +110,14 @@ const listCharts = [
         xValuesSuffix: "h",
         downloadLink: `visiteurs/telecharger?jour=${today.toFormat("yyyy-LL-dd")}`
     },
-    // {
-    //     apiKey: "jour",
-    //     id: "weeklyChart",
-    //     chartTitle: `Visites du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
-    //     xLabels: Info.weekdays('long', {locale: 'fr' }).map((item) => item.charAt(0).toUpperCase() + String(val).slice(1)),
-    //     xTitle: "Jours",
-    //     downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`
-    // },
+    {
+        apiKey: "jour",
+        id: "weeklyChart",
+        chartTitle: `Visites du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
+        xLabels: Info.weekdays('long', {locale: 'fr' }).map((item) => item.charAt(0).toUpperCase() + String(item).slice(1)),
+        xTitle: "Jours",
+        downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`
+    },
     // {
     //     apiKey: "semaine",
     //     id: "monthlyChart",
@@ -131,7 +130,7 @@ const listCharts = [
     //     apiKey: "mois",
     //     id: "yearlyChart",
     //     chartTitle: `Visites du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
-    //     xLabels: Info.months('long', {locale: 'fr' }).map((item) => item.charAt(0).toUpperCase() + String(val).slice(1)),
+    //     xLabels: Info.months('long', {locale: 'fr' }).map((item) => item.charAt(0).toUpperCase() + String(item).slice(1)),
     //     xTitle: "Mois",
     //     downloadLink: `visiteurs/telecharger?annee=${today.toFormat("yyyy")}`
     // }
@@ -150,15 +149,11 @@ const listCharts = [
 
         ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
 
-        const chartData = xLabels.map((item) => {
-            let key = item;
-            if (typeof key === 'object') {
-                key = item.id;
+        const chartData = xLabels.map((key, index) => {
+            if (listVisitsGrouped[index + 1] || listVisitsGrouped[key]) {
+                return (listVisitsGrouped[index + 1] || listVisitsGrouped[key])!.length;
             }
 
-            if (listVisitsGrouped[key]) {
-                return listVisitsGrouped[key].length;
-            }
             return 0;
         });
 
@@ -232,7 +227,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         const { xLabels, xValuesSuffix, chartTitle, downloadLink } = listCharts.find((item) => item.apiKey === chartSelected) || {};
         const totalVisits = Object.values(chartData).flat().length;
 
-        linkDownloadChartData.href = downloadLink;
+        linkDownloadChartData.href = downloadLink || "";
 
         const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr")! as HTMLTableRowElement;
         tableDetailsChartTableHeadRow.innerHTML = "";
@@ -242,7 +237,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
 
         const lineChartDatasets: LineChartEntry[] = [];
 
-        const chartDataPivotTable = getPivotTable(chartData, xLabels as [], {columnSuffix: xValuesSuffix})
+        const chartDataPivotTable = getPivotTable(chartData, xLabels as [], {columnSuffix: xValuesSuffix || ""})
 
         Object.values(chartDataPivotTable).forEach((row, index, table) => {
             const trBody = document.createElement("tr");
@@ -280,9 +275,9 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                 const lineData = row.slice(1, row.length - 1);
 
                 lineChartDatasets.push({
-                    label: row[0],
-                    data: lineData,
-                    borderColor: "#fff",
+                    label: row[0] as string,
+                    data: lineData as number[],
+                    borderColor: listBusinessSector.find((item) => item.name === row[0] as string)!.lineColor,
                     // borderColor: business.lineColor,
                     tension: 0,
                     fill: true,

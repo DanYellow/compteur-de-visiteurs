@@ -1,8 +1,14 @@
 import { DataTypes } from 'sequelize';
+import { fileURLToPath } from "url";
+import path from "path";
+import dotenv from 'dotenv';
 
 import sequelize from "./index";
 
 import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const listBusinessSectorKeys = {}
 listBusinessSector
@@ -16,7 +22,10 @@ listBusinessSector
 
 const Visitor = sequelize.define('visitor', {
     date_passage: DataTypes.DATE,
-    lieu: DataTypes.STRING,
+    lieu: {
+        type: DataTypes.STRING,
+        defaultValue: dotenv.config({ path: __dirname + '/.env.local' }).parsed?.PLACE
+    },
     ...listBusinessSectorKeys,
 }, {
     createdAt: 'date_passage',
