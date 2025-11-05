@@ -40,10 +40,6 @@ router.get("/", async (req, res) => {
     const [openHours, closeHours] = (process.env.OPENING_HOURS || "10-19").split("-").map(Number);
     const startTime = today.startOf((dictGroupType as any)[queryStringParam]?.luxon || "day").set({ hour: openHours });
     const endTime = today.endOf((dictGroupType as any)[queryStringParam]?.luxon || "day").set({ hour: closeHours });
-    // if (queryStringParam === "heure") {
-    //     startTime = startTime;
-    //     endTime = endTime;
-    // }
 
     const listVisitors = await VisitorModel.findAll({
         raw: true,
@@ -63,11 +59,17 @@ router.get("/", async (req, res) => {
         }
     });
 
+    const filteredVisits = listVisitors
+        .filter((item) => {
+            const visitHour = new Date(item.date_passage).getHours();
+            return visitHour >= openHours && visitHour <= closeHours;
+        });
+
     res.status(200).json({
-        data: listVisitors.map((item) => {
+        data: filteredVisits.map((item) => {
             return {
                 ...item,
-                groupe: item.groupe.trim(),
+                groupe: queryStringParam === "semaine" ? Number(item.groupe) + 0 : item.groupe.trim(),
             }
         })
     });

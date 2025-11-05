@@ -1,16 +1,11 @@
-import fs from "fs";
-import path from "path";
-import { fileURLToPath } from "url";
 import express from "express";
-import { stringify } from "csv-stringify/sync";
-import { DateTime, DateTimeUnit, Info } from "luxon";
-import { Op, literal, fn, col } from 'sequelize';
+import { DateTime } from "luxon";
+import { Op, literal } from 'sequelize';
 
 import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "../index.ts";
 import VisitorModel from "#models/visitor.ts";
-import sequelize from "#models/index.ts";
 
 import ApiRouter from "./api.ts";
 import DownloadRouter from "./download.ts";
@@ -20,12 +15,7 @@ const router = express.Router();
 router.use("/api", ApiRouter);
 router.use("/telecharger", DownloadRouter);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 router.get("/", (req, res) => {
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress
-
     res.render("pages/index.njk", {
         "list_business_sector": listBusinessSector.filter((item) => (!("listInChoices" in item) || item.listInChoices)),
     });
@@ -110,6 +100,5 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
     });
 });
-
 
 export default router;
