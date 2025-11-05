@@ -13,10 +13,12 @@ import VisitorModel from "#models/visitor.ts";
 import sequelize from "#models/index.ts";
 
 import ApiRouter from "./api.ts";
+import DownloadRouter from "./download.ts";
 
 const router = express.Router();
 
 router.use("/api", ApiRouter);
+router.use("/telecharger", DownloadRouter);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -109,166 +111,5 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     });
 });
 
-router.get('/visiteurs/telecharger', async (req, res) => {
-    // heure, jour, semaine, mois
-    const predicatesDict: Record<string, string> = {
-        "heure": "day",
-        "jour": "week",
-        "semaine": "month",
-        "mois": "year",
-    }
-
-    let filterPredicate: DateTimeUnit | undefined = undefined;
-    let dateValue = DateTime.now();
-
-    const queryParam = Object.keys(predicatesDict).filter(value => Object.keys(req.query).includes(value));
-    const isGrouped = "groupe" in req.query;
-
-    if (queryParam.length > 0) {
-        filterPredicate = predicatesDict[queryParam[0]] as DateTimeUnit;
-        if (req.query[queryParam[0]]) {
-            dateValue = DateTime.fromISO(new Date(req.query[queryParam[0]]).toISOString())
-        }
-    }
-
-    let records = [];
-    if (isGrouped) {
-        const groupFilter: Record<string, string> = {
-            "heure": "%H",
-            "jour": "%u",
-            "semaine": "%W",
-            "mois": "%m",
-        };
-
-        records = await VisitorModel.findAll({
-            raw: true,
-            group: "groupe",
-            attributes: [
-                [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), queryParam[0] || "date_passage"],
-                [sequelize.fn("strftime", groupFilter[queryParam[0]] || "%m", sequelize.col("date_passage"), "localtime"), "groupe"],
-                [literal(`COUNT (distinct "id")`), "total_visites"],
-                ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value])),
-            ],
-            ...((filterPredicate !== undefined && dateValue !== null && dateValue.isValid) ? {
-                where: {
-                    date_passage: {
-                        [Op.and]: {
-                            [Op.gte]: dateValue.startOf(filterPredicate).toString(),
-                            [Op.lte]: dateValue.endOf(filterPredicate).toString(),
-                        }
-                    }
-                }
-            } : {})
-        });
-
-        // console.log(
-        //     await VisitorModel.findAll({
-        //     raw: true,
-        //     attributes: {
-        //         include: [
-        //         [
-        //             // Note the wrapping parentheses in the call below!
-        //             sequelize.literal(`(
-        //                         SELECT COUNT(*)
-        //                         FROM visitor AS reaction
-        //                         WHERE
-        //                             reaction.postId = post.id
-        //                             AND
-        //                             reaction.type = "Laugh"
-        //                     )`),
-        //             'laughReactionsCount',
-        //             ],
-        //         ],
-        //     },
-        // })
-        // )
-        // console.log(records);
-        // return;
-    } else {
-        records = await VisitorModel.findAll({
-            raw: true,
-            ...((filterPredicate !== undefined && dateValue !== null && dateValue.isValid) ? {
-                where: {
-                    date_passage: {
-                        [Op.and]: {
-                            [Op.gte]: dateValue.startOf(filterPredicate).toString(),
-                            [Op.lte]: dateValue.endOf(filterPredicate).toString(),
-                        }
-                    }
-                }
-            } : {})
-        });
-    }
-
-    let values: (string | number)[][] = [Object.keys(VisitorModel.getAttributes())];
-    if (isGrouped){
-        const headerRows = {...records[0]}
-        delete headerRows.groupe;
-
-        values = [Object.keys(headerRows)];
-    }
-
-    const countVisitorType: Record<string, string | number> = {}
-    values[0].forEach((key) => {
-        countVisitorType[key] = 0;
-    })
-    // console.log(countVisitorType)
-
-    if (isGrouped) {
-        records.forEach((item, index) => {
-            const formattedItem = {
-                ...item,
-                [queryParam[0] || "date_passage"]: Info.weekdays('long', {locale: 'fr' })[Number(item.groupe) - 1]
-                // date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
-            }
-
-            delete formattedItem.groupe;
-
-            values.push(Object.values(formattedItem));
-        });
-    } else {
-        countVisitorType.id = "Total";
-        countVisitorType.date_passage = "Tout";
-        if (filterPredicate !== undefined && dateValue !== null && dateValue.isValid) {
-            countVisitorType.date_passage = `${dateValue.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${dateValue.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
-        } else {
-            countVisitorType.date_passage = "Tous";
-        }
-        countVisitorType.lieu = res.locals.PLACE;
-
-        records.forEach((item, index) => {
-            const formattedItem = {
-                ...item,
-                id: index + 1,
-                date_passage: DateTime.fromISO(new Date(item.date_passage).toISOString()).toFormat("dd/LL/yyyy à HH:mm"),
-            }
-
-            listBusinessSector.map((business) => business.value).forEach((business) => {
-                countVisitorType[business] += ((item[business] === "oui") ? 1 : 0) as number
-            });
-
-            values.push(Object.values(formattedItem));
-        });
-    }
-
-    // console.log(Object.values(countVisitorType));
-    // console.log(values);
-    // return;
-
-    const filePayload = values //.toSpliced(1, 0, Object.values(countVisitorType));
-
-    const timestamp = DateTime.now().toFormat("dd-LL-yyyy-HH'h'mm");
-    const csvFile = path.join(__dirname, "..", "liste-membres.tmp.csv");
-
-    fs.writeFileSync(csvFile, stringify(filePayload));
-    res.download(csvFile, `liste-membres.test.csv`, () => {
-        fs.unlinkSync(csvFile);
-    });
-    // res.download(csvFile, `${timestamp}-liste-membres.csv`, () => {
-    //     fs.unlinkSync(csvFile);
-    // });
-
-    // res.status(200).json({ "success": "Téléchargement réussi" })
-});
 
 export default router;
