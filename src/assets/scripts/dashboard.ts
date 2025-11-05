@@ -100,40 +100,53 @@ const chartScales = (xTitle: string) => {
 
 const today = DateTime.now();
 
+const listDays = Info.weekdays('long', {locale: 'fr'})
+    .filter((item) => item !== "samedi" && item !== "dimanche")
+    .map((item, idx) => ({
+        name: item.charAt(0).toUpperCase() + String(item).slice(1),
+        id: idx + 1
+    }));
+
+const listMonths = Info.months('long', {locale: 'fr' })
+    .map((item, idx) => ({
+        name: item.charAt(0).toUpperCase() + String(item).slice(1),
+        id: idx + 1
+    }));
+
 const listCharts = [
-    {
-        apiKey: "heure",
-        id: "dailyChart",
-        chartTitle: `Visites du ${today.toFormat("dd/LL/yyyy")}`,
-        xTitle: 'Tranche horaire',
-        xLabels: listTimeSlots,
-        xValuesSuffix: "h",
-        downloadLink: `visiteurs/telecharger?jour=${today.toFormat("yyyy-LL-dd")}`
-    },
-    {
-        apiKey: "jour",
-        id: "weeklyChart",
-        chartTitle: `Visites du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
-        xLabels: Info.weekdays('long', {locale: 'fr' }).map((item) => item.charAt(0).toUpperCase() + String(item).slice(1)),
-        xTitle: "Jours",
-        downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`
-    },
+    // {
+    //     apiKey: "heure",
+    //     id: "dailyChart",
+    //     chartTitle: `Visites uniques du ${today.toFormat("dd/LL/yyyy")}`,
+    //     xTitle: 'Tranche horaire',
+    //     xLabels: listTimeSlots,
+    //     xValuesSuffix: "h",
+    //     downloadLink: `visiteurs/telecharger?jour=${today.toFormat("yyyy-LL-dd")}`
+    // },
+    // {
+    //     apiKey: "jour",
+    //     id: "weeklyChart",
+    //     chartTitle: `Visites uniques du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
+    //     xLabels: listDays,
+    //     xTitle: "Jours",
+    //     downloadLink: `visiteurs/telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`
+    // },
     // {
     //     apiKey: "semaine",
     //     id: "monthlyChart",
-    //     chartTitle: `Visites du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
+    //     chartTitle: `Visites uniques du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
     //     xLabels: getWeeksRangeMonth(),
     //     xTitle: "Semaines",
     //     downloadLink: `visiteurs/telecharger?mois=${today.toFormat("yyyy-LL")}`
     // },
-    // {
-    //     apiKey: "mois",
-    //     id: "yearlyChart",
-    //     chartTitle: `Visites du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
-    //     xLabels: Info.months('long', {locale: 'fr' }).map((item) => item.charAt(0).toUpperCase() + String(item).slice(1)),
-    //     xTitle: "Mois",
-    //     downloadLink: `visiteurs/telecharger?annee=${today.toFormat("yyyy")}`
-    // }
+    {
+        apiKey: "mois",
+        id: "yearlyChart",
+        chartTitle: `Visites uniques du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
+        xLabels: listMonths,
+        xTitle: "Mois",
+        downloadLink: `visiteurs/telecharger?annee=${today.toFormat("yyyy")}`
+    }
 ];
 
 ; (() => {
@@ -142,18 +155,22 @@ const listCharts = [
 
         const req = await fetch(`/api?filtre=${apiKey}`);
         const res = await req.json();
-
+console.log(res)
         const listVisitsGrouped = Object.groupBy(res.data, (item: { item: Record<string, string | number> }) => {
-            return item[apiKey];
+            return item.groupe;
         });
 
         ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
 
-        const chartData = xLabels.map((key, index) => {
-            if (listVisitsGrouped[index + 1] || listVisitsGrouped[key]) {
-                return (listVisitsGrouped[index + 1] || listVisitsGrouped[key])!.length;
+        const chartData = xLabels.map((item) => {
+            let key = item;
+            if (typeof key === 'object') {
+                key = item.id;
             }
 
+            if (listVisitsGrouped[key]) {
+                return listVisitsGrouped[key].length;
+            }
             return 0;
         });
 
@@ -173,7 +190,7 @@ const listCharts = [
                     labels: chartLabels,
                     datasets: [
                         {
-                            label: "Visites",
+                            label: "Visites uniques",
                             data: chartData,
                             backgroundColor: `rgba(213, 217, 22, 0.5)`,
                             borderColor: greenNumixs,
@@ -290,7 +307,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         })
 
         const data = {
-            labels: chartDataPivotTable[0].slice(1, chartDataPivotTable.length - 1),
+            labels: chartDataPivotTable[0].slice(1, chartDataPivotTable[0].length - 1),
             datasets: lineChartDatasets,
         };
 

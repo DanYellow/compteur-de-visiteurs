@@ -1,4 +1,4 @@
-import type { WeekMonth } from "#types";
+import type { PivotTableOptions, Result, WeekMonth } from "#types";
 import { DateTime } from "luxon";
 
 import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
@@ -149,7 +149,7 @@ export const cancellableSleep = (duration: number, signal: AbortSignal) => {
     });
 }
 
-export const getPivotTable = (data, columns = [], options = {}) => {
+export const getPivotTable = (data: Result, columns = [], options: PivotTableOptions = {columnSuffix: ""}) => {
     const tableValues = [];
     const totalVisits = Object.values(data)
         .flat()
@@ -159,12 +159,15 @@ export const getPivotTable = (data, columns = [], options = {}) => {
     const tableHeaderColumns = ["Groupe"];
     const tableValuesPlaceholder: number[] = [];
 
-    ;[...columns].forEach((label) => {
-        tableHeaderColumns.push(`${label}${options.columnSuffix || ""}`);
+    ;[...columns].forEach((label: string | Record<string, string>) => {
+        if (typeof label === "object") {
+            tableHeaderColumns.push(`${label.name}${options.columnSuffix}`);
+        } else {
+            tableHeaderColumns.push(`${label}${options.columnSuffix}`);
+        }
         tableValuesPlaceholder.push(0);
     });
-    tableHeaderColumns.push("Total par groupe")
-
+    tableHeaderColumns.push("Total par groupe");
     tableValues.push(tableHeaderColumns);
 
     const tableFooter = ["Total (visites)", ...tableValuesPlaceholder];
@@ -181,9 +184,13 @@ export const getPivotTable = (data, columns = [], options = {}) => {
                 (acc: Record<string, number>, visit) => ((acc[business.value] = (acc[business.value] || 0) + ((visit[business.value] === "oui") ? 1 : 0)), acc),
                 {});
 
-            const indexArray = columns.findIndex((label) => {
+            let indexArray = columns.findIndex((label: string | Record<string, number>) => {
+                if (typeof label === "object") {
+                    return Number(label.id) === Number(group);
+                }
                 return Number(label) === Number(group);
             });
+
             if (indexArray >= 0) {
                 tableFooter[indexArray + 1] += totalPerGroup[business.value];
                 visitorPerTypeAndPeriod[business.value][indexArray] = totalPerGroup[business.value];

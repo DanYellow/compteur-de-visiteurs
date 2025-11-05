@@ -2,7 +2,10 @@ import express from "express";
 import { DateTime } from "luxon";
 import { Op } from 'sequelize';
 
+import sequelize from "#models/index.ts";
 import VisitorModel from "#models/visitor.ts";
+
+import { Visit } from "#types";
 
 const router = express.Router();
 
@@ -11,7 +14,7 @@ router.get("/", async (req, res) => {
 
     const dictGroupType = {
         "heure": {
-            "substitution": "%H",
+            "substitution": "%k",
             "luxon": "day",
             "property": "hour",
         },
@@ -33,13 +36,15 @@ router.get("/", async (req, res) => {
     }
 
     const queryStringParam = (req.query?.filtre || "jour") as string;
-    // const sqliteSubtitution = (dictGroupType as any)[queryStringParam]?.substitution || "%H";
 
     const listVisitors = await VisitorModel.findAll({
         raw: true,
-        // attributes: [
-        //     [literal(`*, STRFTIME('${sqliteSubtitution}', date_passage)`), queryStringParam]
-        // ],
+        attributes: {
+            include: [
+                [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"],
+                [sequelize.fn("strftime", (dictGroupType as any)[queryStringParam]?.substitution, sequelize.col("date_passage"), "localtime"), "groupe"],
+            ],
+        },
         where: {
             date_passage: {
                 [Op.and]: {
@@ -52,12 +57,9 @@ router.get("/", async (req, res) => {
 
     res.status(200).json({
         data: listVisitors.map((item) => {
-            const date = DateTime.fromISO(new Date(item.date_passage).toISOString());
-
             return {
                 ...item,
-                date_passage: date,
-                [queryStringParam]: date[(dictGroupType as any)[queryStringParam]?.property],
+                groupe: item.groupe.trim(),
             }
         })
     });
