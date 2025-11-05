@@ -6,6 +6,7 @@ import { DateTime, Info } from "luxon";
 import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } from "#types";
 import { listTimeSlots, getWeeksRangeMonth, getPivotTable } from "#scripts/utils.ts";
+import { getLinearCSV } from './utils.shared';
 
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
@@ -155,7 +156,37 @@ const listCharts = [
 
         const req = await fetch(`/api?filtre=${apiKey}`);
         const res = await req.json();
-console.log(res)
+
+        // const csvHeader = Object.keys(res.data[0]);
+        // csvHeader[1] = "Période";
+        // csvHeader.pop()
+
+        // const csvTotal = ["Total", "/", "/", ...new Array(listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)).length).fill(0)];
+        // const csv = [csvHeader];
+
+        // res.data.forEach((item) => {
+        //     let groupName = xLabels[item.groupe];
+        //     if (typeof groupName === 'object') {
+        //         groupName = groupName.name;
+        //     }
+
+        //     Object.values(item).forEach((value, idx) => {
+        //         if (value === "oui") {
+        //             csvTotal[idx] += 1
+        //         }
+        //     });
+
+        //     const rowData = Object.values({
+        //         ...item,
+        //         groupe: groupName
+        //     })
+        //     rowData.pop()
+        //     csv.push(rowData);
+        // });
+
+        // csv.splice(1, 0, csvTotal);
+        console.log(getLinearCSV(res.data))
+
         const listVisitsGrouped = Object.groupBy(res.data, (item: { item: Record<string, string | number> }) => {
             return item.groupe;
         });
@@ -327,7 +358,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                             }
                         },
                         title: {
-                            text: `${chartTitle || ""} détaillée`,
+                            text: `${(chartTitle || "").replace("uniques", "")} détaillées`,
                             ...chartTitleStyle,
                             font: {
                                 ...chartTitleStyle.font,
