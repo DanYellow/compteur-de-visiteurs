@@ -4,6 +4,7 @@ import { Op } from 'sequelize';
 
 import sequelize from "#models/index.ts";
 import VisitorModel from "#models/visitor.ts";
+import config from "#config" with { type: "json" };
 
 import { Visit } from "#types";
 
@@ -37,7 +38,7 @@ router.get("/", async (req, res) => {
 
     const queryStringParam = (req.query?.filtre || "jour") as string;
 
-    const [openHours, closeHours] = (process.env.OPENING_HOURS || "10-19").split("-").map(Number);
+    const [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
     const startTime = today.startOf((dictGroupType as any)[queryStringParam]?.luxon || "day").set({ hour: openHours });
     const endTime = today.endOf((dictGroupType as any)[queryStringParam]?.luxon || "day").set({ hour: closeHours });
 

@@ -4,9 +4,9 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "cross-env NODE_ENV=development tsx watch --include \"./server/*\" --include \"./src/*\" server/index.ts",
+        "dev": "cross-env NODE_ENV=development node env-to-json.js && cross-env NODE_ENV=development tsx watch --include \"./server/*\" --include \"./src/*\" server/index.ts",
         "dev:docker": "tsx watch --include \"./server/*\" --include \"./src/*\" server/index.ts",
-        "build": "tsc && vite build",
+        "build": "cross-env NODE_ENV=production node env-to-json.js && tsc && vite build",
         "prod": "cross-env NODE_ENV=production node server/index.ts"
     },
     "devDependencies": {
@@ -17,7 +17,6 @@
         "@types/node": "^24.5.2",
         "@types/nunjucks": "^3.2.6",
         "@types/ws": "^8.18.1",
-        "dotenv": "^17.2.2",
         "nunjucks": "^3.2.4",
         "tailwindcss": "^4.1.13",
         "tsx": "^4.20.6",
@@ -43,6 +42,7 @@
         "#server/*.ts": "./server/*.ts",
         "#models/*.ts": "./models/*.ts",
         "#scripts/*.ts": "./src/assets/scripts/*.ts",
-        "#types": "./types.ts"
+        "#types": "./types.ts",
+        "#config": "./config.local.json"
     }
 }

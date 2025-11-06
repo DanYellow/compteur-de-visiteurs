@@ -1,6 +1,3 @@
-import dotenv from 'dotenv';
-dotenv.config({ path: './.env.local' });
-
 import { fileURLToPath } from "url";
 import path from "path";
 import nunjucks from "nunjucks";
@@ -9,6 +6,8 @@ import cors from "cors";
 import { WebSocketServer } from 'ws';
 import { DateTime } from "luxon";
 
+import config from "#config" with { type: "json" };
+
 import router from "./router/index.ts";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -16,7 +15,6 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 if (process.env.NODE_ENV === "development") {
-
     const viteConfig = await import("../vite.config.ts");
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer(viteConfig);
@@ -44,8 +42,8 @@ app.use(
 app.use((req, res, next) => {
     const context = {
         NODE_ENV: process.env.NODE_ENV,
-        PLACE: process.env.PLACE,
-        OPENING_HOURS: process.env.OPENING_HOURS,
+        PLACE: config.PLACE,
+        OPENING_HOURS: config.OPENING_HOURS,
     };
 
     res.locals = {

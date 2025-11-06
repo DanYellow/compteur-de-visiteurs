@@ -1,7 +1,7 @@
 import type { PivotTableOptions, Result, WeekMonth } from "#types";
 import { DateTime, Info } from "luxon";
 
-const env = import.meta?.env ? import.meta.env : process.env;
+import config from "#config" with { type: "json" };
 
 export const listGroups = [
     {
@@ -122,7 +122,7 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
             });
 
             if (indexArray >= 0) {
-                tableFooter[indexArray] += totalPerGroup[business.value];
+                tableFooter[indexArray + 1] += totalPerGroup[business.value];
                 visitorPerTypeAndPeriod[business.value][indexArray] = totalPerGroup[business.value];
             }
         });
@@ -176,7 +176,7 @@ export const getLinearCSV = (data: Result[]) => {
     return csvPayload;
 }
 
-const [openHours, closeHours] = [10, 20] //env.OPENING_HOURS.split("-").map(Number);
+const [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
 const rangeOpeningHours = Math.abs(Number(closeHours) - Number(openHours) + 1);
 
 const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + openHours).map((item) => String(item));
@@ -199,10 +199,10 @@ const getWeeksRangeMonth = (startDate) => {
     const startMonth = today.startOf("month");
     const endMonth = today.endOf("month");
 
-    const firstWeekInYear = DateTime.fromObject({ weekYear: today.year, weekNumber: startMonth.weekNumber });
-    const lastWeekInYear = DateTime.fromObject({ weekYear: today.year, weekNumber: endMonth.weekNumber });
+    // const firstWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: startMonth.weekNumber, day: 1 });
+    // const lastWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: endMonth.weekNumber });
 
-    const intervalYear = firstWeekInYear.until(lastWeekInYear.endOf("week"));
+    const intervalYear = startMonth.until(endMonth);
     const intervalWeeks = intervalYear.splitBy({ weeks: 1 });
 
     const listWeeks: WeekMonth[] = [];
