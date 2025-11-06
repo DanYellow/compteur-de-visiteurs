@@ -1,7 +1,7 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
+import { fileURLToPath, URLSearchParams } from "url";
 import { stringify } from "csv-stringify/sync";
 
 import { configData, getLinearCSV, getPivotTable } from "#scripts/utils.shared.ts";
@@ -24,7 +24,9 @@ router.get('/', async (req, res) => {
 
     let csvPayload = [];
 
-    const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}`);
+    const extraParams = new URLSearchParams({ jour: req.query[configKey] } as Record<string, string>);
+
+    const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}&${extraParams.toString()}`);
     const requestRes = await request.json();
 
     let csvFilename = `liste-visites_${String(Date.now()).slice(-6)}.csv`;
@@ -32,7 +34,7 @@ router.get('/', async (req, res) => {
     if (isGrouped) {
         const config = configData[configKey];
 
-        csvFilename = `liste-visites-detaillee_${String(Date.now()).slice(-6)}.csv`
+        csvFilename = `liste-visites-detaillee_${String(Date.now()).slice(-6)}.csv`;
         const pivotPayload = Object.groupBy(requestRes.data, (item: { item: Record<string, string | number> }) => {
             return item.groupe;
         });

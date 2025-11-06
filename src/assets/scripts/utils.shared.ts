@@ -144,16 +144,16 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
 }
 
 export const getLinearCSV = (data: Result[]) => {
-    const csvHeader = Object.keys(data[0]);
+    const csvHeader = Object.keys(data?.[0] || {});
     csvHeader[1] = "Période";
     csvHeader.pop();
 
-    const csvTotal = [
+    const csvTotal = data.length > 0 ? [
         `Total : ${data.length}`,
         `${DateTime.fromISO(new Date(data.at(0).date_passage).toISOString()).toFormat("dd/LL/yyyy")} ➜ ${DateTime.fromISO(new Date(data.at(-1).date_passage).toISOString()).toFormat("dd/LL/yyyy")}`,
         "/",
         ...new Array(listGroups.filter((item) => (!("listInDb" in item) || item.listInDb)).length).fill(0)
-    ];
+    ] : [];
     const csvPayload = [csvHeader];
 
     data.forEach((item) => {
@@ -186,12 +186,13 @@ const rangeOpeningHours = Math.abs(Number(closeHours) - Number(openHours) + 1);
 
 const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + openHours).map((item) => String(item));
 
+const listClosedDaysIndex = config.CLOSED_DAYS_INDEX.split(",").filter(Boolean).map(Number);
 const listDays = Info.weekdays('long', {locale: 'fr'})
-    .filter((item) => item !== "samedi" && item !== "dimanche")
     .map((item, idx) => ({
         name: item.charAt(0).toUpperCase() + String(item).slice(1),
         id: idx + 1
-    }));
+    }))
+    .filter((_, index) => !listClosedDaysIndex.includes(index + 1))
 
 const listMonths = Info.months('long', {locale: 'fr' })
     .map((item, idx) => ({
