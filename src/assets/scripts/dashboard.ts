@@ -3,9 +3,8 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime } from "luxon";
 
-import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
 import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } from "#types";
-import { configData, getPivotTable } from './utils.shared';
+import { configData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
 
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;

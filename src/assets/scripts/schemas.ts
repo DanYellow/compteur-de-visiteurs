@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
+import { listGroups as listBusinessSector } from './utils.shared';
 
 type BusinessSectorPayload = {
     entreprise?: string;

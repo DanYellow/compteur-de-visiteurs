@@ -3,7 +3,7 @@ import config from "#config" with { type: "json" };
 
 import sequelize from "./index";
 
-import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
+import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 
 const listBusinessSectorKeys = {}
 listBusinessSector

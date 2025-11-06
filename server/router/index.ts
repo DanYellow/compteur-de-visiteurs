@@ -2,7 +2,7 @@ import express from "express";
 import { DateTime } from "luxon";
 import { Op, literal } from 'sequelize';
 
-import { listGroups as listBusinessSector } from "#scripts/list-groups.ts";
+import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "../index.ts";
 import VisitorModel from "#models/visitor.ts";
