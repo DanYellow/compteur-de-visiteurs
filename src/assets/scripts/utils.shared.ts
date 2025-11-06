@@ -148,7 +148,12 @@ export const getLinearCSV = (data: Result[]) => {
     csvHeader[1] = "Période";
     csvHeader.pop();
 
-    const csvTotal = ["Total", "/", "/", ...new Array(listGroups.filter((item) => (!("listInDb" in item) || item.listInDb)).length).fill(0)];
+    const csvTotal = [
+        `Total : ${data.length}`,
+        `${DateTime.fromISO(new Date(data.at(0).date_passage).toISOString()).toFormat("dd/LL/yyyy")} ➜ ${DateTime.fromISO(new Date(data.at(-1).date_passage).toISOString()).toFormat("dd/LL/yyyy")}`,
+        "/",
+        ...new Array(listGroups.filter((item) => (!("listInDb" in item) || item.listInDb)).length).fill(0)
+    ];
     const csvPayload = [csvHeader];
 
     data.forEach((item) => {

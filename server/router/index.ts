@@ -63,6 +63,9 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         }
     }
 
+    // const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}`);
+    // const records = await request.json();
+
     const records = await VisitorModel.findAll({
         where: {
             date_passage: {
