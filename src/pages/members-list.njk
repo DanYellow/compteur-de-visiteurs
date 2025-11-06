@@ -53,6 +53,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
             <div class="text-black">
                 <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
                     <a href="?current_date={{ current_date|add_days(-1)|date("yyyy-LL-dd") }}" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center hocus:bg-green-numixs">
+                        <span class="sr-only">Hier</span>
                         <span class="flex items-center justify-center w-3.5">
                             {% include "includes/icons/arrow-icon.svg" %}
                         </span>
@@ -65,6 +66,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                         </form>
                     </button>
                     <a href="?current_date={{ current_date|add_days(1)|date("yyyy-LL-dd") }}" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center hocus:bg-green-numixs">
+                        <span class="sr-only">Demain</span>
                         <span class="rotate-180 flex items-center justify-center w-3.5">
                             {% include "includes/icons/arrow-icon.svg" %}
                         </span>

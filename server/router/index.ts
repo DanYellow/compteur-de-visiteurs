@@ -6,6 +6,7 @@ import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "../index.ts";
 import VisitorModel from "#models/visitor.ts";
+import config from "#config" with { type: "json" };
 
 import ApiRouter from "./api.ts";
 import DownloadRouter from "./download.ts";
@@ -66,12 +67,13 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     // const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}`);
     // const records = await request.json();
 
+    const [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
     const records = await VisitorModel.findAll({
         where: {
             date_passage: {
                 [Op.and]: {
-                    [Op.gte]: daySelected.startOf("day").toString(),
-                    [Op.lte]: daySelected.endOf("day").toString(),
+                    [Op.gte]: daySelected.startOf("day").set({ hour: openHours }).toString(),
+                    [Op.lte]: daySelected.endOf("day").set({ hour: closeHours }).toString(),
                 }
             }
         },

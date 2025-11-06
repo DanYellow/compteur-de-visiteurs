@@ -20,20 +20,20 @@ services:
     compteur-de-visiteurs:
         image: node:24.8.0
         container_name: compteur-social-dev
-        command: sh -c "npm install && npm run dev:docker" # --verbose
+        command: sh -c "node env-to-json.js && npm install && npm run dev" # --verbose
         working_dir: "/home/node/app"
         depends_on:
             - traefik
         volumes:
-            # - .:/home/node/app/
             - ./public/:/home/node/app/public
             - ./src/:/home/node/app/src
             - ./server:/home/node/app/server
-            - ./package.json:/home/node/app/package.json
+            - ./models:/home/node/app/models
             - ./.env.local:/home/node/app/.env.local
+            - ./package.json:/home/node/app/package.json
             - ./package-lock.json:/home/node/app/package-lock.json
-            # - ./message.tmp.csv:/home/node/app/message.tmp.csv
             - ./vite.config.ts:/home/node/app/vite.config.ts
+            - ./env-to-json.js:/home/node/app/env-to-json.js
             - ./tsconfig.json:/home/node/app/tsconfig.json
             - /home/node/app/node_modules
         ports:
