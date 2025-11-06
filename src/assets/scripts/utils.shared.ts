@@ -217,21 +217,21 @@ const getWeeksRangeMonth = (startDate) => {
 }
 
 export const configData = {
-    "heure": {
-        apiKey: "heure",
+    "jour": {
+        apiKey: "jour",
         listColumns: listTimeSlots,
         xValuesSuffix: "h",
     },
-    "jour": {
-        apiKey: "jour",
-        listColumns: listDays,
-    },
     "semaine": {
         apiKey: "semaine",
+        listColumns: listDays,
+    },
+    "mois": {
+        apiKey: "mois",
         listColumns: getWeeksRangeMonth(),
     },
     "annee": {
-        apiKey: "mois",
+        apiKey: "annee",
         listColumns: listMonths,
     }
 }

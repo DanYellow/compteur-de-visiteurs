@@ -42,7 +42,7 @@ const TotalVisitors = {
     }
 };
 
-const chartScales = (xTitle: string) => {
+const chartScales = (xTitle: string, titleSize: number = 12) => {
     return {
         y: {
             ticks: {
@@ -66,7 +66,7 @@ const chartScales = (xTitle: string) => {
                 text: "Nombre de visites",
                 color: "white",
                 font: {
-                    size: 12
+                    size: titleSize
                 }
             },
             beginAtZero: true,
@@ -92,7 +92,7 @@ const chartScales = (xTitle: string) => {
                 text: xTitle,
                 color: "white",
                 font: {
-                    size: 14
+                    size: titleSize
                 }
             }
         },
@@ -102,29 +102,29 @@ const chartScales = (xTitle: string) => {
 const today = DateTime.now();
 
 const configDataRaw = {
-    "heure": {
-        ...configData.heure,
-        id: "dailyChart",
-        chartTitle: `Visites uniques du ${today.toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?heure=${today.toFormat("yyyy-LL-dd")}`,
-        xTitle: 'Tranche horaire',
-        xLabels: configData.heure.listColumns,
-    },
     "jour": {
         ...configData.jour,
-        id: "weeklyChart",
-        chartTitle: `Visites uniques du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`,
-        xTitle: 'Jours',
+        id: "dailyChart",
+        chartTitle: `Visites uniques du ${today.toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?jour=${today.toFormat("yyyy-LL-dd")}`,
+        xTitle: 'Tranche horaire',
         xLabels: configData.jour.listColumns,
     },
     "semaine": {
         ...configData.semaine,
+        id: "weeklyChart",
+        chartTitle: `Visites uniques du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`,
+        xTitle: 'Jours',
+        xLabels: configData.semaine.listColumns,
+    },
+    "mois": {
+        ...configData.mois,
         id: "monthlyChart",
         chartTitle: `Visites uniques du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
         downloadLink: `telecharger?mois=${today.toFormat("yyyy-LL-dd")}`,
         xTitle: 'Semaines',
-        xLabels: configData.semaine.listColumns,
+        xLabels: configData.mois.listColumns,
     },
     "annee": {
         ...configData.annee,
@@ -230,7 +230,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
         const sourceBtn = e.source! as HTMLButtonElement;
         const chartSelected = sourceBtn.dataset.detailsChart;
         const chartData = JSON.parse(sourceBtn.closest("div")?.querySelector("canvas")?.dataset.chartData || "{}");
-        const { xLabels, xValuesSuffix, chartTitle, downloadLink } = listCharts.find((item) => item.apiKey === chartSelected) || {};
+        const { xLabels = [], xTitle = "", xValuesSuffix = "", chartTitle, downloadLink } = listCharts.find((item) => item.apiKey === chartSelected) || {};
         const totalVisits = Object.values(chartData).flat().length;
 
         linkDownloadChartData.href = downloadLink || "";
@@ -244,7 +244,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
 
         const lineChartDatasets: LineChartEntry[] = [];
 
-        const chartDataPivotTable = getPivotTable(chartData, xLabels as [], {columnSuffix: xValuesSuffix || ""})
+        const chartDataPivotTable = getPivotTable(chartData, xLabels as [], { columnSuffix: xValuesSuffix })
 
         Object.values(chartDataPivotTable).forEach((row, index, table) => {
             const trBody = document.createElement("tr");
@@ -277,7 +277,6 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                 }
             });
 
-
             if (index > 0 && index < table.length - 1) {
                 const lineData = row.slice(1, row.length - 1);
 
@@ -301,6 +300,8 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
             datasets: lineChartDatasets,
         };
 
+        configDataRaw
+
         new Chart(
             detailsChartCtx,
             {
@@ -308,7 +309,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                 data: data,
                 options: {
                     maintainAspectRatio: false,
-                    scales: chartScales("Visites"),
+                    scales: chartScales(xTitle, 18),
                     plugins: {
                         legend: {
                             display: true,

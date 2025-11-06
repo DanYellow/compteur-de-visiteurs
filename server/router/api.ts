@@ -14,22 +14,22 @@ router.get("/", async (req, res) => {
     const today = DateTime.now();
 
     const dictGroupType = {
-        "heure": {
+        "jour": {
             "substitution": "%k",
             "luxon": "day",
             "property": "hour",
         },
-        "jour": {
+        "semaine": {
             "substitution": "%u",
             "luxon": "week",
             "property": "weekday",
         },
-        "semaine": {
+        "mois": {
             "substitution": "%W",
             "luxon": "month",
             "property": "weekNumber",
         },
-        "mois": {
+        "annee": {
             "substitution": "%m",
             "luxon": "year",
             "property": "month",
@@ -57,7 +57,10 @@ router.get("/", async (req, res) => {
                     [Op.lte]: endTime.toString(),
                 }
             }
-        }
+        },
+        order: [
+            ['date_passage', 'DESC'],
+        ]
     });
 
     const filteredVisits = listVisitors

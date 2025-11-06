@@ -11,27 +11,27 @@ const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
-
 router.get('/', async (req, res) => {
     const predicatesDict: Record<string, string> = {
-        "heure": "day",
-        "jour": "week",
-        "semaine": "month",
-        "mois": "year",
+        "jour": "day",
+        "semaine": "week",
+        "mois": "month",
+        "annee": "year",
     }
 
-    const apiKey = Object.keys(predicatesDict).filter(value => Object.keys(req.query).includes(value))[0];
+    const [configKey] = Object.entries(predicatesDict).filter(([key]) => Object.keys(req.query).includes(key)).at(0) || "jour"
     const isGrouped = "groupe" in req.query;
 
     let csvPayload = [];
 
-    const request = await fetch(`http://${req.get('host')}/api?filtre=${apiKey}`);
-
+    const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}`);
     const requestRes = await request.json();
+
     let csvFilename = `liste-visites_${String(Date.now()).slice(-6)}.csv`;
 
     if (isGrouped) {
-        const config = configData[apiKey];
+        const config = configData[configKey];
+
         csvFilename = `liste-visites-detaillee_${String(Date.now()).slice(-6)}.csv`
         const pivotPayload = Object.groupBy(requestRes.data, (item: { item: Record<string, string | number> }) => {
             return item.groupe;
