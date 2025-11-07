@@ -200,7 +200,7 @@ const listCharts = Object.values(configDataRaw);
                             display: false,
                         },
                         totalVisitors: {
-                            text: 'Visites uniques : ' + res.data.length,
+                            text: 'Total : ' + res.data.length,
                         },
                         datalabels: {
                             color: "white",
@@ -325,7 +325,8 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                             }
                         },
                         totalVisitors: {
-                            text: 'Visites uniques : ' + totalVisits,
+                            text: 'Total : ' + totalVisits,
+                            fontSize: "18px",
                         },
                         datalabels: {
                             color: "white",

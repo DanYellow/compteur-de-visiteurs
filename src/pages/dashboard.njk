@@ -101,7 +101,7 @@ Tableau de bord
                 <menu class="absolute right-3 flex flex-row gap-3">
                     <li>
                         {% set split_button_main_action %}
-                            <button data-download-chart="detailsChart" type="button" class="text-white-numixs cursor-pointer">
+                            <button data-download-chart="detailsChart" type="button" class="text-gray-numixs cursor-pointer">
                                 Exporter graphique + tableau (.jpg)
                             </button>
                         {% endset %}
@@ -125,7 +125,8 @@ Tableau de bord
                         ] %}
                         {{ macros.split_button(
                             split_button_main_action,
-                            list_sub_actions
+                            list_sub_actions,
+                            true
                         ) }}
                     </li>
                     <li class="flex">

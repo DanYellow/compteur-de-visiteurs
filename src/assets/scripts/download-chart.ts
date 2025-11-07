@@ -80,7 +80,7 @@ listDownloadButtons.forEach((item) => {
                 const tableDetailsSVG = `
                     <svg xmlns="http://www.w3.org/2000/svg" width="${chart.width}px" height="${chart?.offsetHeight}">
                         <foreignObject width="100%" height="100%">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style="color: white; font-family: Calibri;">
+                            <div xmlns="http://www.w3.org/1999/xhtml" style="color: white; font-family: Calibri, sans-serif;">
                                 ${table?.outerHTML}
                             </div>
                         </foreignObject>

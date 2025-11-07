@@ -174,9 +174,19 @@ input.error {
 }
 
 .split-button {
+    --bg-color: var(--color-gray-numixs);
+    --darken-percentage: 20%;
+    --border-color: white;
+    &.light {
+        --bg-color: var(--color-white-numixs);
+        --darken-percentage: 85%;
+        --border-color: black;
+        color: var(--color-gray-numixs);
+    } 
     display: inline-flex;
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-md);
     fill: currentColor;
+    background-color: var(--bg-color);
 
     touch-action: manipulation;
     user-select: none;
@@ -197,8 +207,14 @@ input.error {
 
         padding-block: 1.25ch;
         padding-inline: 2.5ch;
+        border-top-left-radius: var(--radius-md);
+        border-bottom-left-radius: var(--radius-md);
 
         outline-offset: -5px;
+
+        &:is(:focus, :hover) {
+            background-color: oklch(from var(--bg-color) var(--darken-percentage) c h);
+        }
     }
 
     .popup-button {
@@ -208,12 +224,12 @@ input.error {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border-start-end-radius: var(--radius-xl);
-        border-end-end-radius: var(--radius-xl);
-        border-inline-start: 1px solid white;
+        border-start-end-radius: var(--radius-md);
+        border-end-end-radius: var(--radius-md);
+        border-inline-start: 1px solid var(--border-color);
 
         &:is(:focus-within, :hover) {
-            background-color: var(--color-green-900);
+            background-color: oklch(from var(--bg-color) var(--darken-percentage) c h);
 
             & > svg {
                 translate: 0 3px;
@@ -245,7 +261,7 @@ input.error {
         position: absolute;
         list-style-type: none;
 
-        border-radius: var(--radius-xl);
+        border-radius: var(--radius-md);
         display: flex;
         flex-direction: column;
         font-size: 0.9em;

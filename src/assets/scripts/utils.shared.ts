@@ -150,7 +150,7 @@ export const getLinearCSV = (data: Result[]) => {
 
     const csvTotal = data.length > 0 ? [
         `Total : ${data.length}`,
-        `${DateTime.fromISO(new Date(data.at(0).date_passage).toISOString()).toFormat("dd/LL/yyyy")} ➜ ${DateTime.fromISO(new Date(data.at(-1).date_passage).toISOString()).toFormat("dd/LL/yyyy")}`,
+        `${DateTime.fromISO(new Date(data.at(-1).date_passage).toISOString()).toFormat("dd/LL/yyyy")} ➜ ${DateTime.fromISO(new Date(data.at(0).date_passage).toISOString()).toFormat("dd/LL/yyyy")}`,
         "/",
         ...new Array(listGroups.filter((item) => (!("listInDb" in item) || item.listInDb)).length).fill(0)
     ] : [];
