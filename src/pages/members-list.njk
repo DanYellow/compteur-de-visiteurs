@@ -78,6 +78,9 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                         <p class="text-2xl title-font">Nombre de visites</p>
                         <p class="text-4xl">{{ visitors_list|length }}</p>
                         <p>{{ current_date|date("EEEE dd LLLL yyyy") }}</p>
+                        {% if is_day_closed %}
+                        <p class="text-sm italic">Fermé</p>
+                        {% endif %}
                     </div>
                     <div class="bg-black-numixs p-3 rounded-md text-white-numixs hidden flex-1 lg:grid grid-cols-4 gap-1.5">
                         <p class="col-span-full text-xl">Détails des visites par type de visiteur</p>
