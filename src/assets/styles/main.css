@@ -152,6 +152,14 @@ input.error {
     &:has(.error) .switch {
         border-color: var(--color-red-800);
     }
+
+    &:has(:checked) {
+        background-color: var(--color-green-numixs);
+
+        & .switch-container {
+            background-color: var(--color-green-numixs);
+        }
+    }
 }
 
 [data-input-switch-toggle-recipient] {
@@ -164,7 +172,6 @@ input.error {
 
     @starting-style {
         opacity: 0;
-        /* display: none; */
     }
 
     &.hidden {

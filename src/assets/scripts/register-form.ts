@@ -1,4 +1,6 @@
 import { VisitorSchema } from "#scripts/schemas.ts";
+import config from "#config" with { type: "json" };
+
 import { cancellableSleep } from "./utils";
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
@@ -25,7 +27,6 @@ const submitForm = async (e: SubmitEvent) => {
     dialogSwapContainer.innerHTML = "";
     dialogSwapContainer.append(formSubmittingTplRaw.content.cloneNode(true));
 
-
     const formData = new FormData(form);
 
     const req = await fetch("/", {
@@ -41,6 +42,7 @@ const submitForm = async (e: SubmitEvent) => {
     dialogSwapContainer.innerHTML = "";
 
     if (res.success) {
+        e.submitter?.blur();
         form.reset();
         dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true));
     } else {
@@ -48,7 +50,7 @@ const submitForm = async (e: SubmitEvent) => {
     }
 
     try {
-        await cancellableSleep(3500, sleepController.signal);
+        await cancellableSleep(Number(config.FORM_RESULT_TIMEOUT), sleepController.signal);
         dialog.close();
     } finally {
     }
