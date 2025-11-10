@@ -159,6 +159,18 @@ input.error {
         & .switch-container {
             background-color: var(--color-green-numixs);
         }
+
+        [data-input-switch-toggle-recipient] {
+            display: block;
+            opacity: 1;
+        }
+    }
+
+    &:not(:has(:checked)) {
+        [data-input-switch-toggle-recipient] {
+            display: none;
+            opacity: 0;
+        }
     }
 }
 
@@ -171,11 +183,6 @@ input.error {
     display: block;
 
     @starting-style {
-        opacity: 0;
-    }
-
-    &.hidden {
-        display: none;
         opacity: 0;
     }
 }
