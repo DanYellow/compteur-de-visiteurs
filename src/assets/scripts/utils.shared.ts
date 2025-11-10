@@ -143,15 +143,16 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
     return tableValues;
 }
 
-export const getLinearCSV = (data: Result[]) => {
+export const getLinearCSV = (data: Result[], totalPeriodCell = "") => {
     const csvHeader = Object.keys(data?.[0] || {});
     csvHeader[1] = "Période";
     csvHeader.pop();
 
     const csvTotal = data.length > 0 ? [
         `Total : ${data.length}`,
-        `${DateTime.fromISO(new Date(data.at(-1).date_passage).toISOString()).toFormat("dd/LL/yyyy")} ➜ ${DateTime.fromISO(new Date(data.at(0).date_passage).toISOString()).toFormat("dd/LL/yyyy")}`,
-        "/",
+        totalPeriodCell,
+        // `${DateTime.fromISO(new Date(data.at(0).date_passage).toISOString()).toFormat("dd/LL/yyyy")} ➜ ${DateTime.fromISO(new Date(data.at(-1).date_passage).toISOString()).toFormat("dd/LL/yyyy")}`,
+        config.PLACE,
         ...new Array(listGroups.filter((item) => (!("listInDb" in item) || item.listInDb)).length).fill(0)
     ] : [];
     const csvPayload = [csvHeader];

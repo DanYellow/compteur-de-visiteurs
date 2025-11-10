@@ -5,6 +5,7 @@ import { fileURLToPath, URLSearchParams } from "url";
 import { stringify } from "csv-stringify/sync";
 
 import { configData, getLinearCSV, getPivotTable } from "#scripts/utils.shared.ts";
+import { DateTime, DateTimeUnit } from "luxon";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,7 +41,10 @@ router.get('/', async (req, res) => {
         });
         csvPayload = getPivotTable(pivotPayload, config.listColumns, { columnSuffix: config?.xValuesSuffix || "" });
     } else {
-        csvPayload = getLinearCSV(requestRes.data);
+        const filterPredicate: DateTimeUnit = predicatesDict[configKey] as DateTimeUnit;
+        const daySelected = DateTime.fromISO(Object.values(req.query)[0] as string);
+        const totalPeriodCell = `${daySelected.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${daySelected.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
+        csvPayload = getLinearCSV(requestRes.data, totalPeriodCell);
     }
 
     const tempCsvFile = path.join(__dirname, "..", "liste-visites.tmp.csv");
