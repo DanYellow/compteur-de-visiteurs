@@ -11,7 +11,9 @@ try {
     const result = {}
     fileContent.forEach((item) => {
         const [key, value] = item.split("=");
-        result[key] = value;
+        const [nocomment] = value.split("#");
+
+        result[key] = nocomment.trim();
     })
 
     await fs.writeFile('./config.local.json', JSON.stringify(result));
