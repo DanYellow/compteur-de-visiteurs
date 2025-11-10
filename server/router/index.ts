@@ -85,8 +85,8 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         where: {
             date_passage: {
                 [Op.and]: {
-                    [Op.gte]: daySelected.startOf("day").toString(),
-                    [Op.lte]: daySelected.endOf("day").toString(),
+                    [Op.gte]: daySelected.startOf("day").set({ hour: openHours }).toString(),
+                    [Op.lte]: daySelected.endOf("day").set({ hour: closeHours }).toString(),
                 }
             }
         },

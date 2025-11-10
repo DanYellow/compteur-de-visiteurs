@@ -205,19 +205,19 @@ const getWeeksRangeMonth = (startDate) => {
     const startMonth = today.startOf("month");
     const endMonth = today.endOf("month");
 
-    // const firstWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: startMonth.weekNumber, day: 1 });
-    // const lastWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: endMonth.weekNumber });
+    const firstWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: startMonth.weekNumber });
+    const lastWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: endMonth.weekNumber });
 
-    const intervalYear = startMonth.until(endMonth);
-    const intervalWeeks = intervalYear.splitBy({ weeks: 1 });
+    const intervalMonth = firstWeekInMonth.until(lastWeekInMonth.endOf("month"));
+    const intervalWeeks = intervalMonth.splitBy({ weeks: 1 });
 
     const listWeeks: WeekMonth[] = [];
-    intervalWeeks.forEach((item) => {
+    intervalWeeks.forEach((item: DateTime, index: number, array) => {
         listWeeks.push({
             id: item.s.weekNumber,
-            name: `${item.s.toFormat("dd/LL")} ➜ ${item.e.toFormat("dd/LL")}`
-        })
-    })
+            name: `${(index === 0 ? startMonth : item.s).toFormat("dd/LL")} ➜ ${(index === array.length - 1 ? endMonth : item.e).toFormat("dd/LL")}`
+        });
+    });
 
     return listWeeks;
 }
