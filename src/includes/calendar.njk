@@ -10,7 +10,7 @@
             </button>
             <select class="flex-1 px-6 py-4" name="" data-calendar-select="month">
                 {% for month in list_months %}
-                    <option value="{{ loop.index0 }}">{{ month }}</option>
+                    <option value="{{ loop.index }}">{{ month }}</option>
                 {% endfor %}
             </select>
             <select class="flex-1 px-6 py-4" name="" data-calendar-select="year">

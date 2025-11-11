@@ -17,9 +17,6 @@ if (queryString.has("current_date")) {
     staticCurrentDay = currentDay.toFormat("yyyy-LL-dd");
 }
 
-let currentYear = currentDay.get('year');
-let currentMonth = currentDay.get('month');
-
 const renderCalendar = () => {
     daysContainer.innerHTML = "";
 
@@ -44,6 +41,7 @@ const renderCalendar = () => {
         daysContainer?.append(calendarDayTpl);
     }
 
+    // Current month
     for (let i = 1; i <= lastDayOfMonth.get("day"); i++) { // creating li of all days of current month
         // adding active class to li if the current day, month, and year matched
         const dayNumber = String(i);
@@ -72,64 +70,52 @@ const renderCalendar = () => {
         const dayNumber = String(i - lastDayOfMonth.weekday + 1);
         const yearAndMonth = `${firstDayNextMonth.get("year")}-${String(firstDayNextMonth.get("month")).padStart(2, "0")}`;
         calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
-        // calendarDayTplLink.href = `?current_date=${currentYear}-${String(currentMonth + 2).padStart(2, "0")}-${String(i - lastDayofMonth + 1).padStart(2, "0")}`;
         calendarDayTplLink.textContent = dayNumber;
 
         daysContainer?.append(calendarDayTpl);
     }
 }
 
+const updateDropdowns = () => {
+    selectYearAndMonth.forEach((item) => {
+        const selectType = item.dataset.calendarSelect;
+        if (selectType === "month") {
+            item.value = String(currentDay.get("month"));
+        } else {
+            item.value = String(currentDay.get("year"));
+        }
+    })
+}
 
+updateDropdowns();
 renderCalendar();
 
-// const updateDropdowns = () => {
-//     selectYearAndMonth.forEach((item) => {
-//         const selectType = item.dataset.calendarSelect;
-//         if (selectType === "month") {
-//             item.value = String(currentMonth);
-//         } else {
-//             item.value = String(currentYear);
-//         }
-//     })
-// }
-// updateDropdowns();
+selectYearAndMonth.forEach((item) => {
+    item.addEventListener("change", (e) => {
+        const select = e.currentTarget! as HTMLSelectElement;
+        const selectType = select.dataset.calendarSelect;
+        if (selectType === "month") {
+            const monthSelected = select.value;
+            currentDay = currentDay.set({ month: Number(monthSelected) });
+        } else {
+            const yearSelected = select.value;
+            currentDay = currentDay.set({ year: Number(yearSelected) });
+        }
 
-// selectYearAndMonth.forEach((item) => {
-//     item.addEventListener("change", (e) => {
-//         const select = e.currentTarget! as HTMLSelectElement;
-//         const selectType = select.dataset.calendarSelect;
-//         if (selectType === "month") {
-//             const monthSelected = select.value;
-//             date = new Date(currentYear, Number(monthSelected), 0);
-//         } else {
-//             const yearSelected = select.value;
-//             date = new Date(Number(yearSelected), currentMonth, 0);
-//         }
-//         currentYear = date.getFullYear(); // updating current year with new date year
-//         currentMonth = date.getMonth(); // updating current month with new date month
+        renderCalendar();
+    })
+})
 
-//         renderCalendar();
-//     })
-// })
+navigationMonthsBtns.forEach(icon => {
+    icon.addEventListener("click", (e) => {
+        const btn = e.currentTarget! as HTMLButtonElement;
+        if (btn.dataset.navigationMonth === "prev") {
+            currentDay = currentDay.minus({ months: 1 })
+        } else {
+            currentDay = currentDay.plus({ months: 1 })
+        }
 
-// navigationMonthsBtns.forEach(icon => { // getting prev and next icons
-//     icon.addEventListener("click", (e) => { // adding click event on both icons
-//         const btn = e.currentTarget! as HTMLButtonElement;
-//         // if clicked icon is previous icon then decrement current month by 1 else increment it by 1
-
-//         currentMonth = btn.dataset.navigationMonth === "prev"
-//             ? currentMonth - 1
-//             : currentMonth + 1;
-
-//             if (currentMonth < 0 || currentMonth > 11) { // if current month is less than 0 or greater than 11
-//             // creating a new date of current year & month and pass it as date value
-//             date = new Date(currentYear, currentMonth, new Date().getDate());
-//             currentYear = date.getFullYear(); // updating current year with new date year
-//             currentMonth = date.getMonth(); // updating current month with new date month
-//         } else {
-//             // date = new Date(); // pass the current date as date value
-//         }
-//         updateDropdowns();
-//         renderCalendar();
-//     });
-// });
+        updateDropdowns();
+        renderCalendar();
+    });
+});

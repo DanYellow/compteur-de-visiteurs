@@ -86,6 +86,10 @@
     }
 }
 
+@view-transition {
+    navigation: auto;
+}
+
 :root {
     font-family: "Calibri", sans-serif;
 
@@ -196,7 +200,7 @@ input.error {
         --darken-percentage: 85%;
         --border-color: black;
         color: var(--color-gray-numixs);
-    } 
+    }
     display: inline-flex;
     border-radius: var(--radius-md);
     fill: currentColor;
