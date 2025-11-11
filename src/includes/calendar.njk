@@ -1,8 +1,11 @@
 <style></style>
 
-<div popover id="calendar" class="calendar-wrapper overflow-hidden w-3/4">
+<div popover id="calendar" class="calendar-wrapper overflow-hidden sm:w-3/4 max-w-5xl">
     <div class="calendar">
-        <p class="text-xl font-bold ml-4 mt-2">Choisir un jour</p>
+        <div class="flex justify-between items-center mx-4 mt-2">
+            <p class="text-xl font-bold">Choisir un jour</p>
+            <a href="/visiteurs">Aujourd'hui</a>
+        </div>
         <nav class="flex">
             <button type="button" data-navigation-month="prev" class="py-2.5 px-3.5 hocus:bg-green-numixs" title="Mois précédent">
                 <span class="flex items-center justify-center w-3.5">
