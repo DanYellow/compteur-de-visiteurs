@@ -302,3 +302,7 @@ input.error {
 button {
     cursor: pointer;
 }
+
+.current-day {
+    anchor-name: --calendar-anchor;
+}

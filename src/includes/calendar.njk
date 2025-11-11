@@ -1,9 +1,10 @@
 <style></style>
 
-<div class="calendar-wrapper">
+<div popover id="calendar" class="calendar-wrapper overflow-hidden w-3/4">
     <div class="calendar">
+        <p class="text-xl font-bold ml-4 mt-2">Choisir un jour</p>
         <nav class="flex">
-            <button type="button" data-navigation-month="prev" class="material-symbols-rounded py-2.5 px-3.5" title="Mois précédent">
+            <button type="button" data-navigation-month="prev" class="py-2.5 px-3.5 hocus:bg-green-numixs" title="Mois précédent">
                 <span class="flex items-center justify-center w-3.5">
                     {% include "includes/icons/arrow-icon.svg" %}
                 </span>
@@ -18,7 +19,7 @@
                     <option value="{{ year }}">{{ year }}</option>
                 {% endfor %}
             </select>
-            <button type="button" data-navigation-month="next" class="material-symbols-rounded py-2.5 px-3.5" title="Mois suivant">
+            <button type="button" data-navigation-month="next" class="py-2.5 px-3.5 hocus:bg-green-numixs" title="Mois suivant">
                 <span class="rotate-180 flex items-center justify-center w-3.5">
                     {% include "includes/icons/arrow-icon.svg" %}
                 </span>

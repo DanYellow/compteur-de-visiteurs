@@ -1,4 +1,5 @@
 import { DateTime } from "luxon";
+import config from "#config" with { type: "json" };
 
 const daysContainer = document.querySelector("[data-list-days]") as HTMLOListElement;
 const navigationMonthsBtns = document.querySelectorAll("[data-navigation-month]");
@@ -7,6 +8,7 @@ const calendarDayTplRaw = document.querySelector("[data-template-id='calendar-da
 
 let currentDay = DateTime.now();
 let staticCurrentDay = DateTime.now().toFormat("yyyy-LL-dd");
+const listClosedDaysIndex = config.CLOSED_DAYS_INDEX.split(",").filter(Boolean).map(String);
 
 const queryString = new URLSearchParams(window.location.search);
 if (queryString.has("current_date")) {
@@ -53,7 +55,9 @@ const renderCalendar = () => {
         const calendarDayTplLi = calendarDayTpl.querySelector("li");
         calendarDayTplLi?.classList.toggle("active", isToday);
 
+        const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).weekday;
         const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
+        calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
 
         calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
         calendarDayTplLink.textContent = String(i);
@@ -66,11 +70,15 @@ const renderCalendar = () => {
         const calendarDayTplLi = calendarDayTpl.querySelector("li");
         calendarDayTplLi?.classList.add("inactive");
 
-        const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
-        const dayNumber = String(i - lastDayOfMonth.weekday + 1);
         const yearAndMonth = `${firstDayNextMonth.get("year")}-${String(firstDayNextMonth.get("month")).padStart(2, "0")}`;
+        const dayNumber = String(i - lastDayOfMonth.weekday + 1);
+
+        const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).weekday;
+
+        const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
         calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
         calendarDayTplLink.textContent = dayNumber;
+        calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
 
         daysContainer?.append(calendarDayTpl);
     }

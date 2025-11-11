@@ -1,8 +1,11 @@
 .calendar-wrapper {
-    width: 100%;
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    position: absolute;
+    position-anchor: --calendar-anchor;
+    top: calc(anchor(--calendar-anchor bottom) + 10px);
+    left: 2rem;
 
     header {
         display: flex;
@@ -78,6 +81,10 @@
                 width: 97%;
                 margin-inline: auto;
                 padding: 1.5rem;
+
+                &.open {
+                    border-bottom: 2px solid var(--color-green-numixs);
+                }
             }
         }
     }
