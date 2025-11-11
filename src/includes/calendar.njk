@@ -1,39 +1,48 @@
-<style>
-
-</style>
+<style></style>
 
 <div class="calendar-wrapper">
-    <header class="title-font">
-        <p class="current-date"></p>
-        <div class="icons">
-            <button type="button" id="prev" class="material-symbols-rounded">
-                {% include "includes/icons/arrow-icon.svg" %}
+    <div class="calendar">
+        <nav class="flex">
+            <button type="button" data-navigation-month="prev" class="material-symbols-rounded py-2.5 px-3.5" title="Mois précédent">
+                <span class="flex items-center justify-center w-3.5">
+                    {% include "includes/icons/arrow-icon.svg" %}
+                </span>
             </button>
-            <button type="button" id="next" class="material-symbols-rounded">
+            <select class="flex-1 px-6 py-4" name="" data-calendar-select="month">
+                {% for month in list_months %}
+                    <option value="{{ loop.index0 }}">{{ month }}</option>
+                {% endfor %}
+            </select>
+            <select class="flex-1 px-6 py-4" name="" data-calendar-select="year">
+                {% for year in range(2024, 2035) %}
+                    <option value="{{ year }}">{{ year }}</option>
+                {% endfor %}
+            </select>
+            <button type="button" data-navigation-month="next" class="material-symbols-rounded py-2.5 px-3.5" title="Mois suivant">
                 <span class="rotate-180 flex items-center justify-center w-3.5">
                     {% include "includes/icons/arrow-icon.svg" %}
                 </span>
             </button>
-        </div>
-    </header>
-    <div class="calendar">
-        <ul class="weeks">
-            <li>DIM</li>
+        </nav>
+        <ul class="weeks title-font">
             <li>LUN</li>
             <li>MAR</li>
             <li>MER</li>
             <li>JEU</li>
             <li>VEN</li>
             <li>SAM</li>
+            <li>DIM</li>
         </ul>
-        <ul class="days"></ul>
+
+        <ul class="days !pt-1.5" data-list-days></ul>
     </div>
 </div>
 
 <script>
-    const daysTag = document.querySelector(".days"),
+    {# const daysTag = document.querySelector(".days"),
         currentDate = document.querySelector(".current-date"),
         prevNextIcon = document.querySelectorAll(".icons span");
+    const selectYearAndMonth = document.querySelectorAll("[data-calendar-select]")
     // getting new date, current year and month
     let date = new Date(),
         currYear = date.getFullYear(),
@@ -54,13 +63,13 @@
         "Décembre"
     ];
     const renderCalendar = () => {
-        let firstDayofMonth = new Date(currYear, currMonth, 1).getDay(), // getting first day of month
+        let firstDayofMonth = new Date(currYear, currMonth, 0).getDay(), // getting first day of month
             lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(), // getting last date of month
             lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay(), // getting last day of month
             lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate(); // getting last date of previous month
         let liTag = "";
         for (let i = firstDayofMonth; i > 0; i--) { // creating li of previous month last days
-            liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
+            liTag += `<li class="inactive"><a href="?current_date=${currYear}-${currMonth}-${String(lastDateofLastMonth - i + 1).padStart(2, "0")}">${lastDateofLastMonth - i + 1}</a></li>`;
         }
         for (let i = 1; i <= lastDateofMonth; i++) { // creating li of all days of current month
             // adding active class to li if the current day, month, and year matched
@@ -68,15 +77,16 @@
                 ? "active"
                 : "";
             liTag += `<li class="${isToday}">
-                <button type="button">${i}</button>
+                <a href="?current_date=${currYear}-${currMonth}-${String(i).padStart(2, "0")}">${i}</a>
             </li>`;
         }
-        for (let i = lastDayofMonth; i < 6; i++) { // creating li of next month first days
-            liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`
+        for (let i = lastDayofMonth; i < 7; i++) { // creating li of next month first days
+            liTag += `<li class="inactive"><a href="?current_date=2026-11-11">${i - lastDayofMonth + 1}</a></li>`
         }
-        currentDate.innerText = `${months[currMonth]} ${currYear}`; // passing current mon and yr as currentDate text
+        // currentDate.innerText = `${months[currMonth]} ${currYear}`; // passing current mon and yr as currentDate text
         daysTag.innerHTML = liTag;
     }
+
     renderCalendar();
     prevNextIcon.forEach(icon => { // getting prev and next icons
         icon.addEventListener("click", () => { // adding click event on both icons
@@ -95,10 +105,26 @@
             renderCalendar(); // calling renderCalendar function
         });
     });
+
+    selectYearAndMonth.forEach((item) => {
+        item.addEventListener("change", (e) => {
+            const selectType = e.currentTarget.dataset.calendarSelect;
+            if (selectType === "month") {
+                const monthSelected = e.currentTarget.value;
+                date = new Date(currYear, monthSelected, new Date().getDate());
+            } else {
+                const yearSelected = e.currentTarget.value;
+                date = new Date(yearSelected, currMonth, new Date().getDate());
+            }
+            currYear = date.getFullYear(); // updating current year with new date year
+                currMonth = date.getMonth(); // updating current month with new date month
+            renderCalendar();
+        })
+    }) #}
 </script>
 
-<template data-tempalte-id="calendar-day">
+<template data-template-id="calendar-day">
     <li>
-        <button type="button"></button>
+        <a href="" class="hocus:bg-black-numixs/10 rounded-md"></a>
     </li>
 </template>

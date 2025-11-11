@@ -1,8 +1,8 @@
 import express from "express";
-import { DateTime } from "luxon";
+import { DateTime, Info } from "luxon";
 import { Op, literal } from 'sequelize';
 
-import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
+import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "../index.ts";
 import VisitorModel from "#models/visitor.ts";
@@ -104,6 +104,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "today": DateTime.now(),
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
         "is_day_closed": config.CLOSED_DAYS_INDEX.split(",").includes(String(daySelected.weekday)),
+        "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
     });
 });
 
