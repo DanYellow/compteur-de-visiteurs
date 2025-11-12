@@ -92,7 +92,7 @@ const chartScales = (xTitle: string, titleSize: number = 12) => {
                 color: "white",
                 font: {
                     size: titleSize
-                }
+                },
             }
         },
     }
@@ -144,12 +144,11 @@ const listCharts = Object.values(configDataRaw);
         const req = await fetch(`/api?filtre=${apiKey}`);
         const res = await req.json();
 
-        const listVisitsGrouped:GroupVisit = Object.groupBy(res.data as Visit[], (item) => {
+        const listVisitsGrouped = Object.groupBy(res.data as Visit[], (item) => {
             return item.groupe;
         });
 
         ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
-        console.log(listVisitsGrouped)
 
         const chartData = xLabels.map((item) => {
             let key = item;
@@ -158,7 +157,8 @@ const listCharts = Object.values(configDataRaw);
             }
 
             if (listVisitsGrouped[key]) {
-                return listVisitsGrouped[key].length;
+                const visitsForGroup = listVisitsGrouped[key];
+                return visitsForGroup?.length;
             }
             return 0;
         });
@@ -192,7 +192,10 @@ const listCharts = Object.values(configDataRaw);
                     plugins: {
                         title: {
                             text: chartTitle,
-                            ...chartTitleStyle
+                            ...chartTitleStyle,
+                            padding: {
+                                bottom: 20
+                            }
                         },
                         tooltip: {
                             enabled: true,
@@ -313,7 +316,12 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                         legend: {
                             display: true,
                             labels: {
-                                color: '#FFF'
+                                color: '#FFF',
+                            },
+                            title: {
+                                display: true,
+                                text: "Groupes",
+                                color: '#FFF',
                             }
                         },
                         title: {
@@ -322,7 +330,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                             font: {
                                 ...chartTitleStyle.font,
                                 size: 26,
-                            }
+                            },
                         },
                         totalVisitors: {
                             text: 'Total : ' + totalVisits,

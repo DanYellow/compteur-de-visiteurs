@@ -16,7 +16,7 @@ const SIZE_EXPORT = {
 const today = DateTime.now();
 
 listDownloadButtons.forEach((item) => {
-    item.addEventListener("click", async (e: MouseEvent) => {
+    (item as HTMLButtonElement).addEventListener("click", async (e: MouseEvent) => {
         const element = e.currentTarget as HTMLButtonElement;
         const chartId = element.dataset.downloadChart!;
 
@@ -26,8 +26,8 @@ listDownloadButtons.forEach((item) => {
         const chartInstance = Chart.getChart(chart)!;
 
         const originalSize = { width: chart.style.width, height: chart.style.height };
-        const startDatalabelsSize = chartInstance.options.plugins.datalabels.font.size;
-        const chartXTitleFontSize = chartInstance.config!.options.scales.x.title.font.size;
+        const startDatalabelsSize = chartInstance.options!.plugins!.datalabels!.font!.size;
+        const chartXTitleFontSize = chartInstance.config!.options!.scales!.x!.title!.font.size;
         const chartYTitleFontSize = chartInstance.config!.options!.scales!.y!.title!.font.size;
         const chartTitleFontSize = chartInstance.config.options.plugins.title.font.size;
 
