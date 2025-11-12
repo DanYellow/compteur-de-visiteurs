@@ -17,30 +17,30 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
     <div class="mt-8 px-3 grid grid-cols-1 xl:grid-cols-[220px_minmax(0,_1fr)] gap-6">
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
-            <header class="flex flex-col md:flex-row justify-between md:items-center mb-16 -mt-1.5">
+            <header class="flex flex-row justify-between md:items-center mb-16 -mt-1.5">
                 <h1 class="text-black title-font font-bold text-6xl">Visites</h1>
 
                 {% set split_button_main_action %}
-                    <a href="/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white hocus:bg-green-900">
+                    <a href="/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white">
                         Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)
                     </a>
                 {% endset %}
 
-                {% set split_button_sub_action_3 %}
+                {% set split_button_sub_action_1 %}
                     <a href="/telecharger?semaine={{ current_date|date("yyyy-MM-dd") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                         {% include "includes/icons/download-fill-icon.svg" %}
                         Télécharger toutes les données de la semaine (.csv)
                     </a>
                 {% endset %}
 
-                {% set split_button_sub_action_1 %}
+                {% set split_button_sub_action_2 %}
                     <a href="/telecharger?mois={{ current_date|date("yyyy-MM") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                         {% include "includes/icons/download-fill-icon.svg" %}
-                        Télécharger toutes les données du mois {{ current_date|date("MMMM yyyy") }} (.csv)
+                        Télécharger toutes les données de {{ current_date|date("MMMM yyyy") }} (.csv)
                     </a>
                 {% endset %}
 
-                {% set split_button_sub_action_2 %}
+                {% set split_button_sub_action_3 %}
                     <a href="/telecharger?annee={{ current_date|date("yyyy") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                         {% include "includes/icons/download-fill-icon.svg" %}
                         Télécharger toutes les données de l'année {{ current_date|date("yyyy") }} (.csv)
@@ -48,15 +48,24 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 {% endset %}
 
                 {% set list_sub_actions = [
-                   split_button_sub_action_3,
                    split_button_sub_action_1,
-                   split_button_sub_action_2
+                   split_button_sub_action_2,
+                   split_button_sub_action_3
                 ] %}
 
-                {{ macros.split_button(
-                    split_button_main_action,
-                    list_sub_actions
-                 ) }}
+                <div class="hidden sm:block">
+                    {{ macros.split_button(
+                        split_button_main_action,
+                        list_sub_actions
+                    ) }}
+                </div>
+                <div class="block sm:hidden">
+                    <button type="button" class="text-black-numixs hocus:text-green-numixs" commandfor="download-links" command="toggle-popover">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z" />
+                        </svg>
+                    </button>
+                </div>
             </header>
             <div class="text-black">
                 <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
@@ -66,9 +75,10 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                             {% include "includes/icons/arrow-icon.svg" %}
                         </span>
                     </a>
-                    <button class="py-2.5 px-5 border-black-numixs border rounded-md relative hocus:bg-green-numixs flex gap-2.5 flex-row items-center current-day" commandfor="calendar" command="toggle-popover">
+                    <button class="py-2.5 px-5 border-black-numixs border rounded-md relative hocus:bg-green-numixs flex gap-2.5 flex-row items-center justify-center current-day flex-1 sm:flex-none" commandfor="calendar" command="toggle-popover">
                             {% include "includes/icons/calendar-icon.svg" %}
-                        <span class="pointer-events-none">{{ "Aujourd'hui" if is_today else current_date|date("EEEE dd LLLL yyyy")  }}</span>
+                        <span class="pointer-events-none hidden sm:inline">{{ "Aujourd'hui" if is_today else current_date|date("EEEE dd LLLL yyyy")  }}</span>
+                        <span class="pointer-events-none inline sm:hidden">{{ "Aujourd'hui" if is_today else current_date|date("dd/LL/yyyy")  }}</span>
                     </button>
                     <a href="?current_date={{ current_date|add_days(1)|date("yyyy-LL-dd") }}" class="py-2.5 px-3.5 border-black-numixs border rounded-md flex items-center justify-center hocus:bg-green-numixs">
                         <span class="sr-only">Demain</span>
@@ -150,5 +160,35 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
             </button>
         </div>
     </template>
+
+    <div popover id="download-links" class="bg-slate-50 shadow-2xl rounded-md p-1 backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12">
+        <ul class="flex flex-col gap-1">
+            <li>
+                <a href="/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}" download class="w-full align-center inline-flex gap-2 px-3.5 py-2.5 rounded-xl text-white bg-black-numixs hocus:bg-black">
+                    {% include "includes/icons/download-fill-icon.svg" %}
+                    Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)
+                </a>
+            </li>
+            <li>
+                <a href="/telecharger?semaine={{ current_date|date("yyyy-MM-dd") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                    {% include "includes/icons/download-fill-icon.svg" %}
+                    Télécharger toutes les données de la semaine (.csv)
+                </a>
+            </li>
+            <li>
+                <a href="/telecharger?mois={{ current_date|date("yyyy-MM") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                    {% include "includes/icons/download-fill-icon.svg" %}
+                    Télécharger toutes les données de {{ current_date|date("MMMM yyyy") }} (.csv)
+                </a>
+            </li>
+            <li>
+                <a href="/telecharger?annee={{ current_date|date("yyyy") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                    {% include "includes/icons/download-fill-icon.svg" %}
+                    Télécharger toutes les données de l'année {{ current_date|date("yyyy") }} (.csv)
+                </a>
+            </li>
+        </ul>
+
+    </div>
 
 {% endblock %}

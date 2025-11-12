@@ -233,7 +233,9 @@ input.error {
         outline-offset: -5px;
 
         &:is(:focus, :hover) {
-            background-color: oklch(from var(--bg-color) var(--darken-percentage) c h);
+            background-color: oklch(
+                from var(--bg-color) var(--darken-percentage) c h
+            );
         }
     }
 
@@ -249,7 +251,9 @@ input.error {
         border-inline-start: 1px solid var(--border-color);
 
         &:is(:focus-within, :hover) {
-            background-color: oklch(from var(--bg-color) var(--darken-percentage) c h);
+            background-color: oklch(
+                from var(--bg-color) var(--darken-percentage) c h
+            );
 
             & > svg {
                 translate: 0 3px;
@@ -307,4 +311,17 @@ button {
 
 .current-day {
     anchor-name: --calendar-anchor;
+}
+
+.result-form-modal::after {
+    content: "";
+    position: fixed;
+    display: block;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.25;
+    background: url("/images/bottom-left-pattern.svg") no-repeat left bottom,
+        url("/images/top-right-pattern.svg") no-repeat right top, #312f2f;
+    width: 100vw;
+    height: 100vh;
 }

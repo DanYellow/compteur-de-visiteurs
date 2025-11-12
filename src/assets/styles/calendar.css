@@ -1,6 +1,7 @@
 .calendar-wrapper {
     background: #fff;
     border-radius: 10px;
+    border: 1px solid #8894AA;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
     position: absolute;
     position-anchor: --calendar-anchor;
@@ -45,12 +46,19 @@
             font-size: 1.07rem;
 
             a {
-                display: block;
+                display: flex;
                 height: 95%;
                 width: 97%;
                 margin-inline: auto;
-                padding-block: 1.5rem;
                 border: 2px solid transparent;
+                justify-content: center;
+                align-items: center;
+                aspect-ratio: 1;
+
+                @media screen and (width >= 640px) {
+                    padding-block: 1.5rem;
+                    aspect-ratio: auto;
+                }
 
                 &.open {
                     border-bottom-color: var(--color-green-numixs);
