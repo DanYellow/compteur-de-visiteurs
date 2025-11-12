@@ -26,6 +26,13 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                     </a>
                 {% endset %}
 
+                {% set split_button_sub_action_3 %}
+                    <a href="/telecharger?semaine={{ current_date|date("yyyy-MM-dd") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                        {% include "includes/icons/download-fill-icon.svg" %}
+                        Télécharger toutes les données de la semaine (.csv)
+                    </a>
+                {% endset %}
+
                 {% set split_button_sub_action_1 %}
                     <a href="/telecharger?mois={{ current_date|date("yyyy-MM") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                         {% include "includes/icons/download-fill-icon.svg" %}
@@ -41,6 +48,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 {% endset %}
 
                 {% set list_sub_actions = [
+                   split_button_sub_action_3,
                    split_button_sub_action_1,
                    split_button_sub_action_2
                 ] %}

@@ -44,6 +44,7 @@ router.get('/', async (req, res) => {
         const filterPredicate: DateTimeUnit = predicatesDict[configKey] as DateTimeUnit;
         const daySelected = DateTime.fromISO(Object.values(req.query)[0] as string);
         const totalPeriodCell = `${daySelected.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${daySelected.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
+
         csvPayload = getLinearCSV(requestRes.data, totalPeriodCell);
     }
 
@@ -54,6 +55,5 @@ router.get('/', async (req, res) => {
         fs.unlinkSync(tempCsvFile);
     });
 });
-
 
 export default router;
