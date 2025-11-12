@@ -4,25 +4,33 @@
     <div class="calendar">
         <div class="flex justify-between items-center mx-4 mt-2">
             <p class="text-xl font-bold">Choisir un jour</p>
-            <a href="/visiteurs">Aujourd'hui</a>
+            <a href="/visiteurs" class="underline hocus:no-underline">Aujourd'hui</a>
         </div>
         <nav class="flex">
-            <button type="button" data-navigation-month="prev" class="py-2.5 px-3.5 hocus:bg-green-numixs" title="Mois précédent">
+            <button type="button" data-navigation-month="prev" class="navigation-month py-2.5 px-3.5 hocus:bg-green-numixs flex flex-row gap-2 items-center" title="Mois précédent">
                 <span class="flex items-center justify-center w-3.5">
                     {% include "includes/icons/arrow-icon.svg" %}
                 </span>
+                <span data-month="prev">Mars</span>
             </button>
-            <select class="flex-1 px-6 py-4" name="" data-calendar-select="month">
-                {% for month in list_months %}
-                    <option value="{{ loop.index }}">{{ month }}</option>
-                {% endfor %}
-            </select>
-            <select class="flex-1 px-6 py-4" name="" data-calendar-select="year">
-                {% for year in range(2024, 2035) %}
-                    <option value="{{ year }}">{{ year }}</option>
-                {% endfor %}
-            </select>
-            <button type="button" data-navigation-month="next" class="py-2.5 px-3.5 hocus:bg-green-numixs" title="Mois suivant">
+            <div class="flex-1 px-6 py-4 relative">
+                {# <label for="mois" class="text-sm absolute top-0 left-6">Mois</label> #}
+                <select id="mois" class="w-full" data-calendar-select="month">
+                    {% for month in list_months %}
+                        <option value="{{ loop.index }}">{{ month }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="flex-1 px-6 py-4 relative">
+                {# <label for="annee" class="text-sm absolute top-0 left-6">Année</label> #}
+                <select id="annee" class="w-full" data-calendar-select="year">
+                    {% for year in range(2024, 2035) %}
+                        <option value="{{ year }}">{{ year }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="button" data-navigation-month="next" class="navigation-month py-2.5 px-3.5 hocus:bg-green-numixs flex flex-row gap-2 items-center" title="Mois suivant">
+                <span data-month="next">Mars</span>
                 <span class="rotate-180 flex items-center justify-center w-3.5">
                     {% include "includes/icons/arrow-icon.svg" %}
                 </span>
@@ -38,94 +46,9 @@
             <li>DIM</li>
         </ul>
 
-        <ul class="days !pt-1.5" data-list-days></ul>
+        <ul class="days" data-list-days></ul>
     </div>
 </div>
-
-<script>
-    {# const daysTag = document.querySelector(".days"),
-        currentDate = document.querySelector(".current-date"),
-        prevNextIcon = document.querySelectorAll(".icons span");
-    const selectYearAndMonth = document.querySelectorAll("[data-calendar-select]")
-    // getting new date, current year and month
-    let date = new Date(),
-        currYear = date.getFullYear(),
-        currMonth = date.getMonth();
-    // storing full name of all months in array
-    const months = [
-        "Janvier",
-        "Février",
-        "Mars",
-        "Avril",
-        "Mai",
-        "Juin",
-        "Juillet",
-        "Août",
-        "Septembre",
-        "Octobre",
-        "Novembre",
-        "Décembre"
-    ];
-    const renderCalendar = () => {
-        let firstDayofMonth = new Date(currYear, currMonth, 0).getDay(), // getting first day of month
-            lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(), // getting last date of month
-            lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay(), // getting last day of month
-            lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate(); // getting last date of previous month
-        let liTag = "";
-        for (let i = firstDayofMonth; i > 0; i--) { // creating li of previous month last days
-            liTag += `<li class="inactive"><a href="?current_date=${currYear}-${currMonth}-${String(lastDateofLastMonth - i + 1).padStart(2, "0")}">${lastDateofLastMonth - i + 1}</a></li>`;
-        }
-        for (let i = 1; i <= lastDateofMonth; i++) { // creating li of all days of current month
-            // adding active class to li if the current day, month, and year matched
-            let isToday = i === date.getDate() && currMonth === new Date().getMonth() && currYear === new Date().getFullYear()
-                ? "active"
-                : "";
-            liTag += `<li class="${isToday}">
-                <a href="?current_date=${currYear}-${currMonth}-${String(i).padStart(2, "0")}">${i}</a>
-            </li>`;
-        }
-        for (let i = lastDayofMonth; i < 7; i++) { // creating li of next month first days
-            liTag += `<li class="inactive"><a href="?current_date=2026-11-11">${i - lastDayofMonth + 1}</a></li>`
-        }
-        // currentDate.innerText = `${months[currMonth]} ${currYear}`; // passing current mon and yr as currentDate text
-        daysTag.innerHTML = liTag;
-    }
-
-    renderCalendar();
-    prevNextIcon.forEach(icon => { // getting prev and next icons
-        icon.addEventListener("click", () => { // adding click event on both icons
-            // if clicked icon is previous icon then decrement current month by 1 else increment it by 1
-            currMonth = icon.id === "prev"
-                ? currMonth - 1
-                : currMonth + 1;
-            if (currMonth < 0 || currMonth > 11) { // if current month is less than 0 or greater than 11
-                // creating a new date of current year & month and pass it as date value
-                date = new Date(currYear, currMonth, new Date().getDate());
-                currYear = date.getFullYear(); // updating current year with new date year
-                currMonth = date.getMonth(); // updating current month with new date month
-            } else {
-                date = new Date(); // pass the current date as date value
-            }
-            renderCalendar(); // calling renderCalendar function
-        });
-    });
-
-    selectYearAndMonth.forEach((item) => {
-        item.addEventListener("change", (e) => {
-            const selectType = e.currentTarget.dataset.calendarSelect;
-            if (selectType === "month") {
-                const monthSelected = e.currentTarget.value;
-                date = new Date(currYear, monthSelected, new Date().getDate());
-            } else {
-                const yearSelected = e.currentTarget.value;
-                date = new Date(yearSelected, currMonth, new Date().getDate());
-            }
-            currYear = date.getFullYear(); // updating current year with new date year
-                currMonth = date.getMonth(); // updating current month with new date month
-            renderCalendar();
-        })
-    }) #}
-</script>
 
 <template data-template-id="calendar-day">
     <li>

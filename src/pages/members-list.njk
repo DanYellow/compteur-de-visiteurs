@@ -79,7 +79,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 </header>
                 {% include "includes/calendar.njk" %}
                 <header class="flex mb-3 gap-3">
-                    <div class="flex flex-col w-full lg:w-auto lg:mr-4 bg-green-numixs p-3 pr-5 rounded-md text-black-numixs">
+                    <div class="flex flex-col w-full md:w-auto lg:mr-4 bg-green-numixs p-3 pr-5 rounded-md text-black-numixs">
                         <p class="text-2xl title-font">Nombre de visites</p>
                         <p class="text-4xl">{{ visitors_list|length }}</p>
                         <p>{{ current_date|date("EEEE dd LLLL yyyy") }}</p>
@@ -87,7 +87,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                         <p class="text-sm italic">Fermé</p>
                         {% endif %}
                     </div>
-                    <div class="bg-black-numixs p-3 rounded-md text-white-numixs hidden flex-1 lg:grid grid-cols-4 gap-1.5">
+                    <div class="bg-black-numixs p-3 rounded-md text-white-numixs hidden flex-1 md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
                         <p class="col-span-full text-xl">Détails des visites par type de visiteur</p>
                         {% for business in list_business_sector %}
                             <div class="flex flex-col flex-auto">
