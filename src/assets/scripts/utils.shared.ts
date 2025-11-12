@@ -1,5 +1,5 @@
 import type { PivotTableOptions, Result, WeekMonth } from "#types";
-import { DateTime, Info } from "luxon";
+import { DateTime, Info, type IntervalObject } from "luxon";
 
 import config from "#config" with { type: "json" };
 
@@ -201,7 +201,7 @@ const listMonths = Info.months('long', {locale: 'fr' })
         id: idx + 1
     }));
 
-const getWeeksRangeMonth = (startDate) => {
+const getWeeksRangeMonth = (startDate = null) => {
     const today = DateTime.now();
     const startMonth = today.startOf("month");
     const endMonth = today.endOf("month");
@@ -213,10 +213,10 @@ const getWeeksRangeMonth = (startDate) => {
     const intervalWeeks = intervalMonth.splitBy({ weeks: 1 });
 
     const listWeeks: WeekMonth[] = [];
-    intervalWeeks.forEach((item: DateTime, index: number, array) => {
+    intervalWeeks.forEach((item: IntervalObject, index: number, array: WeekMonth[]) => {
         listWeeks.push({
-            id: item.s.weekNumber,
-            name: `${(index === 0 ? startMonth : item.s).toFormat("dd/LL")} ➜ ${(index === array.length - 1 ? endMonth : item.e).toFormat("dd/LL")}`
+            id: item.start!.weekNumber,
+            name: `${(index === 0 ? startMonth : item.start!).toFormat("dd/LL")} ➜ ${(index === array.length - 1 ? endMonth : item.end!).toFormat("dd/LL")}`
         });
     });
 

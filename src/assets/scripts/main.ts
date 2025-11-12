@@ -3,7 +3,6 @@ import "../styles/notification.css";
 import "../styles/calendar.css";
 import "../styles/responsive-table.css";
 
-import "./select-date.ts";
 import "./calendar.ts";
 
 document.querySelectorAll("dialog").forEach((item) => {

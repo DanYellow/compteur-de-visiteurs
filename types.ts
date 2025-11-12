@@ -1,12 +1,8 @@
-import type { Align, TitleOptions } from "chart.js";
-import type { DateTime } from "luxon";
+import type { Align, LineControllerDatasetOptions, TitleOptions } from "chart.js";
 
-export interface LineChartEntry {
-    label: string;
+export type LineChartEntry = {
     data: Number[];
-    borderColor: string;
-}
-
+} & Partial<LineControllerDatasetOptions>;
 
 export interface WeekMonth {
     id: number;
@@ -34,6 +30,12 @@ export interface PivotTableOptions {
 export interface Visit {
     id: number;
     heure?: number;
-    date_passage: DateTime;
+    date_passage: string;
     lieu?: string;
+    groupe: string;
+    // [key: string]: string;
+}
+
+export interface GroupVisit {
+    [key: number]: Visit[];
 }

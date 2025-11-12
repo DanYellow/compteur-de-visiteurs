@@ -1,9 +1,9 @@
-import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend } from 'chart.js';
+import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend, type ScaleChartOptions, type ScriptableScaleContext } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime } from "luxon";
 
-import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions } from "#types";
+import type { CustomTitleOptions, GroupVisit, LineChartEntry, TotalVisitorsPluginOptions, Visit } from "#types";
 import { configData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
 
 
@@ -52,7 +52,7 @@ const chartScales = (xTitle: string, titleSize: number = 12) => {
                 }
             },
             grid: {
-                color: (ctx) => {
+                color: (ctx: ScriptableScaleContext) => {
                     if (ctx.index === 0) {
                         return "rgba(255, 255, 255, 1)";
                     }
@@ -78,7 +78,7 @@ const chartScales = (xTitle: string, titleSize: number = 12) => {
                 }
             },
             grid: {
-                color: (ctx) => {
+                color: (ctx: ScriptableScaleContext) => {
                     if (ctx.index === 0) {
                         return "rgba(255, 255, 255, 1)";
                     }
@@ -144,16 +144,17 @@ const listCharts = Object.values(configDataRaw);
         const req = await fetch(`/api?filtre=${apiKey}`);
         const res = await req.json();
 
-        const listVisitsGrouped = Object.groupBy(res.data, (item: { item: Record<string, string | number> }) => {
+        const listVisitsGrouped:GroupVisit = Object.groupBy(res.data as Visit[], (item) => {
             return item.groupe;
         });
 
         ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
+        console.log(listVisitsGrouped)
 
         const chartData = xLabels.map((item) => {
             let key = item;
             if (typeof key === 'object') {
-                key = item.id;
+                key = String((item as { name: string; id: number; }).id);
             }
 
             if (listVisitsGrouped[key]) {
@@ -283,7 +284,6 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                     label: row[0] as string,
                     data: lineData as number[],
                     borderColor: listBusinessSector.find((item) => item.name === row[0] as string)!.lineColor,
-                    // borderColor: business.lineColor,
                     tension: 0,
                     fill: true,
                 });
