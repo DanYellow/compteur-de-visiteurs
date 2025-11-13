@@ -22,7 +22,6 @@ if (process.env.NODE_ENV === "development") {
 }
 
 let publicPath = path.join(path.resolve(), "public");
-console.log("process.env.NODE_ENV", process.env.NODE_ENV)
 if (process.env.NODE_ENV === "production") {
     publicPath = path.join(path.resolve(), "dist");
 }

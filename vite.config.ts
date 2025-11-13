@@ -33,6 +33,8 @@ export default defineConfig(({ mode }) => {
         },
         build: {
             emptyOutDir: false,
+            manifest: "manifest.json",
+            target: 'esnext',
             lib: {
                 entry: [
                     path.resolve(__dirname, "src/assets/scripts/main.ts"),

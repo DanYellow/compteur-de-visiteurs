@@ -10,7 +10,7 @@ Compteur de visiteurs
 {% if NODE_ENV == "development" %}
     <script type="module" src="/src/assets/scripts/register-form.ts" defer></script>
 {% else %}
-    <script type="module" src="/register-form.js" defer></script>
+    <script type="module" src="/{{ manifest['src/assets/scripts/register-form.ts'].file }}" defer></script>
 {% endif %}
 {% endblock %}
 {% block content %}

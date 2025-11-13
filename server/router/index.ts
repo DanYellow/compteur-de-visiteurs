@@ -10,8 +10,19 @@ import config from "#config" with { type: "json" };
 
 import ApiRouter from "./api.ts";
 import DownloadRouter from "./download.ts";
+import parseManifest from "#server/parse-manifest.ts";
 
 const router = express.Router();
+
+router.use(async (_req, res, next) => {
+    const manifest = {
+        manifest: await parseManifest("manifest.json"),
+    };
+    res.locals = manifest;
+
+    next();
+});
+
 
 router.use("/api", ApiRouter);
 router.use("/telecharger", DownloadRouter);
