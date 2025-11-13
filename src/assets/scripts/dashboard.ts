@@ -1,11 +1,10 @@
-import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend, type ScaleChartOptions, type ScriptableScaleContext } from 'chart.js';
+import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend, type ScriptableScaleContext } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime } from "luxon";
 
-import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions, Visit } from "#types";
+import type { ChartConfigData, CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions, Visit } from "#types";
 import { configData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
-
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const linkDownloadChartData = document.querySelector("[data-download-chart-data='simple']") as HTMLLinkElement;
@@ -29,7 +28,7 @@ const chartTitleStyle: CustomTitleOptions = {
 
 const TotalVisitors = {
     id: 'totalVisitors',
-    beforeDraw: (chart: Chart, args, options: TotalVisitorsPluginOptions) => {
+    beforeDraw: (chart: Chart, _args: any, options: TotalVisitorsPluginOptions) => {
         const { ctx } = chart;
         const { text = "", fontSize = "14px" } = options;
         ctx.save();
@@ -108,7 +107,7 @@ if (queryParams.has("current_date")) {
     }
 }
 
-const configDataRaw = {
+const configDataRaw: ChartConfigData = {
     "jour": {
         ...configData.jour,
         id: "dailyChart",
@@ -234,11 +233,12 @@ const listCharts = Object.values(configDataRaw);
 })();
 
 const detailsChartCtx = document.getElementById("detailsChart")! as HTMLCanvasElement;
-detailsChartsDialog?.addEventListener("toggle", async (e) => {
-    const isOpened = e.newState === "open";
+detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
+    const toggleEvent = e as ToggleEvent;
+    const isOpened = toggleEvent.newState === "open";
 
     if (isOpened) {
-        const sourceBtn = e.source! as HTMLButtonElement;
+        const sourceBtn = toggleEvent.source! as HTMLButtonElement;
         const chartSelected = sourceBtn.dataset.detailsChart;
         const chartData = JSON.parse(sourceBtn.closest("div")?.querySelector("canvas")?.dataset.chartData || "{}");
         const { xLabels = [], xTitle = "", xValuesSuffix = "", chartTitle, downloadLink } = listCharts.find((item) => item.apiKey === chartSelected) || {};

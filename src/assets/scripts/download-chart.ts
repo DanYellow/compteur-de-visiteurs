@@ -33,7 +33,7 @@ listDownloadButtons.forEach((item) => {
 
         const chartScaleOptions = chartInstance!.config!.options!.scales!;
 
-        chartInstance.options.plugins!.totalVisitors.fontSize = "18px";
+        chartInstance.options.plugins!.totalVisitors!.fontSize = "18px";
         (chartScaleOptions.x! as any).title!.font!.size = 20;
         (chartScaleOptions.y! as any).title!.font!.size = 20;
         (chartInstance.config!.options!.plugins!.title!.font! as any).size = 32;
@@ -110,7 +110,7 @@ listDownloadButtons.forEach((item) => {
             (chartInstance.config!.options!.scales!.x! as any).title!.font.size = chartXTitleFontSize;
             (chartInstance.config!.options!.scales!.y! as any).title.font.size = chartYTitleFontSize;
             (chartInstance.config!.options!.plugins!.title!.font! as any).size = chartTitleFontSize;
-            chartInstance.options.plugins!.totalVisitors.fontSize = "14px";
+            chartInstance.options.plugins!.totalVisitors!.fontSize = "14px";
 
             chartInstance.options.plugins!.tooltip!.enabled = true;
             chartInstance.resize();

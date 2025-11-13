@@ -100,8 +100,9 @@ const validForm = (e: Event) => {
     return true;
 }
 
-dialog.addEventListener("toggle", (e) => {
-    const isOpened = e.newState === "open";
+dialog.addEventListener("toggle", (e: Event) => {
+    const toggleEvent = e as ToggleEvent;
+    const isOpened = toggleEvent.newState === "open";
 
     if (!isOpened && !sleepController.signal.aborted) {
         form.removeAttribute('data-is-dirty');

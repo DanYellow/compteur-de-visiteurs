@@ -1,5 +1,5 @@
-import type { PivotTableOptions, Result, WeekMonth } from "#types";
-import { DateTime, Info, type IntervalObject } from "luxon";
+import type { BaseConfigData, PivotTableOptions, Result, Visit, WeekMonth } from "#types";
+import { DateTime, Info, Interval } from "luxon";
 
 import config from "#config" with { type: "json" };
 
@@ -110,7 +110,7 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
         };
 
         Object.entries(data).forEach(([group, listVisits]) => {
-            const totalPerGroup = listVisits.reduce(
+            const totalPerGroup = (listVisits as unknown as Visit[]).reduce(
                 (acc: Record<string, number>, visit) => ((acc[business.value] = (acc[business.value] || 0) + ((visit[business.value] === "oui") ? 1 : 0)), acc),
                 {});
 
@@ -122,7 +122,7 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
             });
 
             if (indexArray >= 0) {
-                tableFooter[indexArray + 1] += totalPerGroup[business.value];
+                (tableFooter[indexArray + 1] as number) += totalPerGroup[business.value];
                 visitorPerTypeAndPeriod[business.value][indexArray] = totalPerGroup[business.value];
             }
         });
@@ -188,20 +188,20 @@ const rangeOpeningHours = Math.abs(Number(closeHours) - Number(openHours) + 1);
 const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + openHours).map((item) => String(item));
 
 const listClosedDaysIndex = config.CLOSED_DAYS_INDEX.split(",").filter(Boolean).map(Number);
-const listDays = Info.weekdays('long', {locale: 'fr'})
+const listDays = Info.weekdays('long', { locale: 'fr' })
     .map((item, idx) => ({
         name: item.charAt(0).toUpperCase() + String(item).slice(1),
         id: idx + 1
     }))
     .filter((_, index) => !listClosedDaysIndex.includes(index + 1))
 
-const listMonths = Info.months('long', {locale: 'fr' })
+const listMonths = Info.months('long', { locale: 'fr' })
     .map((item, idx) => ({
         name: item.charAt(0).toUpperCase() + String(item).slice(1),
         id: idx + 1
     }));
 
-const getWeeksRangeMonth = (startDate = null) => {
+const getWeeksRangeMonth = (_startDate = null) => {
     const today = DateTime.now();
     const startMonth = today.startOf("month");
     const endMonth = today.endOf("month");
@@ -210,20 +210,24 @@ const getWeeksRangeMonth = (startDate = null) => {
     const lastWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: endMonth.weekNumber });
 
     const intervalMonth = firstWeekInMonth.until(lastWeekInMonth.endOf("month"));
-    const intervalWeeks = intervalMonth.splitBy({ weeks: 1 });
+    if (intervalMonth.isValid) {
+        const intervalWeeks = intervalMonth.splitBy({ weeks: 1 });
+        const listWeeks: WeekMonth[] = [];
 
-    const listWeeks: WeekMonth[] = [];
-    intervalWeeks.forEach((item: IntervalObject, index: number, array: WeekMonth[]) => {
-        listWeeks.push({
-            id: item.start!.weekNumber,
-            name: `${(index === 0 ? startMonth : item.start!).toFormat("dd/LL")} ➜ ${(index === array.length - 1 ? endMonth : item.end!).toFormat("dd/LL")}`
+        intervalWeeks.forEach((item: Interval<true>, index: number, array: Interval<boolean>[]) => {
+            listWeeks.push({
+                id: item.start!.weekNumber,
+                name: `${(index === 0 ? startMonth : item.start!).toFormat("dd/LL")} ➜ ${(index === array.length - 1 ? endMonth : item.end!).toFormat("dd/LL")}`
+            });
         });
-    });
 
-    return listWeeks;
+        return listWeeks;
+    }
+
+    return [];
 }
 
-export const configData = {
+export const configData: BaseConfigData = {
     "jour": {
         apiKey: "jour",
         listColumns: listTimeSlots,

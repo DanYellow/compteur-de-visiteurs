@@ -6,6 +6,7 @@ import { stringify } from "csv-stringify/sync";
 
 import { configData, getLinearCSV, getPivotTable } from "#scripts/utils.shared.ts";
 import { DateTime, DateTimeUnit } from "luxon";
+import { Visit } from "#types";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,23 +31,27 @@ router.get('/', async (req, res) => {
     const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}&${extraParams.toString()}`);
     const requestRes = await request.json();
 
-    let csvFilename = `liste-visites_${String(Date.now()).slice(-6)}.csv`;
+    const fileTimestamp = `_${String(Date.now()).slice(-6)}.csv`;
+    let csvFilename = "";
 
     if (isGrouped) {
         const config = configData[configKey];
 
-        csvFilename = `liste-visites-detaillee_${String(Date.now()).slice(-6)}.csv`;
-        const pivotPayload = Object.groupBy(requestRes.data, (item: { item: Record<string, string | number> }) => {
-            return item.groupe;
+        csvFilename = `liste-visites-detaillee_${configKey}`;
+        const pivotPayload = Object.groupBy(requestRes.data, (item) => {
+            return (item as Visit).groupe;
         });
         csvPayload = getPivotTable(pivotPayload, config.listColumns, { columnSuffix: config?.xValuesSuffix || "" });
     } else {
+        csvFilename = `liste-visites_${configKey}`;
         const filterPredicate: DateTimeUnit = predicatesDict[configKey] as DateTimeUnit;
         const daySelected = DateTime.fromISO(Object.values(req.query)[0] as string);
         const totalPeriodCell = `${daySelected.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${daySelected.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
 
         csvPayload = getLinearCSV(requestRes.data, totalPeriodCell);
     }
+
+    csvFilename += fileTimestamp;
 
     const tempCsvFile = path.join(__dirname, "..", "liste-visites.tmp.csv");
 

@@ -21,21 +21,42 @@ export type CustomTitleOptions = Omit<TitleOptions, 'fullSize' | 'text' | "align
     padding?: number | { top: number; bottom: number };
 };
 
-export type Result = Record<string, Record<string, string>>;
+export type Result = Record<string, string>;
 
 export interface PivotTableOptions {
     columnSuffix: string;
 }
 
-export interface Visit {
+type Groups = {
+    [key: string]: string;
+}
+
+export type Visit = Groups & {
     id: number;
     heure?: number;
     date_passage: string;
     lieu?: string;
     groupe: string;
-    // [key: string]: string;
 }
 
 export interface GroupVisit {
     [key: number]: Visit[];
+}
+
+export interface BaseConfigData {
+    [key: string]: {
+        apiKey: string;
+        xValuesSuffix?: string;
+        listColumns: string[] | { id: number; name: string; }[];
+    }
+}
+
+export type ChartConfigData = BaseConfigData & {
+    [key: string]: {
+        id: string;
+        chartTitle: string;
+        downloadLink: string;
+        xTitle: string;
+        xLabels: string[] | { id: number; name: string; }[];
+    }
 }
