@@ -15,7 +15,7 @@
             </button>
             <div class="flex-1 px-6 py-4 relative">
                 {# <label for="mois" class="text-sm absolute top-0 left-6">Mois</label> #}
-                <select id="mois" class="w-full" data-calendar-select="month">
+                <select id="mois" class="w-full custom-select" data-calendar-select="month">
                     {% for month in list_months %}
                         <option value="{{ loop.index }}">{{ month }}</option>
                     {% endfor %}
@@ -23,7 +23,7 @@
             </div>
             <div class="flex-1 px-6 py-4 relative">
                 {# <label for="annee" class="text-sm absolute top-0 left-6">Année</label> #}
-                <select id="annee" class="w-full" data-calendar-select="year">
+                <select id="annee" class="w-full custom-select" data-calendar-select="year">
                     {% for year in range(2024, 2035) %}
                         <option value="{{ year }}">{{ year }}</option>
                     {% endfor %}

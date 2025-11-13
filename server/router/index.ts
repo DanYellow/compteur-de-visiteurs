@@ -51,7 +51,22 @@ router.post("/", async (req, res) => {
 });
 
 router.get(["/dashboard"], async (req, res) => {
-    res.render("pages/dashboard.njk");
+    let daySelected = DateTime.now();
+    const today = daySelected;
+    if (req.query.current_date) {
+        const tmpDate = DateTime.fromISO(req.query.current_date as string);
+        if (tmpDate.isValid) {
+            daySelected = tmpDate;
+        }
+    }
+
+    res.render("pages/dashboard.njk", {
+        "current_date": daySelected,
+        "today": DateTime.now(),
+        "is_today": daySelected.startOf('day').equals(today.startOf('day')),
+        "is_day_closed": config.CLOSED_DAYS_INDEX.split(",").includes(String(daySelected.weekday)),
+        "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
+    });
 })
 
 router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {

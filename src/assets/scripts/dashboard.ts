@@ -3,7 +3,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime } from "luxon";
 
-import type { CustomTitleOptions, GroupVisit, LineChartEntry, TotalVisitorsPluginOptions, Visit } from "#types";
+import type { CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions, Visit } from "#types";
 import { configData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
 
 
@@ -98,38 +98,46 @@ const chartScales = (xTitle: string, titleSize: number = 12) => {
     }
 }
 
-const today = DateTime.now();
+let daySelected = DateTime.now();
+const queryParams = new URLSearchParams(window.location.search);
+
+if (queryParams.has("current_date")) {
+    const tmpDate = DateTime.fromISO(queryParams.get("current_date") as string);
+    if (tmpDate.isValid) {
+        daySelected = tmpDate;
+    }
+}
 
 const configDataRaw = {
     "jour": {
         ...configData.jour,
         id: "dailyChart",
-        chartTitle: `Visites uniques du ${today.toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?jour=${today.toFormat("yyyy-LL-dd")}`,
+        chartTitle: `Visites uniques du ${daySelected.toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?jour=${daySelected.toFormat("yyyy-LL-dd")}`,
         xTitle: 'Tranche horaire',
         xLabels: configData.jour.listColumns,
     },
     "semaine": {
         ...configData.semaine,
         id: "weeklyChart",
-        chartTitle: `Visites uniques du ${today.startOf("week").toFormat("dd/LL/yyyy")} au ${today.endOf("week").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?semaine=${today.toFormat("yyyy-LL-dd")}`,
+        chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}`,
         xTitle: 'Jours',
         xLabels: configData.semaine.listColumns,
     },
     "mois": {
         ...configData.mois,
         id: "monthlyChart",
-        chartTitle: `Visites uniques du ${today.startOf("month").toFormat("dd/LL/yyyy")} au ${today.endOf("month").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?mois=${today.toFormat("yyyy-LL-dd")}`,
+        chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}`,
         xTitle: 'Semaines',
         xLabels: configData.mois.listColumns,
     },
     "annee": {
         ...configData.annee,
         id: "yearlyChart",
-        chartTitle: `Visites uniques du ${today.startOf("year").toFormat("dd/LL/yyyy")} au ${today.endOf("year").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?annee=${today.toFormat("yyyy-LL-dd")}`,
+        chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}`,
         xTitle: 'Mois',
         xLabels: configData.annee.listColumns,
     }
@@ -141,7 +149,7 @@ const listCharts = Object.values(configDataRaw);
     listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
         const ctx = document.getElementById(id)! as HTMLCanvasElement;
 
-        const req = await fetch(`/api?filtre=${apiKey}`);
+        const req = await fetch(`/api?filtre=${apiKey}&jour=${daySelected.toFormat("yyyy-LL-dd")}`);
         const res = await req.json();
 
         const listVisitsGrouped = Object.groupBy(res.data as Visit[], (item) => {

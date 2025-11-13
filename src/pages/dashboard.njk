@@ -21,6 +21,10 @@ Tableau de bord
             <header class="flex flex-col md:flex-row justify-between md:items-center mb-16 -mt-1.5">
                 <h1 class="text-black title-font font-bold text-6xl">Tableau de bord</h1>
             </header>
+            <header class="flex gap-4 mb-6 justify-between sm:justify-normal text-black-numixs">
+                {% include "includes/date-nav.njk" %}
+            </header>
+            {% include "includes/calendar.njk" %}
             <div class="text-black">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                     <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
