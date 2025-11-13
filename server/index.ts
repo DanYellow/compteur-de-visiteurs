@@ -21,7 +21,11 @@ if (process.env.NODE_ENV === "development") {
     app.use(vite.middlewares);
 }
 
-const publicPath = path.join(path.resolve(), "public");
+let publicPath = path.join(path.resolve(), "public");
+console.log("process.env.NODE_ENV", process.env.NODE_ENV)
+if (process.env.NODE_ENV === "production") {
+    publicPath = path.join(path.resolve(), "dist");
+}
 
 app.set("view engine", "nunjucks");
 app.set("views", path.join(__dirname, "..", "/src"));

@@ -11,7 +11,9 @@
         {% if NODE_ENV == "development" %}
             <script type="module" src="/src/assets/scripts/main.ts" defer></script>
         {% else %}
-            <script type="module" src="/dist/" defer></script>
+            <script type="module" src="/utils.shared-ynHin5l2.js" defer></script>
+            <script type="module" src="/compteur-de-visiteurs.js" defer></script>
+            <link rel="stylesheet" href="/compteur-de-visiteurs.css">
         {% endif %}
         <link rel="shortcut icon" href="/images/faclab-logo.svg" type="image/x-icon">
         {% block scripts %}{% endblock %}

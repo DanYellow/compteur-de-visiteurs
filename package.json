@@ -7,7 +7,7 @@
         "dev": "cross-env NODE_ENV=development node env-to-json.js && cross-env NODE_ENV=development tsx watch --include \"./server/*\" --include \"./src/*\" server/index.ts",
         "dev:docker": "tsx watch --include \"./server/*\" --include \"./src/*\" server/index.ts",
         "build": "cross-env NODE_ENV=production node env-to-json.js && tsc && vite build",
-        "prod": "cross-env NODE_ENV=production node server/index.ts"
+        "prod": "cross-env NODE_ENV=production node --import=tsx server/index.ts"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.1.13",

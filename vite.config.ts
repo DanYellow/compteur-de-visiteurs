@@ -1,6 +1,7 @@
 import { defineConfig, loadEnv, type UserConfig } from "vite";
 
 import tailwindcss from "@tailwindcss/vite";
+import path from "path";
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
@@ -30,6 +31,21 @@ export default defineConfig(({ mode }) => {
             //     }
             // } : {})
         },
+        build: {
+            emptyOutDir: false,
+            lib: {
+                entry: [
+                    path.resolve(__dirname, "src/assets/scripts/main.ts"),
+                    path.resolve(__dirname, "src/assets/scripts/register-form.ts"),
+                ],
+                formats: ["es"],
+            },
+            rollupOptions: {
+                output: {
+                    assetFileNames: "[name].[ext]",
+                },
+            },
+        }
     } satisfies UserConfig
 });
 

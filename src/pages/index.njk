@@ -7,7 +7,11 @@
 Compteur de visiteurs
 {% endblock %}
 {% block scripts %}
+{% if NODE_ENV == "development" %}
     <script type="module" src="/src/assets/scripts/register-form.ts" defer></script>
+{% else %}
+    <script type="module" src="/register-form.js" defer></script>
+{% endif %}
 {% endblock %}
 {% block content %}
     <div class="max-w-7xl mt-8 px-3 grid grid-cols-1 lg:grid-cols-[1fr_456px] justify-center gap-24 mx-auto">

@@ -1,7 +1,6 @@
 import "../styles/main.css";
 import "../styles/notification.css";
 import "../styles/calendar.css";
-import "../styles/responsive-table.css";
 
 import "./calendar.ts";
 

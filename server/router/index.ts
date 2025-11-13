@@ -25,7 +25,7 @@ router.get("/", (req, res) => {
 router.post("/", async (req, res) => {
     const validator = VisitorSchema.safeParse(req.body);
     if (!validator.success) {
-        res.status(500).json({ "success": false })
+        return res.status(500).json({ "success": false });
     }
 
     try {
