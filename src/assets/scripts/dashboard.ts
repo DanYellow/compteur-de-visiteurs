@@ -325,7 +325,7 @@ detailsChartsDialog?.addEventListener("toggle", async (e) => {
                             }
                         },
                         title: {
-                            text: `${(chartTitle || "").replace("uniques ", "")} détaillées`,
+                            text: `${(chartTitle || "").replace("uniques", "détaillées")}`,
                             ...chartTitleStyle,
                             font: {
                                 ...chartTitleStyle.font,
