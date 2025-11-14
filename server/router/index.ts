@@ -15,10 +15,11 @@ import parseManifest from "#server/parse-manifest.ts";
 const router = express.Router();
 
 router.use(async (_req, res, next) => {
-    const manifest = {
-        manifest: await parseManifest("manifest.json"),
+    const manifest = await parseManifest("manifest.json");
+    res.locals = {
+        ...res.locals,
+        manifest,
     };
-    res.locals = manifest;
 
     next();
 });

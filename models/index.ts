@@ -1,8 +1,14 @@
 import { Sequelize } from 'sequelize';
 
+let databaseFileName = './database.tmp.sqlite';
+
+if (process.env.NODE_ENV === "production") {
+    databaseFileName = './database-prod.tmp.sqlite';
+}
+
 const sequelize = new Sequelize({
     dialect: 'sqlite',
-    storage: './database.tmp.sqlite',
+    storage: databaseFileName,
     define: {
         freezeTableName: true,
     },
