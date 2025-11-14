@@ -70,6 +70,12 @@
                 cursor: pointer;
                 position: relative;
                 align-content: center;
+                opacity: 1;
+                transition: opacity 0.1s;
+
+                @starting-style {
+                    opacity: 0;
+                }
 
                 &.active {
                     a {

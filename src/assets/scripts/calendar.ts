@@ -43,13 +43,14 @@ const loadMonth = (e: FocusEvent) => {
 const moveToDay = async (date: DateTime) => {
     const daySelected = date.toFormat("yyyy-LL-dd");
 
-    const dayLink = (calendarWrapper!.querySelector(`[data-date="${daySelected}"]`) as HTMLLinkElement);
+    let dayLink = (calendarWrapper!.querySelector(`[data-date="${daySelected}"]`) as HTMLLinkElement);
     staticCurrentDay = daySelected;
     if (!dayLink) {
         currentDay = date;
         updateDropdowns();
         renderCalendar();
     }
+    dayLink = (calendarWrapper!.querySelector(`[data-date="${daySelected}"]`) as HTMLLinkElement);
     dayLink.tabIndex = 0;
     dayLink.focus();
 }
@@ -115,6 +116,7 @@ const renderCalendar = () => {
     if (!daysContainer) {
         return;
     }
+
     daysContainer.innerHTML = "";
 
     const firstDayOfMonth = currentDay.startOf("month");
@@ -216,8 +218,6 @@ const updateDropdowns = () => {
         }
     })
 }
-
-
 
 selectYearAndMonth.forEach((item) => {
     item.addEventListener("change", (e) => {
