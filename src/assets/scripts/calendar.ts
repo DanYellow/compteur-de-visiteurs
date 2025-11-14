@@ -2,6 +2,7 @@ import { DateTime } from "luxon";
 import config from "#config" with { type: "json" };
 import { capitalizeFirstLetter } from "./utils.shared";
 
+const calendarWrapper = document.getElementById("calendar");
 const daysContainer = document.querySelector("[data-list-days]") as HTMLOListElement;
 const navigationMonthsBtns = document.querySelectorAll("[data-navigation-month]");
 const listSiblingsMonthLabel = document.querySelectorAll("[data-month]") as unknown as HTMLSpanElement[];
@@ -22,8 +23,25 @@ if (queryString.has("current_date")) {
     staticCurrentDay = currentDay.toFormat("yyyy-LL-dd");
 }
 
+const loadMonth = (e: FocusEvent) => {
+    const date = e.currentTarget as HTMLLinkElement;
+    const dateSelected = date.dataset.date;
+    const monthType = date.dataset.month;
+
+    if (monthType === "prev") {
+        currentDay = currentDay.minus({ months: 1 })
+    } else {
+        currentDay = currentDay.plus({ months: 1 })
+    }
+
+    updateDropdowns();
+    renderCalendar();
+
+    (document.querySelector(`[data-date="${dateSelected}"]`) as HTMLLinkElement).focus();
+}
+
 const renderCalendar = () => {
-    if(!daysContainer) {
+    if (!daysContainer) {
         return;
     }
     daysContainer.innerHTML = "";
@@ -34,8 +52,8 @@ const renderCalendar = () => {
     const lastDayLastMonth = currentDay.startOf("month").minus({ months: 1 }).endOf("month")
     const firstDayNextMonth = currentDay.startOf("month").plus({ months: 1 }).startOf("month")
 
-    listSiblingsMonthLabel[0].textContent = capitalizeFirstLetter(lastDayLastMonth.toFormat("LLLL", {locale: "fr"}))
-    listSiblingsMonthLabel[1].textContent = capitalizeFirstLetter(firstDayNextMonth.toFormat("LLLL", {locale: "fr"}))
+    listSiblingsMonthLabel[0].textContent = capitalizeFirstLetter(lastDayLastMonth.toFormat("LLLL", { locale: "fr" }))
+    listSiblingsMonthLabel[1].textContent = capitalizeFirstLetter(firstDayNextMonth.toFormat("LLLL", { locale: "fr" }))
 
     const countdownPrevMonth = firstDayOfMonth.weekday === 1 ? 8 : firstDayOfMonth.weekday;
 
@@ -53,7 +71,10 @@ const renderCalendar = () => {
         calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
         calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
         calendarDayTplLink.textContent = String(dayNumber);
-        calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", {locale: "fr"})
+        calendarDayTplLink.dataset.month = "prev";
+        calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
+        calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" })
+        calendarDayTplLink.addEventListener("focus", loadMonth);
 
         daysContainer?.append(calendarDayTpl);
     }
@@ -78,8 +99,9 @@ const renderCalendar = () => {
 
         calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
         calendarDayTplLink.textContent = String(i);
+        calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
         // calendarDayTplLink.tabIndex = -1;
-        calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", {locale: "fr"})
+        calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" })
 
         daysContainer?.append(calendarDayTpl);
     }
@@ -99,7 +121,10 @@ const renderCalendar = () => {
         calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
         calendarDayTplLink.textContent = dayNumber;
         calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
-        calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", {locale: "fr"})
+        calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" });
+        calendarDayTplLink.dataset.month = "next";
+        calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
+        calendarDayTplLink.addEventListener("focus", loadMonth);
 
         daysContainer?.append(calendarDayTpl);
     }
@@ -116,8 +141,7 @@ const updateDropdowns = () => {
     })
 }
 
-updateDropdowns();
-renderCalendar();
+
 
 selectYearAndMonth.forEach((item) => {
     item.addEventListener("change", (e) => {
@@ -148,3 +172,15 @@ navigationMonthsBtns.forEach(icon => {
         renderCalendar();
     });
 });
+
+renderCalendar();
+updateDropdowns();
+
+calendarWrapper?.addEventListener("toggle", (e: Event) => {
+    const toggleEvent = e as ToggleEvent;
+    const isOpened = toggleEvent.newState === "open";
+
+    if (isOpened) {
+        ;(calendarWrapper.querySelector(`[data-date="${currentDay.toFormat("yyyy-LL-dd")}"]`) as HTMLLinkElement).focus();
+    }
+})
