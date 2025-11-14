@@ -61,7 +61,7 @@ const chartScales = (xTitle: string, titleSize: number = 12) => {
             },
             title: {
                 display: true,
-                text: "Nombre de visites",
+                text: "Visites uniques",
                 color: "white",
                 font: {
                     size: titleSize

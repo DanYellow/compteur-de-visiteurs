@@ -157,7 +157,7 @@ export const getLinearCSV = (data: Result[], totalPeriodCell = "") => {
     ] : [];
     const csvPayload = [csvHeader];
 
-    data.forEach((item) => {
+    data.forEach((item, idx) => {
         // let groupName = xLabels[item.groupe];
         // if (typeof groupName === 'object') {
         //     groupName = groupName.name;
@@ -168,11 +168,12 @@ export const getLinearCSV = (data: Result[], totalPeriodCell = "") => {
                 csvTotal[idx] += 1
             }
         });
-
+        item.id = String(idx + 1);
         const rowData: string[] = Object.values({
             ...item,
             // groupe: groupName
         })
+
         rowData.pop()
         csvPayload.push(rowData);
     });
