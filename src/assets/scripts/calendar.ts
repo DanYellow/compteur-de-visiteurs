@@ -10,8 +10,9 @@ const selectYearAndMonth = document.querySelectorAll("[data-calendar-select]") a
 const calendarDayTplRaw = document.querySelector("[data-template-id='calendar-day']") as HTMLTemplateElement;
 
 let currentDay = DateTime.now();
-const today = DateTime.now().toFormat("yyyy-LL-dd");
-let staticCurrentDay = DateTime.now().toFormat("yyyy-LL-dd");
+const today = currentDay.toFormat("yyyy-LL-dd");
+let urlDay = today;
+let staticCurrentDayMonth = currentDay.toFormat("LL-dd");
 const listClosedDaysIndex = config.CLOSED_DAYS_INDEX.split(",").filter(Boolean).map(String);
 
 const queryString = new URLSearchParams(window.location.search);
@@ -20,10 +21,22 @@ if (queryString.has("current_date")) {
     if (tmpDate.isValid) {
         currentDay = tmpDate;
     }
-    staticCurrentDay = currentDay.toFormat("yyyy-LL-dd");
+    staticCurrentDayMonth = currentDay.toFormat("LL-dd");
+    urlDay = currentDay.toFormat("yyyy-LL-dd");
+}
+
+let skipNextFocus = false;
+
+const stopFocusClick = () => {
+    skipNextFocus = true;
 }
 
 const loadMonth = (e: FocusEvent) => {
+    if (skipNextFocus) {
+        skipNextFocus = false;
+        return;
+    }
+
     const date = e.currentTarget as HTMLLinkElement;
     const dateSelected = date.dataset.date;
     const monthType = date.dataset.month;
@@ -44,7 +57,7 @@ const moveToDay = async (date: DateTime) => {
     const daySelected = date.toFormat("yyyy-LL-dd");
 
     let dayLink = (calendarWrapper!.querySelector(`[data-date="${daySelected}"]`) as HTMLLinkElement);
-    staticCurrentDay = daySelected;
+
     if (!dayLink) {
         currentDay = date;
         updateDropdowns();
@@ -147,6 +160,7 @@ const renderCalendar = () => {
         calendarDayTplLink.dataset.month = "prev";
         calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
         calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" })
+        calendarDayTplLink.addEventListener("mousedown", stopFocusClick);
         calendarDayTplLink.addEventListener("focus", loadMonth);
         calendarDayTplLink.tabIndex = -1;
 
@@ -156,29 +170,31 @@ const renderCalendar = () => {
     // Current month
     for (let i = 1; i <= lastDayOfMonth.get("day"); i++) { // creating li of all days of current month
         // adding active class to li if the current day, month, and year matched
-        const dayNumber = String(i);
+        const dayNumber = String(i).padStart(2, "0");
+        const monthDay = `${String(currentDay.get("month")).padStart(2, "0")}-${dayNumber}`;
         const yearAndMonth = `${currentDay.get("year")}-${String(currentDay.get("month")).padStart(2, "0")}`;
 
-        const isDaySelected = `${yearAndMonth}-${dayNumber.padStart(2, "0")}` === staticCurrentDay;
-        const isToday = `${yearAndMonth}-${dayNumber.padStart(2, "0")}` === today;
+        const isDaySelected = monthDay === staticCurrentDayMonth;
+        const isToday = `${yearAndMonth}-${dayNumber}` === today;
+        const isDayInURL = `${yearAndMonth}-${dayNumber}` === urlDay;
 
         const calendarDayTpl = calendarDayTplRaw.content.cloneNode(true) as HTMLElement;
         const calendarDayTplLi = calendarDayTpl.querySelector("li");
-        calendarDayTplLi?.classList.toggle("active", isDaySelected);
+        calendarDayTplLi?.classList.toggle("active", isDayInURL);
         calendarDayTplLi?.classList.toggle("today", isToday);
 
-        const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).weekday;
+        const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber}`).weekday;
         const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
         calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
 
-        calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
+        calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber}`;
         calendarDayTplLink.textContent = String(i);
-        calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
+        calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber}`;
         if (!isDaySelected) {
             calendarDayTplLink.tabIndex = -1;
         }
         calendarDayTplLink.addEventListener("keydown", handleArrowNavigation);
-        calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" })
+        calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" })
 
         daysContainer?.append(calendarDayTpl);
     }
@@ -201,6 +217,7 @@ const renderCalendar = () => {
         calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" });
         calendarDayTplLink.dataset.month = "next";
         calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
+        calendarDayTplLink.addEventListener("mousedown", stopFocusClick);
         calendarDayTplLink.addEventListener("focus", loadMonth);
         calendarDayTplLink.tabIndex = -1;
 
@@ -230,6 +247,7 @@ selectYearAndMonth.forEach((item) => {
             const yearSelected = select.value;
             currentDay = currentDay.set({ year: Number(yearSelected) });
         }
+        staticCurrentDayMonth = currentDay.toFormat("LL-dd");
 
         renderCalendar();
     })
@@ -244,6 +262,8 @@ navigationMonthsBtns.forEach(icon => {
             currentDay = currentDay.plus({ months: 1 })
         }
 
+        staticCurrentDayMonth = currentDay.toFormat("LL-dd");
+
         updateDropdowns();
         renderCalendar();
     });
@@ -251,12 +271,3 @@ navigationMonthsBtns.forEach(icon => {
 
 renderCalendar();
 updateDropdowns();
-
-calendarWrapper?.addEventListener("toggle", (e: Event) => {
-    const toggleEvent = e as ToggleEvent;
-    const isOpened = toggleEvent.newState === "open";
-
-    if (isOpened) {
-        // ; (calendarWrapper.querySelector(`[data-date="${currentDay.toFormat("yyyy-LL-dd")}"]`) as HTMLLinkElement).focus();
-    }
-})
