@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { Chart } from 'chart.js';
 import { loadImage, slugify } from "./utils";
+import config from "#config" with { type: "json" };
 
 const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
 
@@ -56,7 +57,7 @@ listDownloadButtons.forEach((item) => {
         if (cloneCtx) {
             chartClone.width = chartClone.width + 75;
             const table = chart.closest("dialog")?.querySelector("table");
-            chartClone.height = chartClone.height + 50;
+            chartClone.height = chartClone.height + 75;
             if (table) {
                 chartClone.height += table.offsetHeight;
             }
@@ -70,10 +71,12 @@ listDownloadButtons.forEach((item) => {
             watermark.src = '/images/watermark.svg';
             await loadImage(watermark);
 
-            cloneCtx.drawImage(watermark, chartClone.width - watermark.width, chartClone.height - watermark.height, watermark.width * WATERMARK_SCALE_FACTOR, watermark.height * WATERMARK_SCALE_FACTOR);
+            cloneCtx.drawImage(watermark, chartClone.width - watermark.width, chartClone.height - watermark.height - 12, watermark.width * WATERMARK_SCALE_FACTOR, watermark.height * WATERMARK_SCALE_FACTOR);
             cloneCtx.font = "12px Calibri";
             cloneCtx.fillStyle = "white";
             cloneCtx.fillText(`Généré le ${today.toFormat("dd/LL/yyyy à HH:mm")}`, 5, chartClone.height - 7);
+
+            cloneCtx.fillText(config.PLACE, chartClone.width - 46, chartClone.height - 7);
 
             if (chart.closest("dialog")) {
                 const table = chart.closest("dialog")?.querySelector("table");

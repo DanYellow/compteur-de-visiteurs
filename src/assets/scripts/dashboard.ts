@@ -259,6 +259,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
         Object.values(chartDataPivotTable).forEach((row, index, table) => {
             const trBody = document.createElement("tr");
+            trBody.classList.add("hover:bg-green-numixs/15")
             row.forEach((cell, cellIndex, listRows) => {
                 if (index === 0) {
                     const th = document.createElement("th");
