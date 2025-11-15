@@ -24,7 +24,7 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 
 **Production**
 - Compiler les ressources : `npm run build`
-- Lancer le serveur de prévisualisation : `npm run preview`
+- Lancer le serveur de production : `npm run prod`
 
 
 ## Construit avec

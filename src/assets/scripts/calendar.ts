@@ -271,3 +271,17 @@ navigationMonthsBtns.forEach(icon => {
 
 renderCalendar();
 updateDropdowns();
+
+calendarWrapper!.addEventListener("command", (event) => {
+    if (event.command === "toggle-popover" ) {
+        const isOpen = !calendarWrapper!.matches(':popover-open');
+        const triggerEl = event.source!;
+
+        if (isOpen) {
+            triggerEl.title = "Fermer calendrier";
+        } else {
+            triggerEl.title = "Ouvrir calendrier";
+        }
+
+    }
+ });
