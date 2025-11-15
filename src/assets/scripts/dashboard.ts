@@ -35,7 +35,19 @@ const TotalVisitors = {
         ctx.globalCompositeOperation = 'destination-over';
         ctx.font = `${fontSize} Calibri`;
         ctx.fillStyle = "white";
-        ctx.fillText(text, 6, chart.height - 10);
+
+        let x = 6;
+        const idxColon = text.indexOf(":")
+        for (let i = 0; i < text.length; i++) {
+            const ch = text.charAt(i)!;
+
+            if (i > idxColon) {
+                ctx.fillStyle = greenNumixs;
+            }
+            ctx.fillText(ch, x, chart.height - 10);
+            x += ctx.measureText(ch).width;
+        }
+
         ctx.restore();
     }
 };
