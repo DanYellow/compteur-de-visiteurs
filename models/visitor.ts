@@ -27,16 +27,16 @@ const Visitor = sequelize.define('visitor', {
     updatedAt: false,
 });
 
-// const queryInterface = sequelize.getQueryInterface()
-// const tableNames = await queryInterface.showAllTables();
-// try {
-//     const backupTableName = Visitor.tableName + '_backup'
-//     if (tableNames.includes(backupTableName)) {
-//         await queryInterface.dropTable(backupTableName)
-//     }
-//     await Visitor.sync({ alter: true })
-// } catch (e) {
-//     console.error('💔model sync error', e)
-// }
+const queryInterface = sequelize.getQueryInterface()
+const tableNames = await queryInterface.showAllTables();
+try {
+    const backupTableName = Visitor.tableName + '_backup'
+    if (tableNames.includes(backupTableName)) {
+        await queryInterface.dropTable(backupTableName)
+    }
+    await Visitor.sync({ alter: true })
+} catch (e) {
+    console.error('💔model sync error', e)
+}
 
 export default Visitor;

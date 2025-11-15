@@ -10,8 +10,13 @@ Tableau de bord
 {% set active_menu_item = "dashboard" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% block scripts %}
-    <script type="module" src="/src/assets/scripts/dashboard.ts" defer></script>
-    <script type="module" src="/src/assets/scripts/download-chart.ts" defer></script>
+    {% if NODE_ENV == "development" %}
+        <script type="module" src="/src/assets/scripts/dashboard.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/download-chart.ts" defer></script>
+    {% else %}
+        <script type="module" src="/{{ manifest['src/assets/scripts/download-chart.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/dashboard.ts'].file }}" defer></script>
+    {% endif %}
 {% endblock %}
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
