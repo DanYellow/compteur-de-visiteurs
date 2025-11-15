@@ -64,6 +64,20 @@ app.all('/', function (req, res, next) {
 
 app.use(router);
 
+app.use(function (req, res, next) {
+    res.status(404);
+
+    if (req.accepts('html')) {
+        return res.render('pages/error.njk', { code: 404, message: "Page non trouvée" });
+    }
+
+    if (req.accepts('json')) {
+        return res.json({ error: "Page non trouvée" });
+    }
+
+    res.type('txt').send("Page non trouvée");
+});
+
 const nunjucksConfig = nunjucks.configure(app.get("views"), {
     autoescape: true,
     express: app,

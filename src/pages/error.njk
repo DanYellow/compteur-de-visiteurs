@@ -1,0 +1,14 @@
+{% extends "layouts/page.njk" %}
+
+{% set root_class = "register" %}
+
+{% block title %}
+Erreur {{ code }}
+{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mt-8 px-3 mx-auto">
+        <h1 class="text-6xl title-font">Erreur {{ code }}</h1>
+        <p>{{ message }}. <a href="/" class="underline text-green-numixs hocus:no-underline">Retourner à la page d'accueil</a>.</p>
+    </div>
+{% endblock %}
