@@ -6,8 +6,6 @@ import sequelize from "#models/index.ts";
 import VisitorModel from "#models/visitor.ts";
 import config from "#config" with { type: "json" };
 
-import { Visit } from "#types";
-
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -49,14 +47,23 @@ router.get("/", async (req, res) => {
     const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: openHours });
     const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: closeHours });
 
-    const listClosedDaysIndex = config.CLOSED_DAYS_INDEX.split(",").filter(Boolean).map(String);
+    const openingDaysSelector = sequelize.where(
+        sequelize.fn("strftime", "%u", sequelize.col("date_passage"), "localtime"), {
+            [Op.notIn]: config.CLOSED_DAYS_INDEX.split(",")
+        }
+    );
+
+    const openingHoursSelector = sequelize.where(
+        sequelize.cast(sequelize.fn("strftime", "%H", sequelize.col("date_passage"), "localtime"), "int"), {
+            [Op.between]: [openHours, closeHours]
+        }
+    );
 
     const listVisitors = await VisitorModel.findAll({
         raw: true,
         attributes: {
             include: [
                 [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"],
-                [sequelize.fn("strftime", "%u", sequelize.col("date_passage"), "localtime"), "jour"],
                 [sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime"), "groupe"],
             ],
         },
@@ -67,30 +74,18 @@ router.get("/", async (req, res) => {
                     [Op.lte]: endTime.toString(),
                 },
             },
-
+            [Op.and]: [openingDaysSelector, openingHoursSelector],
         },
         order: [
             ['date_passage', 'DESC'],
         ]
     });
 
-    const filteredVisits = listVisitors
-        .filter((item) => {
-            const visitHour = new Date(item.date_passage).getHours();
-
-            return visitHour >= openHours && visitHour <= closeHours && !listClosedDaysIndex.includes(item.jour);
-        })
-        .map((item) => {
-            delete item.jour;
-
-            return item;
-        });
-
     res.status(200).json({
-        data: filteredVisits.map((item) => {
+        data: listVisitors.map((item) => {
             return {
                 ...item,
-                groupe: filtreParam === "semaine" ? Number(item.groupe) : item.groupe.trim(),
+                // groupe: filtreParam === "semaine" ? Number(item.groupe) : item.groupe.trim(),
             }
         })
     });

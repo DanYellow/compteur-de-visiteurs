@@ -11,6 +11,7 @@ import config from "#config" with { type: "json" };
 import ApiRouter from "./api.ts";
 import DownloadRouter from "./download.ts";
 import parseManifest from "#server/parse-manifest.ts";
+import sequelize from "#models/index.ts";
 
 const router = express.Router();
 
@@ -94,6 +95,14 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     // const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}`);
     // const records = await request.json();
 
+    const isClosedDay = config.CLOSED_DAYS_INDEX.split(",").includes(String(daySelected.weekday));
+
+    const openingDaysSelector = sequelize.where(
+        sequelize.fn("strftime", "%u", sequelize.col("date_passage"), "localtime"), {
+            [Op.notIn]: config.CLOSED_DAYS_INDEX.split(",")
+        }
+    );
+
     const [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
     const records = await VisitorModel.findAll({
         where: {
@@ -102,24 +111,26 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                     [Op.gte]: daySelected.startOf("day").set({ hour: openHours }).toString(),
                     [Op.lte]: daySelected.endOf("day").set({ hour: closeHours }).toString(),
                 }
-            }
+            },
+            [Op.and]: [openingDaysSelector],
         },
         order: [['date_passage', 'DESC']]
     });
 
     const visitorsSummary = await VisitorModel.findAll({
         raw: true,
+        attributes: [
+            ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value]))
+        ],
         where: {
             date_passage: {
                 [Op.and]: {
                     [Op.gte]: daySelected.startOf("day").set({ hour: openHours }).toString(),
                     [Op.lte]: daySelected.endOf("day").set({ hour: closeHours }).toString(),
-                }
-            }
+                },
+            },
+            [Op.and]: [openingDaysSelector],
         },
-        attributes: [
-            ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value]))
-        ]
     });
 
     res.render("pages/members-list.njk", {
@@ -130,7 +141,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "current_date": daySelected,
         "today": DateTime.now(),
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
-        "is_day_closed": config.CLOSED_DAYS_INDEX.split(",").includes(String(daySelected.weekday)),
+        "is_day_closed": isClosedDay,
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
     });
 });
