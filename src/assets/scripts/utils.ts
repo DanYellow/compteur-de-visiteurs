@@ -41,3 +41,7 @@ export const cancellableSleep = (duration: number, signal: AbortSignal) => {
         signal.addEventListener('abort', abort);
     });
 }
+
+export const SOCKET_EVENTS = {
+    VISITOR_REGISTERED: "VISITOR_REGISTERED"
+}

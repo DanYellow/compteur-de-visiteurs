@@ -156,13 +156,16 @@ const renderCalendar = () => {
 
         calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
         calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
-        calendarDayTplLink.textContent = String(dayNumber);
         calendarDayTplLink.dataset.month = "prev";
         calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
         calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" })
         calendarDayTplLink.addEventListener("mousedown", stopFocusClick);
         calendarDayTplLink.addEventListener("focus", loadMonth);
         calendarDayTplLink.tabIndex = -1;
+
+        const calendarDayTplTime = calendarDayTpl.querySelector("time")!;
+        calendarDayTplTime.textContent = dayNumber;
+        calendarDayTplTime.dateTime = `${yearAndMonth}-${dayNumber}`;
 
         daysContainer?.append(calendarDayTpl);
     }
@@ -188,13 +191,16 @@ const renderCalendar = () => {
         calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
 
         calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber}`;
-        calendarDayTplLink.textContent = String(i);
         calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber}`;
         if (!isDaySelected) {
             calendarDayTplLink.tabIndex = -1;
         }
         calendarDayTplLink.addEventListener("keydown", handleArrowNavigation);
         calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" })
+
+        const calendarDayTplTime = calendarDayTpl.querySelector("time")!;
+        calendarDayTplTime.textContent = String(i);
+        calendarDayTplTime.dateTime = `${yearAndMonth}-${dayNumber}`;
 
         daysContainer?.append(calendarDayTpl);
     }
@@ -212,7 +218,6 @@ const renderCalendar = () => {
 
         const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
         calendarDayTplLink.href = `?current_date=${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
-        calendarDayTplLink.textContent = dayNumber;
         calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
         calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" });
         calendarDayTplLink.dataset.month = "next";
@@ -220,6 +225,10 @@ const renderCalendar = () => {
         calendarDayTplLink.addEventListener("mousedown", stopFocusClick);
         calendarDayTplLink.addEventListener("focus", loadMonth);
         calendarDayTplLink.tabIndex = -1;
+
+        const calendarDayTplTime = calendarDayTpl.querySelector("time")!;
+        calendarDayTplTime.textContent = dayNumber;
+        calendarDayTplTime.dateTime = `${yearAndMonth}-${dayNumber}`;
 
         daysContainer?.append(calendarDayTpl);
     }

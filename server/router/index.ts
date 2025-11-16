@@ -3,8 +3,9 @@ import { DateTime, Info } from "luxon";
 import { Op, literal } from 'sequelize';
 
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
+import { SOCKET_EVENTS } from '#scripts/utils.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
-import { wss } from "../index.ts";
+import { wss } from "#server/index.ts";
 import VisitorModel from "#models/visitor.ts";
 import config from "#config" with { type: "json" };
 
@@ -52,7 +53,7 @@ router.post("/", async (req, res) => {
 
         wss.clients.forEach((client) => {
             if (client.readyState === client.OPEN) {
-                client.send(JSON.stringify({ type: "VISITOR_REGISTERED", payload: req.body }));
+                client.send(JSON.stringify({ type: SOCKET_EVENTS.VISITOR_REGISTERED, payload: req.body }));
             }
         });
 
