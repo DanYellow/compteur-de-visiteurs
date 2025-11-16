@@ -14,7 +14,7 @@ Compteur de visiteurs
 {% endif %}
 {% endblock %}
 {% block content %}
-    <div class="max-w-7xl mt-8 px-3 grid grid-cols-1 lg:grid-cols-[1fr_456px] justify-center gap-24 mx-auto">
+    <div class="max-w-7xl mt-8 px-3 grid grid-cols-1 lg:grid-cols-[1fr_456px] justify-center gap-24 mr-[max(env(safe-area-inset-right),_theme(space.3))] ml-[max(env(safe-area-inset-left),_theme(space.3))]">
         <form class="w-full" novalidate action="" method="post" data-sign-in-form>
             <header class="mb-6">
                 <img src="/images/faclab-logo-light.svg" class="w-20" alt="">
