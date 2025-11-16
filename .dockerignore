@@ -1,0 +1,17 @@
+*Dockerfile
+.dockerignore
+.git
+node_modules
+dist
+
+*.sqlite
+*.md
+*.yml
+*.tmp.*
+
+.editorconfig
+.env.dist
+.gitignore
+config.local.json
+.vscode
+LICENSE

@@ -5,6 +5,7 @@ import express from "express";
 import cors from "cors";
 import { WebSocketServer } from 'ws';
 import { DateTime } from "luxon";
+import ip from "ip";
 
 import config from "#config" with { type: "json" };
 
@@ -12,6 +13,8 @@ import router from "./router/index.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+const serverip = ip.address();
 
 const app = express();
 if (process.env.NODE_ENV === "development") {
@@ -98,14 +101,14 @@ nunjucksConfig.addFilter("add_days", (value, days) => {
     return DateTime.fromISO(value).plus({ days });
 });
 
-const listDomains: string[] = ["0.0.0.0"]; // "192.168.0.169"
+const listDomains: string[] = process.env.IS_DOCKER?.toLowerCase() === "true" ? ["faclab.localhost"] : ["localhost", "0.0.0.0"];
 const port = Number(process.env.VITE_PORT || 3900);
-const server = app.listen(port, ["::"], () => {
+const server = app.listen(port, () => {
     console.log("---------------------------");
     console.log(
         "Express server running at (ctrl/cmd + click to open in your browser):"
     );
-    ["localhost", ...listDomains]
+    [serverip, ...listDomains]
         .filter(Boolean)
         .filter((item) => item !== "::")
         .forEach((item) => {

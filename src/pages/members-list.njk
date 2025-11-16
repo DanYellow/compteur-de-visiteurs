@@ -74,12 +74,11 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 {% include "includes/calendar.njk" %}
                 <header class="flex mb-3 gap-3">
                     <div class="flex flex-col w-full md:w-auto bg-green-numixs p-3 pr-5 rounded-md text-black-numixs">
+                        {% if is_day_closed == false %}
                         <p class="text-2xl title-font">Nombre de visites uniques</p>
-                        <p class="text-4xl">{{ visitors_list|length }}</p>
-                        <p>{{ current_date|date("EEEE dd LLLL yyyy") }}</p>
-                        {% if is_day_closed %}
-                        <p class="text-sm italic">Fermé</p>
                         {% endif %}
+                        <p class="text-4xl">{{ "Fermé" if is_day_closed else visitors_list|length }}</p>
+                        <p>{{ current_date|date("EEEE dd LLLL yyyy") }}</p>
                     </div>
                     <div class="bg-black-numixs p-3 rounded-md text-white-numixs hidden flex-1 md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
                         <p class="col-span-full text-xl">Détails des visites par type de visiteur</p>
@@ -117,7 +116,13 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                                 </tr>
                             {% else %}
                                 <tr class="">
-                                    <td colspan="{{ (list_business_sector | length) + 2 }}" class="px-4 py-3 text-center">Pas de visites le {{ current_date|date("dd/LL/yyyy") }}</td>
+                                    <td colspan="{{ (list_business_sector | length) + 2 }}" class="px-4 py-3 text-center">
+                                        {% if is_day_closed %}
+                                        Fermé le <time datetime="{{ current_date }}">{{ current_date|date("dd/LL/yyyy") }}</time>
+                                        {% else %}
+                                        Pas de visites le <time datetime="{{ current_date }}">{{ current_date|date("dd/LL/yyyy") }}</time>
+                                        {% endif %}
+                                    </td>
                                 </tr>
                             {% endfor %}
                         </tbody>

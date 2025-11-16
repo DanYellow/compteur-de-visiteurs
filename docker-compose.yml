@@ -1,58 +1,32 @@
 services:
-    traefik:
-        image: traefik:v3
-        container_name: traefik
-        command: --api.insecure=true --providers.docker
-            # - --api.insecure=true
-            # - --providers.docker=true
-            # - --providers.docker.exposedByDefault=false
-            # - --providers.file.filename=/traefik-dynamic.yml
-        ports:
-            - 80:80
-            - 8081:8081
-        volumes:
-            - "/var/run/docker.sock:/var/run/docker.sock:ro"
-        # configs:
-        #     - traefik-dynamic.yml
-        # networks:
-        #     - web
+  traefik:
+    image: traefik:v3
+    container_name: traefik
+    command: --api.insecure=true --providers.docker
+    ports:
+      - 80:80
+      - 8081:8081
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
-    compteur-de-visiteurs:
-        image: node:24.8.0
-        container_name: compteur-social-dev
-        command: sh -c "node env-to-json.js && npm install && npm run dev" # --verbose
-        working_dir: "/home/node/app"
-        depends_on:
-            - traefik
-        volumes:
-            - ./public/:/home/node/app/public
-            - ./src/:/home/node/app/src
-            - ./server:/home/node/app/server
-            - ./models:/home/node/app/models
-            - ./.env.local:/home/node/app/.env.local
-            - ./package.json:/home/node/app/package.json
-            - ./package-lock.json:/home/node/app/package-lock.json
-            - ./vite.config.ts:/home/node/app/vite.config.ts
-            - ./env-to-json.js:/home/node/app/env-to-json.js
-            - ./tsconfig.json:/home/node/app/tsconfig.json
-            - /home/node/app/node_modules
-        ports:
-            - 3900:3900
-            - 24678:24678
-        # restart: always
-        environment:
-            - VITE_USE_POLLING=true
-            - NODE_ENV=development
-            - CHOKIDAR_USEPOLLING=true
-            - NODE_OPTIONS=--max_old_space_size=8192
-        env_file:
-            - .env.local
-        labels:
-            - "traefik.enable=true"
-            - "traefik.http.routers.compteur-de-visiteurs.rule=Host(`faclab.localhost`)"
-        # networks:
-        #     - web
-
-# networks:
-#   web:
-#     external: true
+  compteur-de-visiteurs:
+    container_name: compteur-social-production
+    build:
+      context: .
+      dockerfile: node.Dockerfile
+    depends_on:
+      - traefik
+    stdin_open: true
+    tty: true
+    ports:
+      - 3900:3900
+      - 24678:24678
+    environment:
+      - NODE_ENV=production
+      - NODE_OPTIONS=--max_old_space_size=8192
+      - IS_DOCKER=true
+    env_file:
+      - .env.local
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.compteur-de-visiteurs.rule=Host(`faclab.localhost`)"
