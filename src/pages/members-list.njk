@@ -18,7 +18,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-row justify-between md:items-center mb-16 -mt-1.5">
-                <h1 class="text-black title-font font-bold text-6xl">Visites</h1>
+                <h1 class="text-black title-font font-bold text-6xl">Visites uniques</h1>
 
                 {% set split_button_main_action %}
                     <a href="/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white">
@@ -111,7 +111,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                                         </time>
                                     </td>
                                     {% for business in list_business_sector %}
-                                        <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
+                                        <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left {{ "font-bold" if member[business.value] == "oui" else "" }}" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ member[business.value] }}</td>
                                     {% endfor %}
                                 </tr>
                             {% else %}

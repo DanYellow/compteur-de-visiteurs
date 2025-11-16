@@ -336,3 +336,27 @@ button {
     background-position: right 10px center;
     background-size: 18px;
 }
+
+.navigation-month-2 {
+    width: 2.85rem;
+    overflow-x: clip;
+    transition: width 0.35s ease;
+
+    [data-day] {
+        display: none;
+        transition: opacity 0.15s ease, display 0.15s ease allow-discrete;
+
+        @starting-style {
+            opacity: 0;
+        }
+    }
+
+    &:hover,
+    &:focus-visible {
+        width: max-content;
+        [data-day] {
+            display: initial;
+            opacity: 1;
+        }
+    }
+}
