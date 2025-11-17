@@ -106,6 +106,11 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     const [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
     const records = await VisitorModel.findAll({
+        attributes: {
+            include: [
+                [sequelize.literal('ROW_NUMBER() OVER (ORDER by date_passage ASC)'), 'order']
+            ],
+        },
         where: {
             date_passage: {
                 [Op.and]: {
