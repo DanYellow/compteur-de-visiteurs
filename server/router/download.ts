@@ -3,9 +3,11 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath, URLSearchParams } from "url";
 import { stringify } from "csv-stringify/sync";
-
-import { configData, getLinearCSV, getPivotTable } from "#scripts/utils.shared.ts";
 import { DateTime, DateTimeUnit } from "luxon";
+
+import config from "#config" with { type: "json" };
+import { configData, getLinearCSV, getPivotTable } from "#scripts/utils.shared.ts";
+import { slugify } from "#scripts/utils.ts";
 import { Visit } from "#types";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -31,7 +33,7 @@ router.get('/', async (req, res) => {
     const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}&${extraParams.toString()}`);
     const requestRes = await request.json();
 
-    const fileTimestamp = `_${String(Date.now()).slice(-6)}.csv`;
+    const fileTimestamp = `_${slugify(config.PLACE)}_${String(Date.now()).slice(-6)}.csv`;
     let csvFilename = "";
 
     if (isGrouped) {

@@ -280,12 +280,14 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                 if (index === 0) {
                     const th = document.createElement("th");
                     th.classList.add("px-2")
-
                     th.textContent = String(cell);
                     tableDetailsChartTableHeadRow.append(th);
                 } else {
                     const td = document.createElement("td");
                     td.textContent = String(cell);
+                    if (cellIndex === 0) {
+                        td.style.paddingLeft = "0.2rem";
+                    }
                     if (cellIndex > 0) {
                         td.style.textAlign = "center";
                     }
