@@ -1,7 +1,7 @@
 *Dockerfile
 .dockerignore
-.git
 node_modules
+.npm
 dist
 
 *.sqlite
@@ -11,7 +11,15 @@ dist
 
 .editorconfig
 .env.dist
-.gitignore
 config.local.json
 .vscode
 LICENSE
+
+# Git & editor
+.git
+.gitignore
+.gitattributes
+.vscode
+.idea
+*.swp
+*.swo
