@@ -271,7 +271,11 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
         Object.values(chartDataPivotTable).forEach((row, index, table) => {
             const trBody = document.createElement("tr");
-            trBody.classList.add("hover:bg-green-numixs/15")
+            trBody.classList.add("hover:!bg-green-numixs/15");
+            if (index % 2 === 0) {
+                trBody.style.backgroundColor = "#00000075";
+            }
+
             row.forEach((cell, cellIndex, listRows) => {
                 if (index === 0) {
                     const th = document.createElement("th");

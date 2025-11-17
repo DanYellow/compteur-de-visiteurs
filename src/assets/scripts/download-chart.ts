@@ -39,7 +39,7 @@ listDownloadButtons.forEach((item) => {
         (chartScaleOptions.y! as any).title!.font!.size = 20;
         (chartInstance.config!.options!.plugins!.title!.font! as any).size = 32;
 
-        (chartInstance.options!.plugins!.datalabels!.font! as any).size = 24;
+        // (chartInstance.options!.plugins!.datalabels!.font! as any).size = 24;
         // chartInstance.options!.plugins!.datalabels!.backgroundColor = grayNumixs;
         chartInstance.options.plugins!.tooltip!.enabled = false;
         chartInstance.resize(SIZE_EXPORT.width, SIZE_EXPORT.height);

@@ -1,0 +1,32 @@
+import { DateTime } from "luxon";
+import { listGroups as listBusinessSector } from './utils.shared';
+
+const modal = document.getElementById("detail-visit") as HTMLDialogElement;
+
+const visitTime = modal.querySelector("time") as HTMLTimeElement;
+const visitGroupContainer = modal.querySelector("ul") as HTMLUListElement;
+const visitNumber = modal.querySelector("[data-visit-number]") as HTMLSpanElement;
+
+modal?.addEventListener("toggle", (e: Event) => {
+    const toggleEvent = e as ToggleEvent;
+    const isOpened = toggleEvent.newState === "open";
+
+    if (isOpened) {
+        visitGroupContainer.innerHTML = "";
+        const sourceItem = toggleEvent.source! as HTMLButtonElement;
+        const visitData = JSON.parse(sourceItem.dataset.visitData!);
+
+        Object.entries(visitData).forEach(([key, value]) => {
+            if (String(value).toLowerCase() === "oui") {
+                const li = document.createElement("li");
+                const groupData = listBusinessSector.find((item) => item.value === key);
+                li.textContent = `${groupData?.name || ""} ${groupData?.fullName || ""}`;
+
+                visitGroupContainer.append(li);
+            }
+        })
+        visitNumber.textContent = String(visitData.order);
+        visitTime.dateTime = visitData.date_passage;
+        visitTime.textContent = DateTime.fromISO(visitData.date_passage).toFormat("EEEE dd LLLL yyyy à HH:mm:ss", {locale: "fr"});
+    }
+})

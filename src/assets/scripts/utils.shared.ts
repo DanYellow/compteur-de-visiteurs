@@ -41,6 +41,7 @@ export const listGroups = [
         "name": "Agent CARPF",
         "value": "agent_carpf",
         "lineColor": 'rgb(255, 108, 0)',
+        "fullName": "(Communauté d'Agglomération Roissy Pays de France)"
     },
     {
         "name": "Collectivité",
