@@ -1,0 +1,18 @@
+services:
+  compteur-de-visiteurs:
+    container_name: compteur-social-dev
+    image: node:24.8.0
+    command: sh -c "npm install --verbose && npm run dev"
+    stdin_open: true
+    tty: true
+    working_dir: /home/node/app
+    ports:
+      - 3900:3900
+      - 24678:24678
+    volumes:
+      - ./:/home/node/app
+      - /home/node/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NODE_OPTIONS=--max_old_space_size=8192
+      - IS_DOCKER=true
