@@ -1,0 +1,21 @@
+{% extends "layouts/page.njk" %}
+
+{% block content %}
+    <div class="max-w-7xl mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] justify-center gap-24 mx-auto">
+        <form action="" method="post">
+            <div class="flex flex-col">
+                <label for="place">Sélectionner le lieu</label>
+                <select name="" id="place">
+                    <option value=""></option>
+                </select>
+            </div>
+            <div class="mt-7">
+                <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                    Envoyer
+                    {% include "includes/icons/next-arrow.svg" %}
+                </button>
+            </div>
+
+        </form>
+    </div>
+{% endblock %}
