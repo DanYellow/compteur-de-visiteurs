@@ -34,6 +34,7 @@ app.set("views", path.join(__dirname, "..", "/src"));
 
 app.use(express.static(publicPath));
 app.use(cors());
+app.use(express.urlencoded())
 app.use(
     express.json({
         type: [
@@ -101,7 +102,7 @@ nunjucksConfig.addFilter("add_days", (value, days) => {
     return DateTime.fromISO(value).plus({ days });
 });
 
-const listDomains: string[] = process.env.IS_DOCKER?.toLowerCase() === "true" ? ["faclab.localhost"] : ["localhost", "0.0.0.0"];
+const listDomains: string[] = (process.env.IS_DOCKER?.toLowerCase() === "true" && process.env.NODE_ENV === "production") ? ["faclab.localhost"] : ["localhost", "0.0.0.0"];
 const port = Number(process.env.VITE_PORT || 3900);
 const server = app.listen(port, () => {
     console.log("---------------------------");

@@ -59,3 +59,19 @@ export const VisitorSchema = z.object({
     message: "Vous devez choisir un type d'entreprise",
     path: ['entreprise'] // Pointing out which field is invalid
 })
+
+export const PlaceSchema = z.object({
+    nom: z.string().min(1),
+    adresse: z.string().min(1),
+    jours_fermeture: z.string().optional(),
+    heure_fermeture: z.string(),
+    heure_ouverture: z.string(),
+    ouvert: z.enum(["oui", "non"], {
+        message: "Vous devez définir l'ouverture du lieu"
+    })
+}).refine(data => {
+    return Number(data.heure_ouverture) < Number(data.heure_fermeture);
+}, {
+    message: "L'heure d'ouverture doit être inférieure à celle de fermeture",
+    path: ['heure_ouverture']
+})

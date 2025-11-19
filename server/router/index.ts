@@ -1,7 +1,6 @@
 import express from "express";
 
 import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
-import { listPlaces } from '#scripts/places.local.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "#server/index.ts";

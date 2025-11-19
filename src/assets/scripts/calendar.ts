@@ -281,7 +281,7 @@ navigationMonthsBtns.forEach(icon => {
 renderCalendar();
 updateDropdowns();
 
-calendarWrapper!.addEventListener("command", (event) => {
+calendarWrapper?.addEventListener("command", (event) => {
     if (event.command === "toggle-popover" ) {
         const isOpen = !calendarWrapper!.matches(':popover-open');
         const triggerEl = event.source!;

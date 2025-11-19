@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/forms";
 
 @theme {
     --color-gray-numixs: #312f2f;
@@ -36,7 +37,7 @@
     }
 
     .form-errors-list-container {
-        border: solid 1px var(--color-red-500);
+        border: solid 1px var(--color-red-800);
         background-color: var(--color-red-50);
         padding: --spacing(4);
         color: var(--color-red-800);
@@ -150,7 +151,7 @@ dialog {
 }
 
 /* :not([type="checkbox"], [type="radio"]) */
-input.error {
+input.error, textarea.error, select.error {
     border: solid 1px var(--color-red-800) !important;
 }
 

@@ -1,10 +1,15 @@
 import { DataTypes } from 'sequelize';
-import config from "#config" with { type: "json" };
 
 import sequelize from "./index";
+import Visitor from './visitor';
 
 const Place = sequelize.define('place', {
     nom: DataTypes.STRING,
+    slug: {
+        type: DataTypes.STRING,
+        unique: true,
+        allowNull: false,
+    },
     adresse: DataTypes.STRING,
     jours_fermeture: DataTypes.TEXT,
     heure_ouverture: {
@@ -13,7 +18,14 @@ const Place = sequelize.define('place', {
     },
     heure_fermeture: {
         type: DataTypes.NUMBER,
-        defaultValue: 19,
+        defaultValue: 20,
+        validate: {
+            isGreaterThanOtherField(value: number) {
+                if (Number(value) <= Number(this.heure_ouverture)) {
+                    throw new Error('Bar must be greater than otherField.');
+                }
+            }
+        }
     },
     ouvert: {
         type: DataTypes.BOOLEAN,
@@ -22,6 +34,8 @@ const Place = sequelize.define('place', {
 }, {
     updatedAt: false,
 });
+
+Place.hasMany(Visitor);
 
 const queryInterface = sequelize.getQueryInterface()
 const tableNames = await queryInterface.showAllTables();

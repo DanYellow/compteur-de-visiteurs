@@ -3,10 +3,12 @@ import { DateTime, Info } from "luxon";
 import { Op, literal } from 'sequelize';
 
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
-import { listPlaces } from '#scripts/places.local.ts';
 import VisitorModel from "#models/visitor.ts";
+import PlaceModel from "#models/place.ts";
 import config from "#config" with { type: "json" };
 import sequelize from "#models/index.ts";
+import { PlaceSchema } from "#scripts/schemas.ts";
+import { slugify } from "#scripts/utils.ts";
 
 const router = express.Router();
 
@@ -97,5 +99,38 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
     });
 });
+
+router.get(['/lieu'], async (req, res) => {
+    res.render("pages/add_edit-place.njk", {
+    });
+}).post(['/lieu'], async (req, res) => {
+    const validator = PlaceSchema.safeParse(req.body);
+    if (!validator.success) {
+        return res.render("pages/add_edit-place.njk", {
+        });
+    }
+
+    try {
+        const payload = {
+            ...req.body,
+            slug: slugify(req.body.nom),
+        };
+        await PlaceModel.create(payload);
+    } catch (e) {
+        console.log(e)
+    }
+
+    res.render("pages/add_edit-place.njk", {
+    });
+})
+
+router.get(['/lieux'], async (req, res) => {
+    const listPlaces = await PlaceModel.findAll({
+        raw: true,
+    })
+    console.log(listPlaces)
+    res.render("pages/add_edit-place.njk", {
+    });
+})
 
 export default router;
