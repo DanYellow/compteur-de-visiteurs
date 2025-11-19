@@ -66,6 +66,7 @@ router.get("/", async (req, res) => {
                 [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"],
                 [sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime"), "groupe"],
             ],
+            exclude: ["placeId"]
         },
         where: {
             date_passage: {

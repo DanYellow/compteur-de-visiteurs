@@ -73,9 +73,12 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     const visitorsSummary = await VisitorModel.findAll({
         raw: true,
-        attributes: [
-            ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value]))
-        ],
+        attributes: {
+            include: [
+                ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value]))
+            ],
+            exclude: ["placeId"],
+        },
         where: {
             date_passage: {
                 [Op.and]: {
