@@ -1,9 +1,9 @@
 import { DateTime } from "luxon";
 import { Chart } from 'chart.js';
 import { loadImage, slugify } from "./utils";
-import config from "#config" with { type: "json" };
 
 const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
+const placeData = JSON.parse(document.querySelector("[data-place]")?.dataset.place || "{}")
 
 const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
 const WATERMARK_SCALE_FACTOR = 0.85;
@@ -15,6 +15,7 @@ const SIZE_EXPORT = {
 }
 
 const today = DateTime.now();
+
 
 listDownloadButtons.forEach((item) => {
     (item as HTMLButtonElement).addEventListener("click", async (e: MouseEvent) => {
@@ -74,9 +75,10 @@ listDownloadButtons.forEach((item) => {
             cloneCtx.drawImage(watermark, chartClone.width - watermark.width, chartClone.height - watermark.height - 12, watermark.width * WATERMARK_SCALE_FACTOR, watermark.height * WATERMARK_SCALE_FACTOR);
             cloneCtx.font = "12px Calibri";
             cloneCtx.fillStyle = "white";
-            cloneCtx.fillText(`Généré le ${today.toFormat("dd/LL/yyyy à HH:mm")}`, 5, chartClone.height - 7);
+            cloneCtx.fillText(`Généré le ${today.toFormat("dd/LL/yyyy à HH:mm")}`, 12, chartClone.height - 7);
 
-            cloneCtx.fillText(config.PLACE, chartClone.width - 46, chartClone.height - 7);
+            const placeName = placeData.nom || "Tous"
+            cloneCtx.fillText(placeName, chartClone.width - (cloneCtx.measureText(placeName).width + 12), chartClone.height - 7);
 
             if (chart.closest("dialog")) {
                 const table = chart.closest("dialog")?.querySelector("table");

@@ -61,7 +61,7 @@ router.get("/", async (req, res) => {
         const place = await PlaceModel.findOne({ where: { slug: req.cookies.numixs_place } })
         const payload = {
             ...req.body,
-            placeId: place!.get("id"),
+            place_id: place.id,
         }
 
         await VisitModel.create(payload)
