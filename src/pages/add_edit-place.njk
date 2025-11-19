@@ -1,7 +1,11 @@
 {% extends "layouts/page.njk" %}
 
 {% block title %}
-Créer
+{% if is_edit %}
+Éditer lieu Numixs
+{% else %}
+Créer nouveau lieu Numixs
+{% endif %}
 {% endblock %}
 
 {% import "includes/macros.njk" as forms %}
@@ -34,6 +38,9 @@ Créer
 
             <div class="text-black-numixs">
                 <form action="" method="post" class="flex flex-col gap-5" data-place-form>
+                    {% if flash_message == "no_place" %}
+                        <p class="p-4 bg-amber-50 text-amber-800 border-t-4 border-t-amber-800">Vous devez créer un lieu (puis le sélectionner) avant de pouvoir permettre aux visiteurs de s'enregistrer</p>
+                    {% endif %}
                     <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
                     <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800">Les champs avec * sont obligatoires</p>
                     <div class="flex flex-col">

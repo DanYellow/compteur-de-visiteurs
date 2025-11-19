@@ -6,6 +6,7 @@ import cors from "cors";
 import { WebSocketServer } from 'ws';
 import { DateTime } from "luxon";
 import ip from "ip";
+import cookieParser from "cookie-parser";
 
 import config from "#config" with { type: "json" };
 
@@ -35,6 +36,7 @@ app.set("views", path.join(__dirname, "..", "/src"));
 app.use(express.static(publicPath));
 app.use(cors());
 app.use(express.urlencoded())
+app.use(cookieParser())
 app.use(
     express.json({
         type: [

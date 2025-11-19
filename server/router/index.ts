@@ -30,25 +30,42 @@ router.use("/api", ApiRouter);
 router.use("/telecharger", DownloadRouter);
 router.use("/", AdminRouter);
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
+    const nbPlaces = await PlaceModel.count();
+    const place = await PlaceModel.findOne({ where: { slug: req.cookies.numixs_place } })
+
+
+    if (!("numixs_place" in req.cookies)) {
+        res.cookie('flash_message', "unset_place", { maxAge: 1000, httpOnly: true })
+        return res.redirect("/choix-lieu")
+    } else if (nbPlaces === 0) {
+        res.cookie('flash_message', "no_place", { maxAge: 1000, httpOnly: true })
+
+        return res.redirect("/lieu")
+    } else if (!place) {
+        res.cookie('flash_message', "unknown_place", { maxAge: 1000, httpOnly: true })
+
+        return res.redirect("/choix-lieu")
+    }
+
     res.render("pages/index.njk", {
         "list_business_sector": listBusinessSector.filter((item) => (!("listInChoices" in item) || item.listInChoices)),
+        place,
     });
-});
-
-router.post("/", async (req, res) => {
+}).post("/", async (req, res) => {
     const validator = VisitorSchema.safeParse(req.body);
     if (!validator.success) {
         return res.status(500).json({ "success": false });
     }
 
     try {
+        const place = await PlaceModel.findOne({ where: { slug: req.cookies.numixs_place } })
         const payload = {
             ...req.body,
-            lieu: res.locals.PLACE,
+            placeId: place!.get("id"),
         }
 
-        await VisitorModel.create(payload);
+        await VisitModel.create(payload)
         await new Promise(r => setTimeout(r, 1500));
 
         wss.clients.forEach((client) => {
@@ -67,23 +84,28 @@ router.post("/", async (req, res) => {
 router.get(["/choix-lieu"], async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
         raw: true,
-    })
+    });
 
-    // res.setHeader('Set-Cookie', 'numixs_place=cookie_value; Max-Age=3600'); // Cookie expires in 1 hour
+    let place = null;
+    if (req.cookies.flash_message === "set_place") {
+        place = await PlaceModel.findOne({ where: { slug: req.cookies.numixs_place } })
+    }
 
     res.render("pages/set-place.njk", {
-        "list_places": listPlaces,
+        "places_list": listPlaces,
+        flash_message: req.cookies.flash_message,
+        place,
     });
 }).post(["/choix-lieu"], async (req, res) => {
-    const payload = {
-        ...req.body,
+    const options = {
+        // maxAge: 1000 * 60 * 15, // would expire after 15 minutes
+        httpOnly: true, // The cookie only accessible by the web server
     }
-    console.log("payload", payload)
-    // res.setHeader('Set-Cookie', 'numixs_place=cookie_value; Max-Age=3600'); // Cookie expires in 1 hour
 
-    // res.render("pages/set-place.njk", {
-    //     "list_places": listPlaces,
-    // });
+    res.cookie('numixs_place', req.body.place, options)
+    res.cookie('flash_message', "set_place", { maxAge: 1000, httpOnly: true })
+
+    res.redirect("/choix-lieu");
 });
 
 export default router;

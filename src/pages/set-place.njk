@@ -1,16 +1,30 @@
 {% extends "layouts/page.njk" %}
 
+{% set root_class = "register" %}
 {% block content %}
     <div class="max-w-7xl mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] justify-center gap-24 mx-auto">
+        {% if flash_message == "unset_place" %}
+        <p class="p-4 bg-amber-50 text-amber-800 border-t-4 border-t-amber-800 mb-4">Vous devez sélectionner un lieu avant de pouvoir mettre en place l'enregistrement de vos visiteurs</p>
+        {% endif %}
+        {% if flash_message == "unknown_place" %}
+        <p class="p-4 bg-amber-50 text-amber-800 border-t-4 border-t-amber-800 mb-4">Le lieu définit n'existe pas, vous devez définir un endroit existant</p>
+        {% endif %}
+        {% if flash_message == "set_place" %}
+        <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4">Le lieu "{{ place.nom }}" a été sélectionné. Toutes les visites seront enregistrées comme appartenant au lieu "{{ place.nom }}" depuis cet appareil. <a href="/" class="underline hocus:no-underline">Accéder au formulaire.</a></p>
+        {% endif %}
+
+
         <form action="" method="post">
             <div class="flex flex-col">
-                <label for="place">Sélectionner le lieu</label>
-                <select name="" id="place">
-                    <option value=""></option>
+                <label for="place" class="title-font text-green-numixs text-5xl">Sélectionner le lieu</label>
+                <select name="place" id="place" class="text-black-numixs">
+                    {% for place in places_list %}
+                    <option value="{{ place.slug }}">{{ place.nom }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="mt-7">
-                <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                <button type="submit" class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
                     Envoyer
                     {% include "includes/icons/next-arrow.svg" %}
                 </button>
