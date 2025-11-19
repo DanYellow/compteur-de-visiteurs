@@ -22,8 +22,10 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
-                <h1 class="text-black-numixs title-font font-bold text-6xl">Visites uniques</h1>
-
+                <div class="text-black-numixs flex flex-col items-start">
+                    <h1 class="text-black-numixs title-font font-bold text-6xl">Visites uniques</h1>
+                    {% include "includes/dropdown-places.njk" %}
+                </div>
                 {% set split_button_main_action %}
                 <a href="/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white">
                         Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)

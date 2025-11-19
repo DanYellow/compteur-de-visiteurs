@@ -11,6 +11,8 @@ const linkDownloadChartData = document.querySelector("[data-download-chart-data=
 const linkDownloadDetailedChartData = document.querySelector("[data-download-chart-data='detailed']") as HTMLLinkElement;
 const tableDetailsChart = document.getElementById("table-details-chart") as HTMLTemplateElement;
 
+const placeData = JSON.parse(document.querySelector("[data-place]")?.dataset.place || "{}")
+
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels);
 
 const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs');
@@ -25,6 +27,15 @@ const chartTitleStyle: CustomTitleOptions = {
         family: "Agency FB"
     }
 };
+
+if (Object.keys(placeData).length > 0) {
+    const rangeOpeningHours = Math.abs(Number(placeData.heure_fermeture) - Number(placeData.heure_ouverture) + 1);
+    const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + placeData.heure_ouverture).map((item) => String(item));
+    configData.jour = {
+        ...configData.jour,
+        listColumns: listTimeSlots
+    }
+}
 
 const TotalVisitors = {
     id: 'totalVisitors',

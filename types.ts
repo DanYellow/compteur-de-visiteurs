@@ -35,7 +35,6 @@ export type Visit = Groups & {
     id: number;
     heure?: number;
     date_passage: string;
-    lieu?: string;
     groupe: string;
 }
 

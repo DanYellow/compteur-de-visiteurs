@@ -2,6 +2,6 @@
 <select id="place-dropdown" class="py-1">
     <option value="tous">Tous</option>
     {% for place in places_list %}
-    <option value="{{ place.slug }}">{{ place.nom }}</option>
+    <option {{ "selected" if place_selected == place.slug else "" }} value="{{ place.slug }}">{{ place.nom }}</option>
     {% endfor %}
 </select>

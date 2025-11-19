@@ -26,6 +26,13 @@ router.get(["/dashboard"], async (req, res) => {
         raw: true,
     })
 
+    const placeSelected = req.query?.lieu || "tous";
+    let place = undefined;
+
+    if (placeSelected !== "tous") {
+        place = listPlaces.find((item) => item.slug === placeSelected)
+    }
+
     res.render("pages/dashboard.njk", {
         "current_date": daySelected,
         "today": DateTime.now(),
@@ -33,6 +40,7 @@ router.get(["/dashboard"], async (req, res) => {
         "is_day_closed": config.CLOSED_DAYS_INDEX.split(",").includes(String(daySelected.weekday)),
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
         "places_list": listPlaces,
+        "place": place,
     });
 })
 
@@ -54,7 +62,18 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         }
     );
 
-    const [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
+    const placeSelected = req.query?.lieu || "tous";
+    let place = null;
+    let [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
+
+    if (placeSelected !== "tous") {
+        place = await PlaceModel.findOne({ where: { slug: placeSelected } })
+        if (place) {
+            openHours = Number(place.heure_ouverture);
+            closeHours = Number(place.heure_fermeture);
+        }
+    }
+
     const records = await VisitModel.findAll({
         attributes: {
             include: [
@@ -70,6 +89,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                 }
             },
             [Op.and]: [openingDaysSelector],
+            ...(place?.id ? {place_id: place.id } : {}),
         },
         order: [['date_passage', 'DESC']]
     });
@@ -90,8 +110,13 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                 },
             },
             [Op.and]: [openingDaysSelector],
+            ...(place?.id ? {place_id: place.id } : {}),
         },
     });
+
+    const listPlaces = await PlaceModel.findAll({
+        raw: true,
+    })
 
     res.render("pages/members-list.njk", {
         visitors_summary: visitorsSummary[0],
@@ -103,6 +128,8 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
         "is_day_closed": isClosedDay,
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
+        "places_list": listPlaces,
+        "place_selected": req.query?.lieu || "tous"
     });
 });
 
