@@ -3,7 +3,7 @@ import { DateTime } from "luxon";
 import { Op } from 'sequelize';
 
 import sequelize from "#models/index.ts";
-import VisitorModel from "#models/visitor.ts";
+import VisitModel from "#models/visit.ts";
 import config from "#config" with { type: "json" };
 
 const router = express.Router();
@@ -59,7 +59,7 @@ router.get("/", async (req, res) => {
         }
     );
 
-    const listVisitors = await VisitorModel.findAll({
+    const listVisitors = await VisitModel.findAll({
         raw: true,
         attributes: {
             include: [

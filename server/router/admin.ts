@@ -3,7 +3,7 @@ import { DateTime, Info } from "luxon";
 import { Op, literal } from 'sequelize';
 
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
-import VisitorModel from "#models/visitor.ts";
+import VisitModel from "#models/visit.ts";
 import PlaceModel from "#models/place.ts";
 import config from "#config" with { type: "json" };
 import sequelize from "#models/index.ts";
@@ -50,7 +50,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     );
 
     const [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
-    const records = await VisitorModel.findAll({
+    const records = await VisitModel.findAll({
         attributes: {
             include: [
                 [sequelize.literal('ROW_NUMBER() OVER (ORDER by date_passage ASC)'), 'order']
@@ -69,7 +69,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         order: [['date_passage', 'DESC']]
     });
 
-    const visitorsSummary = await VisitorModel.findAll({
+    const visitorsSummary = await VisitModel.findAll({
         raw: true,
         attributes: {
             include: [
@@ -102,7 +102,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 });
 
 router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
-    let place = {}
+    let place = null
     if (req.params.placeId) {
         place = await PlaceModel.findByPk(req.params.placeId, {raw: true});
     }
@@ -110,6 +110,7 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
     res.render("pages/add_edit-place.njk", {
         place,
         is_edit: Object.keys(place || {}).length > 0,
+        flash_message: req.cookies.flash_message,
     });
 }).post(['/lieu', '/lieu/:placeId'], async (req, res) => {
     const validator = PlaceSchema.safeParse(req.body);

@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize';
 
 import sequelize from "./index";
-import Visitor from './visitor';
+import Visit from './visit';
 
 const Place = sequelize.define('place', {
     nom: DataTypes.STRING,
@@ -35,7 +35,12 @@ const Place = sequelize.define('place', {
     updatedAt: false,
 });
 
-Place.hasMany(Visitor);
+Place.hasMany(Visit, {
+    foreignKey: {
+        name: 'placeId',
+        allowNull: false,
+    },
+});
 
 const queryInterface = sequelize.getQueryInterface()
 const tableNames = await queryInterface.showAllTables();

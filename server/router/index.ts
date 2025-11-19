@@ -4,7 +4,7 @@ import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "#server/index.ts";
-import VisitorModel from "#models/visitor.ts";
+import VisitModel from "#models/visit.ts";
 import PlaceModel from "#models/place.ts";
 
 import ApiRouter from "./api.ts";
