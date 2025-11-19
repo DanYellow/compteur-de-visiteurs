@@ -51,7 +51,6 @@ app.use(
 app.use((req, res, next) => {
     const context = {
         NODE_ENV: process.env.NODE_ENV,
-        PLACE: config.PLACE,
         OPENING_HOURS: config.OPENING_HOURS,
     };
 

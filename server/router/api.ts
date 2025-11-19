@@ -3,8 +3,9 @@ import { DateTime } from "luxon";
 import { Op } from 'sequelize';
 
 import sequelize from "#models/index.ts";
-import VisitModel from "#models/visit.ts";
 import config from "#config" with { type: "json" };
+
+const { visit: VisitModel } = sequelize.models;
 
 const router = express.Router();
 

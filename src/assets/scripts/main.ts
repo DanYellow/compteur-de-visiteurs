@@ -3,7 +3,7 @@ import "../styles/notification.css";
 import "../styles/calendar.css";
 import "choices.js/public/assets/styles/choices.css";
 
-
+import "./select-place.ts";
 import "./calendar.ts";
 import "./members-poll.ts";
 

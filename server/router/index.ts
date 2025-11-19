@@ -4,14 +4,14 @@ import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "#server/index.ts";
-import VisitModel from "#models/visit.ts";
-import PlaceModel from "#models/place.ts";
+import sequelize from "#models/index.ts";
+import parseManifest from "#server/parse-manifest.ts";
 
 import ApiRouter from "./api.ts";
 import DownloadRouter from "./download.ts";
 import AdminRouter from "./admin.ts";
 
-import parseManifest from "#server/parse-manifest.ts";
+const { visit: VisitModel, place: PlaceModel } = sequelize.models;
 
 const router = express.Router();
 
@@ -33,7 +33,6 @@ router.use("/", AdminRouter);
 router.get("/", async (req, res) => {
     const nbPlaces = await PlaceModel.count();
     const place = await PlaceModel.findOne({ where: { slug: req.cookies.numixs_place } })
-
 
     if (!("numixs_place" in req.cookies)) {
         res.cookie('flash_message', "unset_place", { maxAge: 1000, httpOnly: true })

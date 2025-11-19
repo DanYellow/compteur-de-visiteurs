@@ -3,12 +3,12 @@ import { DateTime, Info } from "luxon";
 import { Op, literal } from 'sequelize';
 
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
-import VisitModel from "#models/visit.ts";
-import PlaceModel from "#models/place.ts";
-import config from "#config" with { type: "json" };
 import sequelize from "#models/index.ts";
+import config from "#config" with { type: "json" };
 import { PlaceSchema } from "#scripts/schemas.ts";
 import { slugify } from "#scripts/utils.ts";
+
+const { visit: VisitModel, place: PlaceModel } = sequelize.models;
 
 const router = express.Router();
 
@@ -22,12 +22,17 @@ router.get(["/dashboard"], async (req, res) => {
         }
     }
 
+    const listPlaces = await PlaceModel.findAll({
+        raw: true,
+    })
+
     res.render("pages/dashboard.njk", {
         "current_date": daySelected,
         "today": DateTime.now(),
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
         "is_day_closed": config.CLOSED_DAYS_INDEX.split(",").includes(String(daySelected.weekday)),
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
+        "places_list": listPlaces,
     });
 })
 
@@ -142,7 +147,7 @@ router.get(['/lieux'], async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
         raw: true,
     })
-    console.log(listPlaces)
+
     res.render("pages/places-list.njk", {
         places_list: listPlaces,
     });
