@@ -41,9 +41,6 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         }
     }
 
-    // const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}`);
-    // const records = await request.json();
-
     const isClosedDay = config.CLOSED_DAYS_INDEX.split(",").includes(String(daySelected.weekday));
 
     const openingDaysSelector = sequelize.where(
@@ -58,6 +55,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
             include: [
                 [sequelize.literal('ROW_NUMBER() OVER (ORDER by date_passage ASC)'), 'order']
             ],
+            exclude: ["placeId"],
         },
         where: {
             date_passage: {
@@ -103,10 +101,17 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     });
 });
 
-router.get(['/lieu'], async (req, res) => {
+router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
+    let place = {}
+    if (req.params.placeId) {
+        place = await PlaceModel.findByPk(req.params.placeId, {raw: true});
+    }
+
     res.render("pages/add_edit-place.njk", {
+        place,
+        is_edit: Object.keys(place || {}).length > 0,
     });
-}).post(['/lieu'], async (req, res) => {
+}).post(['/lieu', '/lieu/:placeId'], async (req, res) => {
     const validator = PlaceSchema.safeParse(req.body);
     if (!validator.success) {
         return res.render("pages/add_edit-place.njk", {
@@ -114,17 +119,22 @@ router.get(['/lieu'], async (req, res) => {
     }
 
     try {
-        const payload = {
-            ...req.body,
-            slug: slugify(req.body.nom),
-        };
-        await PlaceModel.create(payload);
+        const payload = req.body;
+        if (req.params.placeId) {
+            await PlaceModel.update(payload, {
+                where: {
+                    id: Number(req.params.placeId)
+                }
+            })
+        } else {
+            payload.slug = slugify(req.body.nom)
+            await PlaceModel.create(payload);
+        }
     } catch (e) {
         console.log(e)
     }
 
-    res.render("pages/add_edit-place.njk", {
-    });
+    res.redirect('/lieux');
 })
 
 router.get(['/lieux'], async (req, res) => {
@@ -132,7 +142,8 @@ router.get(['/lieux'], async (req, res) => {
         raw: true,
     })
     console.log(listPlaces)
-    res.render("pages/add_edit-place.njk", {
+    res.render("pages/places-list.njk", {
+        places_list: listPlaces,
     });
 })
 

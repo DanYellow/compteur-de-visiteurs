@@ -5,6 +5,7 @@ import { SOCKET_EVENTS } from '#scripts/utils.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "#server/index.ts";
 import VisitorModel from "#models/visitor.ts";
+import PlaceModel from "#models/place.ts";
 
 import ApiRouter from "./api.ts";
 import DownloadRouter from "./download.ts";
@@ -63,24 +64,26 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.get(["/lieux"], async (req, res) => {
+router.get(["/choix-lieu"], async (req, res) => {
+    const listPlaces = await PlaceModel.findAll({
+        raw: true,
+    })
+
     // res.setHeader('Set-Cookie', 'numixs_place=cookie_value; Max-Age=3600'); // Cookie expires in 1 hour
 
     res.render("pages/set-place.njk", {
         "list_places": listPlaces,
     });
-});
-
-router.post(["/lieux"], async (req, res) => {
+}).post(["/choix-lieu"], async (req, res) => {
     const payload = {
         ...req.body,
     }
     console.log("payload", payload)
     // res.setHeader('Set-Cookie', 'numixs_place=cookie_value; Max-Age=3600'); // Cookie expires in 1 hour
 
-    res.render("pages/set-place.njk", {
-        "list_places": listPlaces,
-    });
+    // res.render("pages/set-place.njk", {
+    //     "list_places": listPlaces,
+    // });
 });
 
 export default router;

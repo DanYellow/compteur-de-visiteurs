@@ -23,7 +23,13 @@ Créer
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
-                <h1 class="text-black-numixs title-font font-bold text-6xl">Créer nouveau lieu Numixs</h1>
+                <h1 class="text-black-numixs title-font font-bold text-6xl">
+                    {% if is_edit %}
+                    Éditer lieu Numixs
+                    {% else %}
+                    Créer nouveau lieu Numixs
+                    {% endif %}
+                </h1>
             </header>
 
             <div class="text-black-numixs">
@@ -32,11 +38,11 @@ Créer
                     <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800">Les champs avec * sont obligatoires</p>
                     <div class="flex flex-col">
                         <label for="nom" class="font-bold text-lg">Nom*</label>
-                        <input type="text" id="nom" name="nom">
+                        <input type="text" id="nom" name="nom" value="{{ place.nom }}">
                     </div>
                     <div class="flex flex-col">
                         <label for="adresse" class="font-bold text-lg">Adresse*</label>
-                        <textarea name="adresse" id="adresse"></textarea>
+                        <textarea name="adresse" id="adresse">{{ place.adresse }}</textarea>
                     </div>
                     <div class="flex flex-col">
                         <p class="font-bold text-lg">Jours de fermeture</p>
@@ -48,9 +54,9 @@ Créer
                         <div class="flex flex-row gap-5">
                             <div class="flex flex-col">
                                 <label for="ouverture">Ouverture</label>
-                                <select name="heure_ouverture" id="ouverture">
+                                <select name="heure_ouverture" value="{{ place.heure_ouverture }}" id="ouverture">
                                     {% for i in range(10, 20) %}
-                                        <option value="{{ i }}">{{ i }}h</option>
+                                        <option {{ "selected" if place.heure_ouverture == i else "" }} value="{{ i }}">{{ i }}h</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -58,9 +64,10 @@ Créer
                                 <label for="fermeture">Fermeture</label>
                                 <select name="heure_fermeture" id="fermeture">
                                     {% for i in range(10, 20) %}
-                                        <option value="{{ i }}">{{ i }}h</option>
+                                        <option {{ "selected" if place.heure_fermeture == i else "" }} value="{{ i }}">{{ i }}h</option>
                                     {% endfor %}
                                 </select>
+
                                 {# <input type="time" id="fermeture" name="heure_fermeture" min="08:00" max="20:00" /> #}
                             </div>
                         </div>

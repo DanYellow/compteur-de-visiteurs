@@ -1,0 +1,117 @@
+{% extends "layouts/page.njk" %}
+
+{% block title %}
+Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
+{% endblock %}
+
+{% import "includes/macros.njk" as macros %}
+{% block scripts %}
+{% if NODE_ENV == "development" %}
+    <script type="module" src="/src/assets/scripts/details-visit-dialog.ts" defer></script>
+{% else %}
+    <script type="module" src="/{{ manifest['src/assets/scripts/details-visit-dialog.ts'].file }}" defer></script>
+{% endif %}
+{% endblock %}
+
+{% set active_menu_item = "lieu" %}
+{% set date_format = "dd/LL/yyyy à HH:mm" %}
+{% set root_class = "admin" %}
+{% block content %}
+    <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
+    <div class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[220px_minmax(0,_1fr)] gap-6">
+        {% include "includes/admin-nav.njk" %}
+        <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
+            <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
+                <h1 class="text-black-numixs title-font font-bold text-6xl">Liste lieux numixs</h1>
+                <a href="/lieu" class="bg-black-numixs hocus:bg-black px-3.5 py-2.5 rounded-xl text-white">Ajouter un nouvel lieu</a>
+            </header>
+            <div class="text-black-numixs">
+                <div class="overflow-x-auto">
+                    <table class="w-full bg-white border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <td class="font-bold px-4 py-3 text-left">#</td>
+                                <td class="font-bold px-4 py-3 text-left">Nom</td>
+                                <td class="font-bold px-4 py-3 text-left">Adresse</td>
+                                <td class="font-bold px-4 py-3 text-left">Heures d'ouverture</td>
+                                <td class="font-bold px-4 py-3 text-left">Jours fermés</td>
+                                <td class="font-bold px-4 py-3 text-left"></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for place in places_list %}
+                                <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.nom }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.adresse }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.heure_ouverture }}h-{{ place.heure_fermeture }}h</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.heure_ouverture }}h-{{ place.heure_fermeture }}h</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                        <a href="/lieu/{{ place.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr class="">
+                                    <td colspan="6" class="px-4 py-3 text-center">
+                                        Pas de lieux
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div popover id="download-links" class="bg-slate-50 shadow-2xl rounded-md p-1 backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12">
+        <ul class="flex flex-col gap-1">
+            <li>
+                <a href="/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}" download class="w-full align-center inline-flex gap-2 px-3.5 py-2.5 rounded-xl text-white bg-black-numixs hocus:bg-black">
+                    {% include "includes/icons/download-fill-icon.svg" %}
+                    Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)
+                </a>
+            </li>
+            <li>
+                <a href="/telecharger?semaine={{ current_date|date("yyyy-MM-dd") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                    {% include "includes/icons/download-fill-icon.svg" %}
+                    Télécharger toutes les données de la semaine (.csv)
+                </a>
+            </li>
+            <li>
+                <a href="/telecharger?mois={{ current_date|date("yyyy-MM") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                    {% include "includes/icons/download-fill-icon.svg" %}
+                    Télécharger toutes les données de {{ current_date|date("MMMM yyyy") }} (.csv)
+                </a>
+            </li>
+            <li>
+                <a href="/telecharger?annee={{ current_date|date("yyyy") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                    {% include "includes/icons/download-fill-icon.svg" %}
+                    Télécharger toutes les données de l'année {{ current_date|date("yyyy") }} (.csv)
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <dialog id="detail-visit" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-5/12 max-w-2xl">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Visite n°<span data-visit-number></span></p>
+                <p class="text-sm">
+                    <time datetime="">14/11/2025 à 10:47:56</time>
+                </p>
+            </div>
+            <button type="button" command="close" commandfor="detail-visit" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <p class="text-xl">Groupe(s)</p>
+        <ul class="list-disc list-inside">
+            <li>En réinsertion pro</li>
+            <li>Entreprise Externe</li>
+        </ul>
+    </dialog>
+{% endblock %}
