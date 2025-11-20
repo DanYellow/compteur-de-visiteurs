@@ -51,7 +51,7 @@ if (process.env.NODE_ENV === "development") {
                 await queryInterface.dropTable(backupTableName)
             }
 
-            await model.sync() // { alter: true, force: false, }
+            // await model.sync() // { alter: true, force: false, }
         } catch (e) {
             console.error('💔model sync error', e)
         }

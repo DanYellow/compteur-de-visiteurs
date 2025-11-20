@@ -144,42 +144,39 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
     return tableValues;
 }
 
-export const getLinearCSV = (data: Result[], totalPeriodCell = "") => {
-    const csvHeader = Object.keys(data?.[0] || {});
-    csvHeader[1] = "Période";
-    csvHeader.pop();
+type LinearCSVOptions = {
+    periodLabel: string;
+    lieu: string;
+}
 
-    const csvTotal = data.length > 0 ? [
-        `Total : ${data.length}`,
-        totalPeriodCell,
-        // `${DateTime.fromISO(new Date(data.at(0).date_passage).toISOString()).toFormat("dd/LL/yyyy")} ➜ ${DateTime.fromISO(new Date(data.at(-1).date_passage).toISOString()).toFormat("dd/LL/yyyy")}`,
-        config.PLACE,
-        ...new Array(listGroups.filter((item) => (!("listInDb" in item) || item.listInDb)).length).fill(0)
-    ] : [];
-    const csvPayload = [csvHeader];
+export const getLinearCSV = (data: Result[], { periodLabel, lieu }: LinearCSVOptions) => {
+    const listGroupsInForm = listGroups.filter((item) => (!("listInDb" in item) || item.listInDb))
+
+    const firstRow = {
+        ...data?.[0],
+        ...Object.fromEntries(listGroupsInForm.map((item) => [item.value, 0])),
+        date_passage: periodLabel,
+        ...(lieu === "tous" || !lieu ? { "place.nom": "Tous"} : {}),
+        id: `Total : ${data.length}`,
+    }
+
+    const csvPayload = [Object.keys(firstRow)];
 
     data.forEach((item, idx) => {
-        // let groupName = xLabels[item.groupe];
-        // if (typeof groupName === 'object') {
-        //     groupName = groupName.name;
-        // }
-
-        Object.values(item).forEach((value, idx) => {
-            if (value === "oui") {
-                csvTotal[idx] += 1
-            }
-        });
-        item.id = String(idx + 1);
-        const rowData: string[] = Object.values({
-            ...item,
-            // groupe: groupName
+        listGroupsInForm.forEach((group) => {
+            firstRow[group.value] += item[group.value] === "oui" ? 1 : 0;
         })
 
-        rowData.pop()
+        item.id = String(idx + 1);
+        delete item.lieux_id;
+        delete item.groupe;
+
+        const rowData: string[] = Object.values(item)
+
         csvPayload.push(rowData);
     });
 
-    csvPayload.splice(1, 0, csvTotal);
+    csvPayload.splice(1, 0, Object.values(firstRow));
 
     return csvPayload;
 }

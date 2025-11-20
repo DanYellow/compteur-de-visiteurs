@@ -63,9 +63,9 @@ router.get('/', async (req, res) => {
         csvFilename = `liste-visites_${configKey}`;
         const filterPredicate: DateTimeUnit = predicatesDict[configKey] as DateTimeUnit;
         const daySelected = DateTime.fromISO(Object.values(req.query)[0] as string);
-        const totalPeriodCell = `${daySelected.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${daySelected.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
+        const periodLabel = `${daySelected.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${daySelected.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
 
-        csvPayload = getLinearCSV(requestRes.data, totalPeriodCell);
+        csvPayload = getLinearCSV(requestRes.data, { periodLabel, lieu: req.query.lieu });
     }
 
     csvFilename += fileTimestamp;

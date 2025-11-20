@@ -44,13 +44,17 @@ router.get("/", async (req, res) => {
         },
     }
 
-    const [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
+    let [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
     const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: openHours });
     const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: closeHours });
 
     let place = undefined;
     if (req.query.lieu && req.query.lieu !== "tous") {
         place = await PlaceModel.findOne({ where: { slug: req.query.lieu }})
+        if (place) {
+            openHours = Number(place.heure_ouverture)
+            closeHours = Number(place.heure_fermeture)
+        }
     }
 
     const openingDaysSelector = sequelize.where(
@@ -72,6 +76,7 @@ router.get("/", async (req, res) => {
                 [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"],
                 [sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime"), "groupe"],
             ],
+            exclude: ["groupe", "lieu_id"]
         },
         where: {
             date_passage: {
@@ -87,7 +92,7 @@ router.get("/", async (req, res) => {
             model: PlaceModel,
             as: "place",
             attributes: {
-                exclude: ["adresse", "ouvert", "slug", "id", "jours_fermeture", "heure_ouverture", "heure_fermeture"]
+                exclude: ["adresse", "ouvert", "slug", "id", "jours_fermeture", "heure_ouverture", "heure_fermeture", "date_creation"]
             },
         }],
         order: [
@@ -97,9 +102,10 @@ router.get("/", async (req, res) => {
 
     res.status(200).json({
         data: listVisitors.map((item) => {
+            delete item.groupe;
+
             return {
                 ...item,
-                // groupe: filtreParam === "semaine" ? Number(item.groupe) : item.groupe.trim(),
             }
         })
     });
