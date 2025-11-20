@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 import sequelize from "#models/index.ts";
 import config from "#config" with { type: "json" };
 
-const { visit: VisitModel } = sequelize.models;
+const { visit: VisitModel, place: PlaceModel } = sequelize.models;
 
 const router = express.Router();
 
@@ -48,6 +48,11 @@ router.get("/", async (req, res) => {
     const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: openHours });
     const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: closeHours });
 
+    let place = undefined;
+    if (req.query.lieu) {
+        place = await PlaceModel.findOne({ where: { slug: req.query.lieu }})
+    }
+
     const openingDaysSelector = sequelize.where(
         sequelize.fn("strftime", "%u", sequelize.col("date_passage"), "localtime"), {
             [Op.notIn]: config.CLOSED_DAYS_INDEX.split(",")
@@ -77,6 +82,7 @@ router.get("/", async (req, res) => {
                 },
             },
             [Op.and]: [openingDaysSelector, openingHoursSelector],
+            ...(place ? { lieu_id: place.id} : {})
         },
         order: [
             ['date_passage', 'DESC'],

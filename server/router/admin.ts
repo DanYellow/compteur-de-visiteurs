@@ -63,7 +63,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     );
 
     const placeSelected = req.query?.lieu || "tous";
-    let place = null;
+    let place = undefined;
     let [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
 
     if (placeSelected !== "tous") {
@@ -75,12 +75,13 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     }
 
     const records = await VisitModel.findAll({
+        raw: true,
         attributes: {
             include: [
-                [sequelize.literal('ROW_NUMBER() OVER (ORDER by date_passage ASC)'), 'order']
+                [sequelize.literal('ROW_NUMBER() OVER (ORDER by date_passage ASC)'), 'order'],
             ],
-            exclude: ["placeId"],
         },
+        include: 'place',
         where: {
             date_passage: {
                 [Op.and]: {
@@ -89,10 +90,11 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                 }
             },
             [Op.and]: [openingDaysSelector],
-            ...(place?.id ? {place_id: place.id } : {}),
+            ...(place ? { lieu_id: place.id } : {}),
         },
         order: [['date_passage', 'DESC']]
     });
+    console.log(records)
 
     const visitorsSummary = await VisitModel.findAll({
         raw: true,
@@ -110,7 +112,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                 },
             },
             [Op.and]: [openingDaysSelector],
-            ...(place?.id ? {place_id: place.id } : {}),
+            ...(place ? { lieu_id: place.id} : {}),
         },
     });
 

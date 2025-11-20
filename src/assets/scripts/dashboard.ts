@@ -171,7 +171,16 @@ const listCharts = Object.values(configDataRaw);
     listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
         const ctx = document.getElementById(id)! as HTMLCanvasElement;
 
-        const req = await fetch(`/api?filtre=${apiKey}&jour=${daySelected.toFormat("yyyy-LL-dd")}`);
+        const urlParams = new URLSearchParams(window.location.search);
+        const placeParam = urlParams.get('lieu');
+        
+        const apiQueryParams = new URLSearchParams({ 
+            filtre: apiKey, 
+            jour: daySelected.toFormat("yyyy-LL-dd"),
+            ...((placeParam === "tous" || !placeParam) ? {} : {lieu: placeParam}),
+        });
+
+        const req = await fetch(`/api?${apiQueryParams.toString()}`);
         const res = await req.json();
 
         const listVisitsGrouped = Object.groupBy(res.data as Visit[], (item) => {

@@ -32,19 +32,19 @@ router.use("/", AdminRouter);
 
 router.get("/", async (req, res) => {
     const nbPlaces = await PlaceModel.count();
-    const place = await PlaceModel.findOne({ where: { slug: req.cookies.numixs_place } })
-
-    if (!("numixs_place" in req.cookies)) {
-        res.cookie('flash_message', "unset_place", { maxAge: 1000, httpOnly: true })
-        return res.redirect("/choix-lieu")
-    } else if (nbPlaces === 0) {
+    
+    if (nbPlaces === 0) {
         res.cookie('flash_message', "no_place", { maxAge: 1000, httpOnly: true })
-
-        return res.redirect("/lieu")
-    } else if (!place) {
+        return res.redirect("/lieu");
+    } else if (!("lieu_numixs" in req.cookies)) {
+        res.cookie('flash_message', "unset_place", { maxAge: 1000, httpOnly: true })
+        return res.redirect("/choix-lieu");
+    } 
+    
+    const place = await PlaceModel.findOne({ where: { slug: req.cookies.lieu_numixs } })
+    if (!place) {
         res.cookie('flash_message', "unknown_place", { maxAge: 1000, httpOnly: true })
-
-        return res.redirect("/choix-lieu")
+        return res.redirect("/choix-lieu");
     }
 
     res.render("pages/index.njk", {
@@ -58,10 +58,10 @@ router.get("/", async (req, res) => {
     }
 
     try {
-        const place = await PlaceModel.findOne({ where: { slug: req.cookies.numixs_place } })
+        const place = await PlaceModel.findOne({ where: { slug: req.cookies.lieu_numixs } })
         const payload = {
             ...req.body,
-            place_id: place.id,
+            lieu_id: place!.id,
         }
 
         await VisitModel.create(payload)
@@ -87,7 +87,7 @@ router.get(["/choix-lieu"], async (req, res) => {
 
     let place = null;
     if (req.cookies.flash_message === "set_place") {
-        place = await PlaceModel.findOne({ where: { slug: req.cookies.numixs_place } })
+        place = await PlaceModel.findOne({ where: { slug: req.cookies.lieu_numixs } })
     }
 
     res.render("pages/set-place.njk", {
@@ -101,7 +101,7 @@ router.get(["/choix-lieu"], async (req, res) => {
         httpOnly: true, // The cookie only accessible by the web server
     }
 
-    res.cookie('numixs_place', req.body.place, options)
+    res.cookie('lieu_numixs', req.body.place, options)
     res.cookie('flash_message', "set_place", { maxAge: 1000, httpOnly: true })
 
     res.redirect("/choix-lieu");

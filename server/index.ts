@@ -93,9 +93,10 @@ const nunjucksConfig = nunjucks.configure(app.get("views"), {
 });
 
 nunjucksConfig.addFilter("date", (value, format) => {
-    if (typeof value === "object") {
-        value = value.toJSON()
+    if (!DateTime.fromISO(value).isValid) {
+        return DateTime.fromJSDate(new Date(value)).setLocale('fr').toFormat(format);
     }
+
     return DateTime.fromISO(value).setLocale('fr').toFormat(format);
 });
 

@@ -62,7 +62,7 @@ Créer nouveau lieu Numixs
                             <div class="flex flex-col">
                                 <label for="ouverture">Ouverture</label>
                                 <select name="heure_ouverture" value="{{ place.heure_ouverture }}" id="ouverture">
-                                    {% for i in range(10, 20) %}
+                                    {% for i in range(8, 20) %}
                                         <option {{ "selected" if place.heure_ouverture == i else "" }} value="{{ i }}">{{ i }}h</option>
                                     {% endfor %}
                                 </select>
@@ -70,7 +70,7 @@ Créer nouveau lieu Numixs
                             <div class="flex flex-col">
                                 <label for="fermeture">Fermeture</label>
                                 <select name="heure_fermeture" id="fermeture">
-                                    {% for i in range(10, 20) %}
+                                    {% for i in range(8, 20) %}
                                         <option {{ "selected" if place.heure_fermeture == i else "" }} value="{{ i }}">{{ i }}h</option>
                                     {% endfor %}
                                 </select>
@@ -93,11 +93,10 @@ Créer nouveau lieu Numixs
                         </div>
                     </div>
                     <button type="submit" class="text-black-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:opacity-70 items-center">
-                    Envoyer
+                    Soumettre
                     <svg width="23" height="22" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M0.723633 11C0.723633 13.0767 1.37686 15.1068 2.60072 16.8335C3.82458 18.5602 5.56409 19.906 7.59929 20.7007C9.63449 21.4955 11.874 21.7034 14.0345 21.2982C16.1951 20.8931 18.1797 19.8931 19.7373 18.4246C21.295 16.9562 22.3558 15.0852 22.7856 13.0484C23.2153 11.0116 22.9948 8.90045 22.1518 6.98182C21.3088 5.0632 19.8812 3.42332 18.0495 2.26957C16.2179 1.11581 14.0645 0.5 11.8616 0.5C8.90763 0.5 6.07465 1.60625 3.98587 3.57538C1.89709 5.54451 0.723633 8.21523 0.723633 11ZM5.49705 10.25H15.1632L10.7239 6.04475L11.8616 5L18.2262 11L11.8616 17L10.7239 15.9298L15.1632 11.75H5.49705V10.25Z" fill="currentColor"></path>
                         </svg>
-
                     </button>
                 </div>
 
