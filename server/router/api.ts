@@ -45,6 +45,7 @@ router.get("/", async (req, res) => {
     }
 
     let [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
+    let closedDays = config.CLOSED_DAYS_INDEX.split(",");
     const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: openHours });
     const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: closeHours });
 
@@ -53,13 +54,15 @@ router.get("/", async (req, res) => {
         place = await PlaceModel.findOne({ where: { slug: req.query.lieu }})
         if (place) {
             openHours = Number(place.heure_ouverture)
-            closeHours = Number(place.heure_fermeture)
+            closeHours = Number(place.heure_fermeture);
+
+            closedDays = (place.jours_fermeture || "").split(",");
         }
     }
 
     const openingDaysSelector = sequelize.where(
         sequelize.fn("strftime", "%u", sequelize.col("date_passage"), "localtime"), {
-            [Op.notIn]: config.CLOSED_DAYS_INDEX.split(",")
+            [Op.notIn]: closedDays
         }
     );
 

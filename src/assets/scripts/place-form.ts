@@ -1,8 +1,11 @@
+import "choices.js/public/assets/styles/choices.css";
+import Choices from "choices.js";
+
 import { PlaceSchema } from "#scripts/schemas.ts";
-import config from "#config" with { type: "json" };
 
 const form = document.querySelector("[data-place-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
+const dropdownDays = document.getElementById("jours") as HTMLSelectElement;
 
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -24,6 +27,8 @@ const validForm = (e: Event) => {
     }
 
     const formData = new FormData(form);
+    formData.set("jours_fermeture", Array.from(formData.getAll("jours_fermeture")).join(","));
+
     const validator = PlaceSchema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll(".error").forEach((item) => {
@@ -62,3 +67,22 @@ const validForm = (e: Event) => {
 
 form?.addEventListener("submit", submitForm);
 form?.addEventListener("input", validForm);
+
+const choices = new Choices(dropdownDays, {
+    addItems: false,
+    paste: false,
+    removeItemButton: true,
+    itemSelectText: 'Cliquer pour sélectionner',
+    noChoicesText: 'Plus de propositions',
+    maxItemCount: 6,
+    maxItemText: 'Un jour ouvrable est impératif',
+});
+
+// {
+//   nom: 'Station Numixs Sarcelles',
+//   adresse: 'Test',
+//   jours_fermeture: [ '1', '7' ],
+//   heure_ouverture: '8',
+//   heure_fermeture: '12',
+//   ouvert: 'oui'
+// }

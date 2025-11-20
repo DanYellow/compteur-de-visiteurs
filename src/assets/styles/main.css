@@ -359,3 +359,16 @@ button {
         }
     }
 }
+
+/* .choices__list--multiple {
+    .choices__item {
+        background-color: var(--color-green-numixs)!important;
+        border-color: var(--color-dark-green-numixs)!important;
+        color: var(--color-black-numixs)!important;
+    }
+} */
+
+.choices__inner {
+    background-color: white!important;
+    border-color: oklch(55.1% 0.027 264.364)!important;
+}

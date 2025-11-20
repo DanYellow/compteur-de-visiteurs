@@ -1,10 +1,10 @@
 import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend, type ScriptableScaleContext } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import { DateTime } from "luxon";
+import { DateTime, Info } from "luxon";
 
 import type { ChartConfigData, CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions, Visit } from "#types";
-import { configData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
+import { capitalizeFirstLetter, configData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const linkDownloadChartData = document.querySelector("[data-download-chart-data='simple']") as HTMLLinkElement;
@@ -34,6 +34,22 @@ if (Object.keys(placeData).length > 0) {
     configData.jour = {
         ...configData.jour,
         listColumns: listTimeSlots
+    }
+
+    const listClosedDaysIndex = (placeData.jours_fermeture || "").split(",").map(Number);
+
+    configData.semaine = {
+        ...configData.semaine,
+        listColumns: Info.weekdays('long', { locale: 'fr' })
+            .map((item, idx) => {
+                if (listClosedDaysIndex.includes(idx + 1)) {
+                    return null
+                }
+                return {
+                    name: capitalizeFirstLetter(item),
+                    id: idx + 1
+                }
+            }).filter(Boolean)
     }
 }
 

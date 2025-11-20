@@ -111,7 +111,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                 },
             },
             [Op.and]: [openingDaysSelector],
-            ...(place ? { lieu_id: place.id} : {}),
+            ...(place ? { lieu_id: place.id } : {}),
         },
     });
 
@@ -137,23 +137,31 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
     let place = null
     if (req.params.placeId) {
-        place = await PlaceModel.findByPk(req.params.placeId, {raw: true});
+        place = await PlaceModel.findByPk(req.params.placeId, { raw: true });
     }
 
     res.render("pages/add_edit-place.njk", {
-        place,
+        place: {
+            ...place,
+            jours_fermeture: place ? (place.jours_fermeture || "").split(",") : ["6", "7"]
+        },
         is_edit: Object.keys(place || {}).length > 0,
         flash_message: req.cookies.flash_message,
+        not_found: req.params.placeId && !place,
+        list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
 }).post(['/lieu', '/lieu/:placeId'], async (req, res) => {
-    const validator = PlaceSchema.safeParse(req.body);
+    const payload = {
+        ...req.body,
+        jours_fermeture: (req.body.jours_fermeture || []).join(",")
+    };
+
+    const validator = PlaceSchema.safeParse(payload);
     if (!validator.success) {
-        return res.render("pages/add_edit-place.njk", {
-        });
+        return res.render("pages/add_edit-place.njk");
     }
 
     try {
-        const payload = req.body;
         if (req.params.placeId) {
             await PlaceModel.update(payload, {
                 where: {
@@ -164,20 +172,29 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
             payload.slug = slugify(req.body.nom)
             await PlaceModel.create(payload);
         }
+        res.redirect('/lieux');
     } catch (e) {
         console.log(e)
+        return res.render("pages/add_edit-place.njk");
     }
-
-    res.redirect('/lieux');
 })
 
 router.get(['/lieux'], async (req, res) => {
+    const listDays = Info.weekdays('long', { locale: 'fr' }).map(capitalizeFirstLetter);
     const listPlaces = await PlaceModel.findAll({
         raw: true,
     })
 
+    const listPlacesComputed = listPlaces.map((place) => {
+        const listClosedDays = (place.jours_fermeture || "").split(",")
+        return {
+            ...place,
+            jours_fermeture: listClosedDays.map((idxDay: number) => listDays[idxDay - 1]).map(capitalizeFirstLetter).join(', ')
+        }
+    })
+
     res.render("pages/places-list.njk", {
-        places_list: listPlaces,
+        places_list: listPlacesComputed,
     });
 })
 
