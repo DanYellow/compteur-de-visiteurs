@@ -31,30 +31,7 @@ export default (sequelize: Sequelize) => {
         },
     }, {
         updatedAt: false,
+        createdAt: 'date_creation',
     });
-
-    // return Place
 }
 
-
-
-// Place.hasMany(Visit, {
-//     foreignKey: {
-//         name: 'placeId',
-//         allowNull: false,
-//     },
-// });
-
-// const queryInterface = sequelize.getQueryInterface()
-// const tableNames = await queryInterface.showAllTables();
-// try {
-//     const backupTableName = Place.tableName + '_backup'
-//     if (tableNames.includes(backupTableName)) {
-//         await queryInterface.dropTable(backupTableName)
-//     }
-//     await Place.sync({ alter: true })
-// } catch (e) {
-//     console.error('💔model sync error', e)
-// }
-
-// export default Place;
