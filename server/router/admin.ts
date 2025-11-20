@@ -130,7 +130,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "is_day_closed": isClosedDay,
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
         "places_list": listPlaces,
-        "place_selected": req.query?.lieu || "tous"
+        "place": place
     });
 });
 

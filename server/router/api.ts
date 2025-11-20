@@ -104,13 +104,7 @@ router.get("/", async (req, res) => {
     });
 
     res.status(200).json({
-        data: listVisitors.map((item) => {
-            delete item.groupe;
-
-            return {
-                ...item,
-            }
-        })
+        data: listVisitors
     });
 });
 

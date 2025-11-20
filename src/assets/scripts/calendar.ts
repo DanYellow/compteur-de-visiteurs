@@ -13,7 +13,9 @@ let currentDay = DateTime.now();
 const today = currentDay.toFormat("yyyy-LL-dd");
 let urlDay = today;
 let staticCurrentDayMonth = currentDay.toFormat("LL-dd");
-const listClosedDaysIndex = config.CLOSED_DAYS_INDEX.split(",").filter(Boolean).map(String);
+const placeData = JSON.parse(document.querySelector("[data-place]")?.dataset.place || "{}")
+
+const listClosedDaysIndex = (placeData.jours_fermeture || config.CLOSED_DAYS_INDEX).split(",").filter(Boolean).map(String);
 
 const queryString = new URLSearchParams(window.location.search);
 if (queryString.has("date")) {
