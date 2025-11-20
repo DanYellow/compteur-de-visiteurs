@@ -41,7 +41,21 @@ sequelize.models.visit.belongsTo(sequelize.models.place, {
 });
 
 if (process.env.NODE_ENV === "development") {
-    await sequelize.sync({ alter: true });
+    const queryInterface = sequelize.getQueryInterface();
+    const tableNames = await queryInterface.showAllTables();
+
+    for await (const model of Object.values(sequelize.models)) {
+        try {
+            const backupTableName = model.tableName + '_backup';
+            if (tableNames.includes(backupTableName)) {
+                await queryInterface.dropTable(backupTableName)
+            }
+
+            await model.sync({ alter: true })
+        } catch (e) {
+            console.error('💔model sync error', e)
+        }
+    }
 }
 
 export default sequelize;

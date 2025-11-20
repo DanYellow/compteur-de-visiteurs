@@ -15,8 +15,8 @@ const router = express.Router();
 router.get(["/dashboard"], async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
-    if (req.query.current_date) {
-        const tmpDate = DateTime.fromISO(req.query.current_date as string);
+    if (req.query.date) {
+        const tmpDate = DateTime.fromISO(req.query.date as string);
         if (tmpDate.isValid) {
             daySelected = tmpDate;
         }
@@ -47,14 +47,15 @@ router.get(["/dashboard"], async (req, res) => {
 router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
-    if (req.query.current_date) {
-        const tmpDate = DateTime.fromISO(req.query.current_date as string);
+    if (req.query.date) {
+        const tmpDate = DateTime.fromISO(req.query.date as string);
         if (tmpDate.isValid) {
             daySelected = tmpDate;
         }
     }
 
     const isClosedDay = config.CLOSED_DAYS_INDEX.split(",").includes(String(daySelected.weekday));
+    let [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
 
     const openingDaysSelector = sequelize.where(
         sequelize.fn("strftime", "%u", sequelize.col("date_passage"), "localtime"), {
@@ -63,8 +64,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     );
 
     const placeSelected = req.query?.lieu || "tous";
-    let place = undefined;
-    let [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
+    let place = null;
 
     if (placeSelected !== "tous") {
         place = await PlaceModel.findOne({ where: { slug: placeSelected } })
@@ -94,7 +94,6 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         },
         order: [['date_passage', 'DESC']]
     });
-    console.log(records)
 
     const visitorsSummary = await VisitModel.findAll({
         raw: true,

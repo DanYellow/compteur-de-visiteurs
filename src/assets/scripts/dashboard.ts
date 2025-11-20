@@ -123,8 +123,8 @@ const chartScales = (xTitle: string, titleSize: number = 12) => {
 let daySelected = DateTime.now();
 const queryParams = new URLSearchParams(window.location.search);
 
-if (queryParams.has("current_date")) {
-    const tmpDate = DateTime.fromISO(queryParams.get("current_date") as string);
+if (queryParams.has("date")) {
+    const tmpDate = DateTime.fromISO(queryParams.get("date") as string);
     if (tmpDate.isValid) {
         daySelected = tmpDate;
     }
@@ -173,9 +173,9 @@ const listCharts = Object.values(configDataRaw);
 
         const urlParams = new URLSearchParams(window.location.search);
         const placeParam = urlParams.get('lieu');
-        
-        const apiQueryParams = new URLSearchParams({ 
-            filtre: apiKey, 
+
+        const apiQueryParams = new URLSearchParams({
+            filtre: apiKey,
             jour: daySelected.toFormat("yyyy-LL-dd"),
             ...((placeParam === "tous" || !placeParam) ? {} : {lieu: placeParam}),
         });

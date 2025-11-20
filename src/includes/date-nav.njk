@@ -1,4 +1,4 @@
-<a href="?current_date={{ current_date|add_days(-1)|date("yyyy-LL-dd") }}" title="Hier" class="navigation-month-2 py-2.5 px-3.5 border-black-numixs border rounded-md flex gap-2 items-center justify-center hocus:bg-green-numixs">
+<a href="?date={{ current_date|add_days(-1)|date("yyyy-LL-dd") }}" title="Hier" class="navigation-month-2 py-2.5 px-3.5 border-black-numixs border rounded-md flex gap-2 items-center justify-center hocus:bg-green-numixs">
     <span class="sr-only">Aller au {{ current_date|add_days(-1)|date("dd/LL/yyyy") }}</span>
     <span class="flex items-center justify-center w-3.5">
         {% include "includes/icons/arrow-icon.svg" %}
@@ -10,7 +10,7 @@
     <span class="pointer-events-none hidden sm:inline">{{ "Aujourd'hui" if is_today else current_date|date("EEEE dd LLLL yyyy") }}</span>
     <span class="pointer-events-none inline sm:hidden">{{ "Aujourd'hui" if is_today else current_date|date("dd/LL/yyyy") }}</span>
 </button>
-<a href="?current_date={{ current_date|add_days(1)|date("yyyy-LL-dd") }}" title="Demain" class="navigation-month-2 py-2.5 px-3.5 border-black-numixs border rounded-md flex gap-2 items-center justify-center hocus:bg-green-numixs">
+<a href="?date={{ current_date|add_days(1)|date("yyyy-LL-dd") }}" title="Demain" class="navigation-month-2 py-2.5 px-3.5 border-black-numixs border rounded-md flex gap-2 items-center justify-center hocus:bg-green-numixs">
     <span class="sr-only">Aller au {{ current_date|add_days(1)|date("dd/LL/yyyy") }}</span>
     <time datetime="{{ current_date|add_days(1)|date("dd/LL/yyyy") }}" data-day>{{ current_date|add_days(1)|date("dd/LL/yyyy") }}</time>
     <span class="rotate-180 flex items-center justify-center w-3.5">
