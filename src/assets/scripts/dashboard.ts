@@ -130,12 +130,21 @@ if (queryParams.has("date")) {
     }
 }
 
+
+const urlParams = new URLSearchParams(window.location.search);
+const placeParam = urlParams.get('lieu');
+
+const placeQueryParams = new URLSearchParams({
+    ...((placeParam === "tous" || !placeParam) ? {} : {lieu: placeParam}),
+});
+const downloadLinkSuffix = placeQueryParams.toString().length ? `&${placeQueryParams.toString()}` : '';
+
 const configDataRaw: ChartConfigData = {
     "jour": {
         ...configData.jour,
         id: "dailyChart",
         chartTitle: `Visites uniques du ${daySelected.toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?jour=${daySelected.toFormat("yyyy-LL-dd")}`,
+        downloadLink: `telecharger?jour=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
         xTitle: 'Tranche horaire',
         xLabels: configData.jour.listColumns,
     },
@@ -143,7 +152,7 @@ const configDataRaw: ChartConfigData = {
         ...configData.semaine,
         id: "weeklyChart",
         chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}`,
+        downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
         xTitle: 'Jours',
         xLabels: configData.semaine.listColumns,
     },
@@ -151,7 +160,7 @@ const configDataRaw: ChartConfigData = {
         ...configData.mois,
         id: "monthlyChart",
         chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}`,
+        downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
         xTitle: 'Semaines',
         xLabels: configData.mois.listColumns,
     },
@@ -159,7 +168,7 @@ const configDataRaw: ChartConfigData = {
         ...configData.annee,
         id: "yearlyChart",
         chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}`,
+        downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
         xTitle: 'Mois',
         xLabels: configData.annee.listColumns,
     }
@@ -170,9 +179,6 @@ const listCharts = Object.values(configDataRaw);
 ; (() => {
     listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
         const ctx = document.getElementById(id)! as HTMLCanvasElement;
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const placeParam = urlParams.get('lieu');
 
         const apiQueryParams = new URLSearchParams({
             filtre: apiKey,

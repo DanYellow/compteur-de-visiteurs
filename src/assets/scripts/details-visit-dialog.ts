@@ -16,17 +16,18 @@ modal?.addEventListener("toggle", (e: Event) => {
         const sourceItem = toggleEvent.source! as HTMLButtonElement;
         const visitData = JSON.parse(sourceItem.dataset.visitData!);
 
-        Object.entries(visitData).forEach(([key, value]) => {
-            if (String(value).toLowerCase() === "oui") {
-                const li = document.createElement("li");
-                const groupData = listBusinessSector.find((item) => item.value === key);
-                li.textContent = `${groupData?.name || ""} ${groupData?.fullName || ""}`;
+        const listKeysBusiness = listBusinessSector.map((item) => item.value)
+        const listBusinessSectorSelected = Object.entries(visitData).filter(([key, value]) => value === "oui" && listKeysBusiness.includes(key));
 
-                visitGroupContainer.append(li);
-            }
+        Object.entries(Object.fromEntries(listBusinessSectorSelected)).forEach(([key]) => {
+            const li = document.createElement("li");
+            const groupData = listBusinessSector.find((item) => item.value === key);
+            li.textContent = `${groupData?.name || ""} ${groupData?.fullName || ""}`;
+
+            visitGroupContainer.append(li);
         })
         visitNumber.textContent = String(visitData.order);
         visitTime.dateTime = visitData.date_passage;
-        visitTime.textContent = DateTime.fromISO(visitData.date_passage).toFormat("EEEE dd LLLL yyyy à HH:mm:ss", {locale: "fr"});
+        visitTime.textContent = DateTime.fromJSDate(new Date(visitData.date_passage)).toFormat("EEEE dd LLLL yyyy à HH:mm:ss", {locale: "fr"});
     }
 })

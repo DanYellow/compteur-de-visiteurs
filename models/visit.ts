@@ -14,7 +14,7 @@ export default (sequelize: Sequelize) => {
         })
 
     sequelize.define('visit', {
-        date_passage: DataTypes.DATE,
+        // date_passage: DataTypes.DATE,
         ...listBusinessSectorKeys,
     }, {
         createdAt: 'date_passage',

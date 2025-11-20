@@ -27,27 +27,27 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                     {% include "includes/dropdown-places.njk" %}
                 </div>
                 {% set split_button_main_action %}
-                <a href="/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white">
+                <a href="/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}&lieu={{ place_selected }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white">
                         Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)
                     </a>
                 {% endset %}
 
                 {% set split_button_sub_action_1 %}
-                <a href="/telecharger?semaine={{ current_date|date("yyyy-MM-dd") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                <a href="/telecharger?semaine={{ current_date|date("yyyy-MM-dd") }}&lieu={{ place_selected }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                     {% include "includes/icons/download-fill-icon.svg" %}
                         Télécharger toutes les données de la semaine (.csv)
                     </a>
                 {% endset %}
 
                 {% set split_button_sub_action_2 %}
-                <a href="/telecharger?mois={{ current_date|date("yyyy-MM") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                <a href="/telecharger?mois={{ current_date|date("yyyy-MM") }}&lieu={{ place_selected }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                     {% include "includes/icons/download-fill-icon.svg" %}
                         Télécharger toutes les données de {{ current_date|date("MMMM yyyy") }} (.csv)
                     </a>
                 {% endset %}
 
                 {% set split_button_sub_action_3 %}
-                <a href="/telecharger?annee={{ current_date|date("yyyy") }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                <a href="/telecharger?annee={{ current_date|date("yyyy") }}&lieu={{ place_selected }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                     {% include "includes/icons/download-fill-icon.svg" %}
                         Télécharger toutes les données de l'année {{ current_date|date("yyyy") }} (.csv)
                     </a>
