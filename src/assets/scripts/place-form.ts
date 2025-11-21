@@ -27,7 +27,7 @@ const validForm = (e: Event) => {
     }
 
     const formData = new FormData(form);
-    formData.set("jours_fermeture", Array.from(formData.getAll("jours_fermeture")).join(","));
+    formData.set("jours_fermeture", JSON.stringify(formData.getAll("jours_fermeture")));
 
     const validator = PlaceSchema.safeParse(Object.fromEntries(formData));
 

@@ -75,7 +75,7 @@ export const PlaceSchema = z.object({
     message: "L'heure d'ouverture doit être inférieure à celle de fermeture",
     path: ['heure_ouverture']
 }).refine(data => {
-    const closedDays = (data.jours_fermeture || "").split(",")
+    const closedDays = JSON.parse(data.jours_fermeture || "[]")
     return closedDays?.length < 7;
 }, {
     message: "Le lieu doit être ouvert au minimum un jour",

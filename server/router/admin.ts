@@ -126,6 +126,9 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     const listPlaces = await PlaceModel.findAll({
         raw: true,
+        order: [
+            ['nom', 'ASC'],
+        ],
     })
 
     res.render("pages/members-list.njk", {
@@ -201,6 +204,9 @@ router.get(['/lieux'], async (req, res) => {
     const listDays = Info.weekdays('long', { locale: 'fr' }).map(capitalizeFirstLetter);
     const listPlaces = await PlaceModel.findAll({
         raw: true,
+        order: [
+            ['nom', 'ASC'],
+        ],
     })
 
     const listPlacesComputed = listPlaces.map((place) => {

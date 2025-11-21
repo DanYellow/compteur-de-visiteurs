@@ -6,6 +6,7 @@ const modal = document.getElementById("detail-visit") as HTMLDialogElement;
 const visitTime = modal.querySelector("time") as HTMLTimeElement;
 const visitGroupContainer = modal.querySelector("ul") as HTMLUListElement;
 const visitNumber = modal.querySelector("[data-visit-number]") as HTMLSpanElement;
+const placeName = modal.querySelector("[data-place-name]") as HTMLParagraphElement;
 
 modal?.addEventListener("toggle", (e: Event) => {
     const toggleEvent = e as ToggleEvent;
@@ -29,5 +30,7 @@ modal?.addEventListener("toggle", (e: Event) => {
         visitNumber.textContent = String(visitData.order);
         visitTime.dateTime = visitData.date_passage;
         visitTime.textContent = DateTime.fromJSDate(new Date(visitData.date_passage)).toFormat("EEEE dd LLLL yyyy à HH:mm:ss", {locale: "fr"});
+
+        placeName.textContent = visitData["place.nom"];
     }
 })

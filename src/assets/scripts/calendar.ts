@@ -1,5 +1,4 @@
 import { DateTime } from "luxon";
-import config from "#config" with { type: "json" };
 import { capitalizeFirstLetter } from "./utils.shared";
 
 const calendarWrapper = document.getElementById("calendar");
@@ -15,7 +14,7 @@ let urlDay = today;
 let staticCurrentDayMonth = currentDay.toFormat("LL-dd");
 const placeData = JSON.parse(document.querySelector("[data-place]")?.dataset.place || "{}")
 
-const listClosedDaysIndex = (placeData.jours_fermeture || config.CLOSED_DAYS_INDEX).split(",").filter(Boolean).map(String);
+const listClosedDaysIndex = placeData.jours_fermeture;
 
 const queryString = new URLSearchParams(window.location.search);
 if (queryString.has("date")) {
