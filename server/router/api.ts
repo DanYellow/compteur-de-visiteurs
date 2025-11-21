@@ -45,34 +45,15 @@ router.get("/", async (req, res) => {
     }
 
     let [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
-    let closedDays = config.CLOSED_DAYS_INDEX.split(",");
     const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: openHours });
     const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: closeHours });
 
     let place = undefined;
     if (req.query.lieu && req.query.lieu !== "tous") {
-        place = await PlaceModel.findOne({ where: { slug: req.query.lieu }})
-        if (place) {
-            openHours = Number(place.heure_ouverture)
-            closeHours = Number(place.heure_fermeture);
-
-            closedDays = (place.jours_fermeture || "").split(",");
-        }
+        place = await PlaceModel.findOne({ where: { slug: req.query.lieu } })
     }
 
-    const openingDaysSelector = sequelize.where(
-        sequelize.fn("strftime", "%u", sequelize.col("date_passage"), "localtime"), {
-            [Op.notIn]: closedDays
-        }
-    );
-
-    const openingHoursSelector = sequelize.where(
-        sequelize.cast(sequelize.fn("strftime", "%H", sequelize.col("date_passage"), "localtime"), "int"), {
-            [Op.between]: [openHours, closeHours]
-        }
-    );
-
-    const listVisitors = await VisitModel.findAll({
+    const listVisits = await VisitModel.findAll({
         raw: true,
         attributes: {
             include: [
@@ -86,10 +67,23 @@ router.get("/", async (req, res) => {
                 [Op.and]: {
                     [Op.gte]: startTime.toString(),
                     [Op.lte]: endTime.toString(),
-                },
+                }
             },
-            [Op.and]: [openingDaysSelector, openingHoursSelector],
-            ...(place ? { lieu_id: place.id } : {})
+            [Op.and]: [
+                sequelize.literal(`
+                            EXISTS (
+                                SELECT 1
+                                FROM json_each(place.jours_fermeture)
+                                WHERE json_each.value != CAST( strftime('%u', visit.date_passage, 'localtime') AS text)
+                            )
+                        `),
+                sequelize.where(
+                    sequelize.fn("strftime", "%H", sequelize.col("date_passage"), "localtime"), {
+                    [Op.between]: [sequelize.col("place.heure_ouverture"), sequelize.col("place.heure_fermeture")]
+                }
+                )
+            ],
+            ...(place ? { lieu_id: place.id } : {}),
         },
         include: [{
             model: PlaceModel,
@@ -104,7 +98,7 @@ router.get("/", async (req, res) => {
     });
 
     res.status(200).json({
-        data: listVisitors
+        data: listVisits
     });
 });
 

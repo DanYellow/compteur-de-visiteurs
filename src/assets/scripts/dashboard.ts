@@ -36,7 +36,7 @@ if (Object.keys(placeData).length > 0) {
         listColumns: listTimeSlots
     }
 
-    const listClosedDaysIndex = (placeData.jours_fermeture || "").split(",").map(Number);
+    const listClosedDaysIndex = JSON.parse(placeData.jours_fermeture || []).map(Number);
 
     configData.semaine = {
         ...configData.semaine,

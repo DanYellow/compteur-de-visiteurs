@@ -56,8 +56,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         }
     }
 
-    let [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
-    let closedDays = config.CLOSED_DAYS_INDEX.split(",");
+    let closedDays = [];
 
     const placeSelected = req.query?.lieu || "tous";
     let place = null;
@@ -65,9 +64,6 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     if (placeSelected !== "tous") {
         place = await PlaceModel.findOne({ where: { slug: placeSelected } })
         if (place) {
-            openHours = Number(place.heure_ouverture);
-            closeHours = Number(place.heure_fermeture);
-
             closedDays = place.jours_fermeture || [];
         }
     }
