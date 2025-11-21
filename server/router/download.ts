@@ -5,12 +5,11 @@ import { fileURLToPath, URLSearchParams } from "url";
 import { stringify } from "csv-stringify/sync";
 import { DateTime, DateTimeUnit } from "luxon";
 import sequelize from "#models/index.ts";
-import config from "#config" with { type: "json" };
 import { configData, getLinearCSV, getPivotTable } from "#scripts/utils.shared.ts";
 import { slugify } from "#scripts/utils.ts";
 import { Visit } from "#types";
 
-const { visit: VisitModel, place: PlaceModel } = sequelize.models;
+const { place: PlaceModel } = sequelize.models;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 

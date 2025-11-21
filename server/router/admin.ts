@@ -33,11 +33,13 @@ router.get(["/dashboard"], async (req, res) => {
         place = listPlaces.find((item) => item.slug === placeSelected)
     }
 
+    const listDaysClosed = place ? (place.jours_fermeture || "").split(",") : config.CLOSED_DAYS_INDEX.split(",");
+
     res.render("pages/dashboard.njk", {
         "current_date": daySelected,
         "today": DateTime.now(),
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
-        "is_day_closed": config.CLOSED_DAYS_INDEX.split(",").includes(String(daySelected.weekday)),
+        "is_day_closed": listDaysClosed.includes(String(daySelected.weekday)),
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
         "places_list": listPlaces,
         "place": place,
@@ -54,14 +56,8 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         }
     }
 
-    const isClosedDay = config.CLOSED_DAYS_INDEX.split(",").includes(String(daySelected.weekday));
     let [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
-
-    const openingDaysSelector = sequelize.where(
-        sequelize.fn("strftime", "%u", sequelize.col("date_passage"), "localtime"), {
-            [Op.notIn]: config.CLOSED_DAYS_INDEX.split(",")
-        }
-    );
+    let closedDays = config.CLOSED_DAYS_INDEX.split(",");
 
     const placeSelected = req.query?.lieu || "tous";
     let place = null;
@@ -71,8 +67,50 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         if (place) {
             openHours = Number(place.heure_ouverture);
             closeHours = Number(place.heure_fermeture);
+
+            closedDays = (place.jours_fermeture || "").split(",");
         }
     }
+
+    const isClosedDay = closedDays.includes(String(daySelected.weekday));
+
+    const openingDaysSelector = sequelize.where(
+        sequelize.fn("strftime", "%u", sequelize.col("date_passage"), "localtime"), {
+            [Op.notIn]: closedDays
+        }
+    );
+
+    // const records = []
+
+    try {
+        console.log(
+        await sequelize.query(`
+            SELECT * FROM visit
+            INNER JOIN place ON visit.lieu_id = place.id
+            WHERE EXISTS (
+                SELECT 1
+                FROM json_each(place.jours_fermeture)
+                WHERE json_each.value != CAST( strftime('%u', visit.date_passage, 'localtime') AS text)
+            )
+            AND strftime('%H', visit.date_passage, 'localtime') BETWEEN place.heure_ouverture AND place.heure_fermeture
+            `,
+            { raw: true }
+        )
+    );
+    } catch (error) {
+        console.log(error)
+    }
+
+    // console.log(
+    //     await sequelize.query(`
+    //         SELECT * FROM visit
+    //         INNER JOIN place ON visit.lieu_id = place.id
+    //         WHERE strftime('%H', visit.date_passage, 'localtime') BETWEEN place.heure_ouverture AND place.heure_fermeture
+    //         AND strftime('%u', visit.date_passage, 'localtime') IN place.jours_fermeture
+    //         `,
+    //         { raw: true }
+    //     )
+    // );
 
     const records = await VisitModel.findAll({
         raw: true,
@@ -81,15 +119,28 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                 [sequelize.literal('ROW_NUMBER() OVER (ORDER by date_passage ASC)'), 'order'],
             ],
         },
-        include: 'place',
-        where: {
-            date_passage: {
-                [Op.and]: {
-                    [Op.gte]: daySelected.startOf("day").set({ hour: openHours }).toString(),
-                    [Op.lte]: daySelected.endOf("day").set({ hour: closeHours }).toString(),
-                }
+        include: [{
+            model: PlaceModel,
+            as: "place",
+            attributes: {
+                exclude: ["adresse", "ouvert", "slug", "id", "heure_ouverture", "heure_fermeture", "date_creation"]
             },
-            [Op.and]: [openingDaysSelector],
+        }],
+        where: {
+            [Op.and]: [
+                sequelize.literal(`
+                    EXISTS (
+                        SELECT 1
+                        FROM json_each(place.jours_fermeture)
+                        WHERE json_each.value != CAST( strftime('%u', visit.date_passage, 'localtime') AS text)
+                    )
+                `),
+                sequelize.where(
+                    sequelize.fn("strftime", "%H", sequelize.col("date_passage"), "localtime"), {
+                        [Op.between]: [sequelize.col("place.heure_ouverture"), sequelize.col("place.heure_fermeture")]
+                    }
+                )
+            ],
             ...(place ? { lieu_id: place.id } : {}),
         },
         order: [['date_passage', 'DESC']]
@@ -101,7 +152,6 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
             include: [
                 ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value]))
             ],
-            exclude: ["placeId"],
         },
         where: {
             date_passage: {
@@ -138,12 +188,16 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
     let place = null
     if (req.params.placeId) {
         place = await PlaceModel.findByPk(req.params.placeId, { raw: true });
+        place = {
+            ...place,
+            jours_fermeture: JSON.parse(place.jours_fermeture)
+        }
     }
 
     res.render("pages/add_edit-place.njk", {
         place: {
             ...place,
-            jours_fermeture: place ? (place.jours_fermeture || "").split(",") : ["6", "7"]
+            jours_fermeture: place ? place.jours_fermeture : ["6", "7"]
         },
         is_edit: Object.keys(place || {}).length > 0,
         flash_message: req.cookies.flash_message,
@@ -151,15 +205,20 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
 }).post(['/lieu', '/lieu/:placeId'], async (req, res) => {
-    const payload = {
+    let payload = {
         ...req.body,
-        jours_fermeture: (req.body.jours_fermeture || []).join(",")
+        jours_fermeture: JSON.stringify(req.body.jours_fermeture || [])
     };
 
     const validator = PlaceSchema.safeParse(payload);
     if (!validator.success) {
         return res.render("pages/add_edit-place.njk");
     }
+
+    payload = {
+        ...req.body,
+        jours_fermeture: req.body.jours_fermeture
+    };
 
     try {
         if (req.params.placeId) {
@@ -186,7 +245,7 @@ router.get(['/lieux'], async (req, res) => {
     })
 
     const listPlacesComputed = listPlaces.map((place) => {
-        const listClosedDays = (place.jours_fermeture || "").split(",")
+        const listClosedDays = JSON.parse(place.jours_fermeture)
         return {
             ...place,
             jours_fermeture: listClosedDays.map((idxDay: number) => listDays[idxDay - 1]).map(capitalizeFirstLetter).join(', ')
