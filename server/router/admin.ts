@@ -68,51 +68,13 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
             openHours = Number(place.heure_ouverture);
             closeHours = Number(place.heure_fermeture);
 
-            closedDays = (place.jours_fermeture || "").split(",");
+            closedDays = place.jours_fermeture || [];
         }
     }
 
     const isClosedDay = closedDays.includes(String(daySelected.weekday));
 
-    const openingDaysSelector = sequelize.where(
-        sequelize.fn("strftime", "%u", sequelize.col("date_passage"), "localtime"), {
-            [Op.notIn]: closedDays
-        }
-    );
-
-    // const records = []
-
-    try {
-        console.log(
-        await sequelize.query(`
-            SELECT * FROM visit
-            INNER JOIN place ON visit.lieu_id = place.id
-            WHERE EXISTS (
-                SELECT 1
-                FROM json_each(place.jours_fermeture)
-                WHERE json_each.value != CAST( strftime('%u', visit.date_passage, 'localtime') AS text)
-            )
-            AND strftime('%H', visit.date_passage, 'localtime') BETWEEN place.heure_ouverture AND place.heure_fermeture
-            `,
-            { raw: true }
-        )
-    );
-    } catch (error) {
-        console.log(error)
-    }
-
-    // console.log(
-    //     await sequelize.query(`
-    //         SELECT * FROM visit
-    //         INNER JOIN place ON visit.lieu_id = place.id
-    //         WHERE strftime('%H', visit.date_passage, 'localtime') BETWEEN place.heure_ouverture AND place.heure_fermeture
-    //         AND strftime('%u', visit.date_passage, 'localtime') IN place.jours_fermeture
-    //         `,
-    //         { raw: true }
-    //     )
-    // );
-
-    const records = await VisitModel.findAll({
+    const listVisits = await VisitModel.findAll({
         raw: true,
         attributes: {
             include: [
@@ -123,10 +85,16 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
             model: PlaceModel,
             as: "place",
             attributes: {
-                exclude: ["adresse", "ouvert", "slug", "id", "heure_ouverture", "heure_fermeture", "date_creation"]
+                exclude: ["adresse", "jours_fermeture", "ouvert", "slug", "id", "heure_ouverture", "heure_fermeture", "date_creation"]
             },
         }],
         where: {
+            date_passage: {
+                [Op.and]: {
+                    [Op.gte]: daySelected.startOf("day").toString(),
+                    [Op.lte]: daySelected.endOf("day").toString(),
+                }
+            },
             [Op.and]: [
                 sequelize.literal(`
                     EXISTS (
@@ -137,8 +105,8 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                 `),
                 sequelize.where(
                     sequelize.fn("strftime", "%H", sequelize.col("date_passage"), "localtime"), {
-                        [Op.between]: [sequelize.col("place.heure_ouverture"), sequelize.col("place.heure_fermeture")]
-                    }
+                    [Op.between]: [sequelize.col("place.heure_ouverture"), sequelize.col("place.heure_fermeture")]
+                }
                 )
             ],
             ...(place ? { lieu_id: place.id } : {}),
@@ -146,23 +114,14 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         order: [['date_passage', 'DESC']]
     });
 
-    const visitorsSummary = await VisitModel.findAll({
-        raw: true,
-        attributes: {
-            include: [
-                ...(listBusinessSector.map((item) => [literal(`COUNT (distinct "id") FILTER (WHERE "${item.value}" = 'oui')`), item.value]))
-            ],
-        },
-        where: {
-            date_passage: {
-                [Op.and]: {
-                    [Op.gte]: daySelected.startOf("day").set({ hour: openHours }).toString(),
-                    [Op.lte]: daySelected.endOf("day").set({ hour: closeHours }).toString(),
-                },
-            },
-            [Op.and]: [openingDaysSelector],
-            ...(place ? { lieu_id: place.id } : {}),
-        },
+    const listBusinessSectorSelectable = listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb));
+    const listBusinessSectorKeys = listBusinessSectorSelectable.map((item) => item.value)
+
+    const visitorsSummary = {}
+    listVisits.forEach((v) => {
+        listBusinessSectorKeys.forEach((business) => {
+            visitorsSummary[business] = v[business] === "oui" ? ((visitorsSummary[business] || 0) + 1) : (visitorsSummary[business] || 0)
+        })
     });
 
     const listPlaces = await PlaceModel.findAll({
@@ -170,17 +129,17 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     })
 
     res.render("pages/members-list.njk", {
-        visitors_summary: visitorsSummary[0],
-        "visitors_list": records,
+        visitors_summary: visitorsSummary,
+        "visitors_list": listVisits,
         "list_business_sector": listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)),
-        "header_list": records?.[0] ? Object.keys(records[0]) : [],
+        "header_list": listVisits?.[0] ? Object.keys(listVisits[0]) : [],
         "current_date": daySelected,
         "today": DateTime.now(),
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
         "is_day_closed": isClosedDay,
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
         "places_list": listPlaces,
-        "place": place
+        "place": place || {}
     });
 });
 
