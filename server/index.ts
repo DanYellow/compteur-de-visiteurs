@@ -104,6 +104,19 @@ nunjucksConfig.addFilter("add_days", (value, days) => {
     return DateTime.fromISO(value).plus({ days });
 });
 
+nunjucksConfig.addGlobal("formatQueryParams", (obj: Record<string, string>, removeIfEmpty: boolean = false) => {
+    const params = new URLSearchParams(obj);
+    if (removeIfEmpty) {
+        Object.keys(obj).forEach((item) => {
+            if (!params.get(item)) {
+                params.delete(item);
+            }
+        })
+    }
+
+    return `?${params.toString()}`;
+});
+
 const listDomains: string[] = (process.env.IS_DOCKER?.toLowerCase() === "true" && process.env.NODE_ENV === "production") ? ["faclab.localhost"] : ["localhost", "0.0.0.0"];
 const port = Number(process.env.VITE_PORT || 3900);
 const server = app.listen(port, () => {

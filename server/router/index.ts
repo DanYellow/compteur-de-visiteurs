@@ -15,11 +15,12 @@ const { visit: VisitModel, place: PlaceModel } = sequelize.models;
 
 const router = express.Router();
 
-router.use(async (_req, res, next) => {
+router.use(async (req, res, next) => {
     const manifest = await parseManifest("manifest.json");
     res.locals = {
         ...res.locals,
         manifest,
+        lieu: req.query.lieu
     };
 
     next();
@@ -32,15 +33,15 @@ router.use("/", AdminRouter);
 
 router.get("/", async (req, res) => {
     const nbPlaces = await PlaceModel.count();
-    
+
     if (nbPlaces === 0) {
         res.cookie('flash_message', "no_place", { maxAge: 1000, httpOnly: true })
         return res.redirect("/lieu");
     } else if (!("lieu_numixs" in req.cookies)) {
         res.cookie('flash_message', "unset_place", { maxAge: 1000, httpOnly: true })
         return res.redirect("/choix-lieu");
-    } 
-    
+    }
+
     const place = await PlaceModel.findOne({ where: { slug: req.cookies.lieu_numixs } })
     if (!place) {
         res.cookie('flash_message', "unknown_place", { maxAge: 1000, httpOnly: true })
