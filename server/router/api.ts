@@ -107,37 +107,19 @@ router.get("/lieux", async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
         attributes: [
             [sequelize.literal(`(
-            SELECT json_group_array(value) as shared_values
-            FROM (
-                SELECT json_each.value
-                FROM place, json_each(place.jours_fermeture)
-                GROUP BY json_each.value
-                HAVING COUNT(DISTINCT place.id) = (SELECT COUNT(*) FROM place)
-            )
-            )`), "jours_fermeture"],
+                SELECT json_group_array(value) as shared_values
+                FROM (
+                    SELECT json_each.value
+                    FROM place, json_each(place.jours_fermeture)
+                    GROUP BY json_each.value
+                    HAVING COUNT(DISTINCT place.id) = (SELECT COUNT(*) FROM place)
+                )
+                )`),
+            "jours_fermeture"],
             [sequelize.fn("MAX", sequelize.col("heure_fermeture")), "heure_fermeture"],
             [sequelize.fn("MIN", sequelize.col("heure_ouverture")), "heure_ouverture"],
         ]
     })
-
-
-    console.log(await sequelize.query(`
-        SELECT json_group_array(value) as shared_values
-        FROM (
-            SELECT json_each.value
-            FROM place, json_each(place.jours_fermeture)
-            GROUP BY json_each.value
-            HAVING COUNT(DISTINCT place.id) = (SELECT COUNT(*) FROM place)
-        )
-        `))
-
-    // console.log(await sequelize.query(`
-
-    //     SELECT json_each.value
-    //     FROM place, json_each(place.jours_fermeture)
-    //     GROUP BY json_each.value
-    //     HAVING COUNT(DISTINCT place.id) = (SELECT COUNT(*) FROM place)
-    //     `))
 
     res.status(200).json({
         data: listPlaces[0]

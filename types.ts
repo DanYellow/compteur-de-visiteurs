@@ -59,7 +59,7 @@ export interface BaseConfigData {
     [key: string]: {
         apiKey: string;
         xValuesSuffix?: string;
-        listColumns: string[] | { id: number; name: string; }[];
+        listColumns?: string[] | { id: number; name: string; }[];
     }
 }
 

@@ -36,7 +36,7 @@ if (Object.keys(placeData).length > 0) {
         listColumns: listTimeSlots
     }
 
-    const listClosedDaysIndex = JSON.parse(placeData.jours_fermeture || []).map(Number);
+    const listClosedDaysIndex = JSON.parse(placeData.jours_fermeture || '[]').map(Number);
 
     configData.semaine = {
         ...configData.semaine,
@@ -61,6 +61,24 @@ if (Object.keys(placeData).length > 0) {
     configData.jour = {
         ...configData.jour,
         listColumns: listTimeSlots
+    }
+
+    const listClosedDaysIndex = openingHoursLimitsRes.jours_fermeture.map(Number);
+
+    const listOpenedDays = Info.weekdays('long', { locale: 'fr' })
+            .map((item, idx) => {
+                if (listClosedDaysIndex.includes(idx + 1)) {
+                    return {}
+                }
+                return {
+                    name: capitalizeFirstLetter(item),
+                    id: idx + 1
+                }
+            }).filter(Boolean)
+
+    configData.semaine = {
+        ...configData.semaine,
+        listColumns: listOpenedDays
     }
 }
 

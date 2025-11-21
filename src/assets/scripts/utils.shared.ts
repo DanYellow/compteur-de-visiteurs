@@ -181,19 +181,6 @@ export const getLinearCSV = (data: Result[], { periodLabel, lieu }: LinearCSVOpt
     return csvPayload;
 }
 
-const [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
-const rangeOpeningHours = Math.abs(Number(closeHours) - Number(openHours) + 1);
-
-const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + openHours).map((item) => String(item));
-
-const listClosedDaysIndex = config.CLOSED_DAYS_INDEX.split(",").filter(Boolean).map(Number);
-const listDays = Info.weekdays('long', { locale: 'fr' })
-    .map((item, idx) => ({
-        name: item.charAt(0).toUpperCase() + String(item).slice(1),
-        id: idx + 1
-    }))
-    .filter((_, index) => !listClosedDaysIndex.includes(index + 1))
-
 const listMonths = Info.months('long', { locale: 'fr' })
     .map((item, idx) => ({
         name: item.charAt(0).toUpperCase() + String(item).slice(1),
@@ -229,12 +216,10 @@ const getWeeksRangeMonth = (_startDate = null) => {
 export const configData: BaseConfigData = {
     "jour": {
         apiKey: "jour",
-        listColumns: listTimeSlots,
         xValuesSuffix: "h",
     },
     "semaine": {
         apiKey: "semaine",
-        listColumns: listDays,
     },
     "mois": {
         apiKey: "mois",
