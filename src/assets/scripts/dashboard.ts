@@ -51,6 +51,17 @@ if (Object.keys(placeData).length > 0) {
                 }
             }).filter(Boolean)
     }
+} else {
+    const openingHoursLimitsReq = await fetch(`/api/lieux`);
+    const openingHoursLimitsRes = (await openingHoursLimitsReq.json()).data || {min: 8, max: 20};
+
+    const rangeOpeningHours = Math.abs(Number(openingHoursLimitsRes.heure_fermeture) - Number(openingHoursLimitsRes.heure_ouverture) + 1);
+    const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + openingHoursLimitsRes.heure_ouverture).map((item) => String(item));
+
+    configData.jour = {
+        ...configData.jour,
+        listColumns: listTimeSlots
+    }
 }
 
 const TotalVisitors = {
@@ -151,7 +162,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const placeParam = urlParams.get('lieu');
 
 const placeQueryParams = new URLSearchParams({
-    ...((placeParam === "tous" || !placeParam) ? {} : {lieu: placeParam}),
+    ...((placeParam === "tous" || !placeParam) ? {} : { lieu: placeParam }),
 });
 const downloadLinkSuffix = placeQueryParams.toString().length ? `&${placeQueryParams.toString()}` : '';
 
@@ -199,7 +210,7 @@ const listCharts = Object.values(configDataRaw);
         const apiQueryParams = new URLSearchParams({
             filtre: apiKey,
             jour: daySelected.toFormat("yyyy-LL-dd"),
-            ...((placeParam === "tous" || !placeParam) ? {} : {lieu: placeParam}),
+            ...((placeParam === "tous" || !placeParam) ? {} : { lieu: placeParam }),
         });
 
         const req = await fetch(`/api?${apiQueryParams.toString()}`);
