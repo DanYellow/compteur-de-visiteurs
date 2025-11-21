@@ -9,7 +9,7 @@ export default (sequelize: Sequelize) => {
             allowNull: false,
         },
         adresse: DataTypes.STRING,
-        jours_fermeture: DataTypes.TEXT,
+        jours_fermeture: DataTypes.JSON,
         heure_ouverture: {
             type: DataTypes.NUMBER,
             defaultValue: 10,
