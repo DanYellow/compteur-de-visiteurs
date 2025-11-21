@@ -23,7 +23,7 @@ try {
     console.error('Unable to connect to the database:', error);
 }
 
-Place(sequelize);
+Place.initModel(sequelize);
 Visit(sequelize);
 
 sequelize.models.place.hasMany(sequelize.models.visit, {
