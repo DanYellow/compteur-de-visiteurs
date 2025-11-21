@@ -62,13 +62,12 @@ if (Object.keys(placeData).length > 0) {
         ...configData.jour,
         listColumns: listTimeSlots
     }
-
-    const listClosedDaysIndex = openingHoursLimitsRes.jours_fermeture.map(Number);
+    const listClosedDaysIndex = JSON.parse(openingHoursLimitsRes.jours_fermeture || '[]').map(Number);
 
     const listOpenedDays = Info.weekdays('long', { locale: 'fr' })
             .map((item, idx) => {
                 if (listClosedDaysIndex.includes(idx + 1)) {
-                    return {}
+                    return null
                 }
                 return {
                     name: capitalizeFirstLetter(item),

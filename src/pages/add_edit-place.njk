@@ -92,11 +92,11 @@ Créer nouveau lieu Numixs
                         <div class="flex flex-row gap-5">
                             <div>
                                 <label for="oui">Oui</label>
-                                <input type="radio" name="ouvert" checked value="oui" id="oui">
+                                <input type="radio" name="ouvert" {{ "checked" if place.ouvert == 1 else "" }} value="1" id="oui">
                             </div>
                             <div>
                                 <label for="non">Non</label>
-                                <input type="radio" name="ouvert" value="non" id="non">
+                                <input type="radio" name="ouvert" {{ "checked" if place.ouvert == 0 else "" }} value="0" id="non">
                             </div>
                         </div>
                     </div>

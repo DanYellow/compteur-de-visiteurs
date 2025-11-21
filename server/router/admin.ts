@@ -125,8 +125,9 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
 
     res.render("pages/add_edit-place.njk", {
         place: {
+            jours_fermeture: DEFAULT_CLOSED_DAYS,
+            ouvert: 1,
             ...place,
-            jours_fermeture: place ? place.jours_fermeture : DEFAULT_CLOSED_DAYS
         },
         is_edit: Object.keys(place || {}).length > 0,
         flash_message: req.cookies.flash_message,
