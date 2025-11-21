@@ -14,7 +14,7 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
         Place.init(
             {
                 id: {
-                    type: DataTypes.INTEGER,
+                    type: DataTypes.TINYINT.UNSIGNED,
                     primaryKey: true,
                     autoIncrement: true,
                 },

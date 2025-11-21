@@ -1,23 +1,40 @@
-import { DataTypes, Sequelize } from 'sequelize';
+import { DataTypes, Sequelize, Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
 
 import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
+import Place from '#models/place.ts';
 
-export default (sequelize: Sequelize) => {
-    const listBusinessSectorKeys: Record<string, any> = {}
-    listBusinessSector
-        .filter((item) => (!("listInDb" in item) || item.listInDb))
-        .forEach((item) => {
-            listBusinessSectorKeys[item.value] = {
-                type: DataTypes.STRING,
-                defaultValue: 'non',
-            };
-        })
+export default class Visit extends Model<InferAttributes<Visit>, InferCreationAttributes<Visit>> {
+    declare id: CreationOptional<number>;
+    declare lieu_id: ForeignKey<Place['id']>;
+    declare date_passage: CreationOptional<Date>;
 
-    sequelize.define('visit', {
-        // date_passage: DataTypes.DATE,
-        ...listBusinessSectorKeys,
-    }, {
-        createdAt: 'date_passage',
-        updatedAt: false,
-    });
+    static initModel(sequelize: Sequelize) {
+        const listBusinessSectorKeys: Record<string, any> = {}
+        listBusinessSector
+            .filter((item) => (!("listInDb" in item) || item.listInDb))
+            .forEach((item) => {
+                listBusinessSectorKeys[item.value] = {
+                    type: DataTypes.STRING,
+                    defaultValue: 'non',
+                };
+            })
+
+        Visit.init(
+            {
+                id: {
+                    type: DataTypes.TINYINT.UNSIGNED,
+                    primaryKey: true,
+                    autoIncrement: true,
+                },
+                date_passage: DataTypes.DATE,
+                ...listBusinessSectorKeys,
+            },
+            {
+                modelName: 'visit',
+                createdAt: 'date_passage',
+                updatedAt: false,
+                sequelize,
+            }
+        )
+    }
 }

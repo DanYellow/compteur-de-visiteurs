@@ -68,7 +68,7 @@ const validForm = (e: Event) => {
 form?.addEventListener("submit", submitForm);
 form?.addEventListener("input", validForm);
 
-const choices = new Choices(dropdownDays, {
+new Choices(dropdownDays, {
     addItems: false,
     paste: false,
     removeItemButton: true,
@@ -77,12 +77,3 @@ const choices = new Choices(dropdownDays, {
     maxItemCount: 6,
     maxItemText: 'Un jour ouvrable est impératif',
 });
-
-// {
-//   nom: 'Station Numixs Sarcelles',
-//   adresse: 'Test',
-//   jours_fermeture: [ '1', '7' ],
-//   heure_ouverture: '8',
-//   heure_fermeture: '12',
-//   ouvert: 'oui'
-// }

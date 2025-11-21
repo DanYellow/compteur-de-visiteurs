@@ -27,15 +27,28 @@ export interface PivotTableOptions {
     columnSuffix: string;
 }
 
-type Groups = {
-    [key: string]: string;
-}
+// const STATS = ["hp", "attack", "defense"] as const;
+// type StatKey = (typeof STATS)[number];
 
-export type Visit = Groups & {
+// type StatFields = {
+//   [K in StatKey]: number;
+// };
+
+export type Visit = Record<string, string> & {
     id: number;
     heure?: number;
     date_passage: string;
     groupe: string;
+}
+
+export type Place = {
+    nom: string;
+    slug: string;
+    adresse: string;
+    jours_fermeture: string;
+    heure_ouverture: number;
+    heure_fermeture: string;
+    ouvert: boolean;
 }
 
 export interface GroupVisit {

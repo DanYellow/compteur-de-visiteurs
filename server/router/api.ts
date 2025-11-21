@@ -57,6 +57,7 @@ router.get("/", async (req, res) => {
         raw: true,
         attributes: {
             include: [
+                [sequelize.literal("ROW_NUMBER() OVER (ORDER by date_passage ASC)"), "order"],
                 [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"],
                 [sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime"), "groupe"],
             ],

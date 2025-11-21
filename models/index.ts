@@ -24,7 +24,7 @@ try {
 }
 
 Place.initModel(sequelize);
-Visit(sequelize);
+Visit.initModel(sequelize);
 
 sequelize.models.place.hasMany(sequelize.models.visit, {
     foreignKey: {
