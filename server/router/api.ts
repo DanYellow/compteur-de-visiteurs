@@ -80,8 +80,13 @@ router.get("/", async (req, res) => {
                         `),
                 sequelize.where(
                     sequelize.fn("strftime", "%H", sequelize.col("date_passage"), "localtime"), {
-                    [Op.between]: [sequelize.col("place.heure_ouverture"), sequelize.col("place.heure_fermeture")]
-                }
+                        [Op.between]: [sequelize.col("place.heure_ouverture"), sequelize.col("place.heure_fermeture")]
+                    }
+                ),
+                sequelize.where(
+                    sequelize.col("place.ouvert"), {
+                        [Op.eq]: 1
+                    }
                 )
             ],
             ...(place ? { lieu_id: place.id } : {}),
@@ -90,7 +95,7 @@ router.get("/", async (req, res) => {
             model: PlaceModel,
             as: "place",
             attributes: {
-                exclude: ["adresse", "ouvert", "slug", "id", "jours_fermeture", "heure_ouverture", "heure_fermeture", "date_creation"]
+                exclude: ["adresse", "slug", "id", "jours_fermeture", "heure_ouverture", "heure_fermeture", "date_creation"]
             },
         }],
         order: [
@@ -104,21 +109,21 @@ router.get("/", async (req, res) => {
 });
 
 router.get("/lieux", async (req, res) => {
-    const listPlaces = await PlaceModel.findAll({
-        attributes: [
-            [sequelize.literal(`(
-                SELECT json_group_array(value) as shared_values
-                FROM (
-                    SELECT json_each.value
-                    FROM place, json_each(place.jours_fermeture)
-                    GROUP BY json_each.value
-                    HAVING COUNT(DISTINCT place.id) = (SELECT COUNT(*) FROM place)
-                )
-                )`),
-            "jours_fermeture"],
-            [sequelize.fn("MAX", sequelize.col("heure_fermeture")), "heure_fermeture"],
-            [sequelize.fn("MIN", sequelize.col("heure_ouverture")), "heure_ouverture"],
-        ]
+    const [listPlaces] = await sequelize.query(
+    `
+        SELECT
+            json_group_array(value) as jours_fermeture,
+            (SELECT MIN(heure_ouverture) FROM place WHERE ouvert = 1) as heure_ouverture,
+            (SELECT MAX(heure_fermeture) FROM place WHERE ouvert = 1) as heure_fermeture
+        FROM (
+            SELECT json_each.value
+            FROM place, json_each(place.jours_fermeture)
+            GROUP BY json_each.value
+            HAVING COUNT(DISTINCT place.id) = (SELECT COUNT(*) FROM place WHERE ouvert = 1)
+        )
+    `,
+    {
+        raw: true,
     })
 
     res.status(200).json({

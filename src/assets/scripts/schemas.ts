@@ -66,7 +66,7 @@ export const PlaceSchema = z.object({
     jours_fermeture: z.string().optional(),
     heure_fermeture: z.string(),
     heure_ouverture: z.string(),
-    ouvert: z.enum(["oui", "non"], {
+    ouvert: z.enum(["1", "0"], {
         message: "Vous devez définir l'ouverture du lieu"
     })
 }).refine(data => {

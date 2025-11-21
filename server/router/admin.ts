@@ -64,12 +64,16 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         if (place) {
             closedDays = JSON.parse(place.jours_fermeture as string || "[]");
         }
+    } else {
+        const openingHoursLimitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/lieux`);
+        place = (await openingHoursLimitsReq.json()).data || {min: 8, max: 20, jours_fermeture: DEFAULT_CLOSED_DAYS};
+        closedDays = place.jours_fermeture || [];
     }
 
     const isClosedDay = closedDays.includes(String(daySelected.weekday));
 
-    const request = await fetch(`http://${req.get('host')}/api?filtre=jour&jour=${daySelected.toFormat("yyyy-LL-dd")}&lieu=${placeSelected}`);
-    const listVisits = (await request.json()).data || [];
+    const listVisitsReq = await fetch(`${req.protocol}://${req.get('host')}/api?filtre=jour&jour=${daySelected.toFormat("yyyy-LL-dd")}&lieu=${placeSelected}`);
+    const listVisits = (await listVisitsReq.json()).data || [];
 
     const listBusinessSectorSelectable = listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb));
     const listBusinessSectorKeys = listBusinessSectorSelectable.map((item) => item.value)
