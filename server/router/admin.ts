@@ -1,16 +1,13 @@
 import express from "express";
 import { DateTime, Info } from "luxon";
-import { Op, literal } from 'sequelize';
 
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
-import sequelize from "#models/index.ts";
-import config from "#config" with { type: "json" };
 import { PlaceSchema } from "#scripts/schemas.ts";
 import { slugify } from "#scripts/utils.ts";
 import { Visit } from "#types";
+import { Place as PlaceModel } from "#models/index.ts";
 
-const { visit: VisitModel, place: PlaceModel } = sequelize.models;
-
+const DEFAULT_CLOSED_DAYS = ["6", "7"];
 const router = express.Router();
 
 router.get(["/dashboard"], async (req, res) => {
@@ -34,7 +31,7 @@ router.get(["/dashboard"], async (req, res) => {
         place = listPlaces.find((item) => item.slug === placeSelected)
     }
 
-    const listDaysClosed = place ? (place.jours_fermeture || "").split(",") : config.CLOSED_DAYS_INDEX.split(",");
+    const listDaysClosed = place ? (place.jours_fermeture || []) : DEFAULT_CLOSED_DAYS;
 
     res.render("pages/dashboard.njk", {
         "current_date": daySelected,
@@ -57,15 +54,15 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         }
     }
 
-    let closedDays = [];
+    let closedDays: string[] = DEFAULT_CLOSED_DAYS;
 
-    const placeSelected = req.query?.lieu || "tous";
+    const placeSelected = String(req.query?.lieu || "tous");
     let place = null;
 
     if (placeSelected !== "tous") {
-        place = await PlaceModel.findOne({ where: { slug: placeSelected } })
+        place = await PlaceModel.findOne({ where: { slug: placeSelected }, raw: true })
         if (place) {
-            closedDays = place.jours_fermeture || [];
+            closedDays = JSON.parse(place.jours_fermeture as string || "[]");
         }
     }
 
@@ -81,7 +78,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     listVisits.forEach((visit: Visit) => {
         listBusinessSectorKeys.forEach((business) => {
-            visitorsSummary[business] = visit[business] === "oui" ? (visitorsSummary[business] + 1) : visitorsSummary[business]
+            visitorsSummary[business] += visit[business] === "oui" ? 1 : 0
         });
     });
 
@@ -103,7 +100,10 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "is_day_closed": isClosedDay,
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
         "places_list": listPlaces,
-        "place": place || {}
+        "place": {
+            jours_fermeture: DEFAULT_CLOSED_DAYS,
+            ...place,
+        }
     });
 });
 
@@ -111,16 +111,18 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
     let place = null
     if (req.params.placeId) {
         place = await PlaceModel.findByPk(req.params.placeId, { raw: true });
-        place = {
-            ...place,
-            jours_fermeture: JSON.parse(place.jours_fermeture)
+        if (place) {
+            place = {
+                ...place,
+                jours_fermeture: JSON.parse(place.jours_fermeture as string)
+            }
         }
     }
 
     res.render("pages/add_edit-place.njk", {
         place: {
             ...place,
-            jours_fermeture: place ? place.jours_fermeture : ["6", "7"]
+            jours_fermeture: place ? place.jours_fermeture : DEFAULT_CLOSED_DAYS
         },
         is_edit: Object.keys(place || {}).length > 0,
         flash_message: req.cookies.flash_message,
@@ -171,7 +173,8 @@ router.get(['/lieux'], async (req, res) => {
     })
 
     const listPlacesComputed = listPlaces.map((place) => {
-        const listClosedDays = JSON.parse(place.jours_fermeture)
+        const listClosedDays = JSON.parse(place.jours_fermeture as string);
+
         return {
             ...place,
             jours_fermeture: listClosedDays.map((idxDay: number) => listDays[idxDay - 1]).map(capitalizeFirstLetter).join(', ')

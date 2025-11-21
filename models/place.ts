@@ -2,13 +2,14 @@ import { DataTypes, Sequelize, Model, InferAttributes, InferCreationAttributes, 
 
 export default class Place extends Model<InferAttributes<Place>, InferCreationAttributes<Place>> {
     declare id: CreationOptional<number>;
-    declare heure_ouverture: number;
     declare nom: string;
     declare slug: string;
     declare adresse: string;
-    declare jours_fermeture: string;
+    declare jours_fermeture: string | string[];
     declare heure_fermeture: number;
-    declare ouvert: string;
+    declare heure_ouverture: number;
+    declare ouvert: boolean;
+    declare date_creation: CreationOptional<Date>;
 
     static initModel(sequelize: Sequelize) {
         Place.init(
@@ -27,11 +28,11 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
                 adresse: DataTypes.STRING,
                 jours_fermeture: DataTypes.JSON,
                 heure_ouverture: {
-                    type: DataTypes.NUMBER,
+                    type: DataTypes.INTEGER,
                     defaultValue: 10,
                 },
                 heure_fermeture: {
-                    type: DataTypes.NUMBER,
+                    type: DataTypes.INTEGER,
                     defaultValue: 20,
                     validate: {
                         isGreaterThanOtherField(value: number) {
@@ -42,9 +43,10 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
                     }
                 },
                 ouvert: {
-                    type: DataTypes.STRING,
+                    type: DataTypes.BOOLEAN,
                     defaultValue: true,
                 },
+                date_creation: DataTypes.DATE,
             },
             {
                 sequelize,
