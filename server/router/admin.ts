@@ -7,6 +7,7 @@ import sequelize from "#models/index.ts";
 import config from "#config" with { type: "json" };
 import { PlaceSchema } from "#scripts/schemas.ts";
 import { slugify } from "#scripts/utils.ts";
+import { Visit } from "#types";
 
 const { visit: VisitModel, place: PlaceModel } = sequelize.models;
 
@@ -70,54 +71,18 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     const isClosedDay = closedDays.includes(String(daySelected.weekday));
 
-    const listVisits = await VisitModel.findAll({
-        raw: true,
-        attributes: {
-            include: [
-                [sequelize.literal('ROW_NUMBER() OVER (ORDER by date_passage ASC)'), 'order'],
-            ],
-        },
-        include: [{
-            model: PlaceModel,
-            as: "place",
-            attributes: {
-                exclude: ["adresse", "jours_fermeture", "ouvert", "slug", "id", "heure_ouverture", "heure_fermeture", "date_creation"]
-            },
-        }],
-        where: {
-            date_passage: {
-                [Op.and]: {
-                    [Op.gte]: daySelected.startOf("day").toString(),
-                    [Op.lte]: daySelected.endOf("day").toString(),
-                }
-            },
-            [Op.and]: [
-                sequelize.literal(`
-                    EXISTS (
-                        SELECT 1
-                        FROM json_each(place.jours_fermeture)
-                        WHERE json_each.value != CAST( strftime('%u', visit.date_passage, 'localtime') AS text)
-                    )
-                `),
-                sequelize.where(
-                    sequelize.fn("strftime", "%H", sequelize.col("date_passage"), "localtime"), {
-                    [Op.between]: [sequelize.col("place.heure_ouverture"), sequelize.col("place.heure_fermeture")]
-                }
-                )
-            ],
-            ...(place ? { lieu_id: place.id } : {}),
-        },
-        order: [['date_passage', 'DESC']]
-    });
+    const request = await fetch(`http://${req.get('host')}/api?filtre=jour&jour=${daySelected.toFormat("yyyy-LL-dd")}&lieu=${placeSelected}`);
+    const listVisits = (await request.json()).data || [];
 
     const listBusinessSectorSelectable = listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb));
     const listBusinessSectorKeys = listBusinessSectorSelectable.map((item) => item.value)
 
-    const visitorsSummary = {}
-    listVisits.forEach((v) => {
+    const visitorsSummary = Object.fromEntries(listBusinessSectorKeys.map((item) => [item, 0]))
+
+    listVisits.forEach((visit: Visit) => {
         listBusinessSectorKeys.forEach((business) => {
-            visitorsSummary[business] = v[business] === "oui" ? ((visitorsSummary[business] || 0) + 1) : (visitorsSummary[business] || 0)
-        })
+            visitorsSummary[business] = visit[business] === "oui" ? (visitorsSummary[business] + 1) : visitorsSummary[business]
+        });
     });
 
     const listPlaces = await PlaceModel.findAll({
