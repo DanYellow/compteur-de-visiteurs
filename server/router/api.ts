@@ -44,9 +44,8 @@ router.get("/", async (req, res) => {
         },
     }
 
-    let [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
-    const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: openHours });
-    const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day").set({ hour: closeHours });
+    const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day");
+    const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day");
 
     let place = undefined;
     if (req.query.lieu && req.query.lieu !== "tous") {
@@ -59,7 +58,9 @@ router.get("/", async (req, res) => {
             include: [
                 [sequelize.literal("ROW_NUMBER() OVER (ORDER by date_passage ASC)"), "order"],
                 [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"],
-                [sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime"), "groupe"],
+                [sequelize.fn("trim",
+                    sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime")
+                ), "groupe"],
             ],
             exclude: ["groupe", "lieu_id"]
         },
@@ -95,7 +96,7 @@ router.get("/", async (req, res) => {
             model: PlaceModel,
             as: "place",
             attributes: {
-                exclude: ["adresse", "slug", "id", "jours_fermeture", "heure_ouverture", "heure_fermeture", "date_creation"]
+                exclude: ["adresse", "slug", "ouvert", "id", "jours_fermeture", "heure_ouverture", "heure_fermeture", "date_creation"]
             },
         }],
         order: [

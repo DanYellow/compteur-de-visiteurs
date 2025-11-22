@@ -10,6 +10,7 @@ import parseManifest from "#server/parse-manifest.ts";
 import ApiRouter from "./api.ts";
 import DownloadRouter from "./download.ts";
 import AdminRouter from "./admin.ts";
+import { DateTime } from "luxon";
 
 const router = express.Router();
 
@@ -66,6 +67,24 @@ router.get("/", async (req, res) => {
             lieu_id: place!.id,
         }
 
+//         const [order, created] = await sequelize.query(`
+//     INSERT INTO orders (customer_id, amount, created_at, updated_at)
+//     SELECT :customerId, :amount, NOW(), NOW()
+//     FROM customers
+//     WHERE id = :customerId AND status = 'active'
+//     RETURNING *;
+//   `, {
+//     replacements: {
+//       customerId,
+//       amount: orderData.amount
+//     },
+//     type: QueryTypes.INSERT
+//   });
+
+// if (!created || order.length === 0) {
+//     throw new Error('Cannot create order: Customer not active');
+//   }
+
         await VisitModel.create(payload)
         await new Promise(r => setTimeout(r, 1500));
 
@@ -85,16 +104,20 @@ router.get("/", async (req, res) => {
 router.get(["/choix-lieu"], async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
         raw: true,
+        order: [["nom", "ASC"]]
     });
 
     let place = null;
-    if (req.cookies.flash_message === "set_place") {
+
+    const listFlashMessages = JSON.parse(req.cookies.flash_message || "[]")
+
+    if ("lieu_numixs" in req.cookies) {
         place = await PlaceModel.findOne({ where: { slug: req.cookies.lieu_numixs } })
     }
 
     res.render("pages/set-place.njk", {
         "places_list": listPlaces,
-        flash_message: req.cookies.flash_message,
+        flash_message: listFlashMessages.reduce((a: Record<string, string>, v: string) => ({ ...a, [v]: v}), {}) ,
         place,
     });
 }).post(["/choix-lieu"], async (req, res) => {
@@ -103,8 +126,21 @@ router.get(["/choix-lieu"], async (req, res) => {
         httpOnly: true, // The cookie only accessible by the web server
     }
 
-    res.cookie('lieu_numixs', req.body.place, options)
-    res.cookie('flash_message', "set_place", { maxAge: 1000, httpOnly: true })
+    const place = await PlaceModel.findOne({ where: { slug: req.body.place, ouvert: true } });
+    const listFlashMessages = []
+    if (place) {
+        const daySelected = DateTime.now();
+        const closedDays = place.jours_fermeture || [];
+        const isClosedDay = closedDays.includes(String(daySelected.weekday));
+        if (isClosedDay) {
+            listFlashMessages.push("closed_place")
+        }
+        res.cookie('lieu_numixs', req.body.place, options)
+        listFlashMessages.push("set_place")
+    } else {
+        listFlashMessages.push("not_found_place")
+    }
+    res.cookie('flash_message', JSON.stringify(listFlashMessages), { maxAge: 1000, httpOnly: true })
 
     res.redirect("/choix-lieu");
 });
