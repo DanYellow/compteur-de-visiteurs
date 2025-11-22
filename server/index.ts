@@ -103,6 +103,10 @@ nunjucksConfig.addFilter("add_days", (value, days) => {
     return DateTime.fromISO(value).plus({ days });
 });
 
+nunjucksConfig.addFilter("pad", (value, char: string, nb: number) => {
+    return String(value).padStart(nb, char);
+});
+
 nunjucksConfig.addGlobal("formatQueryParams", (obj: Record<string, string>, removeIfEmpty: boolean = false) => {
     const params = new URLSearchParams(obj);
     if (removeIfEmpty) {

@@ -1,6 +1,8 @@
 import { Sequelize } from 'sequelize';
 import Place from './place';
 import Visit from './visit';
+import RegularOpening from './regular-opening';
+import SpecialOpening from './special-opening';
 
 let databaseFileName = './database.tmp.sqlite';
 
@@ -25,12 +27,15 @@ try {
 
 Place.initModel(sequelize);
 Visit.initModel(sequelize);
+RegularOpening.initModel(sequelize);
+SpecialOpening.initModel(sequelize);
 
 sequelize.models.place.hasMany(sequelize.models.visit, {
     foreignKey: {
         name: 'lieu_id',
         allowNull: false,
     },
+    onDelete: 'CASCADE',
 });
 
 sequelize.models.visit.belongsTo(sequelize.models.place, {
@@ -40,24 +45,38 @@ sequelize.models.visit.belongsTo(sequelize.models.place, {
     },
 });
 
+sequelize.models.place.hasOne(sequelize.models.regular_opening, {
+    foreignKey: {
+        name: 'place_id',
+        allowNull: false,
+    },
+    onDelete: 'CASCADE',
+});
+
+sequelize.models.regular_opening.belongsTo(sequelize.models.place, {
+    foreignKey: {
+        name: 'place_id',
+        allowNull: false,
+    },
+});
+
+sequelize.models.place.belongsToMany(sequelize.models.special_opening, {
+    through: 'place_special-opening',
+    foreignKey: 'place_id',
+    otherKey: 'special_opening_id',
+});
+
+sequelize.models.special_opening.belongsToMany(sequelize.models.place, {
+    through: 'place_special-opening',
+    foreignKey: 'special_opening_id',
+    otherKey: 'place_id',
+});
+
+
 if (process.env.NODE_ENV === "development") {
-    const queryInterface = sequelize.getQueryInterface();
-    const tableNames = await queryInterface.showAllTables();
-
-    for await (const model of Object.values(sequelize.models)) {
-        try {
-            const backupTableName = model.tableName + '_backup';
-            if (tableNames.includes(backupTableName)) {
-                await queryInterface.dropTable(backupTableName)
-            }
-
-            // await model.sync() // { alter: true, force: false, }
-        } catch (e) {
-            console.error('💔model sync error', e)
-        }
-    }
+    // await sequelize.sync({force: true})
 }
 
 export default sequelize;
 
-export { Place, Visit }
+export { Place, Visit, RegularOpening, SpecialOpening }

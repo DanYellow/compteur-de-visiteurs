@@ -5,9 +5,7 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
     declare nom: string;
     declare slug: string;
     declare adresse: string;
-    declare jours_fermeture: string | string[];
-    declare heure_fermeture: number;
-    declare heure_ouverture: number;
+    declare description: string;
     declare ouvert: boolean;
     declare date_creation: CreationOptional<Date>;
 
@@ -15,7 +13,7 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
         Place.init(
             {
                 id: {
-                    type: DataTypes.TINYINT.UNSIGNED,
+                    type: DataTypes.INTEGER,
                     primaryKey: true,
                     autoIncrement: true,
                 },
@@ -25,22 +23,10 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
                     unique: true,
                     allowNull: false,
                 },
-                adresse: DataTypes.STRING,
-                jours_fermeture: DataTypes.JSON,
-                heure_ouverture: {
-                    type: DataTypes.INTEGER,
-                    defaultValue: 10,
-                },
-                heure_fermeture: {
-                    type: DataTypes.INTEGER,
-                    defaultValue: 20,
-                    validate: {
-                        isGreaterThanOtherField(value: number) {
-                            if (Number(value) <= Number(this.heure_ouverture)) {
-                                throw new Error('L\'heure de fermeture ne peut pas être inférieure à celle d\'ouverture.');
-                            }
-                        }
-                    }
+                adresse: DataTypes.TEXT,
+                description: {
+                    type: DataTypes.TEXT,
+                    allowNull: true
                 },
                 ouvert: {
                     type: DataTypes.BOOLEAN,
@@ -53,6 +39,7 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
                 updatedAt: false,
                 createdAt: 'date_creation',
                 modelName: 'place',
+                underscored: true,
             }
         )
     }

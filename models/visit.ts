@@ -5,7 +5,7 @@ import Place from '#models/place.ts';
 
 export default class Visit extends Model<InferAttributes<Visit>, InferCreationAttributes<Visit>> {
     declare id: CreationOptional<number>;
-    declare lieu_id: ForeignKey<Place['id']>;
+    declare place_id: ForeignKey<Place['id']>;
     declare date_passage: CreationOptional<Date>;
 
     static initModel(sequelize: Sequelize) {
@@ -22,7 +22,7 @@ export default class Visit extends Model<InferAttributes<Visit>, InferCreationAt
         Visit.init(
             {
                 id: {
-                    type: DataTypes.TINYINT.UNSIGNED,
+                    type: DataTypes.INTEGER,
                     primaryKey: true,
                     autoIncrement: true,
                 },
