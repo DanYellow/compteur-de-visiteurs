@@ -1,4 +1,4 @@
-import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend, type ScriptableScaleContext } from 'chart.js';
+import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend, SubTitle, type ScriptableScaleContext } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime, Info } from "luxon";
@@ -13,7 +13,7 @@ const tableDetailsChart = document.getElementById("table-details-chart") as HTML
 
 const placeData = JSON.parse(document.querySelector("[data-place]")?.dataset.place || "{}")
 
-Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels);
+Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels, SubTitle);
 
 const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs');
 
@@ -283,8 +283,22 @@ const listCharts = Object.values(configDataRaw);
                             text: chartTitle,
                             ...chartTitleStyle,
                             padding: {
-                                bottom: 20
+                                bottom: 0
                             }
+                        },
+                        subtitle: {
+                            display: true,
+                            text: `(${placeData.nom ?? "Tous"})`,
+                            color: "white",
+                            font: {
+                                size: 0,
+                                style: 'normal',
+                                weight: 'normal',
+                                family: "Calibri"
+                            },
+                            padding: {
+                                bottom: 20
+                            },
                         },
                         tooltip: {
                             enabled: true,
@@ -399,8 +413,6 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
             datasets: lineChartDatasets,
         };
 
-        configDataRaw
-
         new Chart(
             detailsChartCtx,
             {
@@ -424,9 +436,26 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                         title: {
                             text: `${(chartTitle || "").replace("uniques", "détaillées")}`,
                             ...chartTitleStyle,
+                            padding: {
+                                bottom: 0
+                            },
                             font: {
                                 ...chartTitleStyle.font,
                                 size: 26,
+                            },
+                        },
+                        subtitle: {
+                            display: true,
+                            text: `(${placeData.nom ?? "Tous"})`,
+                            color: "white",
+                            font: {
+                                size: 16,
+                                style: 'normal',
+                                weight: 'normal',
+                                family: "Calibri"
+                            },
+                            padding: {
+                                bottom: 10
                             },
                         },
                         totalVisitors: {
