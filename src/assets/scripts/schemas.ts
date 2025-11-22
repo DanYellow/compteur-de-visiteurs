@@ -60,20 +60,36 @@ export const VisitorSchema = z.object({
     path: ['entreprise'] // Pointing out which field is invalid
 })
 
+const REQUIRED_MESSAGE = "Ce champ est obligatoire";
+
 export const PlaceSchema = z.object({
-    nom: z.string().min(1),
-    adresse: z.string().min(1),
+    nom: z.string().min(1, {
+        message: `Nom : ${REQUIRED_MESSAGE}`
+    }),
+    adresse: z.string().min(1, {
+        message: `Adresse : ${REQUIRED_MESSAGE}`
+    }),
     jours_fermeture: z.string().optional(),
-    heure_fermeture: z.string(),
-    heure_ouverture: z.string(),
+    heure_ouverture_heure: z.string(),
+    heure_ouverture_minutes: z.string(),
+    heure_fermeture_heure: z.string(),
+    heure_fermeture_minutes: z.string(),
     ouvert: z.enum(["1", "0"], {
         message: "Vous devez définir l'ouverture du lieu"
     })
 }).refine(data => {
-    return Number(data.heure_ouverture) < Number(data.heure_fermeture);
+    const timeOpen = new Date();
+    timeOpen.setHours(Number(data.heure_ouverture_heure))
+    timeOpen.setMinutes(Number(data.heure_ouverture_minutes))
+
+    const timeClose = new Date();
+    timeClose.setHours(Number(data.heure_fermeture_heure))
+    timeClose.setMinutes(Number(data.heure_fermeture_minutes))
+
+    return timeOpen < timeClose;
 }, {
-    message: "L'heure d'ouverture doit être inférieure à celle de fermeture",
-    path: ['heure_ouverture']
+    message: "Horaires : L'heure d'ouverture doit être inférieure à celle de fermeture",
+    path: ['heure_ouverture_heure', 'heure_ouverture_minutes', 'heure_fermeture_heure', 'heure_fermeture_minutes']
 }).refine(data => {
     const closedDays = JSON.parse(data.jours_fermeture || "[]")
     return closedDays?.length < 7;
