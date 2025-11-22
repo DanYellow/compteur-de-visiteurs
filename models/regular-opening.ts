@@ -1,14 +1,14 @@
 import { DataTypes, Sequelize, Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
 
-export default class PlaceRegularOpening extends Model<InferAttributes<PlaceRegularOpening>, InferCreationAttributes<PlaceRegularOpening>> {
+export default class RegularOpening extends Model<InferAttributes<RegularOpening>, InferCreationAttributes<RegularOpening>> {
     declare id: CreationOptional<number>;
     declare place_id: ForeignKey<number>;
     declare jours_fermeture: string | string[];
-    declare heure_fermeture: number;
-    declare heure_ouverture: number;
+    declare heure_fermeture: string;
+    declare heure_ouverture: string;
 
     static initModel(sequelize: Sequelize) {
-        PlaceRegularOpening.init(
+        RegularOpening.init(
             {
                 id: {
                     type: DataTypes.INTEGER,
@@ -21,7 +21,7 @@ export default class PlaceRegularOpening extends Model<InferAttributes<PlaceRegu
                 },
                 heure_ouverture: {
                     type: DataTypes.TIME,
-                    defaultValue: '10:00:00'
+                    defaultValue: '10:00:00',
                 },
                 heure_fermeture: {
                     type: DataTypes.TIME,

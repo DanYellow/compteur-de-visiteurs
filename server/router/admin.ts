@@ -2,13 +2,14 @@ import express from "express";
 import { DateTime, Info } from "luxon";
 
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
-import { PlaceSchema } from "#scripts/schemas.ts";
-import { slugify } from "#scripts/utils.ts";
+import PlaceRouter from "#server/router/admin/places.ts";
 import { Visit } from "#types";
-import { Place as PlaceModel } from "#models/index.ts";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
 
-const DEFAULT_CLOSED_DAYS = ["6", "7"];
+export const DEFAULT_CLOSED_DAYS = ["6", "7"];
 const router = express.Router();
+
+router.use("/", PlaceRouter);
 
 router.get(["/dashboard"], async (req, res) => {
     let daySelected = DateTime.now();
@@ -66,7 +67,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         }
     } else {
         const openingHoursLimitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/lieux`);
-        place = (await openingHoursLimitsReq.json()).data || {min: 8, max: 20, jours_fermeture: DEFAULT_CLOSED_DAYS};
+        place = (await openingHoursLimitsReq.json()).data || { min: 8, max: 20, jours_fermeture: DEFAULT_CLOSED_DAYS };
         closedDays = place.jours_fermeture || [];
     }
 
@@ -111,84 +112,5 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     });
 });
 
-router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
-    let place = null
-    if (req.params.placeId) {
-        place = await PlaceModel.findByPk(req.params.placeId, { raw: true });
-        if (place) {
-            place = {
-                ...place,
-                jours_fermeture: JSON.parse(place.jours_fermeture as string)
-            }
-        }
-    }
-
-    res.render("pages/add_edit-place.njk", {
-        place: {
-            jours_fermeture: DEFAULT_CLOSED_DAYS,
-            ouvert: 1,
-            ...place,
-        },
-        is_edit: Object.keys(place || {}).length > 0,
-        flash_message: req.cookies.flash_message,
-        not_found: req.params.placeId && !place,
-        list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
-    });
-}).post(['/lieu', '/lieu/:placeId'], async (req, res) => {
-    let payload = {
-        ...req.body,
-        jours_fermeture: JSON.stringify(req.body.jours_fermeture || [])
-    };
-
-    const validator = PlaceSchema.safeParse(payload);
-    if (!validator.success) {
-        return res.render("pages/add_edit-place.njk");
-    }
-
-    payload = {
-        ...req.body,
-        jours_fermeture: req.body.jours_fermeture
-    };
-
-    try {
-        if (req.params.placeId) {
-            await PlaceModel.update(payload, {
-                where: {
-                    id: Number(req.params.placeId)
-                }
-            })
-        } else {
-            payload.slug = slugify(req.body.nom)
-            await PlaceModel.create(payload);
-        }
-        res.redirect('/lieux');
-    } catch (e) {
-        console.log(e)
-        return res.render("pages/add_edit-place.njk");
-    }
-})
-
-router.get(['/lieux'], async (req, res) => {
-    const listDays = Info.weekdays('long', { locale: 'fr' }).map(capitalizeFirstLetter);
-    const listPlaces = await PlaceModel.findAll({
-        raw: true,
-        order: [
-            ['nom', 'ASC'],
-        ],
-    })
-
-    const listPlacesComputed = listPlaces.map((place) => {
-        const listClosedDays = JSON.parse(place.jours_fermeture as string);
-
-        return {
-            ...place,
-            jours_fermeture: listClosedDays.map((idxDay: number) => listDays[idxDay - 1]).map(capitalizeFirstLetter).join(', ')
-        }
-    })
-
-    res.render("pages/places-list.njk", {
-        places_list: listPlacesComputed,
-    });
-})
 
 export default router;

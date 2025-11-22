@@ -1,4 +1,5 @@
-import { DataTypes, Sequelize, Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
+import { DataTypes, Sequelize, Model, InferAttributes, InferCreationAttributes, CreationOptional, HasOneGetAssociationMixin, HasOneCreateAssociationMixin } from 'sequelize';
+import { RegularOpening } from '.';
 
 export default class Place extends Model<InferAttributes<Place>, InferCreationAttributes<Place>> {
     declare id: CreationOptional<number>;
@@ -8,6 +9,9 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
     declare description: string;
     declare ouvert: boolean;
     declare date_creation: CreationOptional<Date>;
+
+    declare addRegularOpening: HasOneCreateAssociationMixin<RegularOpening>;
+    declare getRegularOpening: HasOneGetAssociationMixin<RegularOpening>;
 
     static initModel(sequelize: Sequelize) {
         Place.init(

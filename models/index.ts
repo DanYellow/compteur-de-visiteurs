@@ -51,6 +51,7 @@ sequelize.models.place.hasOne(sequelize.models.regular_opening, {
         allowNull: false,
     },
     onDelete: 'CASCADE',
+    as: "regularOpening",
 });
 
 sequelize.models.regular_opening.belongsTo(sequelize.models.place, {
@@ -64,12 +65,14 @@ sequelize.models.place.belongsToMany(sequelize.models.special_opening, {
     through: 'place_special-opening',
     foreignKey: 'place_id',
     otherKey: 'special_opening_id',
+    as: "specialOpening",
 });
 
 sequelize.models.special_opening.belongsToMany(sequelize.models.place, {
     through: 'place_special-opening',
     foreignKey: 'special_opening_id',
     otherKey: 'place_id',
+    as: "place",
 });
 
 
