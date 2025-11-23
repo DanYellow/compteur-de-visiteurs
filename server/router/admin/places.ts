@@ -1,11 +1,12 @@
 import express from "express";
-import { DateTime, Info } from "luxon";
+import { Info } from "luxon";
 
-import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
+import { capitalizeFirstLetter } from '#scripts/utils.shared.ts';
 import { PlaceSchema } from "#scripts/schemas.ts";
 import { slugify } from "#scripts/utils.ts";
 import { DEFAULT_CLOSED_DAYS } from "#server/router/admin.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
+import { PlaceRaw } from "#types";
 
 const router = express.Router();
 
@@ -60,6 +61,15 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
     };
 
     try {
+        let listClosedDays = [];
+        if (req.body.jours_fermeture) {
+            if (Array.isArray(req.body.jours_fermeture)) {
+                listClosedDays = req.body.jours_fermeture;
+            } else {
+                listClosedDays = req.body.jours_fermeture.split();
+            }
+        }
+
         if (req.params.placeId) {
             const { heure_ouverture_heure, heure_ouverture_minutes, heure_fermeture_heure, heure_fermeture_minutes } = req.body
 
@@ -69,7 +79,7 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
                 }
             })
             await RegularOpeningModel.update({
-                jours_fermeture: req.body.jours_fermeture,
+                jours_fermeture: listClosedDays,
                 heure_ouverture: `${heure_ouverture_heure}:${heure_ouverture_minutes}:00`,
                 heure_fermeture: `${heure_fermeture_heure}:${heure_fermeture_minutes}:00`,
             }, {
@@ -90,12 +100,10 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
 
             await RegularOpeningModel.create({
                 place_id: place.id,
-                jours_fermeture: req.body.jours_fermeture,
+                jours_fermeture: listClosedDays,
                 heure_ouverture: `${heure_ouverture_heure}:${heure_ouverture_minutes}:00`,
                 heure_fermeture: `${heure_fermeture_heure}:${heure_fermeture_minutes}:00`,
             })
-
-            // await place.addRegularOpening(placeRegularOpening);
         }
         res.redirect('/lieux');
     } catch (e) {
@@ -126,7 +134,8 @@ router.get(['/lieux'], async (req, res) => {
                 jours_fermeture: listClosedDays.map((idxDay) => listDays[Number(idxDay) - 1]).join(', '),
                 heure_ouverture: `${heure_ouverture_heure}h${heure_ouverture_minutes}`,
                 heure_fermeture: `${heure_fermeture_heure}h${heure_fermeture_minutes}`,
-            }
+            } as PlaceRaw;
+
             delete res.regularOpening
 
             return res
