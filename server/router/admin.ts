@@ -2,7 +2,8 @@ import express from "express";
 import { DateTime, Info } from "luxon";
 
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
-import PlaceRouter from "#server/router/admin/places.ts";
+import PlaceRouter from "#server/router/admin/place.ts";
+import SpecialOpeningRouter from "#server/router/admin/special-opening.ts";
 import { CommonRegularOpening, PlaceRaw, Visit } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
 
@@ -10,6 +11,7 @@ export const DEFAULT_CLOSED_DAYS = ["1", "6", "7"];
 const router = express.Router();
 
 router.use("/", PlaceRouter);
+router.use("/", SpecialOpeningRouter);
 
 router.get(["/dashboard"], async (req, res) => {
     let daySelected = DateTime.now();
@@ -127,6 +129,5 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         }
     });
 });
-
 
 export default router;

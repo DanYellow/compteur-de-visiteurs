@@ -39,7 +39,7 @@ export default class PlaceSpecialOpening extends Model<InferAttributes<PlaceSpec
                 },
                 ouvert: {
                     type: DataTypes.BOOLEAN,
-                    defaultValue: false,
+                    defaultValue: true,
                 },
             },
             {

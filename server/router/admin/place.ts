@@ -10,6 +10,8 @@ import { PlaceRaw } from "#types";
 
 const router = express.Router();
 
+// const base = "auteurs";
+
 router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
     let place = null
     if (req.params.placeId) {

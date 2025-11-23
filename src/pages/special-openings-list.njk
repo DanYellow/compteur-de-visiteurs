@@ -1,0 +1,104 @@
+{% extends "layouts/page.njk" %}
+
+{% block title %}
+Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
+{% endblock %}
+
+{% import "includes/macros.njk" as macros %}
+{% block scripts %}
+{% if NODE_ENV == "development" %}
+    <script type="module" src="/src/assets/scripts/details-visit-dialog.ts" defer></script>
+{% else %}
+    <script type="module" src="/{{ manifest['src/assets/scripts/details-visit-dialog.ts'].file }}" defer></script>
+{% endif %}
+{% endblock %}
+
+{% set active_menu_item = "exceptionnel" %}
+{% set place_selected = place.slug or "tous" %}
+{% set date_format = "dd/LL/yyyy à HH:mm" %}
+{% set root_class = "admin" %}
+{% block content %}
+    <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
+    <div data-place='{{ place | dump | safe }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
+        {% include "includes/admin-nav.njk" %}
+        <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
+            <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
+                <div class="text-black-numixs flex flex-col items-start">
+                    <h1 class="text-black-numixs title-font font-bold text-6xl">Jours exceptionnels</h1>
+                    <p>Gestion des ouvertures et fermetures exceptionnelles des lieux</p>
+                </div>
+                <a href="/jours-exceptionnel" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Ajouter un jour exceptionnel</a>
+            </header>
+            <div class="text-black-numixs">
+                {# <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
+                    {% include "includes/date-nav.njk" %}
+                </header> #}
+                {# {% include "includes/calendar.njk" %} #}
+                <div>
+                    <table class="w-full bg-white border-collapse whitespace-nowrap">
+                        <thead>
+                            <tr class="bg-gray-200">
+                                <td class="font-bold px-4 py-3 text-left">#</td>
+                                <td class="font-bold px-4 py-3 text-left">Nom</td>
+                                <td class="font-bold px-4 py-3 text-left">Jour</td>
+                                <td class="font-bold px-4 py-3 text-left">Lieux concernés</td>
+                                <td class="font-bold px-4 py-3 text-left">Ouvert</td>
+                                <td class="font-bold px-4 py-3 text-left"></td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for special_opening in special_openings_list %}
+                                <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                        <time datetime="{{ special_opening['date_passage'] }}">
+                                            {# {{ visit["date_passage"]|date("dd/LL/yyyy à HH:mm") }} #}
+                                        </time>
+                                    </td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left"></td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
+                                        <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-visit" command="show-modal" data-visit-data='{{ special_opening | dump | safe }}'>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 0 1-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.513 3.518 0 4.842a3.75 3.75 0 0 1-.837.552c-.676.328-1.028.774-1.028 1.152v.75a.75.75 0 0 1-1.5 0v-.75c0-1.279 1.06-2.107 1.875-2.502.182-.088.351-.199.503-.331.83-.727.83-1.857 0-2.584ZM12 18a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr class="">
+                                    <td colspan="6" class="px-4 py-3 text-center">
+                                        Aucune données
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="detail-places" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-5/12 max-w-2xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Visite n°<span data-visit-number></span></p>
+                <p class="text-sm">
+                    <time datetime="">14/11/2025 à 10:47:56</time>
+                </p>
+                <p class="text-sm" data-place-name></p>
+            </div>
+            <button type="button" command="close" commandfor="detail-visit" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <p class="text-xl">Groupe(s)</p>
+        <ul class="list-disc list-inside">
+            <li>En réinsertion pro</li>
+            <li>Entreprise Externe</li>
+        </ul>
+    </dialog>
+{% endblock %}

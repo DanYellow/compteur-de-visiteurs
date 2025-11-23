@@ -16,7 +16,7 @@ Listes lieux numixs
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
                 <h1 class="text-black-numixs title-font font-bold text-6xl">Liste lieux numixs</h1>
-                <a href="/lieu" class="bg-black-numixs hocus:bg-black px-3.5 py-2.5 rounded-xl text-white self-start md:self-auto">Ajouter un nouvel lieu</a>
+                <a href="/lieu" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Ajouter un nouvel lieu</a>
             </header>
             <div class="text-black-numixs">
                 <div class="overflow-x-auto">
@@ -40,7 +40,10 @@ Listes lieux numixs
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.jours_fermeture or "Aucun" }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ "Oui" if place.ouvert == 1 else "Non" }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                        <a href="/lieu/{{ place.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                        <div class="flex flex-row gap-3">
+                                            <a href="/lieu/{{ place.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                            <button type="button" class="font-bold text-red-800 hover:text-red-950" commandfor="delete-place" command="show-modal">Supprimer</button>
+                                        </div>
                                     </td>
                                 </tr>
                             {% else %}
@@ -56,5 +59,21 @@ Listes lieux numixs
             </div>
         </div>
     </div>
+
+    <dialog id="delete-place" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-2xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Supprimer</p>
+            </div>
+        </header>
+
+        <hr class="pb-1 mt-1 border-red-600">
+        <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Cette action est irréversible.</p>
+
+        <form action="">
+            <button type="submit" class="text-white-numixs bg-red-800 hocus:bg-red-950 px-3 py-1.5 rounded-xl">Supprimer</button>
+            <button type="button" command="close" commandfor="delete-place" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white-numixs">Annuler</button>
+        </form>
+    </dialog>
 
 {% endblock %}
