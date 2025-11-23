@@ -1,7 +1,5 @@
-import type { BaseConfigData, PivotTableOptions, Result, Visit, WeekMonth } from "#types";
+import type { BaseConfigData, CSVLinearHeader, PivotTableOptions, Result, Visit, WeekMonth } from "#types";
 import { DateTime, Info, Interval } from "luxon";
-
-import config from "#config" with { type: "json" };
 
 export const listGroups = [
     {
@@ -158,9 +156,14 @@ export const getLinearCSV = (data: Result[], { periodLabel, lieu }: LinearCSVOpt
         date_passage: periodLabel,
         ...(lieu === "tous" || !lieu ? { "place.nom": "Tous"} : {}),
         id: `Total : ${data.length}`,
-    }
+    } as CSVLinearHeader;
 
-    const csvPayload = [Object.keys(firstRow)];
+    delete firstRow.groupe;
+    delete firstRow.order;
+
+    const csvHeaderColumns = Object.keys(firstRow);
+    csvHeaderColumns[csvHeaderColumns.length - 1] = "Lieu"
+    const csvPayload = [csvHeaderColumns];
 
     data.forEach((item, idx) => {
         listGroupsInForm.forEach((group) => {
@@ -168,8 +171,9 @@ export const getLinearCSV = (data: Result[], { periodLabel, lieu }: LinearCSVOpt
         })
 
         item.id = String(idx + 1);
-        delete item.lieux_id;
+        delete item.lieu_id;
         delete item.groupe;
+        delete item.order;
 
         const rowData: string[] = Object.values(item)
 
