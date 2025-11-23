@@ -43,6 +43,7 @@ sequelize.models.visit.belongsTo(sequelize.models.place, {
         name: 'lieu_id',
         allowNull: false,
     },
+    as: 'place',
 });
 
 sequelize.models.place.hasOne(sequelize.models.regular_opening, {
@@ -59,6 +60,7 @@ sequelize.models.regular_opening.belongsTo(sequelize.models.place, {
         name: 'place_id',
         allowNull: false,
     },
+    as: 'place',
 });
 
 sequelize.models.place.belongsToMany(sequelize.models.special_opening, {
