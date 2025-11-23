@@ -53,10 +53,13 @@ if (Object.keys(placeData).length > 0) {
     }
 } else {
     const openingHoursLimitsReq = await fetch(`/api/lieux`);
-    const openingHoursLimitsRes = (await openingHoursLimitsReq.json()).data || {min: 8, max: 20};
+    const openingHoursLimitsRes = (await openingHoursLimitsReq.json()).data || { heure_ouverture: "08:00", heure_fermeture: "20:00", jour_fermeture: ["6", "7"] };
 
-    const rangeOpeningHours = Math.abs(Number(openingHoursLimitsRes.heure_fermeture) - Number(openingHoursLimitsRes.heure_ouverture) + 1);
-    const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + openingHoursLimitsRes.heure_ouverture).map((item) => String(item));
+    const [heure_ouverture_heure] = openingHoursLimitsRes.heure_ouverture.split(":");
+    const [heure_fermeture_heure] = openingHoursLimitsRes.heure_fermeture.split(":");
+
+    const rangeOpeningHours = Math.abs(parseInt(heure_fermeture_heure) - parseInt(heure_ouverture_heure) + 1);
+    const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + parseInt(heure_ouverture_heure)).map((item) => String(item));
 
     configData.jour = {
         ...configData.jour,
@@ -65,15 +68,15 @@ if (Object.keys(placeData).length > 0) {
     const listClosedDaysIndex = JSON.parse(openingHoursLimitsRes.jours_fermeture || '[]').map(Number);
 
     const listOpenedDays = Info.weekdays('long', { locale: 'fr' })
-            .map((item, idx) => {
-                if (listClosedDaysIndex.includes(idx + 1)) {
-                    return null
-                }
-                return {
-                    name: capitalizeFirstLetter(item),
-                    id: idx + 1
-                }
-            }).filter(Boolean)
+        .map((item, idx) => {
+            if (listClosedDaysIndex.includes(idx + 1)) {
+                return null
+            }
+            return {
+                name: capitalizeFirstLetter(item),
+                id: idx + 1
+            }
+        }).filter(Boolean)
 
     configData.semaine = {
         ...configData.semaine,
