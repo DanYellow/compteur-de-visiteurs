@@ -171,7 +171,8 @@ router.get("/lieux", async (req, res) => {
 
         res.status(200).json({
             data: {
-                ...commonRegularOpening,
+                heure_ouverture: commonRegularOpening.heure_ouverture || "10:00:00",
+                heure_fermeture: commonRegularOpening.heure_fermeture || "19:30:00",
                 jours_fermeture: JSON.parse(commonRegularOpening.jours_fermeture as string)
             }
         });
