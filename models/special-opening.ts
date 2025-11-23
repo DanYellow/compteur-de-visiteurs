@@ -1,16 +1,21 @@
-import { DataTypes, Sequelize, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import { slugify } from '#scripts/utils.ts';
+import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin } from 'sequelize';
+import Place from './place';
 
-export default class PlaceSpecialOpening extends Model<InferAttributes<PlaceSpecialOpening>, InferCreationAttributes<PlaceSpecialOpening>> {
+export default class SpecialOpening extends Model<InferAttributes<SpecialOpening>, InferCreationAttributes<SpecialOpening>> {
     declare id: CreationOptional<number>;
     declare nom: string;
     declare description: string;
-    declare jour: Date;
-    declare heure_fermeture: number;
-    declare heure_ouverture: number;
-    declare ouvert: boolean;
+    declare slug?: string;
+    declare date: Date;
+    declare heure_fermeture: string;
+    declare heure_ouverture: string;
+    declare ouvert?: boolean;
+
+    declare setListPlaces: BelongsToManySetAssociationsMixin<Place, number>;
 
     static initModel(sequelize: Sequelize) {
-        PlaceSpecialOpening.init(
+        SpecialOpening.init(
             {
                 id: {
                     type: DataTypes.INTEGER,
@@ -18,9 +23,14 @@ export default class PlaceSpecialOpening extends Model<InferAttributes<PlaceSpec
                     autoIncrement: true,
                 },
                 nom: DataTypes.STRING,
+                slug: {
+                    type: DataTypes.STRING,
+                    unique: true,
+                    allowNull: false,
+                },
                 description: DataTypes.STRING,
-                jour: {
-                    type: DataTypes.DATE,
+                date: {
+                    type: DataTypes.DATEONLY,
                 },
                 heure_ouverture: {
                     type: DataTypes.TIME,
@@ -48,6 +58,11 @@ export default class PlaceSpecialOpening extends Model<InferAttributes<PlaceSpec
                 createdAt: false,
                 modelName: 'special_opening',
                 underscored: true,
+                hooks: {
+                    beforeValidate(record) {
+                        record.slug = `${slugify(record.nom)}-${record.date}-${String(Date.now()).slice(-6)}`
+                    },
+                }
             }
         )
     }

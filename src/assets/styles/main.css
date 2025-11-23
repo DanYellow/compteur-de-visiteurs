@@ -371,4 +371,8 @@ button {
 .choices__inner {
     background-color: white!important;
     border-color: oklch(55.1% 0.027 264.364)!important;
+
+    &:has(.error) {
+        border: solid 1px var(--color-red-800) !important;
+    }
 }

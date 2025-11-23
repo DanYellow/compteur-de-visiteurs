@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize, Model, InferAttributes, InferCreationAttributes, CreationOptional, ForeignKey } from 'sequelize';
+import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type ForeignKey } from 'sequelize';
 
 import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import Place from '#models/place.ts';

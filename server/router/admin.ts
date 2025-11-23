@@ -23,6 +23,15 @@ router.get(["/dashboard"], async (req, res) => {
         }
     }
 
+    // try {
+    //     const listPlaces = await PlaceModel.findAll({
+    //     raw: true,
+    //     nest: true,
+    //     include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
+    // })
+    // } catch (error) {
+    //     console.log(error)
+    // }
     const listPlaces = await PlaceModel.findAll({
         raw: true,
         nest: true,

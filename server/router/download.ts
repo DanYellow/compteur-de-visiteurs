@@ -64,7 +64,7 @@ router.get('/', async (req, res) => {
         const daySelected = DateTime.fromISO(Object.values(req.query)[0] as string);
         const periodLabel = `${daySelected.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${daySelected.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
 
-        csvPayload = getLinearCSV(requestRes.data, { periodLabel, lieu: req.query.lieu });
+        csvPayload = getLinearCSV(requestRes.data, { periodLabel, lieu: String(req.query.lieu) });
     }
 
     csvFilename += fileTimestamp;

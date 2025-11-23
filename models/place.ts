@@ -1,5 +1,5 @@
-import { DataTypes, Sequelize, Model, InferAttributes, InferCreationAttributes, CreationOptional, HasOneGetAssociationMixin, HasOneCreateAssociationMixin } from 'sequelize';
-import { RegularOpening } from '.';
+import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type HasOneGetAssociationMixin, type HasOneCreateAssociationMixin, type BelongsToManyAddAssociationMixin, type BelongsToManyGetAssociationsMixin, type BelongsToManyAddAssociationsMixin } from 'sequelize';
+import { RegularOpening, SpecialOpening } from '.';
 
 export default class Place extends Model<InferAttributes<Place>, InferCreationAttributes<Place>> {
     declare id: CreationOptional<number>;
@@ -12,6 +12,11 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
 
     declare addRegularOpening: HasOneCreateAssociationMixin<RegularOpening>;
     declare getRegularOpening: HasOneGetAssociationMixin<RegularOpening>;
+
+    declare addSpecialOpening: BelongsToManyAddAssociationMixin<SpecialOpening, number>;
+    declare addListSpecialOpenings: BelongsToManyAddAssociationsMixin<SpecialOpening, number>;
+
+    declare getSpecialOpening: BelongsToManyGetAssociationsMixin<SpecialOpening>;
 
     static initModel(sequelize: Sequelize) {
         Place.init(

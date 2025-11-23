@@ -6,11 +6,11 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
 
 {% import "includes/macros.njk" as macros %}
 {% block scripts %}
-{% if NODE_ENV == "development" %}
+{# {% if NODE_ENV == "development" %}
     <script type="module" src="/src/assets/scripts/details-visit-dialog.ts" defer></script>
 {% else %}
     <script type="module" src="/{{ manifest['src/assets/scripts/details-visit-dialog.ts'].file }}" defer></script>
-{% endif %}
+{% endif %} #}
 {% endblock %}
 
 {% set active_menu_item = "exceptionnel" %}
@@ -27,7 +27,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                     <h1 class="text-black-numixs title-font font-bold text-6xl">Jours exceptionnels</h1>
                     <p>Gestion des ouvertures et fermetures exceptionnelles des lieux</p>
                 </div>
-                <a href="/jours-exceptionnel" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Ajouter un jour exceptionnel</a>
+                <a href="/jour-exceptionnel" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Ajouter un jour exceptionnel</a>
             </header>
             <div class="text-black-numixs">
                 {# <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
@@ -44,18 +44,24 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                                 <td class="font-bold px-4 py-3 text-left">Lieux concernés</td>
                                 <td class="font-bold px-4 py-3 text-left">Ouvert</td>
                                 <td class="font-bold px-4 py-3 text-left"></td>
+                                <td class="font-bold px-4 py-3 text-left"></td>
                             </tr>
                         </thead>
                         <tbody>
                             {% for special_opening in special_openings_list %}
                                 <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ special_opening.nom }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                        <time datetime="{{ special_opening['date_passage'] }}">
-                                            {# {{ visit["date_passage"]|date("dd/LL/yyyy à HH:mm") }} #}
+                                        <time datetime="{{ special_opening.date }}">
+                                            {{ special_opening.date|date("dd/LL/yyyy") }}
                                         </time>
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left"></td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left"></td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                        <a href="/jour-exceptionnel/{{ special_opening.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                    </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
                                         <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-visit" command="show-modal" data-visit-data='{{ special_opening | dump | safe }}'>
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">

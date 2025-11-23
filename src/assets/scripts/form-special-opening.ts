@@ -1,11 +1,11 @@
 import "choices.js/public/assets/styles/choices.css";
 import Choices from "choices.js";
 
-import { PlaceSchema } from "#scripts/schemas.ts";
+import { SpecialOpeningSchema } from "#scripts/schemas.ts";
 
-const form = document.querySelector("[data-place-form]") as HTMLFormElement;
+const form = document.querySelector("[data-special-opening-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
-const dropdownDays = document.getElementById("jours") as HTMLSelectElement;
+const dropdownDays = document.getElementById("places") as HTMLSelectElement;
 
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -27,9 +27,9 @@ const validForm = (e: Event) => {
     }
 
     const formData = new FormData(form);
-    formData.set("jours_fermeture", JSON.stringify(formData.getAll("jours_fermeture")));
+    formData.set("lieux", JSON.stringify(formData.getAll("lieux")));
 
-    const validator = PlaceSchema.safeParse(Object.fromEntries(formData));
+    const validator = SpecialOpeningSchema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll(".error").forEach((item) => {
         item.classList.remove("error");
@@ -73,11 +73,8 @@ new Choices(dropdownDays, {
     paste: false,
     removeItemButton: true,
     itemSelectText: 'Cliquer pour sélectionner',
-    noChoicesText: 'Aucune donnée',
+    noChoicesText: 'Plus de propositions',
     maxItemCount: 6,
     maxItemText: 'Un jour ouvrable est impératif',
     noResultsText: 'Pas de résultat trouvé',
-    sorter: function (a, b) {
-        return Number(a.value) - Number(b.value);
-    },
 });

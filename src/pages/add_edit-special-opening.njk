@@ -2,7 +2,7 @@
 
 {% block title %}
     {% if is_edit %}
-Éditer lieu "{{ place.nom }}"
+Éditer lieu "{{ special_opening.nom }}"
 {% else %}
 Créer nouveau ouverture exceptionnelle
 {% endif %}
@@ -12,13 +12,13 @@ Créer nouveau ouverture exceptionnelle
 
 {% block scripts %}
     {% if NODE_ENV == "development" %}
-        <script type="module" src="/src/assets/scripts/place-form.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/form-special-opening.ts" defer></script>
     {% else %}
-        <script type="module" src="/{{ manifest['src/assets/scripts/place-form.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/form-special-opening.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}
 
-{% set active_menu_item = "lieu" %}
+{% set active_menu_item = "exceptionnel" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
 {% block content %}
@@ -29,7 +29,7 @@ Créer nouveau ouverture exceptionnelle
             <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
                 <h1 class="text-black-numixs title-font font-bold text-4xl md:text-6xl">
                     {% if is_edit %}
-                    Éditer jour "{{ place.nom }}"
+                    Éditer jour "{{ special_opening.nom }}"
                     {% else %}
                     Créer ouverture exceptionnelle
                     {% endif %}
@@ -37,7 +37,7 @@ Créer nouveau ouverture exceptionnelle
             </header>
 
             <div class="text-black-numixs">
-                <form action="" method="post" class="flex flex-col gap-5" data-place-form>
+                <form action="" method="post" class="flex flex-col gap-5" data-special-opening-form>
                     {% if flash_message == "no_place" %}
                         <p class="p-4 bg-amber-50 text-amber-800 border-t-4 border-t-amber-800">Vous devez créer un lieu (puis le sélectionner) avant de pouvoir permettre aux visiteurs de s'enregistrer</p>
                     {% endif %}
@@ -49,15 +49,15 @@ Créer nouveau ouverture exceptionnelle
                     <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800">Les champs avec * sont obligatoires</p>
                     <div class="flex flex-col">
                         <label for="nom" class="font-bold text-lg">Nom*</label>
-                        <input type="text" id="nom" name="nom" value="">
+                        <input type="text" id="nom" name="nom" value="{{ special_opening.nom }}">
                     </div>
                     <div class="flex flex-col">
                         <label for="description" class="font-bold text-lg">Description</label>
-                        <textarea name="description" id="description"></textarea>
+                        <textarea name="description" id="description">{{ special_opening.description }}</textarea>
                     </div>
                     <div class="flex flex-col">
-                        <label for="jour" class="font-bold text-lg">Jour</label>
-                        <input type="date" name="" id="jour">
+                        <label for="date" class="font-bold text-lg">Date</label>
+                        <input type="date" value="{{ special_opening.date }}" name="date" id="date">
                     </div>
                     <div class="flex flex-col">
                         <p class="font-bold text-lg">Horaires</p>
@@ -65,14 +65,14 @@ Créer nouveau ouverture exceptionnelle
                             <div class="flex flex-col">
                                 <p>Ouverture</p>
                                 <div class="flex flex-row gap-1">
-                                    <select name="heure_ouverture_heure" value="{{ place.heure_ouverture_heure }}" id="heure_ouverture_heure">
-                                        {% for i in range(8, 20) %}
-                                            <option value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
+                                    <select name="heure_ouverture_heure" value="{{ special_opening.heure_ouverture_heure }}" id="heure_ouverture_heure">
+                                        {% for i in range(6, 24) %}
+                                            <option {{ "selected" if special_opening.heure_ouverture_heure == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
                                         {% endfor %}
                                     </select>
-                                    <select name="heure_ouverture_minutes" value="{{ place.heure_ouverture_minutes }}" id="heure_ouverture_minutes">
+                                    <select name="heure_ouverture_minutes" value="{{ special_opening.heure_ouverture_minutes }}" id="heure_ouverture_minutes">
                                         {% for i in range(0, 60) %}
-                                            <option value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}</option>
+                                            <option {{ "selected" if special_opening.heure_ouverture_minutes == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -80,14 +80,14 @@ Créer nouveau ouverture exceptionnelle
                             <div class="flex flex-col">
                                 <p>Fermeture</p>
                                 <div class="flex flex-row gap-1">
-                                    <select name="heure_fermeture_heure" value="" id="heure_fermeture_heure">
-                                        {% for i in range(8, 20) %}
-                                            <option value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
+                                    <select name="heure_fermeture_heure" value="{{ special_opening.heure_fermeture_heure }}" id="heure_fermeture_heure">
+                                        {% for i in range(6, 24) %}
+                                            <option {{ "selected" if special_opening.heure_fermeture_heure == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
                                         {% endfor %}
                                     </select>
-                                    <select name="heure_fermeture_minutes" value="{{ place.heure_fermeture_minutes }}" id="heure_fermeture_minutes">
+                                    <select name="heure_fermeture_minutes" value="{{ special_opening.heure_fermeture_minutes }}" id="heure_fermeture_minutes">
                                         {% for i in range(0, 60) %}
-                                            <option value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}</option>
+                                            <option {{ "selected" if special_opening.heure_fermeture_minutes == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -108,10 +108,10 @@ Créer nouveau ouverture exceptionnelle
                         </div>
                     </div> #}
                     <div class="flex flex-col">
-                        <label for="jours" class="font-bold text-lg">Lieux concernés*</label>
-                        <select id="jours" name="jours_fermeture" multiple>
+                        <label for="places" class="font-bold text-lg">Lieux concernés*</label>
+                        <select id="places" name="lieux" multiple>
                             {% for place in list_places %}
-                                <option value="{{ place.id }}">{{ place.nom }}</option>
+                                <option {{ "selected" if special_opening.list_places_id.includes(place.id) else "" }} value="{{ place.id }}">{{ place.nom }}</option>
                             {% endfor %}
                         </select>
                     </div>

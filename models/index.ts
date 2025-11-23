@@ -74,12 +74,14 @@ sequelize.models.special_opening.belongsToMany(sequelize.models.place, {
     through: 'place_special-opening',
     foreignKey: 'special_opening_id',
     otherKey: 'place_id',
-    as: "place",
+    as: "listPlaces",
 });
 
 
 if (process.env.NODE_ENV === "development") {
-    // await sequelize.sync({force: true})
+    await sequelize.sync({
+        // force: true
+    })
 }
 
 export default sequelize;
