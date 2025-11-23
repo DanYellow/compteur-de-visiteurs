@@ -70,7 +70,7 @@ Créer nouveau lieu Numixs
                                 <p>Ouverture</p>
                                 <div class="flex flex-row gap-1">
                                     <select name="heure_ouverture_heure" value="{{ place.heure_ouverture_heure }}" id="heure_ouverture_heure">
-                                        {% for i in range(8, 21) %}
+                                        {% for i in range(8, 20) %}
                                             <option {{ "selected" if place.heure_ouverture_heure == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
                                         {% endfor %}
                                     </select>
@@ -85,7 +85,7 @@ Créer nouveau lieu Numixs
                                 <p>Fermeture</p>
                                 <div class="flex flex-row gap-1">
                                     <select name="heure_fermeture_heure" value="{{ place.heure_fermeture_heure }}" id="heure_fermeture_heure">
-                                        {% for i in range(8, 21) %}
+                                        {% for i in range(8, 20) %}
                                             <option {{ "selected" if place.heure_fermeture_heure == i|pad('0', 2) else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
                                         {% endfor %}
                                     </select>

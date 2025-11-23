@@ -1,4 +1,6 @@
 import express from "express";
+import { DateTime } from "luxon";
+import { Op } from 'sequelize';
 
 import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
@@ -10,7 +12,6 @@ import parseManifest from "#server/parse-manifest.ts";
 import ApiRouter from "./api.ts";
 import DownloadRouter from "./download.ts";
 import AdminRouter from "./admin.ts";
-import { DateTime } from "luxon";
 
 const router = express.Router();
 
@@ -104,7 +105,12 @@ router.get("/", async (req, res) => {
 router.get(["/choix-lieu"], async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
         raw: true,
-        order: [["nom", "ASC"]]
+        order: [["nom", "ASC"]],
+        where: {
+            ouvert: {
+                [Op.eq]: 1,
+            }
+        }
     });
 
     let place = null;

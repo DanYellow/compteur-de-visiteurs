@@ -31,12 +31,13 @@ const chartTitleStyle: CustomTitleOptions = {
 if (Object.keys(placeData).length > 0) {
     const rangeOpeningHours = Math.abs(Number(placeData.heure_fermeture) - Number(placeData.heure_ouverture) + 1);
     const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + placeData.heure_ouverture).map((item) => String(item));
+
     configData.jour = {
         ...configData.jour,
         listColumns: listTimeSlots
     }
 
-    const listClosedDaysIndex = JSON.parse(placeData.jours_fermeture || '[]').map(Number);
+    const listClosedDaysIndex = placeData.jours_fermeture.map(Number);
 
     configData.semaine = {
         ...configData.semaine,
@@ -65,7 +66,8 @@ if (Object.keys(placeData).length > 0) {
         ...configData.jour,
         listColumns: listTimeSlots
     }
-    const listClosedDaysIndex = JSON.parse(openingHoursLimitsRes.jours_fermeture || '[]').map(Number);
+    console.log(openingHoursLimitsRes.jours_fermeture)
+    const listClosedDaysIndex = openingHoursLimitsRes.jours_fermeture.map(Number);
 
     const listOpenedDays = Info.weekdays('long', { locale: 'fr' })
         .map((item, idx) => {

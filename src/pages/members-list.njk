@@ -97,7 +97,11 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 <div class="p-3 rounded-md border-solid border-black-numixs border mb-3">
                     <h2 class="title-font font-bold text-2xl">{{ place.nom }}</h2>
                     <p>Ouverture : {{ place.heure_ouverture }} | Fermeture : {{ place.heure_fermeture }}</p>
-                    <p>Fermé le {{ place.jours_fermeture| join(", ") }}</p>
+                    {% if place.jours_fermeture_litteral | length %}
+                    <p>Fermé le {{ place.jours_fermeture_litteral | join(", ") }}</p>
+                    {% else %}
+                    <p>Ouvert tous les jours</p>
+                    {% endif %}
                 </div>
                 {% endif %}
                 <div class="overflow-x-auto">

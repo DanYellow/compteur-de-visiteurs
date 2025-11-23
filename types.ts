@@ -1,4 +1,7 @@
 import type { Align, LineControllerDatasetOptions, TitleOptions } from "chart.js";
+import type { InferAttributes } from "sequelize";
+
+import { Place as PlaceModel } from "#models/index.ts";
 
 export type LineChartEntry = {
     data: Number[];
@@ -41,19 +44,25 @@ export type Visit = Record<string, string> & {
     groupe: string;
 }
 
-export type CSVLinearHeader = Omit<Visit, 'id'> &  {
-    id: string;
-    groupe?: string;
+
+export type PlaceRaw = InferAttributes<PlaceModel> & {
+    regularOpening?: {
+        jours_fermeture: string;
+        heure_fermeture: string;
+        heure_ouverture: string;
+    }
+};
+
+export type CommonRegularOpening = {
+    jours_fermeture: string[] | string;
+    heure_ouverture: string;
+    heure_fermeture: string;
+    jours_fermeture_litteral?: string;
 }
 
-export type Place = {
-    nom: string;
-    slug: string;
-    adresse: string;
-    jours_fermeture: string;
-    heure_ouverture: number;
-    heure_fermeture: string;
-    ouvert: boolean;
+export type CSVLinearHeader = Omit<Visit, 'id'> & {
+    id: string;
+    groupe?: string;
 }
 
 export interface GroupVisit {
