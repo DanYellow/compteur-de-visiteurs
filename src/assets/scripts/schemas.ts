@@ -66,9 +66,7 @@ export const PlaceSchema = z.object({
     nom: z.string().min(1, {
         message: `Nom : ${REQUIRED_MESSAGE}`
     }),
-    adresse: z.string().min(1, {
-        message: `Adresse : ${REQUIRED_MESSAGE}`
-    }),
+    adresse: z.string().optional(),
     jours_fermeture: z.string().optional(),
     heure_ouverture_heure: z.string(),
     heure_ouverture_minutes: z.string(),

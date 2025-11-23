@@ -25,7 +25,6 @@ Listes lieux numixs
                             <tr class="bg-gray-200">
                                 <td class="font-bold px-4 py-3 text-left">#</td>
                                 <td class="font-bold px-4 py-3 text-left">Nom</td>
-                                <td class="font-bold px-4 py-3 text-left">Adresse</td>
                                 <td class="font-bold px-4 py-3 text-left">Heures d'ouverture</td>
                                 <td class="font-bold px-4 py-3 text-left">Jours fermés</td>
                                 <td class="font-bold px-4 py-3 text-left">Ouvert</td>
@@ -37,8 +36,7 @@ Listes lieux numixs
                                 <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.nom }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.adresse }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.heure_ouverture }}h-{{ place.heure_fermeture }}h</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.heure_ouverture }}-{{ place.heure_fermeture }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.jours_fermeture }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ "Oui" if place.ouvert == 1 else "Non" }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
@@ -47,7 +45,7 @@ Listes lieux numixs
                                 </tr>
                             {% else %}
                                 <tr class="">
-                                    <td colspan="7" class="px-4 py-3 text-center">
+                                    <td colspan="6" class="px-4 py-3 text-center">
                                         Pas de lieux
                                     </td>
                                 </tr>
