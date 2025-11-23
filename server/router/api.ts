@@ -54,7 +54,6 @@ router.get("/", async (req, res) => {
     try {
         const listVisits = await VisitModel.findAll({
             raw: true,
-            logging: console.log,
             attributes: {
                 include: [
                     [sequelize.literal("ROW_NUMBER() OVER (ORDER by date_passage ASC)"), "order"],
@@ -98,16 +97,22 @@ router.get("/", async (req, res) => {
                 as: "place",
                 required: true,
                 attributes: {
-                    exclude: ["adresse", "slug", "ouvert", "id", "jours_fermeture", "heure_ouverture", "heure_fermeture", "date_creation"]
+                    exclude: ["adresse", "slug", "ouvert", "id", "description", "date_creation"]
                 },
                 include: [
                     {
                         model: RegularOpeningModel,
                         as: "regularOpening",
                         required: true,
-                        // attributes: {
-                        //     exclude: ["adresse", "slug", "ouvert", "id", "jours_fermeture", "heure_ouverture", "heure_fermeture", "date_creation"]
-                        // },
+                        attributes: {
+                            exclude: [
+                                "id",
+                                "jours_fermeture",
+                                "heure_fermeture",
+                                "place_id",
+                                "heure_ouverture",
+                            ]
+                        },
                     }
                 ]
             }],

@@ -4,7 +4,7 @@ import { DateTime, Info } from "luxon";
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import PlaceRouter from "#server/router/admin/places.ts";
 import { Visit } from "#types";
-import { Place as PlaceModel } from "#models/index.ts";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
 
 export const DEFAULT_CLOSED_DAYS = ["6", "7"];
 const router = express.Router();
@@ -59,11 +59,17 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     const placeSelected = String(req.query?.lieu || "tous");
     let place = null;
+    let regularOpening ={};
 
     if (placeSelected !== "tous") {
-        place = await PlaceModel.findOne({ where: { slug: placeSelected }, raw: true })
+        place = await PlaceModel.findOne({ where: { slug: placeSelected } })
         if (place) {
-            closedDays = JSON.parse(place.jours_fermeture as string || "[]");
+            let _regularOpening = await place.getRegularOpening();
+            closedDays = (_regularOpening.jours_fermeture as string[]) || [];
+            regularOpening = {
+                ..._regularOpening.toJSON(),
+                jours_fermeture: Info.weekdays('long', { locale: 'fr' }).filter((_, idx) => closedDays.includes(String(idx)))
+            }
         }
     } else {
         const openingHoursLimitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/lieux`);
@@ -89,6 +95,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     const listPlaces = await PlaceModel.findAll({
         raw: true,
+        include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
         order: [
             ['nom', 'ASC'],
         ],
@@ -107,7 +114,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "places_list": listPlaces,
         "place": {
             jours_fermeture: DEFAULT_CLOSED_DAYS,
-            ...place,
+            ...(Object.keys(regularOpening).length ? {...place.toJSON(), ...regularOpening} : {}),
         }
     });
 });

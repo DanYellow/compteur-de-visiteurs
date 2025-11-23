@@ -93,6 +93,13 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                         {% endfor %}
                     </div>
                 </header>
+                {% if place.nom %}
+                <div class="p-3 rounded-md border-solid border-black-numixs border mb-3">
+                    <h2 class="title-font font-bold text-2xl">{{ place.nom }}</h2>
+                    <p>Ouverture : {{ place.heure_ouverture }} | Fermeture : {{ place.heure_fermeture }}</p>
+                    <p>Fermé le {{ place.jours_fermeture| join(", ") }}</p>
+                </div>
+                {% endif %}
                 <div class="overflow-x-auto">
                     <table class="w-full bg-white border-collapse whitespace-nowrap">
                         <thead>
@@ -189,6 +196,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 </svg>
             </button>
         </header>
+
         <hr class="pb-1 mt-1 border-green-numixs">
         <p class="text-xl">Groupe(s)</p>
         <ul class="list-disc list-inside">

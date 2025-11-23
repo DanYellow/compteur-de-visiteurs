@@ -41,6 +41,11 @@ export type Visit = Record<string, string> & {
     groupe: string;
 }
 
+export type CSVLinearHeader = Omit<Visit, 'id'> &  {
+    id: string;
+    groupe?: string;
+}
+
 export type Place = {
     nom: string;
     slug: string;
