@@ -1,8 +1,8 @@
 {% extends "layouts/page.njk" %}
 
 {% block title %}
-{% if is_edit %}
-Éditer lieu Numixs
+    {% if is_edit %}
+Éditer lieu "{{ place.nom }}"
 {% else %}
 Créer nouveau lieu Numixs
 {% endif %}
@@ -11,11 +11,11 @@ Créer nouveau lieu Numixs
 {% import "includes/macros.njk" as forms %}
 
 {% block scripts %}
-{% if NODE_ENV == "development" %}
-    <script type="module" src="/src/assets/scripts/place-form.ts" defer></script>
-{% else %}
-    <script type="module" src="/{{ manifest['src/assets/scripts/place-form.ts'].file }}" defer></script>
-{% endif %}
+    {% if NODE_ENV == "development" %}
+        <script type="module" src="/src/assets/scripts/place-form.ts" defer></script>
+    {% else %}
+        <script type="module" src="/{{ manifest['src/assets/scripts/place-form.ts'].file }}" defer></script>
+    {% endif %}
 {% endblock %}
 
 {% set active_menu_item = "lieu" %}
@@ -23,13 +23,13 @@ Créer nouveau lieu Numixs
 {% set root_class = "admin" %}
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
-    <div class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[220px_minmax(0,_1fr)] gap-6">
+    <div class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
-                <h1 class="text-black-numixs title-font font-bold text-6xl">
+                <h1 class="text-black-numixs title-font font-bold text-4xl md:text-6xl">
                     {% if is_edit %}
-                    Éditer lieu Numixs
+                    Éditer lieu "{{ place.nom }}"
                     {% else %}
                     Créer nouveau lieu Numixs
                     {% endif %}
@@ -52,38 +52,49 @@ Créer nouveau lieu Numixs
                         <input type="text" id="nom" name="nom" value="{{ place.nom }}">
                     </div>
                     <div class="flex flex-col">
-                        <label for="adresse" class="font-bold text-lg">Adresse*</label>
+                        <label for="adresse" class="font-bold text-lg">Adresse</label>
                         <textarea name="adresse" id="adresse">{{ place.adresse }}</textarea>
                     </div>
                     <div class="flex flex-col">
                         <label for="jours" class="font-bold text-lg">Jours de fermeture</label>
                         <select id="jours" name="jours_fermeture" multiple>
                             {% for day in list_days %}
-                            <option {{ "selected" if place.jours_fermeture.includes(day.value) else "" }} value="{{ day.value }}">{{ day.label }}</option>
+                                <option {{ "selected" if place.jours_fermeture.includes(day.value) else "" }} value="{{ day.value }}">{{ day.label }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <div class="flex flex-col">
                         <p class="font-bold text-lg">Horaires</p>
-                        <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800">Si le lieu ferme à 19h30, vous devez mettre 19h comme heure de fermeture</p>
                         <div class="flex flex-row gap-5">
                             <div class="flex flex-col">
-                                <label for="ouverture">Ouverture</label>
-                                <select name="heure_ouverture" value="{{ place.heure_ouverture }}" id="ouverture">
-                                    {% for i in range(8, 21) %}
-                                        <option {{ "selected" if place.heure_ouverture == i else "" }} value="{{ i }}">{{ i }}h</option>
-                                    {% endfor %}
-                                </select>
+                                <p>Ouverture</p>
+                                <div class="flex flex-row gap-1">
+                                    <select name="heure_ouverture_heure" value="{{ place.heure_ouverture_heure }}" id="heure_ouverture_heure">
+                                        {% for i in range(8, 21) %}
+                                            <option {{ "selected" if place.heure_ouverture_heure == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
+                                        {% endfor %}
+                                    </select>
+                                    <select name="heure_ouverture_minutes" value="{{ place.heure_ouverture_minutes }}" id="heure_ouverture_minutes">
+                                        {% for i in range(0, 60) %}
+                                            <option {{ "selected" if place.heure_ouverture_minutes == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                             <div class="flex flex-col">
-                                <label for="fermeture">Fermeture</label>
-                                <select name="heure_fermeture" id="fermeture">
-                                    {% for i in range(8, 21) %}
-                                        <option {{ "selected" if place.heure_fermeture == i else "" }} value="{{ i }}">{{ i }}h</option>
-                                    {% endfor %}
-                                </select>
-
-                                {# <input type="time" id="fermeture" name="heure_fermeture" min="08:00" max="20:00" /> #}
+                                <p>Fermeture</p>
+                                <div class="flex flex-row gap-1">
+                                    <select name="heure_fermeture_heure" value="{{ place.heure_fermeture_heure }}" id="heure_fermeture_heure">
+                                        {% for i in range(8, 21) %}
+                                            <option {{ "selected" if place.heure_fermeture_heure == i|pad('0', 2) else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
+                                        {% endfor %}
+                                    </select>
+                                    <select name="heure_fermeture_minutes" value="{{ place.heure_fermeture_minutes }}" id="heure_fermeture_minutes">
+                                        {% for i in range(0, 60) %}
+                                            <option {{ "selected" if place.heure_fermeture_minutes == i|pad("0", 2) else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -107,7 +118,6 @@ Créer nouveau lieu Numixs
                         </svg>
                     </button>
                 </div>
-
             </form>
         </div>
     </div>

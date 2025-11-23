@@ -34,16 +34,16 @@ router.get("/", async (req, res) => {
     const nbPlaces = await PlaceModel.count();
 
     if (nbPlaces === 0) {
-        res.cookie('flash_message', "no_place", { maxAge: 1000, httpOnly: true })
+        res.cookie('flash_message', JSON.stringify(["no_place"]), { maxAge: 1000, httpOnly: true })
         return res.redirect("/lieu");
     } else if (!("lieu_numixs" in req.cookies)) {
-        res.cookie('flash_message', "unset_place", { maxAge: 1000, httpOnly: true })
+        res.cookie('flash_message', JSON.stringify(["unset_place"]), { maxAge: 1000, httpOnly: true })
         return res.redirect("/choix-lieu");
     }
 
     const place = await PlaceModel.findOne({ where: { slug: req.cookies.lieu_numixs } })
     if (!place) {
-        res.cookie('flash_message', "unknown_place", { maxAge: 1000, httpOnly: true })
+        res.cookie('flash_message', JSON.stringify(["unknown_place"]), { maxAge: 1000, httpOnly: true })
         return res.redirect("/choix-lieu");
     }
 
@@ -108,7 +108,6 @@ router.get(["/choix-lieu"], async (req, res) => {
     });
 
     let place = null;
-
     const listFlashMessages = JSON.parse(req.cookies.flash_message || "[]")
 
     if ("lieu_numixs" in req.cookies) {
@@ -130,7 +129,7 @@ router.get(["/choix-lieu"], async (req, res) => {
     const listFlashMessages = []
     if (place) {
         const daySelected = DateTime.now();
-        const closedDays = place.jours_fermeture || [];
+        const closedDays = (await place.getRegularOpening()).jours_fermeture || [];
         const isClosedDay = closedDays.includes(String(daySelected.weekday));
         if (isClosedDay) {
             listFlashMessages.push("closed_place")

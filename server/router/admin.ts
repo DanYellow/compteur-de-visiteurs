@@ -4,7 +4,7 @@ import { DateTime, Info } from "luxon";
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import PlaceRouter from "#server/router/admin/places.ts";
 import { Visit } from "#types";
-import { Place as PlaceModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
+import { Place as PlaceModel } from "#models/index.ts";
 
 export const DEFAULT_CLOSED_DAYS = ["6", "7"];
 const router = express.Router();

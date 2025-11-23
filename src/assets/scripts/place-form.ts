@@ -76,4 +76,7 @@ new Choices(dropdownDays, {
     noChoicesText: 'Plus de propositions',
     maxItemCount: 6,
     maxItemText: 'Un jour ouvrable est impératif',
+    sorter: function (a, b) {
+        return Number(a.value) - Number(b.value);
+    },
 });
