@@ -3,7 +3,7 @@ import { DateTime, Info } from "luxon";
 
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import PlaceRouter from "#server/router/admin/places.ts";
-import { Visit } from "#types";
+import { CommonRegularOpening, PlaceRaw, Visit } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
 
 export const DEFAULT_CLOSED_DAYS = ["1", "6", "7"];
@@ -23,16 +23,17 @@ router.get(["/dashboard"], async (req, res) => {
 
     const listPlaces = await PlaceModel.findAll({
         raw: true,
+        nest: true,
+        include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
     })
-
     const placeSelected = req.query?.lieu || "tous";
     let place = undefined;
 
     if (placeSelected !== "tous") {
-        place = listPlaces.find((item) => item.slug === placeSelected)
+        place = listPlaces.find((item) => item.slug === placeSelected) as unknown as PlaceRaw
     }
 
-    const listDaysClosed = place ? (place.jours_fermeture || []) : DEFAULT_CLOSED_DAYS;
+    const listDaysClosed = place ? JSON.parse(place.regularOpening!.jours_fermeture || "[]") : DEFAULT_CLOSED_DAYS;
 
     res.render("pages/dashboard.njk", {
         "current_date": daySelected,
@@ -41,7 +42,14 @@ router.get(["/dashboard"], async (req, res) => {
         "is_day_closed": listDaysClosed.includes(String(daySelected.weekday)),
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
         "places_list": listPlaces,
-        "place": place,
+        "place": {
+            ...(place ? {
+                ...place,
+                heure_fermeture: parseInt(place.regularOpening!.heure_fermeture.split(":")[0]),
+                heure_ouverture: parseInt(place.regularOpening!.heure_ouverture.split(":")[0]),
+                jours_fermeture: listDaysClosed,
+            } : {})
+        },
     });
 })
 
@@ -59,7 +67,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     const placeSelected = String(req.query?.lieu || "tous");
     let place = null;
-    let regularOpening ={};
+    let regularOpening = {};
 
     if (placeSelected !== "tous") {
         place = await PlaceModel.findOne({ where: { slug: placeSelected } })
@@ -68,13 +76,14 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
             closedDays = (_regularOpening.jours_fermeture as string[]) || [];
             regularOpening = {
                 ..._regularOpening.toJSON(),
-                jours_fermeture: Info.weekdays('long', { locale: 'fr' }).filter((_, idx) => closedDays.includes(String(idx)))
+                jours_fermeture: closedDays,
+                jours_fermeture_litteral: Info.weekdays('long', { locale: 'fr' }).filter((_, idx) => closedDays.includes(String(idx + 1))),
             }
         }
     } else {
         const openingHoursLimitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/lieux`);
-        place = (await openingHoursLimitsReq.json()).data || { min: 8, max: 20, jours_fermeture: DEFAULT_CLOSED_DAYS };
-        closedDays = place.jours_fermeture || [];
+        regularOpening = (await openingHoursLimitsReq.json()).data || { heure_ouverture: "10:00:00", heure_fermeture: "19:30:00", jours_fermeture: DEFAULT_CLOSED_DAYS };
+        closedDays = ((regularOpening as CommonRegularOpening).jours_fermeture as string[]) || [];
     }
 
     const isClosedDay = closedDays.includes(String(daySelected.weekday));
@@ -114,7 +123,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "places_list": listPlaces,
         "place": {
             jours_fermeture: DEFAULT_CLOSED_DAYS,
-            ...(Object.keys(regularOpening).length ? {...place.toJSON(), ...regularOpening} : {}),
+            ...(placeSelected !== "tous" ? { ...place!.toJSON(), ...regularOpening } : regularOpening),
         }
     });
 });

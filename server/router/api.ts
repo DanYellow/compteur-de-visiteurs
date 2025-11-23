@@ -2,9 +2,8 @@ import express from "express";
 import { DateTime } from "luxon";
 import { Op } from 'sequelize';
 
-import sequelize from "#models/index.ts";
-
-import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
+import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
+import { CommonRegularOpening } from "#types";
 
 const router = express.Router();
 
@@ -73,7 +72,8 @@ router.get("/", async (req, res) => {
                 },
                 [Op.and]: [
                     sequelize.literal(`
-                            EXISTS (
+                            json_array_length("place->regularOpening"."jours_fermeture") = 0
+                            OR EXISTS (
                                 SELECT 1
                                 FROM json_each("place->regularOpening"."jours_fermeture")
                                 WHERE json_each.value != CAST( strftime('%u', visit.date_passage, 'localtime') AS text)
@@ -134,41 +134,46 @@ router.get("/lieux", async (req, res) => {
     try {
         const [listPlaces] = await sequelize.query(
             `
-        SELECT
-            json_group_array(value) AS jours_fermeture,
-            (
-                SELECT MIN(rh.heure_ouverture)
-                FROM place p
-                JOIN regular_opening rh ON rh.place_id = p.id
-                WHERE p.ouvert = 1
-            ) AS heure_ouverture,
-            (
-                SELECT MAX(rh.heure_fermeture)
-                FROM place p
-                JOIN regular_opening rh ON rh.place_id = p.id
-                WHERE p.ouvert = 1
-            ) AS heure_fermeture
-        FROM (
-            SELECT json_each.value
-            FROM place
-            JOIN regular_opening ON regular_opening.place_id = place.id,
-                json_each(regular_opening.jours_fermeture)
-            WHERE place.ouvert = 1
-            GROUP BY json_each.value
-            HAVING COUNT(DISTINCT place.id) = (
-                SELECT COUNT(*)
-                FROM place
-                JOIN regular_opening ON regular_opening.place_id = place.id
-                WHERE place.ouvert = 1
-            )
-        )
-    `,
+                SELECT
+                    json_group_array(value) AS jours_fermeture,
+                    (
+                        SELECT MIN(rh.heure_ouverture)
+                        FROM place p
+                        JOIN regular_opening rh ON rh.place_id = p.id
+                        WHERE p.ouvert = 1
+                    ) AS heure_ouverture,
+                    (
+                        SELECT MAX(rh.heure_fermeture)
+                        FROM place p
+                        JOIN regular_opening rh ON rh.place_id = p.id
+                        WHERE p.ouvert = 1
+                    ) AS heure_fermeture
+                FROM (
+                    SELECT json_each.value
+                    FROM place
+                    JOIN regular_opening ON regular_opening.place_id = place.id,
+                        json_each(regular_opening.jours_fermeture)
+                    WHERE place.ouvert = 1
+                    GROUP BY json_each.value
+                    HAVING COUNT(DISTINCT place.id) = (
+                        SELECT COUNT(*)
+                        FROM place
+                        JOIN regular_opening ON regular_opening.place_id = place.id
+                        WHERE place.ouvert = 1
+                    )
+                )
+            `,
             {
                 raw: true,
             })
 
+        const commonRegularOpening = listPlaces[0] as CommonRegularOpening;
+
         res.status(200).json({
-            data: listPlaces[0]
+            data: {
+                ...commonRegularOpening,
+                jours_fermeture: JSON.parse(commonRegularOpening.jours_fermeture as string)
+            }
         });
     } catch (e) {
         console.log("e", e)
