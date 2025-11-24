@@ -26,8 +26,13 @@ Liste des ouvertures exceptionnelles
                 <div class="text-black-numixs flex flex-col items-start">
                     <h1 class="text-black-numixs title-font font-bold text-6xl">Ouvertures exceptionnelles</h1>
                     <p>Gestion des ouvertures des lieux en dehors des ouvertures habituelles</p>
+                    <label for="dropdown" class="text-sm">Période</label>
+                    <select data-select-redirect="periode" id="dropdown" class="py-1">
+                        <option value="">Tous</option>
+                        <option {{ "selected" if periode == "a-venir" else "" }} value="a-venir">A venir</option>
+                    </select>
                 </div>
-                <a href="/jour-exceptionnel" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Ajouter un jour exceptionnel</a>
+                <a href="/jour-exceptionnel" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Ajouter une ouverture exceptionnelle</a>
             </header>
             <div class="text-black-numixs">
                 {% include "includes/form-banner-success.njk" %}

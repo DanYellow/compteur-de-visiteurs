@@ -2,7 +2,7 @@ import "../styles/main.css";
 import "../styles/notification.css";
 import "../styles/calendar.css";
 
-import "./select-place.ts";
+import "./dropdown-redirect.ts";
 import "./calendar.ts";
 import "./members-poll.ts";
 

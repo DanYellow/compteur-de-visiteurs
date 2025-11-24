@@ -10,14 +10,24 @@ import { PlaceRaw } from "#types";
 const router = express.Router();
 
 router.get(['/jours-exceptionnels'], async (req, res) => {
+    const today = DateTime.now();
+
     const listSpecialOpening = await SpecialOpeningModel.findAll({
         order: [["nom", "ASC"], ["date", "DESC"], [{ model: PlaceModel, as: 'listPlaces' }, "nom", "ASC"]],
+        where: {
+            ...(req.query.periode ? {
+                date: {
+                    [Op.gte]: `${today.toFormat("yyyy-LL-dd")}`
+                }
+            }: {})
+        },
         include: [{ model: PlaceModel, as: "listPlaces", required: true, }],
     });
 
     res.render("pages/special-openings-list.njk", {
         special_openings_list: listSpecialOpening.map((p) => p.toJSON()),
         flash_message: req.cookies.flash_message,
+        periode: req.query.periode,
     });
 })
 
