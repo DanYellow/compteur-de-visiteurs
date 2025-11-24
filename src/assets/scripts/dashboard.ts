@@ -54,7 +54,7 @@ if (Object.keys(placeData).length > 0) {
     }
 } else {
     const openingHoursLimitsReq = await fetch(`/api/lieux`);
-    const openingHoursLimitsRes = (await openingHoursLimitsReq.json()).data || { heure_ouverture: "08:00", heure_fermeture: "20:00", jour_fermeture: ["6", "7"] };
+    const openingHoursLimitsRes = (await openingHoursLimitsReq.json()).data || { heure_ouverture: "08:00", heure_fermeture: "20:00", jours_fermeture: ["6", "7"] };
 
     const [heure_ouverture_heure] = openingHoursLimitsRes.heure_ouverture.split(":");
     const [heure_fermeture_heure] = openingHoursLimitsRes.heure_fermeture.split(":");

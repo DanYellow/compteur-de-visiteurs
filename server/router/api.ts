@@ -2,8 +2,9 @@ import express from "express";
 import { DateTime } from "luxon";
 import { Op } from 'sequelize';
 
-import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
+import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, SpecialOpening as SpecialOpeningModel } from "#models/index.ts";
 import { CommonRegularOpening } from "#types";
+import { DEFAULT_CLOSED_DAYS } from "./admin";
 
 const router = express.Router();
 
@@ -47,7 +48,7 @@ router.get("/", async (req, res) => {
 
     let place = undefined;
     if (req.query.lieu && req.query.lieu !== "tous") {
-        place = await PlaceModel.findOne({ where: { slug: req.query.lieu } })
+        place = await PlaceModel.findOne({ where: { slug: String(req.query.lieu) } })
     }
 
     try {
@@ -125,10 +126,11 @@ router.get("/", async (req, res) => {
             data: listVisits
         });
     } catch (e) {
-        console.log("e", e)
+        console.log("error", e)
     }
 
 });
+
 
 router.get("/lieux", async (req, res) => {
     try {
@@ -177,13 +179,67 @@ router.get("/lieux", async (req, res) => {
             }
         });
     } catch (e) {
-        console.log("e", e)
+        console.log("error 22", e)
         res.status(500).json({
-            data: []
+            data: {
+                heure_ouverture: "10:00:00",
+                heure_fermeture: "19:30:00",
+                jours_fermeture: DEFAULT_CLOSED_DAYS,
+            }
         });
     }
 });
 
+router.get("/jour-exceptionnel/:special_opening{/:place}", async (req, res) => {
+    try {
+        const table = SpecialOpeningModel.getTableName();
+        //         const [rows] = await sequelize.query('PRAGMA table_info("special_opening")');
+        // console.log(rows);
+        const place = String(req.params.special_opening);
+        const specialOpening = await SpecialOpeningModel.findByPk(String(req.params.special_opening), {
+            include: [{
+                model: PlaceModel,
+                as: "listPlaces",
+                attributes: {
+                    exclude: ["adresse", "slug", "ouvert", "id", "description", "date_creation", "place_special-opening.date_creation"]
+                },
+                include: [{
+                    model: VisitModel,
+                    as: "listVisits",
+                    required: false,
+                    where: {
+                        [Op.and]: [
+                            sequelize.where(
+                                sequelize.fn("strftime", "%H:%M", sequelize.col("date_passage"), "localtime"), {
+                                [Op.between]: [sequelize.col(`${table}.heure_ouverture`), sequelize.col(`${table}.heure_fermeture`)]
+                            }
+                            )
+                        ]
+                    },
+                    attributes: {
+                        exclude: ["lieu_id"],
+                        include: [[sequelize.fn('strftime', '%H', sequelize.col('date_passage')), 'groupe']]
+                    }
+                }]
+            }]
+        })
+
+        res.status(200).json({
+            data: specialOpening?.toJSON()
+        })
+    } catch (error) {
+        console.log(error)
+    }
+    // if (specialOpening) {
+    //     console.log(specialOpening)
+
+    //     return res.status(200).json({
+
+    //     })
+    // }
+
+    res.status(200).json({})
+})
 
 
 export default router;

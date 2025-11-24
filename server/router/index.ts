@@ -26,7 +26,6 @@ router.use(async (req, res, next) => {
     next();
 });
 
-
 router.use("/api", ApiRouter);
 router.use("/telecharger", DownloadRouter);
 router.use("/", AdminRouter);

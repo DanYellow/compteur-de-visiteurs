@@ -35,6 +35,7 @@ sequelize.models.place.hasMany(sequelize.models.visit, {
         name: 'lieu_id',
         allowNull: false,
     },
+    as: 'listVisits',
     onDelete: 'CASCADE',
 });
 
