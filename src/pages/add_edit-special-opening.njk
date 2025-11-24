@@ -38,11 +38,8 @@ Créer nouveau ouverture exceptionnelle
 
             <div class="text-black-numixs">
                 <form action="" method="post" class="flex flex-col gap-5" data-special-opening-form>
-                    {% if flash_message == "no_place" %}
-                        <p class="p-4 bg-amber-50 text-amber-800 border-t-4 border-t-amber-800">Vous devez créer un lieu (puis le sélectionner) avant de pouvoir permettre aux visiteurs de s'enregistrer</p>
-                    {% endif %}
-                    {% if not_found %}
-                        <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800">Ce lieu n'existe pas</p>
+                    {% if flash_message == "error" %}
+                        <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Une erreur est survenue</p>
                     {% endif %}
 
                     <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>

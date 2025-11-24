@@ -17,6 +17,7 @@ router.get(['/jours-exceptionnels'], async (req, res) => {
 
     res.render("pages/special-openings-list.njk", {
         special_openings_list: listSpecialOpening.map((p) => p.toJSON()),
+        flash_message: req.cookies.flash_message,
     });
 })
 
@@ -99,6 +100,7 @@ router.get(['/jour-exceptionnel', '/jour-exceptionnel/:specialOpeningId'], async
                 });
                 await specialOpening.setListPlaces(listPlacesId.map(Number))
             }
+            res.cookie('flash_message', "update_success", { maxAge: 1000, httpOnly: true })
         } else {
             const specialOpening = await SpecialOpeningModel.create({
                 nom: payload.nom,
@@ -116,20 +118,17 @@ router.get(['/jour-exceptionnel', '/jour-exceptionnel/:specialOpeningId'], async
                 }
             })
 
-            // console.log("listPlaces", listPlaces)
-
             for (const place of listPlaces) {
                 await place.addSpecialOpening(specialOpening);
             }
-
-            // await Promise.all(
-            //     listPlaces.map((place) => place.addSpecialOpening(specialOpening))
-            // );
+            res.cookie('flash_message', "create_success", { maxAge: 1000, httpOnly: true })
         }
         res.redirect('/jours-exceptionnels');
     } catch (e) {
+        res.cookie('flash_message', "error", { maxAge: 1000, httpOnly: true })
+
         console.log(e);
-        // return res.render("pages/add_edit-special-opening.njk");
+        return res.render("pages/add_edit-special-opening.njk");
     }
 })
 

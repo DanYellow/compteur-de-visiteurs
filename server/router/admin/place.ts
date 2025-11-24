@@ -89,6 +89,7 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
                     place_id: Number(req.params.placeId)
                 }
             })
+            res.cookie('flash_message', "update_success", { maxAge: 1000, httpOnly: true });
         } else {
             const place = await PlaceModel.create({
                 nom: payload.nom,
@@ -106,9 +107,12 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
                 heure_ouverture: `${heure_ouverture_heure}:${heure_ouverture_minutes}:00`,
                 heure_fermeture: `${heure_fermeture_heure}:${heure_fermeture_minutes}:00`,
             })
+            res.cookie('flash_message', "create_success", { maxAge: 1000, httpOnly: true });
         }
         res.redirect('/lieux');
     } catch (e) {
+        res.cookie('flash_message', "error", { maxAge: 1000, httpOnly: true })
+
         console.log(e)
         return res.render("pages/add_edit-place.njk");
     }
@@ -146,6 +150,7 @@ router.get(['/lieux'], async (req, res) => {
 
     res.render("pages/places-list.njk", {
         places_list: listPlacesComputed,
+        flash_message: req.cookies.flash_message,
     });
 })
 

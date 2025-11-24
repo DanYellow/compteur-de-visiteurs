@@ -1,12 +1,12 @@
 {% extends "layouts/page.njk" %}
 
 {% block title %}
-Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
+Liste des ouvertures exceptionnelles
 {% endblock %}
 
 {% import "includes/macros.njk" as macros %}
 {% block scripts %}
-{# {% if NODE_ENV == "development" %}
+    {# {% if NODE_ENV == "development" %}
     <script type="module" src="/src/assets/scripts/details-visit-dialog.ts" defer></script>
 {% else %}
     <script type="module" src="/{{ manifest['src/assets/scripts/details-visit-dialog.ts'].file }}" defer></script>
@@ -22,27 +22,24 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
     <div data-place='{{ place | dump | safe }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
-            <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
+            <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 -mt-1.5">
                 <div class="text-black-numixs flex flex-col items-start">
-                    <h1 class="text-black-numixs title-font font-bold text-6xl">Jours exceptionnels</h1>
-                    <p>Gestion des ouvertures et fermetures exceptionnelles des lieux</p>
+                    <h1 class="text-black-numixs title-font font-bold text-6xl">Ouvertures exceptionnelles</h1>
+                    <p>Gestion des ouvertures des lieux en dehors des ouvertures habituelles</p>
                 </div>
                 <a href="/jour-exceptionnel" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Ajouter un jour exceptionnel</a>
             </header>
             <div class="text-black-numixs">
-                {# <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
-                    {% include "includes/date-nav.njk" %}
-                </header> #}
-                {# {% include "includes/calendar.njk" %} #}
-                <div>
+                {% include "includes/form-banner-success.njk" %}
+                <div class="overflow-x-auto">
                     <table class="w-full bg-white border-collapse whitespace-nowrap">
                         <thead>
                             <tr class="bg-gray-200">
                                 <td class="font-bold px-4 py-3 text-left">#</td>
                                 <td class="font-bold px-4 py-3 text-left">Nom</td>
+                                <td class="font-bold px-4 py-3 text-left">Heures d'ouverture</td>
                                 <td class="font-bold px-4 py-3 text-left">Jour</td>
                                 <td class="font-bold px-4 py-3 text-left">Lieux concernés</td>
-                                <td class="font-bold px-4 py-3 text-left">Ouvert</td>
                                 <td class="font-bold px-4 py-3 text-left"></td>
                                 <td class="font-bold px-4 py-3 text-left"></td>
                             </tr>
@@ -53,19 +50,35 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ special_opening.nom }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                        {{ special_opening.heure_ouverture|date("hh'h'mm") }}-{{ special_opening.heure_fermeture|date("hh'h'mm") }}
+                                    </td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <time datetime="{{ special_opening.date }}">
                                             {{ special_opening.date|date("dd/LL/yyyy") }}
                                         </time>
                                     </td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left"></td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left"></td>
+
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                        {% set offset = 1 %}
+                                        {% for place in special_opening.listPlaces %}
+                                            {% if loop.index0 < offset %}
+                                                {{ place.nom }}
+                                                {% if loop.index0 < loop.last - 1 %}
+                                                ,
+                                                {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if special_opening.listPlaces|length - offset > 0 %}
+                                        +{{ special_opening.listPlaces|length - offset }}
+                                        {% endif %}
+                                    </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <a href="/jour-exceptionnel/{{ special_opening.id }}" class="font-bold hocus:opacity-75">Éditer</a>
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
                                         <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-visit" command="show-modal" data-visit-data='{{ special_opening | dump | safe }}'>
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 0 1-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.513 3.518 0 4.842a3.75 3.75 0 0 1-.837.552c-.676.328-1.028.774-1.028 1.152v.75a.75.75 0 0 1-1.5 0v-.75c0-1.279 1.06-2.107 1.875-2.502.182-.088.351-.199.503-.331.83-.727.83-1.857 0-2.584ZM12 18a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+                                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 0 1-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.513 3.518 0 4.842a3.75 3.75 0 0 1-.837.552c-.676.328-1.028.774-1.028 1.152v.75a.75.75 0 0 1-1.5 0v-.75c0-1.279 1.06-2.107 1.875-2.502.182-.088.351-.199.503-.331.83-.727.83-1.857 0-2.584ZM12 18a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
                                             </svg>
                                         </button>
                                     </td>

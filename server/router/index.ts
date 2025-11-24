@@ -122,7 +122,7 @@ router.get(["/choix-lieu"], async (req, res) => {
 
     res.render("pages/set-place.njk", {
         "places_list": listPlaces,
-        flash_message: listFlashMessages.reduce((a: Record<string, string>, v: string) => ({ ...a, [v]: v}), {}) ,
+        flash_message: listFlashMessages.reduce((a: Record<string, string>, v: string) => ({ ...a, [v]: v}), {}),
         place,
     });
 }).post(["/choix-lieu"], async (req, res) => {
