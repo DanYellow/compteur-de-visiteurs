@@ -55,7 +55,7 @@ Liste des ouvertures exceptionnelles
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ special_opening.nom }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                        {{ special_opening.heure_ouverture|date("hh'h'mm") }}-{{ special_opening.heure_fermeture|date("hh'h'mm") }}
+                                        {{ special_opening.heure_ouverture|date("HH'h'mm") }}-{{ special_opening.heure_fermeture|date("HH'h'mm") }}
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <time datetime="{{ special_opening.date }}">
@@ -81,7 +81,7 @@ Liste des ouvertures exceptionnelles
                                         <a href="/jour-exceptionnel/{{ special_opening.id }}" class="font-bold hocus:opacity-75">Éditer</a>
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
-                                        <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-special-opening" command="show-modal" data-special-opening-data='{{ special_opening | dump | safe }}'>
+                                        <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-special-opening" command="show-modal" data-special-opening-data='{{ special_opening | json }}'>
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
                                                 <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 0 1-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.513 3.518 0 4.842a3.75 3.75 0 0 1-.837.552c-.676.328-1.028.774-1.028 1.152v.75a.75.75 0 0 1-1.5 0v-.75c0-1.279 1.06-2.107 1.875-2.502.182-.088.351-.199.503-.331.83-.727.83-1.857 0-2.584ZM12 18a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
                                             </svg>
@@ -107,7 +107,7 @@ Liste des ouvertures exceptionnelles
             <div>
                 <p class="title-font text-4xl" data-name></p>
                 <p class="text-sm">
-                    <time datetime="">14/11/2025 de 10:47:56 à 12:47:56</time>
+                    Le <time datetime="">14/11/2025 de 10:47:56 à 12:47:56</time>
                 </p>
                 <p class="text-sm" data-place-name></p>
             </div>
@@ -119,6 +119,7 @@ Liste des ouvertures exceptionnelles
         </header>
 
         <hr class="pb-1 mt-1 border-green-numixs">
+        <p data-description=""></p>
         <p class="text-xl">Lieux concernés</p>
         <ul class="list-disc list-inside">
         </ul>

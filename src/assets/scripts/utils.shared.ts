@@ -207,7 +207,7 @@ const getWeeksRangeMonth = (_startDate = null) => {
         intervalWeeks.forEach((item: Interval<true>, index: number, array: Interval<boolean>[]) => {
             listWeeks.push({
                 id: item.start!.weekNumber,
-                name: `${(index === 0 ? startMonth : item.start!).toFormat("dd/LL")} ➜ ${(index === array.length - 1 ? endMonth : item.end!).toFormat("dd/LL")}`
+                name: `${(index === 0 ? startMonth : item.start!).toFormat("dd/LL")} ➜ ${(index === array.length - 1 ? endMonth : (item.end!).minus({day: 1})).toFormat("dd/LL")}`
             });
         });
 

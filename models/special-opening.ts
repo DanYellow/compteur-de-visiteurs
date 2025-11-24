@@ -1,5 +1,5 @@
 import { slugify } from '#scripts/utils.ts';
-import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin } from 'sequelize';
+import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin, type BelongsToManyGetAssociationsMixin } from 'sequelize';
 import Place from './place';
 
 export default class SpecialOpening extends Model<InferAttributes<SpecialOpening>, InferCreationAttributes<SpecialOpening>> {
@@ -13,6 +13,7 @@ export default class SpecialOpening extends Model<InferAttributes<SpecialOpening
     declare ouvert?: boolean;
 
     declare setListPlaces: BelongsToManySetAssociationsMixin<Place, number>;
+    declare getListPlaces: BelongsToManyGetAssociationsMixin<Place>;
 
     static initModel(sequelize: Sequelize) {
         SpecialOpening.init(

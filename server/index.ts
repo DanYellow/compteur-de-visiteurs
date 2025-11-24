@@ -107,6 +107,15 @@ nunjucksConfig.addFilter("pad", (value, char: string, nb: number) => {
     return String(value).padStart(nb, char);
 });
 
+nunjucksConfig.addFilter("json", (value) => {
+    if (value instanceof nunjucks.runtime.SafeString) {
+        value = value.toString()
+    }
+
+    const jsonString = JSON.stringify(value)
+    return jsonString
+});
+
 nunjucksConfig.addGlobal("formatQueryParams", (obj: Record<string, string>, removeIfEmpty: boolean = false) => {
     const params = new URLSearchParams(obj);
     if (removeIfEmpty) {

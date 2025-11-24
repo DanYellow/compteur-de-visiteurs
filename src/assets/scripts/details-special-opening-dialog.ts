@@ -6,8 +6,8 @@ const modal = document.getElementById("detail-special-opening") as HTMLDialogEle
 
 const openingDateTime = modal.querySelector("time") as HTMLTimeElement;
 const listPlacesContainer = modal.querySelector("ul") as HTMLUListElement;
-// const visitNumber = modal.querySelector("[data-visit-number]") as HTMLSpanElement;
 const name = modal.querySelector("[data-name]") as HTMLParagraphElement;
+const description = modal.querySelector("[data-description]") as HTMLParagraphElement;
 
 modal?.addEventListener("toggle", (e: Event) => {
     const toggleEvent = e as ToggleEvent;
@@ -19,6 +19,9 @@ modal?.addEventListener("toggle", (e: Event) => {
         const specialOpeningData = JSON.parse(sourceItem.dataset.specialOpeningData!) as SpecialOpening;
 
         name.textContent = specialOpeningData.nom;
+        description.textContent = "";
+        description.textContent = specialOpeningData.description;
+
         specialOpeningData.listPlaces.forEach((item:PlaceRaw) => {
             const li = document.createElement("li");
             li.textContent = item.nom;
