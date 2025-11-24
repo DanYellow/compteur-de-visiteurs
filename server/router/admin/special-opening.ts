@@ -11,8 +11,8 @@ const router = express.Router();
 
 router.get(['/jours-exceptionnels'], async (req, res) => {
     const listSpecialOpening = await SpecialOpeningModel.findAll({
-        order: [["nom", "ASC"], ["date", "DESC"]],
-        include: [{ model: PlaceModel, as: "listPlaces", required: true }],
+        order: [["nom", "ASC"], ["date", "DESC"], [{ model: PlaceModel, as: 'listPlaces' }, "nom", "ASC"]],
+        include: [{ model: PlaceModel, as: "listPlaces", required: true, }],
     });
 
     res.render("pages/special-openings-list.njk", {
@@ -30,7 +30,7 @@ router.get(['/jour-exceptionnel', '/jour-exceptionnel/:specialOpeningId'], async
     let specialOpening = null;
     if (req.params.specialOpeningId) {
         specialOpening = await SpecialOpeningModel.findByPk(req.params.specialOpeningId, {
-            include: [{ model: PlaceModel, as: "listPlaces", required: true }]
+            include: [{ model: PlaceModel, as: "listPlaces", required: true, order: [["nom", "ASC"]] }]
         });
         if (specialOpening) {
             specialOpening = specialOpening.toJSON();

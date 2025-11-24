@@ -1,7 +1,7 @@
 import type { Align, LineControllerDatasetOptions, TitleOptions } from "chart.js";
 import type { InferAttributes } from "sequelize";
 
-import { Place as PlaceModel } from "#models/index.ts";
+import type { Place as PlaceModel } from "#models/index.ts";
 
 export type LineChartEntry = {
     data: Number[];
@@ -29,13 +29,6 @@ export type Result = Record<string, string>;
 export interface PivotTableOptions {
     columnSuffix: string;
 }
-
-// const STATS = ["hp", "attack", "defense"] as const;
-// type StatKey = (typeof STATS)[number];
-
-// type StatFields = {
-//   [K in StatKey]: number;
-// };
 
 export type Visit = Record<string, string> & {
     id: number;
