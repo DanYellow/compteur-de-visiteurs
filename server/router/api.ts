@@ -193,9 +193,7 @@ router.get("/lieux", async (req, res) => {
 router.get("/jour-exceptionnel/:special_opening{/:place}", async (req, res) => {
     try {
         const table = SpecialOpeningModel.getTableName();
-        //         const [rows] = await sequelize.query('PRAGMA table_info("special_opening")');
-        // console.log(rows);
-        const place = String(req.params.special_opening);
+        const place = String(req.params.place || "");
         const specialOpening = await SpecialOpeningModel.findByPk(String(req.params.special_opening), {
             include: [{
                 model: PlaceModel,
@@ -203,6 +201,7 @@ router.get("/jour-exceptionnel/:special_opening{/:place}", async (req, res) => {
                 attributes: {
                     exclude: ["adresse", "slug", "ouvert", "id", "description", "date_creation", "place_special-opening.date_creation"]
                 },
+                ...(place ? { where: { id: place } }: {}),
                 include: [{
                     model: VisitModel,
                     as: "listVisits",
@@ -213,30 +212,33 @@ router.get("/jour-exceptionnel/:special_opening{/:place}", async (req, res) => {
                                 sequelize.fn("strftime", "%H:%M", sequelize.col("date_passage"), "localtime"), {
                                 [Op.between]: [sequelize.col(`${table}.heure_ouverture`), sequelize.col(`${table}.heure_fermeture`)]
                             }
+                            ),
+                            sequelize.where(
+                                sequelize.fn("strftime", "%Y-%m-%d", sequelize.col("date_passage"), "localtime"), {
+                                [Op.eq]: sequelize.col(`${table}.date`)
+                            }
                             )
                         ]
                     },
                     attributes: {
                         exclude: ["lieu_id"],
-                        include: [[sequelize.fn('strftime', '%H', sequelize.col('date_passage')), 'groupe']]
+                        include: [[sequelize.fn("trim",
+                            sequelize.fn('strftime', '%H', sequelize.col('date_passage'))), 'groupe']]
                     }
                 }]
             }]
         })
 
-        res.status(200).json({
-            data: specialOpening?.toJSON()
-        })
+        if (specialOpening) {
+            return res.status(200).json({
+                data: specialOpening.toJSON()
+            })
+        }
+        return res.status(404).json({})
+
     } catch (error) {
         console.log(error)
     }
-    // if (specialOpening) {
-    //     console.log(specialOpening)
-
-    //     return res.status(200).json({
-
-    //     })
-    // }
 
     res.status(200).json({})
 })
