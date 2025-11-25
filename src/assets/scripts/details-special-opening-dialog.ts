@@ -10,10 +10,10 @@ import {
     LineElement,
     PointElement,
     Tooltip,
-    Legend,
     SubTitle,
     type ScriptableScaleContext,
 } from "chart.js";
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import type SpecialOpening from "#models/special-opening.ts";
 import type { PlaceRaw } from "#types";
@@ -30,8 +30,8 @@ Chart.register(
     LineController,
     LineElement,
     PointElement,
-    Legend,
-    SubTitle
+    SubTitle,
+    ChartDataLabels
 );
 
 const greenNumixs = window
@@ -86,8 +86,8 @@ modal?.addEventListener("toggle", async (e: Event) => {
 
         const rangeOpeningHours = Math.abs(
             parseInt(heure_fermeture_heure) -
-                parseInt(heure_ouverture_heure) +
-                1
+            parseInt(heure_ouverture_heure) +
+            1
         );
         const xLabels = Array.from(
             new Array(rangeOpeningHours),
@@ -110,7 +110,10 @@ modal?.addEventListener("toggle", async (e: Event) => {
                 return item.groupe;
             }
         );
-        globalChart.dataset.chartData = JSON.stringify(listVisitsGlobal);
+
+        ;(modal.querySelector("[data-download-chart]") as HTMLButtonElement)!.dataset.chartData = JSON.stringify({
+            nom: `Évènement(s) : ${specialOpeningData.listPlaces.map((item) => item.nom).join(", ")}`
+        });
 
         const chartData = xLabels.map((item) => {
             let key = item;
@@ -135,85 +138,104 @@ modal?.addEventListener("toggle", async (e: Event) => {
                         borderWidth: 1.5,
                     },
                 ],
-                options: {
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            text: "Test",
-                            display: true,
-                            color: greenNumixs,
-                            font: {
-                                size: 22,
-                                style: "normal",
-                                weight: "normal",
-                                family: "Agency FB",
-                            },
-                            padding: {
-                                bottom: 0
-                            }
+            },
+            options: {
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        text: `Visites uniques ${specialOpeningData.nom}`,
+                        display: true,
+                        color: greenNumixs,
+                        font: {
+                            size: 22,
+                            style: "normal",
+                            weight: "normal",
+                            family: "Agency FB",
                         },
-                        totalVisitors: {
-                            text: "Total : " + 4,
-                            totalColor: greenNumixs,
+                        padding: {
+                            bottom: 0
+                        }
+                    },
+                    totalVisitors: {
+                        text: "Total : " + 4,
+                        totalColor: greenNumixs,
+                    },
+                    subtitle: {
+                        display: true,
+                        text: `(${DateTime.fromISO(String(specialOpeningData.date)).toFormat("dd/LL/yyyy")})`,
+                        color: "white",
+                        font: {
+                            size: 16,
+                            style: 'normal',
+                            weight: 'normal',
+                            family: "Calibri"
+                        },
+                        padding: {
+                            bottom: 10
                         },
                     },
-                    scales: {
-                        y: {
-                            ticks: {
-                                color: "white",
-                                stepSize: 1,
-                                font: {
-                                    size: 12,
-                                },
-                            },
-                            grid: {
-                                color: (ctx: ScriptableScaleContext) => {
-                                    if (ctx.index === 0) {
-                                        return "rgba(255, 255, 255, 1)";
-                                    }
-                                },
-                                drawOnChartArea: true,
-                                lineWidth: 1,
-                            },
-                            title: {
-                                display: true,
-                                text: "Visites uniques",
-                                color: "white",
-                                font: {
-                                    size: 12,
-                                },
-                            },
-                            beginAtZero: true,
+                    datalabels: {
+                        font: {
+                            size: 0
                         },
-                        x: {
-                            ticks: {
-                                color: "white",
-                                font: {
-                                    size: 12,
-                                },
+                    }
+                },
+                scales: {
+                    y: {
+                        ticks: {
+                            color: "white",
+                            stepSize: 1,
+                            font: {
+                                size: 12,
                             },
-                            grid: {
-                                color: (ctx: ScriptableScaleContext) => {
-                                    if (ctx.index === 0) {
-                                        return "rgba(255, 255, 255, 1)";
-                                    }
-                                },
-                                drawOnChartArea: true,
-                                lineWidth: 1,
+                        },
+                        grid: {
+                            color: (ctx: ScriptableScaleContext) => {
+                                if (ctx.index === 0) {
+                                    return "rgba(255, 255, 255, 1)";
+                                }
                             },
-                            title: {
-                                display: true,
-                                text: "xTitle",
-                                color: "white",
-                                font: {
-                                    size: 16,
-                                },
+                            drawOnChartArea: true,
+                            lineWidth: 1,
+                        },
+                        title: {
+                            display: true,
+                            text: "Visites uniques",
+                            color: "white",
+                            font: {
+                                size: 12,
+                            },
+                        },
+                        beginAtZero: true,
+                    },
+                    x: {
+                        ticks: {
+                            color: "white",
+                            font: {
+                                size: 12,
+                            },
+                        },
+                        grid: {
+                            color: (ctx: ScriptableScaleContext) => {
+                                if (ctx.index === 0) {
+                                    return "rgba(255, 255, 255, 1)";
+                                }
+                            },
+                            drawOnChartArea: true,
+                            lineWidth: 1,
+                        },
+                        title: {
+                            display: true,
+                            text: "Tranche horaire",
+                            color: "white",
+                            font: {
+                                size: 12,
                             },
                         },
                     },
                 },
-                plugins: [TotalVisitors],
             },
+            plugins: [TotalVisitors],
         });
     }
 });

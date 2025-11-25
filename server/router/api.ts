@@ -68,9 +68,9 @@ router.get("/", async (req, res) => {
                     sequelize.literal(`(
                             SELECT GROUP_CONCAT(so.nom)
                             FROM ${specialOpeningTable} AS so
-                            WHERE so.date = strftime("%Y-%m-%d", ${visitTable}.date_passage)
-                            AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage)
-                            AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage)
+                            WHERE so.date = strftime("%Y-%m-%d", ${visitTable}.date_passage, 'localtime')
+                            AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                            AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
                     )`),
                     "liste_evenements"
                     ]
@@ -134,6 +134,7 @@ router.get("/", async (req, res) => {
                 ['date_passage', 'DESC'],
             ]
         });
+        console.log("listVisits", listVisits)
 
         res.status(200).json({
             data: listVisits
@@ -235,7 +236,7 @@ router.get("/jour-exceptionnel/:special_opening{/:place}", async (req, res) => {
                     attributes: {
                         exclude: ["lieu_id"],
                         include: [[sequelize.fn("trim",
-                            sequelize.fn('strftime', '%H', sequelize.col('date_passage'))), 'groupe']]
+                            sequelize.fn('strftime', '%H', sequelize.col('date_passage'), "localtime")), 'groupe']]
                     }
                 }]
             }]

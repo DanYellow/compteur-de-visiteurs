@@ -8,7 +8,9 @@ Liste des évènements
 {% block scripts %}
     {% if NODE_ENV == "development" %}
         <script type="module" src="/src/assets/scripts/details-special-opening-dialog.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/download-chart.ts" defer></script>
     {% else %}
+        <script type="module" src="/{{ manifest['src/assets/scripts/download-chart.ts'].file }}" defer></script>
         <script type="module" src="/{{ manifest['src/assets/scripts/details-special-opening-dialog.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}
@@ -22,7 +24,7 @@ Liste des évènements
     <div data-place='{{ place | json }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
-            <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 -mt-1.5">
+            <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 -mt-1.5 gap-3">
                 <div class="text-black-numixs flex flex-col items-start">
                     <h1 class="text-black-numixs title-font font-bold text-6xl">Évènements</h1>
                     <p>Gestion des ouvertures des lieux en dehors des horaires habituels</p>
@@ -78,7 +80,7 @@ Liste des évènements
                                         {% endif %}
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                        <a href="/jour-exceptionnel/{{ special_opening.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                        <a href="/evenement/{{ special_opening.id }}" class="font-bold hocus:opacity-75">Éditer</a>
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
                                         <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-special-opening" command="show-modal" data-special-opening-data='{{ special_opening | json }}'>
@@ -102,7 +104,7 @@ Liste des évènements
         </div>
     </div>
 
-    <dialog id="detail-special-opening" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-5/12 max-w-2xl border border-solid border-green-numixs">
+    <dialog id="detail-special-opening" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
         <header class="flex flex-row justify-between items-start">
             <div>
                 <p class="title-font text-4xl" data-name></p>
@@ -120,18 +122,11 @@ Liste des évènements
 
         <hr class="pb-1 mt-1 border-green-numixs">
         <p data-description=""></p>
-        <div class="p-3 rounded-2xl h-80 relative">
+        <div class="p-3 rounded-2xl h-85 relative">
             <menu class="absolute right-3 flex flex-row gap-3">
                 <li>
-                    <button data-download-chart="dailyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                    <button data-download-chart="global-chart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer" title="Télécharger graphique">
                         {% include "includes/icons/download-fill-icon.svg" %}
-                    </button>
-                </li>
-                <li>
-                    <button data-details-chart="jour" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                        </svg>
                     </button>
                 </li>
             </menu>

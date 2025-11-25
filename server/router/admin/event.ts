@@ -133,7 +133,7 @@ router.get(['/evenement', '/evenement/:specialOpeningId'], async (req, res) => {
             }
             res.cookie('flash_message', "create_success", { maxAge: 1000, httpOnly: true })
         }
-        res.redirect('/jours-exceptionnels');
+        res.redirect('/evenements');
     } catch (e) {
         res.cookie('flash_message', "error", { maxAge: 1000, httpOnly: true })
 

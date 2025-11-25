@@ -3,7 +3,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime, Info } from "luxon";
 
-import type { ChartConfigData, CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions, Visit } from "#types";
+import type { ChartConfigData, CustomTitleOptions, LineChartEntry, Visit } from "#types";
 import { capitalizeFirstLetter, configData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
 import { TotalVisitors } from './utils';
 

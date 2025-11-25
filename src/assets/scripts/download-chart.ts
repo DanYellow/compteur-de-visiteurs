@@ -3,7 +3,7 @@ import { Chart } from 'chart.js';
 import { loadImage, slugify } from "./utils";
 
 const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
-const placeData = JSON.parse(document.querySelector("[data-place]")?.dataset.place || "{}")
+const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")
 
 const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
 const WATERMARK_SCALE_FACTOR = 0.85;
@@ -16,11 +16,11 @@ const SIZE_EXPORT = {
 
 const today = DateTime.now();
 
-
 listDownloadButtons.forEach((item) => {
     (item as HTMLButtonElement).addEventListener("click", async (e: MouseEvent) => {
         const element = e.currentTarget as HTMLButtonElement;
         const chartId = element.dataset.downloadChart!;
+        const chartData = JSON.parse(element.dataset.chartData || "{}");
 
         const link = document.createElement("a");
         const chart = document.getElementById(chartId) as HTMLCanvasElement;
@@ -28,7 +28,7 @@ listDownloadButtons.forEach((item) => {
         const chartInstance = Chart.getChart(chart)!;
 
         const originalSize = { width: chart.style.width, height: chart.style.height };
-        const startDatalabelsSize = (chartInstance.options!.plugins!.datalabels!.font! as any).size;
+        // const startDatalabelsSize = (chartInstance.options!.plugins!.datalabels!.font! as any).size;
         const chartXTitleFontSize = (chartInstance.config!.options!.scales!.x! as any).title!.font.size;
         const chartYTitleFontSize = (chartInstance.config!.options!.scales!.y! as any).title!.font.size;
         const chartTitleFontSize = (chartInstance.config!.options!.plugins!.title!.font! as any).size!;
@@ -79,7 +79,7 @@ listDownloadButtons.forEach((item) => {
             cloneCtx.fillStyle = "white";
             cloneCtx.fillText(`Généré le ${today.toFormat("dd/LL/yyyy à HH:mm")}`, 12, chartClone.height - 7);
 
-            const placeName = placeData.nom || "Tous"
+            const placeName = placeData.nom || chartData.nom || "Tous"
             cloneCtx.fillText(placeName, chartClone.width - (cloneCtx.measureText(placeName).width + 12), chartClone.height - 7);
 
             if (chart.closest("dialog")) {
@@ -111,8 +111,8 @@ listDownloadButtons.forEach((item) => {
 
             download();
 
-            (chartInstance.options.plugins!.datalabels!.font! as any).size = startDatalabelsSize;
-            chartInstance.options!.plugins!.datalabels!.backgroundColor = "";
+            // (chartInstance.options.plugins!.datalabels!.font! as any).size = startDatalabelsSize;
+            // chartInstance.options!.plugins!.datalabels!.backgroundColor = "";
 
             (chartInstance.config!.options!.scales!.x! as any).title!.font.size = chartXTitleFontSize;
             (chartInstance.config!.options!.scales!.y! as any).title.font.size = chartYTitleFontSize;
