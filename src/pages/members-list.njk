@@ -112,6 +112,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                                 <td class="font-bold px-4 py-3 text-left">#</td>
                                 <td class="font-bold px-4 py-3 text-left">Date de visite</td>
                                 <td class="font-bold px-4 py-3 text-left">Lieu</td>
+                                <td class="font-bold px-4 py-3 text-left">Évènement</td>
                                 {% for business in list_business_sector %}
                                     <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name | striptags(true) | escape | nl2br }}</td>
                                 {% endfor %}
@@ -128,6 +129,9 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                                         </time>
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">{{ visit['place.nom'] }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Date de passage" data-row-key="Date de passage">
+                                        {{ visit["liste_evenements"]|split()|safe or "/" }}
+                                    </td>
                                     {% for business in list_business_sector %}
                                         <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left {{ "font-bold" if visit[business.value] == "oui" else "" }}" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ visit[business.value] }}</td>
                                     {% endfor %}
@@ -193,7 +197,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 <p class="text-sm">
                     <time datetime="">14/11/2025 à 10:47:56</time>
                 </p>
-                <p class="text-sm" data-place-name></p>
+                <p class="text-sm"><span data-place-name></span> | <span data-visit-events></span></p>
             </div>
             <button type="button" command="close" commandfor="detail-visit" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">

@@ -9,7 +9,7 @@ import { PlaceRaw } from "#types";
 
 const router = express.Router();
 
-router.get(['/jours-exceptionnels'], async (req, res) => {
+router.get(['/evenements'], async (req, res) => {
     const today = DateTime.now();
 
     const listSpecialOpening = await SpecialOpeningModel.findAll({
@@ -31,7 +31,7 @@ router.get(['/jours-exceptionnels'], async (req, res) => {
     });
 })
 
-router.get(['/jour-exceptionnel', '/jour-exceptionnel/:specialOpeningId'], async (req, res) => {
+router.get(['/evenement', '/evenement/:specialOpeningId'], async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
         raw: true,
         order: [["nom", "ASC"]],
@@ -72,7 +72,7 @@ router.get(['/jour-exceptionnel', '/jour-exceptionnel/:specialOpeningId'], async
         list_places: listPlaces,
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
-}).post(['/jour-exceptionnel', '/jour-exceptionnel/:specialOpeningId'], async (req, res) => {
+}).post(['/evenement', '/evenement/:specialOpeningId'], async (req, res) => {
     const payloadValidation = {
         ...req.body,
         lieux: JSON.stringify(req.body.lieux || [])

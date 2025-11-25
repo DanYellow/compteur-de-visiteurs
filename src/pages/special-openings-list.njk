@@ -1,7 +1,7 @@
 {% extends "layouts/page.njk" %}
 
 {% block title %}
-Liste des ouvertures exceptionnelles
+Liste des évènements
 {% endblock %}
 
 {% import "includes/macros.njk" as macros %}
@@ -13,7 +13,7 @@ Liste des ouvertures exceptionnelles
     {% endif %}
 {% endblock %}
 
-{% set active_menu_item = "exceptionnel" %}
+{% set active_menu_item = "evenements" %}
 {% set place_selected = place.slug or "tous" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
@@ -24,7 +24,7 @@ Liste des ouvertures exceptionnelles
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 -mt-1.5">
                 <div class="text-black-numixs flex flex-col items-start">
-                    <h1 class="text-black-numixs title-font font-bold text-6xl">Ouvertures exceptionnelles</h1>
+                    <h1 class="text-black-numixs title-font font-bold text-6xl">Évènements</h1>
                     <p>Gestion des ouvertures des lieux en dehors des horaires habituels</p>
                     <label for="dropdown" class="text-sm">Période</label>
                     <select data-select-redirect="periode" id="dropdown" class="py-1">
@@ -32,7 +32,7 @@ Liste des ouvertures exceptionnelles
                         <option {{ "selected" if periode == "a-venir" else "" }} value="a-venir">A venir</option>
                     </select>
                 </div>
-                <a href="/jour-exceptionnel" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Ajouter une ouverture exceptionnelle</a>
+                <a href="/evenement" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Ajouter une ouverture exceptionnelle</a>
             </header>
             <div class="text-black-numixs">
                 {% include "includes/form-banner-success.njk" %}
@@ -138,6 +138,6 @@ Liste des ouvertures exceptionnelles
             <canvas id="global-chart" class="w-full h-full"></canvas>
         </div>
         <p class="text-xl">Lieux concernés</p>
-        <ul class="list-disc list-inside"></ul>
+        <ul class="list-disc list-inside columns-2"></ul>
     </dialog>
 {% endblock %}

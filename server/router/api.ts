@@ -52,6 +52,9 @@ router.get("/", async (req, res) => {
     }
 
     try {
+        const specialOpeningTable = SpecialOpeningModel.getTableName();
+        const visitTable = VisitModel.getTableName();
+
         const listVisits = await VisitModel.findAll({
             raw: true,
             attributes: {
@@ -61,6 +64,16 @@ router.get("/", async (req, res) => {
                     [sequelize.fn("trim",
                         sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime")
                     ), "groupe"],
+                    [
+                    sequelize.literal(`(
+                            SELECT GROUP_CONCAT(so.nom)
+                            FROM ${specialOpeningTable} AS so
+                            WHERE so.date = strftime("%Y-%m-%d", ${visitTable}.date_passage)
+                            AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage)
+                            AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage)
+                    )`),
+                    "liste_evenements"
+                    ]
                 ],
                 exclude: ["groupe", "lieu_id"]
             },
@@ -130,7 +143,6 @@ router.get("/", async (req, res) => {
     }
 
 });
-
 
 router.get("/lieux", async (req, res) => {
     try {
@@ -242,6 +254,5 @@ router.get("/jour-exceptionnel/:special_opening{/:place}", async (req, res) => {
 
     res.status(200).json({})
 })
-
 
 export default router;
