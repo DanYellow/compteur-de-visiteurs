@@ -15,6 +15,7 @@ export interface WeekMonth {
 export interface TotalVisitorsPluginOptions {
     text?: string;
     fontSize?: string;
+    totalColor?: string;
 }
 
 export type CustomTitleOptions = Omit<TitleOptions, 'fullSize' | 'text' | "align" | "padding" | "position"> & {

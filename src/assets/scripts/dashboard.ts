@@ -5,6 +5,7 @@ import { DateTime, Info } from "luxon";
 
 import type { ChartConfigData, CustomTitleOptions, LineChartEntry, TotalVisitorsPluginOptions, Visit } from "#types";
 import { capitalizeFirstLetter, configData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
+import { TotalVisitors } from './utils';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const linkDownloadChartData = document.querySelector("[data-download-chart-data='simple']") as HTMLLinkElement;
@@ -66,7 +67,7 @@ if (Object.keys(placeData).length > 0) {
         ...configData.jour,
         listColumns: listTimeSlots
     }
-    console.log(openingHoursLimitsRes.jours_fermeture)
+
     const listClosedDaysIndex = openingHoursLimitsRes.jours_fermeture.map(Number);
 
     const listOpenedDays = Info.weekdays('long', { locale: 'fr' })
@@ -86,33 +87,8 @@ if (Object.keys(placeData).length > 0) {
     }
 }
 
-const TotalVisitors = {
-    id: 'totalVisitors',
-    beforeDraw: (chart: Chart, _args: any, options: TotalVisitorsPluginOptions) => {
-        const { ctx } = chart;
-        const { text = "", fontSize = "14px" } = options;
-        ctx.save();
-        ctx.globalCompositeOperation = 'destination-over';
-        ctx.font = `${fontSize} Calibri`;
-        ctx.fillStyle = "white";
 
-        let x = 6;
-        const idxColon = text.indexOf(":")
-        for (let i = 0; i < text.length; i++) {
-            const ch = text.charAt(i)!;
-
-            if (i > idxColon) {
-                ctx.fillStyle = greenNumixs;
-            }
-            ctx.fillText(ch, x, chart.height - 10);
-            x += ctx.measureText(ch).width;
-        }
-
-        ctx.restore();
-    }
-};
-
-const chartScales = (xTitle: string, titleSize: number = 12) => {
+export const chartScales = (xTitle: string, titleSize: number = 12) => {
     return {
         y: {
             ticks: {
@@ -313,6 +289,7 @@ const listCharts = Object.values(configDataRaw);
                         },
                         totalVisitors: {
                             text: 'Total : ' + res.data.length,
+                            totalColor: greenNumixs,
                         },
                         datalabels: {
                             color: "white",

@@ -7,6 +7,7 @@ export default class Visit extends Model<InferAttributes<Visit>, InferCreationAt
     declare id: CreationOptional<number>;
     declare place_id: ForeignKey<Place['id']>;
     declare date_passage: CreationOptional<Date>;
+    declare groupe?: string;
 
     static initModel(sequelize: Sequelize) {
         const listBusinessSectorKeys: Record<string, any> = {}

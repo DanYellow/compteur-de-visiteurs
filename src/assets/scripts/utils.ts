@@ -1,3 +1,6 @@
+import type { TotalVisitorsPluginOptions } from "#types";
+import type { Chart } from "chart.js";
+
 export const loadImage = (obj: HTMLImageElement) => {
     return new Promise((resolve, reject) => {
         obj.onload = () => resolve(obj);
@@ -45,3 +48,29 @@ export const cancellableSleep = (duration: number, signal: AbortSignal) => {
 export const SOCKET_EVENTS = {
     VISITOR_REGISTERED: "VISITOR_REGISTERED"
 }
+
+export const TotalVisitors = {
+    id: 'totalVisitors',
+    beforeDraw: (chart: Chart, _args: any, options: TotalVisitorsPluginOptions) => {
+        const { ctx } = chart;
+        const { text = "", fontSize = "14px", totalColor = "white" } = options;
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-over';
+        ctx.font = `${fontSize} Calibri`;
+        ctx.fillStyle = "white";
+
+        let x = 6;
+        const idxColon = text.indexOf(":")
+        for (let i = 0; i < text.length; i++) {
+            const ch = text.charAt(i)!;
+
+            if (i > idxColon) {
+                ctx.fillStyle = totalColor;
+            }
+            ctx.fillText(ch, x, chart.height - 10);
+            x += ctx.measureText(ch).width;
+        }
+
+        ctx.restore();
+    }
+};
