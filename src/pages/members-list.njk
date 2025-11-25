@@ -80,7 +80,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                         {% if is_day_closed == false %}
                             <p class="text-2xl title-font">Nombre de visites uniques</p>
                         {% endif %}
-                        <p class="text-4xl title-font">{{ "Fermé" if is_day_closed else visitors_list|length }}</p>
+                        <p class="text-4xl title-font">{{ "Fermé" if is_day_closed else visits_list|length }}</p>
                         <p>{{ current_date|date("EEEE dd LLLL yyyy") }}</p>
                     </div>
                     <div class="bg-black-numixs p-3 rounded-md text-white-numixs hidden flex-1 md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
@@ -120,7 +120,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                             </tr>
                         </thead>
                         <tbody>
-                            {% for visit in visitors_list %}
+                            {% for visit in visits_list %}
                                 <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">{{ loop.index }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Date de passage" data-row-key="Date de passage">
@@ -138,7 +138,8 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
                                         <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-visit" command="show-modal" data-visit-data='{{ visit | json }}'>
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 0 1-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.513 3.518 0 4.842a3.75 3.75 0 0 1-.837.552c-.676.328-1.028.774-1.028 1.152v.75a.75.75 0 0 1-1.5 0v-.75c0-1.279 1.06-2.107 1.875-2.502.182-.088.351-.199.503-.331.83-.727.83-1.857 0-2.584ZM12 18a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd" />
+                                                <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z" />
+                                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clip-rule="evenodd" />
                                             </svg>
                                         </button>
                                     </td>

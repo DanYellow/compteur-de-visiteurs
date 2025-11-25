@@ -24,7 +24,7 @@ router.get(['/evenements'], async (req, res) => {
         include: [{ model: PlaceModel, as: "listPlaces", required: true, }],
     });
 
-    res.render("pages/special-openings-list.njk", {
+    res.render("pages/events-list.njk", {
         special_openings_list: listSpecialOpening.map((p) => p.toJSON()),
         flash_message: req.cookies.flash_message,
         periode: req.query.periode,

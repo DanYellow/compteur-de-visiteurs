@@ -124,7 +124,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     res.render("pages/members-list.njk", {
         visitors_summary: visitorsSummary,
-        "visitors_list": listVisits,
+        "visits_list": listVisits,
         "list_business_sector": listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)),
         "header_list": listVisits?.[0] ? Object.keys(listVisits[0]) : [],
         "current_date": daySelected,

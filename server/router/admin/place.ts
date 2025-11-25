@@ -142,9 +142,9 @@ router.get(['/lieux'], async (req, res) => {
                 heure_fermeture: `${heure_fermeture_heure}h${heure_fermeture_minutes}`,
             } as PlaceRaw;
 
-            delete res.regularOpening
+            delete res.regularOpening;
 
-            return res
+            return res;
         })
     );
 

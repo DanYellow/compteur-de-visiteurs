@@ -33,6 +33,9 @@ modal?.addEventListener("toggle", (e: Event) => {
         visitTime.textContent = DateTime.fromJSDate(new Date(visitData.date_passage)).toFormat("EEEE dd LLLL yyyy à HH:mm:ss", {locale: "fr"});
 
         placeName.textContent = visitData["place.nom"];
-        visitEvents.textContent = visitData["liste_evenements"];
+        visitEvents.textContent = "";
+        if (visitData["liste_evenements"] !== "/") {
+            visitEvents.textContent = visitData["liste_evenements"];
+        }
     }
 })
