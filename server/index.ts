@@ -107,13 +107,33 @@ nunjucksConfig.addFilter("pad", (value, char: string, nb: number) => {
     return String(value).padStart(nb, char);
 });
 
-nunjucksConfig.addFilter("json", (value) => {
+function deleteKey(object: Record<string, any>, keys: string[] = []) {
+    var last = keys.pop();
+    delete keys.reduce((o, k: string) => o[k], object)[last];
+    return object;
+}
+
+nunjucksConfig.addFilter("json", (value, listKeysToDelete: string[] = []) => {
+    if (!Array.isArray(listKeysToDelete)) {
+        listKeysToDelete = []
+    }
+    // listKeysToDelete.forEach((key: string) => {
+    //     if(key.split("[]").length > 1) {
+    //         const [arrayKey, subKey] = key.split("[]");
+    //         value[arrayKey].forEach((_: unknown, idx: number) => {
+    //             console.log(value[arrayKey][idx])
+    //             delete value[arrayKey][idx][subKey.replace(".", "")]
+    //         })
+    //     }
+    //     delete value[key];
+    // });
+
     if (value instanceof nunjucks.runtime.SafeString) {
-        value = value.toString()
+        value = value.toString();
     }
 
-    const jsonString = JSON.stringify(value)
-    return jsonString
+    const jsonString = JSON.stringify(value);
+    return jsonString;
 });
 
 nunjucksConfig.addGlobal("formatQueryParams", (obj: Record<string, string>, removeIfEmpty: boolean = false) => {

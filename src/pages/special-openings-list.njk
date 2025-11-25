@@ -19,7 +19,7 @@ Liste des ouvertures exceptionnelles
 {% set root_class = "admin" %}
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
-    <div data-place='{{ place | dump | safe }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
+    <div data-place='{{ place | json }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 -mt-1.5">
@@ -120,8 +120,24 @@ Liste des ouvertures exceptionnelles
 
         <hr class="pb-1 mt-1 border-green-numixs">
         <p data-description=""></p>
+        <div class="p-3 rounded-2xl h-80 relative">
+            <menu class="absolute right-3 flex flex-row gap-3">
+                <li>
+                    <button data-download-chart="dailyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                        {% include "includes/icons/download-fill-icon.svg" %}
+                    </button>
+                </li>
+                <li>
+                    <button data-details-chart="jour" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+                        </svg>
+                    </button>
+                </li>
+            </menu>
+            <canvas id="global-chart" class="w-full h-full"></canvas>
+        </div>
         <p class="text-xl">Lieux concernés</p>
-        <ul class="list-disc list-inside">
-        </ul>
+        <ul class="list-disc list-inside"></ul>
     </dialog>
 {% endblock %}
