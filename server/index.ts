@@ -108,7 +108,7 @@ nunjucksConfig.addFilter("pad", (value, char: string, nb: number) => {
 });
 
 nunjucksConfig.addFilter("split", (value, char=",") => {
-    return String(value).split(char).map((item) => `${item}<br />`);
+    return String(value).split(char).map((item) => `${item}<br />`).join("");
 });
 
 function deleteKey(object: Record<string, any>, keys: string[] = []) {

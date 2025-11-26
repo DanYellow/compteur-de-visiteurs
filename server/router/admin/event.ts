@@ -13,7 +13,7 @@ router.get(['/evenements'], async (req, res) => {
     const today = DateTime.now();
 
     const listSpecialOpening = await SpecialOpeningModel.findAll({
-        order: [["nom", "ASC"], ["date", "DESC"], [{ model: PlaceModel, as: 'listPlaces' }, "nom", "ASC"]],
+        order: [["nom", "ASC"], ["date", "DESC"], ["heure_ouverture", "DESC"], [{ model: PlaceModel, as: 'listPlaces' }, "nom", "ASC"]],
         where: {
             ...(req.query.periode ? {
                 date: {

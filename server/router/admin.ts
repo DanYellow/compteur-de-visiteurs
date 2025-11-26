@@ -83,6 +83,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     if (placeSelected !== "tous") {
         place = await PlaceModel.findOne({ where: { slug: placeSelected } })
+        // @TODO : return events related data
         if (place) {
             let _regularOpening = await place.getRegularOpening();
             closedDays = (_regularOpening.jours_fermeture as string[]) || [];
@@ -122,7 +123,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         ],
     })
 
-    res.render("pages/members-list.njk", {
+    res.render("pages/visits-list.njk", {
         visitors_summary: visitorsSummary,
         "visits_list": listVisits,
         "list_business_sector": listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)),

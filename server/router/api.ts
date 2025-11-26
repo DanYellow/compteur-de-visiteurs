@@ -54,7 +54,6 @@ router.get("/", async (req, res) => {
     try {
         const specialOpeningTable = SpecialOpeningModel.getTableName();
         const visitTable = VisitModel.getTableName();
-
         const listVisits = await VisitModel.findAll({
             raw: true,
             attributes: {
@@ -65,44 +64,63 @@ router.get("/", async (req, res) => {
                         sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime")
                     ), "groupe"],
                     [
-                    sequelize.literal(`(
-                            SELECT GROUP_CONCAT(so.nom)
-                            FROM ${specialOpeningTable} AS so
-                            WHERE so.date = strftime("%Y-%m-%d", ${visitTable}.date_passage, 'localtime')
-                            AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
-                            AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
-                    )`),
-                    "liste_evenements"
+                        sequelize.literal(`
+                        COALESCE(
+                            (
+                                SELECT GROUP_CONCAT(so.nom)
+                                FROM ${specialOpeningTable} AS so
+                                WHERE strftime("%Y-%m-%d", so.date, 'localtime') = "${daySelected.toFormat("yyyy-LL-dd")}"
+                                AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                                AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                            ),
+                            "/"
+                        )`
+                        ),
+                        "liste_evenements"
                     ]
                 ],
                 exclude: ["groupe", "lieu_id"]
             },
             where: {
-                date_passage: {
-                    [Op.and]: {
-                        [Op.gte]: startTime.toString(),
-                        [Op.lte]: endTime.toString(),
-                    }
-                },
                 [Op.and]: [
                     sequelize.literal(`
-                            json_array_length("place->regularOpening"."jours_fermeture") = 0
-                            OR EXISTS (
-                                SELECT 1
-                                FROM json_each("place->regularOpening"."jours_fermeture")
-                                WHERE json_each.value != CAST( strftime('%u', visit.date_passage, 'localtime') AS text)
-                            )
-                        `),
-                    sequelize.where(
-                        sequelize.fn("strftime", "%H:%M", sequelize.col("date_passage"), "localtime"), {
-                        [Op.between]: [sequelize.col("place.regularOpening.heure_ouverture"), sequelize.col("place.regularOpening.heure_fermeture")]
-                    }
-                    ),
+                        json_array_length("place->regularOpening"."jours_fermeture") = 0
+                        OR EXISTS (
+                            SELECT 1
+                            FROM json_each("place->regularOpening"."jours_fermeture")
+                            WHERE json_each.value != CAST( strftime('%u', visit.date_passage, 'localtime') AS text)
+                        )
+                    `),
                     sequelize.where(
                         sequelize.col("place.ouvert"), {
                         [Op.eq]: 1
+                    })
+                    ,
+                    {
+                        date_passage: {
+                            [Op.and]: [
+                                {
+                                    [Op.between]: [startTime.toString(), endTime.toString()]
+                                }, {
+                                    [Op.or]: [
+                                        sequelize.literal(`(
+                                            SELECT 1
+                                            FROM regular_opening AS p
+                                            WHERE p.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                                            AND p.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                                        )`),
+                                        sequelize.literal(`(
+                                            SELECT 1
+                                            FROM ${specialOpeningTable} AS so
+                                            WHERE so.date = strftime("%Y-%m-%d", ${visitTable}.date_passage, 'localtime')
+                                            AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                                            AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                                        )`)
+                                    ]
+                                }
+                            ]
+                        }
                     }
-                    )
                 ],
                 ...(place ? { lieu_id: place.id } : {}),
             },
@@ -134,7 +152,6 @@ router.get("/", async (req, res) => {
                 ['date_passage', 'DESC'],
             ]
         });
-        console.log("listVisits", listVisits)
 
         res.status(200).json({
             data: listVisits
@@ -142,7 +159,6 @@ router.get("/", async (req, res) => {
     } catch (e) {
         console.log("error", e)
     }
-
 });
 
 router.get("/lieux", async (req, res) => {
@@ -214,7 +230,7 @@ router.get("/jour-exceptionnel/:special_opening{/:place}", async (req, res) => {
                 attributes: {
                     exclude: ["adresse", "slug", "ouvert", "id", "description", "date_creation", "place_special-opening.date_creation"]
                 },
-                ...(place ? { where: { id: place } }: {}),
+                ...(place ? { where: { id: place } } : {}),
                 include: [{
                     model: VisitModel,
                     as: "listVisits",
