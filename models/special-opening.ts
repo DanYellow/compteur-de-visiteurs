@@ -48,10 +48,6 @@ export default class SpecialOpening extends Model<InferAttributes<SpecialOpening
                         }
                     }
                 },
-                ouvert: {
-                    type: DataTypes.BOOLEAN,
-                    defaultValue: true,
-                },
             },
             {
                 sequelize,

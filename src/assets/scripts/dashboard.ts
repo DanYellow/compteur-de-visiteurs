@@ -173,30 +173,30 @@ const configDataRaw: ChartConfigData = {
         xTitle: 'Tranche horaire',
         xLabels: configData.jour.listColumns,
     },
-    "semaine": {
-        ...configData.semaine,
-        id: "weeklyChart",
-        chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-        xTitle: 'Jours',
-        xLabels: configData.semaine.listColumns,
-    },
-    "mois": {
-        ...configData.mois,
-        id: "monthlyChart",
-        chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-        xTitle: 'Semaines',
-        xLabels: configData.mois.listColumns,
-    },
-    "annee": {
-        ...configData.annee,
-        id: "yearlyChart",
-        chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-        xTitle: 'Mois',
-        xLabels: configData.annee.listColumns,
-    }
+    // "semaine": {
+    //     ...configData.semaine,
+    //     id: "weeklyChart",
+    //     chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
+    //     downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+    //     xTitle: 'Jours',
+    //     xLabels: configData.semaine.listColumns,
+    // },
+    // "mois": {
+    //     ...configData.mois,
+    //     id: "monthlyChart",
+    //     chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
+    //     downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+    //     xTitle: 'Semaines',
+    //     xLabels: configData.mois.listColumns,
+    // },
+    // "annee": {
+    //     ...configData.annee,
+    //     id: "yearlyChart",
+    //     chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
+    //     downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+    //     xTitle: 'Mois',
+    //     xLabels: configData.annee.listColumns,
+    // }
 }
 
 const listCharts = Object.values(configDataRaw);
@@ -211,9 +211,11 @@ const listCharts = Object.values(configDataRaw);
             ...((placeParam === "tous" || !placeParam) ? {} : { lieu: placeParam }),
         });
 
+        console.log(placeParam)
+
         const req = await fetch(`/api?${apiQueryParams.toString()}`);
         const res = await req.json();
-
+        console.log("res", res)
         const listVisitsGrouped = Object.groupBy(res.data as Visit[], (item) => {
             return item.groupe;
         });

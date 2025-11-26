@@ -154,6 +154,7 @@ export const getLinearCSV = (data: Result[], { periodLabel, lieu }: LinearCSVOpt
         ...data?.[0],
         ...Object.fromEntries(listGroupsInForm.map((item) => [item.value, 0])),
         date_passage: periodLabel,
+        liste_evenements: "/",
         ...(lieu === "tous" || !lieu ? { "place.nom": "Tous"} : {}),
         id: `Total : ${data.length}`,
     } as CSVLinearHeader;

@@ -2,9 +2,9 @@
 
 {% block title %}
     {% if is_edit %}
-Éditer lieu "{{ special_opening.nom }}"
+Éditer évènement "{{ special_opening.nom }}"
 {% else %}
-Créer nouveau ouverture exceptionnelle
+Créer évènement
 {% endif %}
 {% endblock %}
 
@@ -29,9 +29,9 @@ Créer nouveau ouverture exceptionnelle
             <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
                 <h1 class="text-black-numixs title-font font-bold text-4xl md:text-6xl">
                     {% if is_edit %}
-                    Éditer jour "{{ special_opening.nom }}"
+                    Éditer évènement "{{ special_opening.nom }}"
                     {% else %}
-                    Créer ouverture exceptionnelle
+                    Créer évènement
                     {% endif %}
                 </h1>
             </header>
