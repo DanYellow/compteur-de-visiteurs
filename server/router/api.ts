@@ -252,7 +252,7 @@ router.get("/jour-exceptionnel/:special_opening{/:place}", async (req, res) => {
                     attributes: {
                         exclude: ["lieu_id"],
                         include: [[sequelize.fn("trim",
-                            sequelize.fn('strftime', '%H', sequelize.col('date_passage'), "localtime")), 'groupe']]
+                            sequelize.fn('strftime', '%k', sequelize.col('date_passage'), "localtime")), 'groupe']]
                     }
                 }]
             }]

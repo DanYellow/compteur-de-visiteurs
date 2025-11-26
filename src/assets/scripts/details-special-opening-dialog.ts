@@ -157,7 +157,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                         }
                     },
                     totalVisitors: {
-                        text: "Total : " + 4,
+                        text: "Total : " + allVisits.length,
                         totalColor: greenNumixs,
                     },
                     subtitle: {
@@ -237,5 +237,12 @@ modal?.addEventListener("toggle", async (e: Event) => {
             },
             plugins: [TotalVisitors],
         });
+    } else {
+        try {
+            const modalChart = Chart.getChart('global-chart')
+            modalChart?.destroy();
+        } catch (error) {
+
+        }
     }
 });

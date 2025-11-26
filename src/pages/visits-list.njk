@@ -97,7 +97,13 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 <div class="p-3 rounded-md border-solid border-black-numixs border mb-3">
                     <h2 class="title-font font-bold text-2xl">{{ place.nom }}</h2>
                     <p>Horaires réguliers : {{ place.heure_ouverture|date("HH'h'mm") }}-{{ place.heure_fermeture|date("HH'h'mm") }}</p>
-                    <p>Évènement(s) du jour : Fête de la science - {{ place.heure_ouverture|date("HH'h'mm") }}-{{ place.heure_fermeture|date("HH'h'mm") }}</p>
+                    {% if place.specialOpening %}
+                    <p>Évènement(s) du jour :
+                        {% for event in place.specialOpening %}
+                            {{ event.nom }} - {{ event.heure_ouverture|date("HH'h'mm") }}-{{ event.heure_fermeture|date("HH'h'mm") }}{% if loop.last == false %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                    {% endif %}
                     {% if place.jours_fermeture_litteral | length %}
                     <p>Fermé le {{ place.jours_fermeture_litteral | join(", ") }}</p>
                     {% else %}
