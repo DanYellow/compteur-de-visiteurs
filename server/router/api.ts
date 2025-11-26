@@ -67,8 +67,11 @@ router.get("/", async (req, res) => {
                         sequelize.literal(`
                         COALESCE(
                             (
-                                SELECT GROUP_CONCAT(so.nom)
+                                SELECT GROUP_CONCAT(DISTINCT so.nom)
                                 FROM ${specialOpeningTable} AS so
+                                INNER JOIN "place_special-opening" f
+                                    ON f.place_id = ${visitTable}.lieu_id
+                                    AND f.special_opening_id = so.id
                                 WHERE strftime("%Y-%m-%d", so.date, 'localtime') = "${daySelected.toFormat("yyyy-LL-dd")}"
                                 AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
                                 AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')

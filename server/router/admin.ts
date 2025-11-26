@@ -98,6 +98,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                 }
             }
         ] })
+
         if (place) {
             let _regularOpening = await place.getRegularOpening();
             closedDays = (_regularOpening.jours_fermeture as string[]) || [];
