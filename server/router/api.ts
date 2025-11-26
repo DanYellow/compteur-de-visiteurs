@@ -208,7 +208,6 @@ router.get("/lieux", async (req, res) => {
             }
         });
     } catch (e) {
-        console.log("error 22", e)
         res.status(500).json({
             data: {
                 heure_ouverture: "10:00:00",
@@ -219,7 +218,55 @@ router.get("/lieux", async (req, res) => {
     }
 });
 
-router.get("/jour-exceptionnel/:special_opening{/:place}", async (req, res) => {
+router.get("/:place/evenements", async (req, res) => {
+    try {
+        let daySelected = DateTime.now();
+
+        if (req.query.jour) {
+            const tmpDate = DateTime.fromISO(req.query.jour as string);
+            if (tmpDate.isValid) {
+                daySelected = tmpDate;
+            }
+        }
+
+        const place = await PlaceModel.findOne({
+            attributes: {
+                include: [
+                    'id',
+                    'nom',
+                    [sequelize.fn('MIN', sequelize.col('specialOpening.heure_ouverture')), 'heure_ouverture'],
+                    [sequelize.fn('MAX', sequelize.col('specialOpening.heure_fermeture')), 'heure_fermeture'],
+                ],
+            },
+            where: {
+                slug: req.params.place
+            },
+            include: [{
+                model: SpecialOpeningModel,
+                as: "specialOpening",
+                attributes: [],
+                required: true,
+                where: {
+                    date: {
+                        [Op.eq]: daySelected.toFormat("yyyy-LL-dd")
+                    }
+                }
+            }],
+            group: ['place.id'],
+        })
+
+        if (place) {
+            return res.status(200).json({
+                data: place || {}
+            })
+        }
+        return res.status(404).json({})
+    } catch (e) {
+        return res.status(500).json({})
+    }
+})
+
+router.get("/evenements/:special_opening{/:place}", async (req, res) => {
     try {
         const table = SpecialOpeningModel.getTableName();
         const place = String(req.params.place || "");

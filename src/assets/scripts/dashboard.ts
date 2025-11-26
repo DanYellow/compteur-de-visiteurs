@@ -98,6 +98,7 @@ export const chartScales = (xTitle: string, titleSize: number = 12) => {
                     size: 12
                 }
             },
+
             grid: {
                 color: (ctx: ScriptableScaleContext) => {
                     if (ctx.index === 0) {
@@ -116,8 +117,10 @@ export const chartScales = (xTitle: string, titleSize: number = 12) => {
                 }
             },
             beginAtZero: true,
+            stacked: true,
         },
         x: {
+            stacked: true,
             ticks: {
                 color: "white",
                 font: {
@@ -211,28 +214,49 @@ const listCharts = Object.values(configDataRaw);
             ...((placeParam === "tous" || !placeParam) ? {} : { lieu: placeParam }),
         });
 
-        console.log(placeParam)
-
         const req = await fetch(`/api?${apiQueryParams.toString()}`);
         const res = await req.json();
-        console.log("res", res)
+
         const listVisitsGrouped = Object.groupBy(res.data as Visit[], (item) => {
             return item.groupe;
         });
 
+        let eventHours: { heure_fermeture?: number, heure_ouverture?: number } = {};
+        if (placeParam && apiKey === "jour") {
+            const reqEvent = await fetch(`/api/${placeParam}/evenements?${apiQueryParams.toString()}`);
+            const resEvent = await reqEvent.json();
+
+            if (resEvent.data) {
+                const [heure_ouverture_heure] = resEvent.data.heure_ouverture.split(":");
+                const [heure_fermeture_heure] = resEvent.data.heure_fermeture.split(":");
+
+                eventHours = { heure_ouverture: heure_ouverture_heure, heure_fermeture: heure_fermeture_heure }
+
+                const maxHour = Math.max(parseInt(heure_fermeture_heure), placeData.heure_fermeture);
+                const minHour = Math.min(parseInt(heure_ouverture_heure), placeData.heure_ouverture)
+                const rangeOpeningHours = Math.abs(maxHour - minHour + 1);
+                xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + minHour).map((item) => String(item));
+            }
+        }
+
         ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
 
-        const chartData = xLabels.map((item) => {
-            let key = item;
+        const regularData: number[] = new Array(xLabels.length).fill(0);
+        const eventData: number[] = new Array(xLabels.length).fill(0);
+
+        xLabels.forEach((key, idx) => {
             if (typeof key === 'object') {
-                key = String((item as { name: string; id: number; }).id);
+                key = String((key as { name: string; id: number; }).id);
             }
 
-            if (listVisitsGrouped[key]) {
-                const visitsForGroup = listVisitsGrouped[key];
-                return visitsForGroup?.length;
+            const visitsForGroup = listVisitsGrouped[key];
+            if (visitsForGroup) {
+                if (Number(key) <= eventHours.heure_fermeture! && Number(key) >= eventHours.heure_ouverture!) {
+                    eventData[idx] = visitsForGroup.length;
+                } else {
+                    regularData[idx] = visitsForGroup.length;
+                }
             }
-            return 0;
         });
 
         const chartLabels = xLabels.map((item) => {
@@ -251,11 +275,18 @@ const listCharts = Object.values(configDataRaw);
                     labels: chartLabels,
                     datasets: [
                         {
-                            label: "Visites uniques",
-                            data: chartData,
+                            label: "Visites uniques régulières",
+                            data: regularData,
                             backgroundColor: `rgba(213, 217, 22, 0.5)`,
                             borderColor: greenNumixs,
                             borderWidth: 1.5
+                        },
+                        {
+                            label: "Visites uniques évènement",
+                            data: eventData,
+                            backgroundColor: `rgba(255, 255, 255, 0.5)`,
+                            borderColor: "white",
+                            borderWidth: 1.5,
                         }
                     ]
                 },

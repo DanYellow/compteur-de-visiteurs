@@ -95,7 +95,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
         ).map((item) => String(item));
 
         const req = await fetch(
-            `api/jour-exceptionnel/${specialOpeningData.id}`
+            `api/evenements/${specialOpeningData.id}`
         );
         const res = await req.json();
         const allVisits = res.data.listPlaces
