@@ -218,7 +218,7 @@ const getWeeksRangeMonth = (_startDate = null) => {
     return [];
 }
 
-export const configData: BaseConfigData = {
+export const baseConfigData: BaseConfigData = {
     "jour": {
         apiKey: "jour",
         xValuesSuffix: "h",

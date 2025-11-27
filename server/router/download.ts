@@ -5,7 +5,7 @@ import { fileURLToPath, URLSearchParams } from "url";
 import { stringify } from "csv-stringify/sync";
 import { DateTime, DateTimeUnit } from "luxon";
 import sequelize from "#models/index.ts";
-import { configData, getLinearCSV, getPivotTable } from "#scripts/utils.shared.ts";
+import { baseConfigData, getLinearCSV, getPivotTable } from "#scripts/utils.shared.ts";
 import { slugify } from "#scripts/utils.ts";
 import { Visit } from "#types";
 
@@ -42,9 +42,9 @@ router.get('/', async (req, res) => {
     let csvFilename = "";
 
     if (isGrouped) {
-        const config = configData[configKey];
+        const config = baseConfigData[configKey];
         if (req.query.lieu && req.query.lieu !== "tous" && configKey === "jour") {
-            const place = await PlaceModel.findOne({ where: { slug: req.query.lieu }})
+            const place = await PlaceModel.findOne({ where: { slug: req.query.lieu }, raw: true})
             if (place) {
                 const rangeOpeningHours = Math.abs(Number(place.heure_fermeture) - Number(place.heure_ouverture) + 1);
                 const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + place.heure_ouverture).map((item) => String(item));

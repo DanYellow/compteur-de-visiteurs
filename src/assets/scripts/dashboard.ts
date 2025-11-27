@@ -4,7 +4,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { DateTime, Info } from "luxon";
 
 import type { ChartConfigData, CustomTitleOptions, LineChartEntry, Visit } from "#types";
-import { capitalizeFirstLetter, configData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
+import { capitalizeFirstLetter, baseConfigData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
 import { TotalVisitors } from './utils';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
@@ -33,15 +33,15 @@ if (Object.keys(placeData).length > 0) {
     const rangeOpeningHours = Math.abs(Number(placeData.heure_fermeture) - Number(placeData.heure_ouverture) + 1);
     const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + placeData.heure_ouverture).map((item) => String(item));
 
-    configData.jour = {
-        ...configData.jour,
+    baseConfigData.jour = {
+        ...baseConfigData.jour,
         listColumns: listTimeSlots
     }
 
     const listClosedDaysIndex = placeData.jours_fermeture.map(Number);
 
-    configData.semaine = {
-        ...configData.semaine,
+    baseConfigData.semaine = {
+        ...baseConfigData.semaine,
         listColumns: Info.weekdays('long', { locale: 'fr' })
             .map((item, idx) => {
                 if (listClosedDaysIndex.includes(idx + 1)) {
@@ -63,8 +63,8 @@ if (Object.keys(placeData).length > 0) {
     const rangeOpeningHours = Math.abs(parseInt(heure_fermeture_heure) - parseInt(heure_ouverture_heure) + 1);
     const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + parseInt(heure_ouverture_heure)).map((item) => String(item));
 
-    configData.jour = {
-        ...configData.jour,
+    baseConfigData.jour = {
+        ...baseConfigData.jour,
         listColumns: listTimeSlots
     }
 
@@ -81,14 +81,14 @@ if (Object.keys(placeData).length > 0) {
             }
         }).filter(Boolean)
 
-    configData.semaine = {
-        ...configData.semaine,
+    baseConfigData.semaine = {
+        ...baseConfigData.semaine,
         listColumns: listOpenedDays
     }
 }
 
 
-export const chartScales = (xTitle: string, titleSize: number = 12) => {
+export const chartScales = (xTitle: string, titleSize: number = 12, stacked = false) => {
     return {
         y: {
             ticks: {
@@ -117,10 +117,10 @@ export const chartScales = (xTitle: string, titleSize: number = 12) => {
                 }
             },
             beginAtZero: true,
-            stacked: true,
+            stacked,
         },
         x: {
-            stacked: true,
+            stacked,
             ticks: {
                 color: "white",
                 font: {
@@ -167,42 +167,42 @@ const placeQueryParams = new URLSearchParams({
 });
 const downloadLinkSuffix = placeQueryParams.toString().length ? `&${placeQueryParams.toString()}` : '';
 
-const configDataRaw: ChartConfigData = {
+const configData: ChartConfigData = {
     "jour": {
-        ...configData.jour,
+        ...baseConfigData.jour,
         id: "dailyChart",
         chartTitle: `Visites uniques du ${daySelected.toFormat("dd/LL/yyyy")}`,
         downloadLink: `telecharger?jour=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
         xTitle: 'Tranche horaire',
-        xLabels: configData.jour.listColumns,
+        xLabels: baseConfigData.jour.listColumns!,
     },
-    // "semaine": {
-    //     ...configData.semaine,
-    //     id: "weeklyChart",
-    //     chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
-    //     downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-    //     xTitle: 'Jours',
-    //     xLabels: configData.semaine.listColumns,
-    // },
-    // "mois": {
-    //     ...configData.mois,
-    //     id: "monthlyChart",
-    //     chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
-    //     downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-    //     xTitle: 'Semaines',
-    //     xLabels: configData.mois.listColumns,
-    // },
-    // "annee": {
-    //     ...configData.annee,
-    //     id: "yearlyChart",
-    //     chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
-    //     downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-    //     xTitle: 'Mois',
-    //     xLabels: configData.annee.listColumns,
-    // }
+    "semaine": {
+        ...baseConfigData.semaine,
+        id: "weeklyChart",
+        chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        xTitle: 'Jours',
+        xLabels: baseConfigData.semaine.listColumns!,
+    },
+    "mois": {
+        ...baseConfigData.mois,
+        id: "monthlyChart",
+        chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        xTitle: 'Semaines',
+        xLabels: baseConfigData.mois.listColumns!,
+    },
+    "annee": {
+        ...baseConfigData.annee,
+        id: "yearlyChart",
+        chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        xTitle: 'Mois',
+        xLabels: baseConfigData.annee.listColumns!,
+    }
 }
 
-const listCharts = Object.values(configDataRaw);
+const listCharts = Object.values(configData);
 
 ; (() => {
     listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
@@ -222,6 +222,8 @@ const listCharts = Object.values(configDataRaw);
         });
 
         let eventHours: { heure_fermeture?: number, heure_ouverture?: number } = {};
+        let eventData: number[] = [];
+
         if (placeParam && apiKey === "jour") {
             const reqEvent = await fetch(`/api/${placeParam}/evenements?${apiQueryParams.toString()}`);
             const resEvent = await reqEvent.json();
@@ -231,18 +233,23 @@ const listCharts = Object.values(configDataRaw);
                 const [heure_fermeture_heure] = resEvent.data.heure_fermeture.split(":");
 
                 eventHours = { heure_ouverture: heure_ouverture_heure, heure_fermeture: heure_fermeture_heure }
+                eventData = new Array(xLabels.length).fill(0);
 
                 const maxHour = Math.max(parseInt(heure_fermeture_heure), placeData.heure_fermeture);
                 const minHour = Math.min(parseInt(heure_ouverture_heure), placeData.heure_ouverture)
                 const rangeOpeningHours = Math.abs(maxHour - minHour + 1);
                 xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + minHour).map((item) => String(item));
+
+                configData.jour = {
+                    ...configData.jour,
+                    xLabels,
+                }
             }
         }
 
         ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
 
         const regularData: number[] = new Array(xLabels.length).fill(0);
-        const eventData: number[] = new Array(xLabels.length).fill(0);
 
         xLabels.forEach((key, idx) => {
             if (typeof key === 'object') {
@@ -275,14 +282,14 @@ const listCharts = Object.values(configDataRaw);
                     labels: chartLabels,
                     datasets: [
                         {
-                            label: "Visites uniques régulières",
+                            label: "Visites régulières",
                             data: regularData,
                             backgroundColor: `rgba(213, 217, 22, 0.5)`,
                             borderColor: greenNumixs,
                             borderWidth: 1.5
                         },
                         {
-                            label: "Visites uniques évènement",
+                            label: "Visites évènement",
                             data: eventData,
                             backgroundColor: `rgba(255, 255, 255, 0.5)`,
                             borderColor: "white",
@@ -311,15 +318,30 @@ const listCharts = Object.values(configDataRaw);
                                 family: "Calibri"
                             },
                             padding: {
-                                bottom: 20
+                                bottom: eventData.length > 0 ? 0 : 20
                             },
                         },
                         tooltip: {
                             enabled: true,
                         },
-                        legend: {
-                            display: false,
-                        },
+                        ...(eventData.length > 0 ? {
+                            legend: {
+                                display: true,
+                                labels: {
+                                    color: '#FFF',
+                                },
+                                title: {
+                                    display: true,
+                                    text: "Visites",
+                                    color: '#FFF',
+                                }
+                            }
+                        } : {
+                            legend: {
+                                display: false,
+                            }
+                        })
+                        ,
                         totalVisitors: {
                             text: 'Total : ' + res.data.length,
                             totalColor: greenNumixs,
@@ -335,7 +357,7 @@ const listCharts = Object.values(configDataRaw);
                             formatter: v => v ? v : ''
                         }
                     },
-                    scales: chartScales(xTitle),
+                    scales: chartScales(xTitle, undefined, true),
                 },
                 plugins: [TotalVisitors],
             }
@@ -350,9 +372,10 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
     if (isOpened) {
         const sourceBtn = toggleEvent.source! as HTMLButtonElement;
-        const chartSelected = sourceBtn.dataset.detailsChart;
+        const chartSelected = sourceBtn.dataset.detailsChart || "jour";
         const chartData = JSON.parse(sourceBtn.closest("div")?.querySelector("canvas")?.dataset.chartData || "{}");
-        const { xLabels = [], xTitle = "", xValuesSuffix = "", chartTitle, downloadLink } = listCharts.find((item) => item.apiKey === chartSelected) || {};
+
+        const { xLabels = [], xTitle = "", xValuesSuffix = "", chartTitle, downloadLink } = configData[chartSelected] || {};
         const totalVisits = Object.values(chartData).flat().length;
 
         linkDownloadChartData.href = downloadLink || "";
@@ -365,7 +388,6 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         tableDetailsChartTableBody.innerHTML = "";
 
         const lineChartDatasets: LineChartEntry[] = [];
-
         const chartDataPivotTable = getPivotTable(chartData, xLabels as [], { columnSuffix: xValuesSuffix })
 
         Object.values(chartDataPivotTable).forEach((row, index, table) => {
@@ -421,7 +443,8 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
             if (index > 0) {
                 tableDetailsChartTableBody.append(trBody);
             }
-        })
+        });
+
 
         const data = {
             labels: chartDataPivotTable[0].slice(1, chartDataPivotTable[0].length - 1),
