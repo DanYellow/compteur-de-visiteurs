@@ -221,7 +221,7 @@ router.get("/lieux", async (req, res) => {
     }
 });
 
-router.get("/evenements/:place", async (req, res) => {
+router.get("/evenements", async (req, res) => {
     try {
         let daySelected = DateTime.now();
 
@@ -266,9 +266,11 @@ router.get("/evenements/:place", async (req, res) => {
                     as: 'listPlaces',
                     attributes: [],
                     required: true,
-                    where: {
-                        slug: req.params.place,
-                    },
+                    ...("lieu" in req.query && req.query.lieu !== "tous" ? {
+                        where: {
+                            slug: req.query.lieu,
+                        }
+                    } : {}),
                     through: {
                         attributes: [],
                     },
@@ -292,6 +294,7 @@ router.get("/evenements/:place", async (req, res) => {
         }
         return res.status(404).json([])
     } catch (e) {
+        console.log(e)
         return res.status(500).json([])
     }
 })

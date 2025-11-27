@@ -12,7 +12,7 @@ const linkDownloadChartData = document.querySelector("[data-download-chart-data=
 const linkDownloadDetailedChartData = document.querySelector("[data-download-chart-data='detailed']") as HTMLLinkElement;
 const tableDetailsChart = document.getElementById("table-details-chart") as HTMLTemplateElement;
 
-const placeData = JSON.parse(document.querySelector("[data-place]")?.dataset.place || "{}")
+const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")
 
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels, SubTitle);
 
@@ -29,48 +29,19 @@ const chartTitleStyle: CustomTitleOptions = {
     }
 };
 
-if (Object.keys(placeData).length > 0) {
-    const rangeOpeningHours = Math.abs(Number(placeData.heure_fermeture) - Number(placeData.heure_ouverture) + 1);
-    const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + placeData.heure_ouverture).map((item) => String(item));
+const rangeOpeningHours = Math.abs(Number(placeData.heure_fermeture) - Number(placeData.heure_ouverture) + 1);
+const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + placeData.heure_ouverture).map((item) => String(item));
 
-    baseConfigData.jour = {
-        ...baseConfigData.jour,
-        listColumns: listTimeSlots
-    }
+baseConfigData.jour = {
+    ...baseConfigData.jour,
+    listColumns: listTimeSlots
+}
 
-    const listClosedDaysIndex = placeData.jours_fermeture.map(Number);
+const listClosedDaysIndex = placeData.jours_fermeture.map(Number);
 
-    baseConfigData.semaine = {
-        ...baseConfigData.semaine,
-        listColumns: Info.weekdays('long', { locale: 'fr' })
-            .map((item, idx) => {
-                if (listClosedDaysIndex.includes(idx + 1)) {
-                    return null
-                }
-                return {
-                    name: capitalizeFirstLetter(item),
-                    id: idx + 1
-                }
-            }).filter(Boolean)
-    }
-} else {
-    const openingHoursLimitsReq = await fetch(`/api/lieux`);
-    const openingHoursLimitsRes = (await openingHoursLimitsReq.json()).data || { heure_ouverture: "08:00", heure_fermeture: "20:00", jours_fermeture: ["6", "7"] };
-
-    const [heure_ouverture_heure] = openingHoursLimitsRes.heure_ouverture.split(":");
-    const [heure_fermeture_heure] = openingHoursLimitsRes.heure_fermeture.split(":");
-
-    const rangeOpeningHours = Math.abs(parseInt(heure_fermeture_heure) - parseInt(heure_ouverture_heure) + 1);
-    const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + parseInt(heure_ouverture_heure)).map((item) => String(item));
-
-    baseConfigData.jour = {
-        ...baseConfigData.jour,
-        listColumns: listTimeSlots
-    }
-
-    const listClosedDaysIndex = openingHoursLimitsRes.jours_fermeture.map(Number);
-
-    const listOpenedDays = Info.weekdays('long', { locale: 'fr' })
+baseConfigData.semaine = {
+    ...baseConfigData.semaine,
+    listColumns: Info.weekdays('long', { locale: 'fr' })
         .map((item, idx) => {
             if (listClosedDaysIndex.includes(idx + 1)) {
                 return null
@@ -79,14 +50,8 @@ if (Object.keys(placeData).length > 0) {
                 name: capitalizeFirstLetter(item),
                 id: idx + 1
             }
-        }).filter(Boolean)
-
-    baseConfigData.semaine = {
-        ...baseConfigData.semaine,
-        listColumns: listOpenedDays
-    }
+        }).filter((item) => item !== null)
 }
-
 
 export const chartScales = (xTitle: string, titleSize: number = 12, stacked = false) => {
     return {
@@ -176,30 +141,30 @@ const configData: ChartConfigData = {
         xTitle: 'Tranche horaire',
         xLabels: baseConfigData.jour.listColumns!,
     },
-    // "semaine": {
-    //     ...baseConfigData.semaine,
-    //     id: "weeklyChart",
-    //     chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
-    //     downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-    //     xTitle: 'Jours',
-    //     xLabels: baseConfigData.semaine.listColumns!,
-    // },
-    // "mois": {
-    //     ...baseConfigData.mois,
-    //     id: "monthlyChart",
-    //     chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
-    //     downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-    //     xTitle: 'Semaines',
-    //     xLabels: baseConfigData.mois.listColumns!,
-    // },
-    // "annee": {
-    //     ...baseConfigData.annee,
-    //     id: "yearlyChart",
-    //     chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
-    //     downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-    //     xTitle: 'Mois',
-    //     xLabels: baseConfigData.annee.listColumns!,
-    // }
+    "semaine": {
+        ...baseConfigData.semaine,
+        id: "weeklyChart",
+        chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        xTitle: 'Jours',
+        xLabels: baseConfigData.semaine.listColumns!,
+    },
+    "mois": {
+        ...baseConfigData.mois,
+        id: "monthlyChart",
+        chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        xTitle: 'Semaines',
+        xLabels: baseConfigData.mois.listColumns!,
+    },
+    "annee": {
+        ...baseConfigData.annee,
+        id: "yearlyChart",
+        chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
+        downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        xTitle: 'Mois',
+        xLabels: baseConfigData.annee.listColumns!,
+    }
 }
 
 const listCharts = Object.values(configData);
@@ -216,7 +181,7 @@ const listCharts = Object.values(configData);
 
         const req = await fetch(`/api?${apiQueryParams.toString()}`);
         const res = await req.json();
-        console.log(`/api?${apiQueryParams.toString()}`)
+
         const listVisitsGrouped = Object.groupBy(res.data as Visit[], (item) => {
             return item.groupe;
         });
@@ -224,15 +189,15 @@ const listCharts = Object.values(configData);
         let eventData: number[] = [];
         let listEventsHours = [];
 
-        if (placeParam) {
-            const reqEvent = await fetch(`/api/evenements/${placeParam}?${apiQueryParams.toString()}`);
+        if (true) {
+            const reqEvent = await fetch(`/api/evenements?${apiQueryParams.toString()}`);
             const resEvent = await reqEvent.json();
 
             if (resEvent.data) {
                 resEvent.data.forEach((item) => {
                     const [heure_ouverture_heure] = item.heure_ouverture.split(":");
                     const [heure_fermeture_heure] = item.heure_fermeture.split(":");
-
+                    console.log("heure_ouverture_heure", Math.max(parseInt(heure_fermeture_heure), placeData.heure_fermeture))
                     listEventsHours.push({
                         date: item.date,
                         groupe: item.groupe,
@@ -244,7 +209,7 @@ const listCharts = Object.values(configData);
                 eventData = new Array(xLabels.length).fill(0);
 
                 if (apiKey === "jour") {
-                    const { heure_fermeture = placeData.heure_fermeture, heure_ouverture = placeData.heure_ouverture} = listEventsHours?.[0] || {}
+                    const { heure_fermeture = placeData.heure_fermeture, heure_ouverture = placeData.heure_ouverture } = listEventsHours?.[0] || {}
                     const rangeOpeningHours = Math.abs(heure_fermeture - heure_ouverture + 1);
                     xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + heure_ouverture).map((item) => String(item));
 

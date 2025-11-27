@@ -25,19 +25,13 @@ router.get(["/dashboard"], async (req, res) => {
         }
     }
 
-    // try {
-    //     const listPlaces = await PlaceModel.findAll({
-    //     raw: true,
-    //     nest: true,
-    //     include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
-    // })
-    // } catch (error) {
-    //     console.log(error)
-    // }
     const listPlaces = await PlaceModel.findAll({
         raw: true,
         nest: true,
         include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
+        order: [
+            ['nom', 'ASC'],
+        ],
     })
     const placeSelected = req.query?.lieu || "tous";
     let place = undefined;
@@ -47,6 +41,17 @@ router.get(["/dashboard"], async (req, res) => {
     }
 
     const listDaysClosed = place ? JSON.parse(place.regularOpening!.jours_fermeture || "[]") : DEFAULT_CLOSED_DAYS;
+
+    let globalPlace = {}
+    if (!place) {
+        const openingHoursLimitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/lieux`);
+        const openingHoursLimitsRes = (await openingHoursLimitsReq.json()).data
+        globalPlace = {
+            heure_fermeture: parseInt(openingHoursLimitsRes.heure_fermeture.split(":")[0]),
+            heure_ouverture: parseInt(openingHoursLimitsRes.heure_ouverture.split(":")[0]),
+            jours_fermeture: openingHoursLimitsRes.jours_fermeture,
+        };
+    }
 
     res.render("pages/dashboard.njk", {
         "current_date": daySelected,
@@ -61,7 +66,7 @@ router.get(["/dashboard"], async (req, res) => {
                 heure_fermeture: parseInt(place.regularOpening!.heure_fermeture.split(":")[0]),
                 heure_ouverture: parseInt(place.regularOpening!.heure_ouverture.split(":")[0]),
                 jours_fermeture: listDaysClosed,
-            } : {})
+            } : globalPlace)
         },
     });
 })
