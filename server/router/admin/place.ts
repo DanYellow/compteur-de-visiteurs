@@ -152,6 +152,19 @@ router.get(['/lieux'], async (req, res) => {
         places_list: listPlacesComputed,
         flash_message: req.cookies.flash_message,
     });
+}).post(['/lieux/suppression'], async (req, res) => {
+    try {
+        await PlaceModel.destroy({
+            where: {
+                id: req.body.id,
+            },
+        })
+        res.cookie('flash_message', "delete_success", { maxAge: 1000, httpOnly: true });
+    } catch (error) {
+        res.cookie('flash_message', "delete_error", { maxAge: 1000, httpOnly: true });
+    }
+
+    res.redirect('/lieux');
 })
 
 export default router;

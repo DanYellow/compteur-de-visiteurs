@@ -1,6 +1,9 @@
 {% if flash_message == "update_success" %}
-    <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4">Les données ont correctement été mises à jour avec succès</p>
+    <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4">Les données ont été mises à jour avec succès</p>
 {% endif %}
 {% if flash_message == "create_success" %}
-    <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4">Les données ont correctement été créées avec succès</p>
+    <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4">Les données ont été créées avec succès</p>
+{% endif %}
+{% if flash_message == "delete_success" %}
+    <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4">Les données ont été supprimées avec succès</p>
 {% endif %}
