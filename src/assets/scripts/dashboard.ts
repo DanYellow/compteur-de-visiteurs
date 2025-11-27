@@ -227,21 +227,6 @@ const listCharts = Object.values(configData);
 
         const regularData: number[] = new Array(xLabels.length).fill(0);
 
-        // xLabels.forEach((key, idx) => {
-        //     if (typeof key === 'object') {
-        //         key = String((key as { name: string; id: number; }).id);
-        //     }
-
-        //     const visitsForGroup = listVisitsGrouped[key];
-        //     if (visitsForGroup) {
-        //         if (Number(key) <= eventHours.heure_fermeture! && Number(key) >= eventHours.heure_ouverture!) {
-        //             eventData[idx] = visitsForGroup.length;
-        //         } else {
-        //             regularData[idx] = visitsForGroup.length;
-        //         }
-        //     }
-        // });
-
         const getIndexForKey = (value: string): number => {
             return xLabels.findIndex((item) => {
                 let labelKey = item;

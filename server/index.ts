@@ -150,7 +150,9 @@ nunjucksConfig.addGlobal("formatQueryParams", (obj: Record<string, string>, remo
         })
     }
 
-    return `?${params.toString()}`;
+    const stringifiedParams = params.toString();
+
+    return stringifiedParams.length ? `?${params.toString()}` : "";
 });
 
 const listDomains: string[] = (process.env.IS_DOCKER?.toLowerCase() === "true" && process.env.NODE_ENV === "production") ? ["faclab.localhost"] : ["localhost", "0.0.0.0"];

@@ -2,7 +2,7 @@
     <div class="calendar">
         <div class="flex justify-between items-center mx-4 mt-2">
             <p class="text-xl font-bold">Choisir un jour</p>
-            <a href="/visiteurs?{{ formatQueryParams({ lieu: lieu or "" }, true) }}" class="underline hocus:no-underline">Aujourd'hui</a>
+            <a href="{{ todayLink }}{{ formatQueryParams({ lieu: lieu or "" }, true) }}" class="underline hocus:no-underline">Aujourd'hui</a>
         </div>
         <nav class="flex">
             <button type="button" data-navigation-month="prev" class="navigation-month py-2.5 px-3.5 hocus:bg-green-numixs flex flex-row gap-2 items-center" title="Mois précédent">

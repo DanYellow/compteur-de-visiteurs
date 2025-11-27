@@ -144,9 +144,7 @@ const renderCalendar = () => {
 
     const countdownPrevMonth = firstDayOfMonth.weekday === 1 ? 8 : firstDayOfMonth.weekday;
 
-    let urlExtraQueryString:URLSearchParams|string = new URLSearchParams(window.location.search );
-    urlExtraQueryString.delete("date")
-    urlExtraQueryString = urlExtraQueryString.toString();
+    const queryParams:URLSearchParams|string = new URLSearchParams(window.location.search );
 
     for (let i = countdownPrevMonth - 1; i > 0; i--) {
         const calendarDayTpl = calendarDayTplRaw.content.cloneNode(true) as HTMLElement;
@@ -160,7 +158,10 @@ const renderCalendar = () => {
         const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).weekday;
 
         calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
-        calendarDayTplLink.href = `?date=${yearAndMonth}-${dayNumber.padStart(2, "0")}&${urlExtraQueryString}`;
+
+        queryParams.set("date", `${yearAndMonth}-${dayNumber.padStart(2, "0")}`);
+
+        calendarDayTplLink.href = `?${queryParams.toString()}`;
         calendarDayTplLink.dataset.month = "prev";
         calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
         calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" })
@@ -195,7 +196,9 @@ const renderCalendar = () => {
         const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
         calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
 
-        calendarDayTplLink.href = `?date=${yearAndMonth}-${dayNumber}&${urlExtraQueryString}`;
+        queryParams.set("date", `${yearAndMonth}-${dayNumber}`);
+
+        calendarDayTplLink.href = `?${queryParams.toString()}`;
         calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber}`;
         if (!isDaySelected) {
             calendarDayTplLink.tabIndex = -1;
@@ -222,7 +225,10 @@ const renderCalendar = () => {
         const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).weekday;
 
         const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
-        calendarDayTplLink.href = `?date=${yearAndMonth}-${dayNumber.padStart(2, "0")}&${urlExtraQueryString}`;
+
+        queryParams.set("date", `${yearAndMonth}-${dayNumber.padStart(2, "0")}`);
+
+        calendarDayTplLink.href = `?${queryParams.toString()}`;
         calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
         calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" });
         calendarDayTplLink.dataset.month = "next";
@@ -297,4 +303,4 @@ calendarWrapper?.addEventListener("command", (event) => {
             triggerEl.title = "Ouvrir calendrier";
         }
     }
- });
+});
