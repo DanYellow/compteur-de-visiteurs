@@ -8,6 +8,29 @@ import { DEFAULT_CLOSED_DAYS } from "./admin";
 
 const router = express.Router();
 
+const dictGroupType = {
+    "jour": {
+        "substitution": "%k",
+        "luxon": "day",
+        "property": "hour",
+    },
+    "semaine": {
+        "substitution": "%u",
+        "luxon": "week",
+        "property": "weekday",
+    },
+    "mois": {
+        "substitution": "%W",
+        "luxon": "month",
+        "property": "weekNumber",
+    },
+    "annee": {
+        "substitution": "%m",
+        "luxon": "year",
+        "property": "month",
+    },
+}
+
 router.get("/", async (req, res) => {
     let daySelected = DateTime.now();
 
@@ -19,29 +42,6 @@ router.get("/", async (req, res) => {
     }
 
     const filtreParam = (req.query?.filtre || "jour") as string;
-
-    const dictGroupType = {
-        "jour": {
-            "substitution": "%k",
-            "luxon": "day",
-            "property": "hour",
-        },
-        "semaine": {
-            "substitution": "%u",
-            "luxon": "week",
-            "property": "weekday",
-        },
-        "mois": {
-            "substitution": "%W",
-            "luxon": "month",
-            "property": "weekNumber",
-        },
-        "annee": {
-            "substitution": "%m",
-            "luxon": "year",
-            "property": "month",
-        },
-    }
 
     const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day");
     const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day");
@@ -72,7 +72,7 @@ router.get("/", async (req, res) => {
                                 INNER JOIN "place_special-opening" f
                                     ON f.place_id = ${visitTable}.lieu_id
                                     AND f.special_opening_id = so.id
-                                WHERE strftime("%Y-%m-%d", so.date, 'localtime') = "${daySelected.toFormat("yyyy-LL-dd")}"
+                                WHERE strftime("%Y-%m-%d", so.date, 'localtime') = strftime("%Y-%m-%d", ${visitTable}.date_passage, 'localtime')
                                 AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
                                 AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
                             ),
@@ -221,7 +221,7 @@ router.get("/lieux", async (req, res) => {
     }
 });
 
-router.get("/:place/evenements", async (req, res) => {
+router.get("/evenements/:place", async (req, res) => {
     try {
         let daySelected = DateTime.now();
 
@@ -232,40 +232,67 @@ router.get("/:place/evenements", async (req, res) => {
             }
         }
 
-        const place = await PlaceModel.findOne({
+        const filtreParam = (req.query?.filtre || "jour") as string;
+
+        const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day");
+        const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day");
+
+        const table = SpecialOpeningModel.getTableName();
+        const listSpecialOpenings = await SpecialOpeningModel.findAll({
             attributes: {
                 include: [
-                    'id',
-                    'nom',
-                    [sequelize.fn('MIN', sequelize.col('specialOpening.heure_ouverture')), 'heure_ouverture'],
-                    [sequelize.fn('MAX', sequelize.col('specialOpening.heure_fermeture')), 'heure_fermeture'],
+                    [sequelize.fn("trim",
+                        sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col(`${table}.date`), "localtime")
+                    ), "groupe"],
+                    [
+                        sequelize.fn("strftime", "%H:%M", sequelize.fn('MIN', sequelize.col(`${table}.heure_ouverture`))),
+                        'heure_ouverture'
+                    ],
+                    [
+                        sequelize.fn("strftime", "%H:%M", sequelize.fn('MAX', sequelize.col(`${table}.heure_fermeture`))),
+                        'heure_fermeture'
+                    ],
                 ],
+                exclude: [
+                    "id",
+                    "date_creation",
+                    "description",
+                    "ouvert"
+                ]
             },
+            include: [
+                {
+                    model: PlaceModel,
+                    as: 'listPlaces',
+                    attributes: [],
+                    required: true,
+                    where: {
+                        slug: req.params.place,
+                    },
+                    through: {
+                        attributes: [],
+                    },
+                },
+            ],
             where: {
-                slug: req.params.place
+                date: {
+                    [Op.between]: [startTime.toString(), endTime.toString()],
+                },
             },
-            include: [{
-                model: SpecialOpeningModel,
-                as: "specialOpening",
-                attributes: [],
-                required: true,
-                where: {
-                    date: {
-                        [Op.eq]: daySelected.toFormat("yyyy-LL-dd")
-                    }
-                }
-            }],
-            group: ['place.id'],
-        })
+            group: [
+                sequelize.fn('strftime', (dictGroupType as any)[filtreParam]?.substitution, sequelize.col(`${table}.date`)),
+            ],
+            raw: true,
+        });
 
-        if (place) {
+        if (listSpecialOpenings) {
             return res.status(200).json({
-                data: place || {}
+                data: listSpecialOpenings
             })
         }
-        return res.status(404).json({})
+        return res.status(404).json([])
     } catch (e) {
-        return res.status(500).json({})
+        return res.status(500).json([])
     }
 })
 

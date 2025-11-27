@@ -176,30 +176,30 @@ const configData: ChartConfigData = {
         xTitle: 'Tranche horaire',
         xLabels: baseConfigData.jour.listColumns!,
     },
-    "semaine": {
-        ...baseConfigData.semaine,
-        id: "weeklyChart",
-        chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-        xTitle: 'Jours',
-        xLabels: baseConfigData.semaine.listColumns!,
-    },
-    "mois": {
-        ...baseConfigData.mois,
-        id: "monthlyChart",
-        chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-        xTitle: 'Semaines',
-        xLabels: baseConfigData.mois.listColumns!,
-    },
-    "annee": {
-        ...baseConfigData.annee,
-        id: "yearlyChart",
-        chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
-        xTitle: 'Mois',
-        xLabels: baseConfigData.annee.listColumns!,
-    }
+    // "semaine": {
+    //     ...baseConfigData.semaine,
+    //     id: "weeklyChart",
+    //     chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
+    //     downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+    //     xTitle: 'Jours',
+    //     xLabels: baseConfigData.semaine.listColumns!,
+    // },
+    // "mois": {
+    //     ...baseConfigData.mois,
+    //     id: "monthlyChart",
+    //     chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
+    //     downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+    //     xTitle: 'Semaines',
+    //     xLabels: baseConfigData.mois.listColumns!,
+    // },
+    // "annee": {
+    //     ...baseConfigData.annee,
+    //     id: "yearlyChart",
+    //     chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
+    //     downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+    //     xTitle: 'Mois',
+    //     xLabels: baseConfigData.annee.listColumns!,
+    // }
 }
 
 const listCharts = Object.values(configData);
@@ -216,33 +216,44 @@ const listCharts = Object.values(configData);
 
         const req = await fetch(`/api?${apiQueryParams.toString()}`);
         const res = await req.json();
-
+        console.log(`/api?${apiQueryParams.toString()}`)
         const listVisitsGrouped = Object.groupBy(res.data as Visit[], (item) => {
             return item.groupe;
         });
 
-        let eventHours: { heure_fermeture?: number, heure_ouverture?: number } = {};
         let eventData: number[] = [];
+        let listEventsHours = [];
 
-        if (placeParam && apiKey === "jour") {
-            const reqEvent = await fetch(`/api/${placeParam}/evenements?${apiQueryParams.toString()}`);
+        if (placeParam) {
+            const reqEvent = await fetch(`/api/evenements/${placeParam}?${apiQueryParams.toString()}`);
             const resEvent = await reqEvent.json();
 
             if (resEvent.data) {
-                const [heure_ouverture_heure] = resEvent.data.heure_ouverture.split(":");
-                const [heure_fermeture_heure] = resEvent.data.heure_fermeture.split(":");
+                resEvent.data.forEach((item) => {
+                    const [heure_ouverture_heure] = item.heure_ouverture.split(":");
+                    const [heure_fermeture_heure] = item.heure_fermeture.split(":");
 
-                eventHours = { heure_ouverture: heure_ouverture_heure, heure_fermeture: heure_fermeture_heure }
+                    listEventsHours.push({
+                        date: item.date,
+                        groupe: item.groupe,
+                        heure_fermeture: Math.max(parseInt(heure_fermeture_heure), placeData.heure_fermeture),
+                        heure_ouverture: Math.min(parseInt(heure_ouverture_heure), placeData.heure_ouverture),
+                    })
+                });
+
                 eventData = new Array(xLabels.length).fill(0);
 
-                const maxHour = Math.max(parseInt(heure_fermeture_heure), placeData.heure_fermeture);
-                const minHour = Math.min(parseInt(heure_ouverture_heure), placeData.heure_ouverture)
-                const rangeOpeningHours = Math.abs(maxHour - minHour + 1);
-                xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + minHour).map((item) => String(item));
+                if (apiKey === "jour") {
+                    const { heure_fermeture = placeData.heure_fermeture, heure_ouverture = placeData.heure_ouverture} = listEventsHours?.[0] || {}
+                    const rangeOpeningHours = Math.abs(heure_fermeture - heure_ouverture + 1);
+                    xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + heure_ouverture).map((item) => String(item));
 
-                configData.jour = {
-                    ...configData.jour,
-                    xLabels,
+                    eventData = new Array(xLabels.length).fill(0);
+
+                    configData.jour = {
+                        ...configData.jour,
+                        xLabels,
+                    }
                 }
             }
         }
@@ -251,20 +262,43 @@ const listCharts = Object.values(configData);
 
         const regularData: number[] = new Array(xLabels.length).fill(0);
 
-        xLabels.forEach((key, idx) => {
-            if (typeof key === 'object') {
-                key = String((key as { name: string; id: number; }).id);
-            }
+        // xLabels.forEach((key, idx) => {
+        //     if (typeof key === 'object') {
+        //         key = String((key as { name: string; id: number; }).id);
+        //     }
 
-            const visitsForGroup = listVisitsGrouped[key];
-            if (visitsForGroup) {
-                if (Number(key) <= eventHours.heure_fermeture! && Number(key) >= eventHours.heure_ouverture!) {
-                    eventData[idx] = visitsForGroup.length;
-                } else {
-                    regularData[idx] = visitsForGroup.length;
+        //     const visitsForGroup = listVisitsGrouped[key];
+        //     if (visitsForGroup) {
+        //         if (Number(key) <= eventHours.heure_fermeture! && Number(key) >= eventHours.heure_ouverture!) {
+        //             eventData[idx] = visitsForGroup.length;
+        //         } else {
+        //             regularData[idx] = visitsForGroup.length;
+        //         }
+        //     }
+        // });
+
+        const getIndexForKey = (value: string): number => {
+            return xLabels.findIndex((item) => {
+                let labelKey = item;
+                if (typeof item === 'object') {
+                    labelKey = String((item as { name: string; id: number; }).id);
                 }
-            }
-        });
+
+                return labelKey === value;
+            })
+        }
+
+        Object.entries(listVisitsGrouped).forEach(([key, listVisits]) => {
+            const idx = getIndexForKey(key);
+
+            listVisits?.forEach((visit) => {
+                if (visit.liste_evenements === "/") {
+                    regularData[idx] += 1;
+                } else {
+                    eventData[idx] += 1;
+                }
+            })
+        })
 
         const chartLabels = xLabels.map((item) => {
             if (typeof item === 'object') {
@@ -318,13 +352,13 @@ const listCharts = Object.values(configData);
                                 family: "Calibri"
                             },
                             padding: {
-                                bottom: eventData.length > 0 ? 0 : 20
+                                bottom: eventData.filter(Boolean).some((item) => item !== 0) ? 0 : 20
                             },
                         },
                         tooltip: {
                             enabled: true,
                         },
-                        ...(eventData.length > 0 ? {
+                        ...(eventData.filter(Boolean).some((item) => item !== 0) ? {
                             legend: {
                                 display: true,
                                 labels: {
