@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize';
 import Place from './place';
 import Visit from './visit';
 import RegularOpening from './regular-opening';
-import SpecialOpening from './special-opening';
+import Event from './event';
 
 let databaseFileName = './database.tmp.sqlite';
 
@@ -28,7 +28,7 @@ try {
 Place.initModel(sequelize);
 Visit.initModel(sequelize);
 RegularOpening.initModel(sequelize);
-SpecialOpening.initModel(sequelize);
+Event.initModel(sequelize);
 
 sequelize.models.place.hasMany(sequelize.models.visit, {
     foreignKey: {
@@ -64,16 +64,16 @@ sequelize.models.regular_opening.belongsTo(sequelize.models.place, {
     as: 'place',
 });
 
-sequelize.models.place.belongsToMany(sequelize.models.special_opening, {
-    through: 'place_special-opening',
+sequelize.models.place.belongsToMany(sequelize.models.event, {
+    through: 'place_event',
     foreignKey: 'place_id',
-    otherKey: 'special_opening_id',
-    as: "specialOpening",
+    otherKey: 'event_id',
+    as: "event",
 });
 
-sequelize.models.special_opening.belongsToMany(sequelize.models.place, {
-    through: 'place_special-opening',
-    foreignKey: 'special_opening_id',
+sequelize.models.event.belongsToMany(sequelize.models.place, {
+    through: 'place_event',
+    foreignKey: 'event_id',
     otherKey: 'place_id',
     as: "listPlaces",
 });
@@ -87,4 +87,4 @@ if (process.env.NODE_ENV === "development") {
 
 export default sequelize;
 
-export { Place, Visit, RegularOpening, SpecialOpening }
+export { Place, Visit, RegularOpening, Event }

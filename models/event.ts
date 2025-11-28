@@ -2,7 +2,7 @@ import { slugify } from '#scripts/utils.ts';
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin, type BelongsToManyGetAssociationsMixin } from 'sequelize';
 import Place from './place';
 
-export default class SpecialOpening extends Model<InferAttributes<SpecialOpening>, InferCreationAttributes<SpecialOpening>> {
+export default class Event extends Model<InferAttributes<Event>, InferCreationAttributes<Event>> {
     declare id: CreationOptional<number>;
     declare nom: string;
     declare description: string;
@@ -16,7 +16,7 @@ export default class SpecialOpening extends Model<InferAttributes<SpecialOpening
     declare getListPlaces: BelongsToManyGetAssociationsMixin<Place>;
 
     static initModel(sequelize: Sequelize) {
-        SpecialOpening.init(
+        Event.init(
             {
                 id: {
                     type: DataTypes.INTEGER,
@@ -53,7 +53,7 @@ export default class SpecialOpening extends Model<InferAttributes<SpecialOpening
                 sequelize,
                 updatedAt: false,
                 createdAt: false,
-                modelName: 'special_opening',
+                modelName: 'event',
                 underscored: true,
                 hooks: {
                     beforeValidate(record) {

@@ -15,7 +15,7 @@ import {
 } from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import type SpecialOpening from "#models/special-opening.ts";
+import type EventModel from "#models/event.ts";
 import type { PlaceRaw } from "#types";
 import type Visit from "#models/visit.ts";
 import { TotalVisitors } from "./utils";
@@ -57,29 +57,29 @@ modal?.addEventListener("toggle", async (e: Event) => {
     if (isOpened) {
         listPlacesContainer.innerHTML = "";
         const sourceItem = toggleEvent.source! as HTMLButtonElement;
-        const specialOpeningData = JSON.parse(
-            sourceItem.dataset.specialOpeningData!
-        ) as SpecialOpening;
+        const eventData = JSON.parse(
+            sourceItem.dataset.eventData!
+        ) as EventModel;
 
-        name.textContent = specialOpeningData.nom;
+        name.textContent = eventData.nom;
         description.textContent = "";
-        description.textContent = specialOpeningData.description;
+        description.textContent = eventData.description;
 
-        specialOpeningData.listPlaces.forEach((item: PlaceRaw) => {
+        eventData.listPlaces.forEach((item: PlaceRaw) => {
             const li = document.createElement("li");
             li.textContent = item.nom;
 
             listPlacesContainer.append(li);
         });
 
-        openingDateTime.dateTime = String(specialOpeningData.date);
+        openingDateTime.dateTime = String(eventData.date);
         const [heure_ouverture_heure, heure_ouverture_minutes] =
-            specialOpeningData.heure_ouverture.split(":");
+            eventData.heure_ouverture.split(":");
         const [heure_fermeture_heure, heure_fermeture_minutes] =
-            specialOpeningData.heure_fermeture.split(":");
+            eventData.heure_fermeture.split(":");
 
         const date = DateTime.fromJSDate(
-            new Date(specialOpeningData.date)
+            new Date(eventData.date)
         ).toFormat("dd/LL/yyyy", { locale: "fr" });
 
         openingDateTime.textContent = `${date} de ${heure_ouverture_heure}h${heure_ouverture_minutes} à ${heure_fermeture_heure}h${heure_fermeture_minutes}`;
@@ -95,7 +95,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
         ).map((item) => String(item));
 
         const req = await fetch(
-            `api/evenements/${specialOpeningData.id}`
+            `api/evenements/${eventData.id}`
         );
         const res = await req.json();
         const allVisits = res.data.listPlaces
@@ -112,7 +112,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
         );
 
         ;(modal.querySelector("[data-download-chart]") as HTMLButtonElement)!.dataset.chartData = JSON.stringify({
-            nom: `Évènement(s) : ${specialOpeningData.listPlaces.map((item) => item.nom).join(", ")}`
+            nom: `Évènement(s) : ${eventData.listPlaces.map((item) => item.nom).join(", ")}`
         });
 
         const chartData = xLabels.map((item) => {
@@ -143,7 +143,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                 maintainAspectRatio: false,
                 plugins: {
                     title: {
-                        text: `Visites uniques ${specialOpeningData.nom}`,
+                        text: `Visites uniques ${eventData.nom}`,
                         display: true,
                         color: greenNumixs,
                         font: {
@@ -162,7 +162,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                     },
                     subtitle: {
                         display: true,
-                        text: `(${DateTime.fromISO(String(specialOpeningData.date)).toFormat("dd/LL/yyyy")})`,
+                        text: `(${DateTime.fromISO(String(eventData.date)).toFormat("dd/LL/yyyy")})`,
                         color: "white",
                         font: {
                             size: 16,

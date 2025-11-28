@@ -2,7 +2,7 @@ import express from "express";
 import { DateTime } from "luxon";
 import { Op } from 'sequelize';
 
-import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, SpecialOpening as SpecialOpeningModel } from "#models/index.ts";
+import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel } from "#models/index.ts";
 import { CommonRegularOpening } from "#types";
 import { DEFAULT_CLOSED_DAYS } from "./admin";
 
@@ -52,7 +52,7 @@ router.get("/", async (req, res) => {
     }
 
     try {
-        const specialOpeningTable = SpecialOpeningModel.getTableName();
+        const eventTable = EventModel.getTableName();
         const visitTable = VisitModel.getTableName();
         const listVisits = await VisitModel.findAll({
             raw: true,
@@ -68,10 +68,10 @@ router.get("/", async (req, res) => {
                         COALESCE(
                             (
                                 SELECT GROUP_CONCAT(DISTINCT so.nom)
-                                FROM ${specialOpeningTable} AS so
-                                INNER JOIN "place_special-opening" f
+                                FROM ${eventTable} AS so
+                                INNER JOIN "place_event" f
                                     ON f.place_id = ${visitTable}.lieu_id
-                                    AND f.special_opening_id = so.id
+                                    AND f.event_id = so.id
                                 WHERE strftime("%Y-%m-%d", so.date, 'localtime') = strftime("%Y-%m-%d", ${visitTable}.date_passage, 'localtime')
                                 AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
                                 AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
@@ -114,7 +114,7 @@ router.get("/", async (req, res) => {
                                         )`),
                                         sequelize.literal(`(
                                             SELECT 1
-                                            FROM ${specialOpeningTable} AS so
+                                            FROM ${eventTable} AS so
                                             WHERE so.date = strftime("%Y-%m-%d", ${visitTable}.date_passage, 'localtime')
                                             AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
                                             AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
@@ -237,8 +237,8 @@ router.get("/evenements", async (req, res) => {
         const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day");
         const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day");
 
-        const table = SpecialOpeningModel.getTableName();
-        const listSpecialOpenings = await SpecialOpeningModel.findAll({
+        const table = EventModel.getTableName();
+        const listEvents = await EventModel.findAll({
             attributes: {
                 include: [
                     [sequelize.fn("trim",
@@ -287,9 +287,9 @@ router.get("/evenements", async (req, res) => {
             raw: true,
         });
 
-        if (listSpecialOpenings) {
+        if (listEvents) {
             return res.status(200).json({
-                data: listSpecialOpenings
+                data: listEvents
             })
         }
         return res.status(404).json([])
@@ -299,16 +299,16 @@ router.get("/evenements", async (req, res) => {
     }
 })
 
-router.get("/evenements/:special_opening{/:place}", async (req, res) => {
+router.get("/evenements/:event{/:place}", async (req, res) => {
     try {
-        const table = SpecialOpeningModel.getTableName();
+        const table = EventModel.getTableName();
         const place = String(req.params.place || "");
-        const specialOpening = await SpecialOpeningModel.findByPk(String(req.params.special_opening), {
+        const event = await EventModel.findByPk(String(req.params.event), {
             include: [{
                 model: PlaceModel,
                 as: "listPlaces",
                 attributes: {
-                    exclude: ["adresse", "slug", "ouvert", "id", "description", "date_creation", "place_special-opening.date_creation"]
+                    exclude: ["adresse", "slug", "ouvert", "id", "description", "date_creation", "place_event.date_creation"]
                 },
                 ...(place ? { where: { id: place } } : {}),
                 include: [{
@@ -338,9 +338,9 @@ router.get("/evenements/:special_opening{/:place}", async (req, res) => {
             }]
         })
 
-        if (specialOpening) {
+        if (event) {
             return res.status(200).json({
-                data: specialOpening.toJSON()
+                data: event.toJSON()
             })
         }
         return res.status(404).json({})

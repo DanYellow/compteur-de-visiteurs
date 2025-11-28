@@ -5,7 +5,7 @@ import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#script
 import PlaceRouter from "#server/router/admin/place.ts";
 import EventRouter from "#server/router/admin/event.ts";
 import { CommonRegularOpening, PlaceRaw, Visit } from "#types";
-import { Place as PlaceModel, RegularOpening as RegularOpeningModel, SpecialOpening } from "#models/index.ts";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index.ts";
 import { Op } from "sequelize";
 
 export const DEFAULT_CLOSED_DAYS = ["1", "6", "7"];
@@ -90,8 +90,8 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     if (placeSelected !== "tous") {
         place = await PlaceModel.findOne({ where: { slug: placeSelected }, include: [
             {
-                model: SpecialOpening,
-                as: "specialOpening",
+                model: EventModel,
+                as: "listEvents",
                 attributes: {
                     include: ["nom", "heure_ouverture", "heure_fermeture"]
                 },

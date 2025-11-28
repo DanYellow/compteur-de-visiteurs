@@ -97,7 +97,7 @@ export const PlaceSchema = z.object({
 })
 
 
-export const SpecialOpeningSchema = z.object({
+export const EventSchema = z.object({
     nom: z.string().min(1, {
         error: `Nom : ${REQUIRED_MESSAGE}`
     }),
