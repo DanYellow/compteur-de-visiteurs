@@ -1,7 +1,7 @@
 import type { Align, LineControllerDatasetOptions, TitleOptions } from "chart.js";
 import type { InferAttributes } from "sequelize";
 
-import type { Place as PlaceModel } from "#models/index.ts";
+import type { Place as PlaceModel, Visit as VisitModel } from "#models/index.ts";
 
 export type LineChartEntry = {
     data: Number[];
@@ -31,9 +31,10 @@ export interface PivotTableOptions {
     columnSuffix: string;
 }
 
-export type Visit = Record<string, string> & {
+export type VisitRaw = InferAttributes<VisitModel> & {
     id: number;
     heure?: number;
+    lieu?: string;
     date_passage: string;
     groupe: string;
 }
@@ -47,6 +48,11 @@ export type PlaceRaw = InferAttributes<PlaceModel> & {
     }
 };
 
+export type Place_Visits = InferAttributes<PlaceModel> & {
+    listVisits: VisitRaw[];
+};
+
+
 export type CommonRegularOpening = {
     jours_fermeture: string[] | string;
     heure_ouverture: string;
@@ -54,13 +60,13 @@ export type CommonRegularOpening = {
     jours_fermeture_litteral?: string;
 }
 
-export type CSVLinearHeader = Omit<Visit, 'id'> & {
+export type CSVLinearHeader = Omit<VisitRaw, 'id'> & {
     id: string;
     groupe?: string;
 }
 
 export interface GroupVisit {
-    [key: number]: Visit[];
+    [key: number]: VisitRaw[];
 }
 
 export interface BaseConfigData {

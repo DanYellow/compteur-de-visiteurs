@@ -13,7 +13,7 @@
         <p class="p-4 bg-amber-50 text-amber-800 border-t-4 border-t-amber-800 mb-4">Le lieu définit n'est pas ouvert aujourd'hui. Les visites ne seront pas enregistrées</p>
         {% endif %}
         {% if flash_message.set_place %}
-        <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4">Le lieu "{{ place.nom }}" a été sélectionné. Toutes les visites seront enregistrées comme appartenant au lieu "{{ place.nom }}" depuis cet appareil. <a href="/" class="underline hocus:no-underline">Accéder au formulaire.</a></p>
+        <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4">Le lieu <span class="font-bold">"{{ place.nom }}"</span> a été sélectionné. Toutes les visites seront enregistrées comme appartenant au lieu <span class="font-bold">"{{ place.nom }}"</span> depuis cet appareil. <a href="/" class="underline hocus:no-underline">Accéder au formulaire.</a></p>
         {% endif %}
         {% if flash_message.not_found_place %}
         <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Le lieu sélectionné n'a pas été trouvé ou est fermé. Veuillez sélectionner un autre lieu.</p>

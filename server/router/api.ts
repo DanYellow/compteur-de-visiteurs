@@ -321,6 +321,9 @@ router.get("/evenements/:event{/:place}", async (req, res) => {
                 attributes: {
                     exclude: ["adresse", "slug", "ouvert", "id", "description", "date_creation", "place_event.date_creation"]
                 },
+                through: {
+                    attributes: [],
+                },
                 ...(place ? { where: { id: place } } : {}),
                 include: [{
                     model: VisitModel,

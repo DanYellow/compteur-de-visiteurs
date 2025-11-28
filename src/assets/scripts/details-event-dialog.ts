@@ -11,13 +11,14 @@ import {
     PointElement,
     Tooltip,
     SubTitle,
+    Legend,
     type ScriptableScaleContext,
+    type ChartDataset,
 } from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import type EventModel from "#models/event.ts";
-import type { PlaceRaw } from "#types";
-import type Visit from "#models/visit.ts";
+import type { Place_Visits, PlaceRaw, VisitRaw } from "#types";
 import { TotalVisitors } from "./utils";
 
 Chart.register(
@@ -31,12 +32,19 @@ Chart.register(
     LineElement,
     PointElement,
     SubTitle,
-    ChartDataLabels
+    ChartDataLabels,
+    Legend,
 );
 
 const greenNumixs = window
     .getComputedStyle(document.body)
     .getPropertyValue("--color-green-numixs");
+
+const listBarChartColors = [
+    greenNumixs,
+    "white",
+    "orange",
+]
 
 const modal = document.getElementById(
     "detail-event"
@@ -98,46 +106,59 @@ modal?.addEventListener("toggle", async (e: Event) => {
             `api/evenements/${eventData.id}`
         );
         const res = await req.json();
+
         const allVisits = res.data.listPlaces
-            .reduce((accumulator: Visit[], currentPlace) => {
-                return [...accumulator, currentPlace.listVisits];
+            .reduce((accumulator: Place_Visits[], currentPlace: Place_Visits) => {
+                return [...accumulator, currentPlace.listVisits.map((item: VisitRaw) => ({ ...item, lieu: currentPlace.nom }))];
             }, [])
             .flat();
 
-        const listVisitsGlobal = Object.groupBy(
-            allVisits as Visit[],
+        const listVisitsPerPlace = Object.groupBy(
+            allVisits as VisitRaw[],
             (item) => {
-                return item.groupe;
+                return item.lieu!;
             }
         );
 
-        ;(modal.querySelector("[data-download-chart]") as HTMLButtonElement)!.dataset.chartData = JSON.stringify({
-            nom: `Évènement(s) : ${eventData.listPlaces.map((item) => item.nom).join(", ")}`
+        const chartData: ChartDataset[] = []
+
+        Object.entries(listVisitsPerPlace).forEach(([key, listVisits], idx) => {
+            const groupedVisits = Object.groupBy(
+                listVisits as VisitRaw[],
+                (item) => {
+                    return item.groupe;
+                }
+            );
+
+            const data = xLabels.map((item) => {
+                let key = item;
+
+                if (groupedVisits[key]) {
+                    const visitsForGroup = groupedVisits[key];
+                    return visitsForGroup?.length;
+                }
+                return 0;
+            });
+
+            const color = listBarChartColors[idx % listBarChartColors.length]
+            chartData.push({
+                label: key,
+                data: data,
+                backgroundColor: `rgb(from ${color} r g b / 50%)`,
+                borderColor: color,
+                borderWidth: 1.5,
+            })
         });
 
-        const chartData = xLabels.map((item) => {
-            let key = item;
-
-            if (listVisitsGlobal[key]) {
-                const visitsForGroup = listVisitsGlobal[key];
-                return visitsForGroup?.length;
-            }
-            return 0;
+        ; (modal.querySelector("[data-download-chart]") as HTMLButtonElement)!.dataset.chartData = JSON.stringify({
+            nom: `Lieux(x) : ${eventData.listPlaces.map((item: PlaceRaw) => item.nom).join(", ")}`
         });
 
         new Chart(globalChart, {
             type: "bar",
             data: {
                 labels: xLabels.map((item) => `${item}h`),
-                datasets: [
-                    {
-                        label: "Visites uniques",
-                        data: chartData,
-                        backgroundColor: `rgba(213, 217, 22, 0.5)`,
-                        borderColor: greenNumixs,
-                        borderWidth: 1.5,
-                    },
-                ],
+                datasets: chartData,
             },
             options: {
                 maintainAspectRatio: false,
@@ -170,10 +191,28 @@ modal?.addEventListener("toggle", async (e: Event) => {
                             weight: 'normal',
                             family: "Calibri"
                         },
-                        padding: {
-                            bottom: 10
-                        },
+
                     },
+                    ...(chartData.length ? {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#FFF',
+                            },
+                            title: {
+                                display: true,
+                                text: "Lieux",
+                                color: '#FFF',
+                                padding: {
+                                    bottom: 0
+                                },
+                            }
+                        }
+                    } : {
+                        legend: {
+                            display: false,
+                        }
+                    }),
                     datalabels: {
                         font: {
                             size: 0
@@ -207,8 +246,10 @@ modal?.addEventListener("toggle", async (e: Event) => {
                             },
                         },
                         beginAtZero: true,
+                        stacked: true,
                     },
                     x: {
+                        stacked: true,
                         ticks: {
                             color: "white",
                             font: {
