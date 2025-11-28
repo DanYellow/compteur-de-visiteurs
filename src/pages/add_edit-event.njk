@@ -2,7 +2,7 @@
 
 {% block title %}
     {% if is_edit %}
-Éditer évènement "{{ special_opening.nom }}"
+Éditer évènement "{{ event.nom }}"
 {% else %}
 Créer évènement
 {% endif %}
@@ -28,7 +28,7 @@ Créer évènement
             <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
                 <h1 class="text-black-numixs title-font font-bold text-4xl md:text-6xl">
                     {% if is_edit %}
-                    Éditer évènement "{{ special_opening.nom }}"
+                    Éditer évènement "{{ event.nom }}"
                     {% else %}
                     Créer évènement
                     {% endif %}
@@ -45,15 +45,15 @@ Créer évènement
                     <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800">Les champs avec * sont obligatoires</p>
                     <div class="flex flex-col">
                         <label for="nom" class="font-bold text-lg">Nom*</label>
-                        <input type="text" id="nom" name="nom" value="{{ special_opening.nom }}">
+                        <input type="text" id="nom" name="nom" value="{{ event.nom }}">
                     </div>
                     <div class="flex flex-col">
                         <label for="description" class="font-bold text-lg">Description</label>
-                        <textarea name="description" id="description">{{ special_opening.description }}</textarea>
+                        <textarea name="description" id="description">{{ event.description }}</textarea>
                     </div>
                     <div class="flex flex-col">
                         <label for="date" class="font-bold text-lg">Date</label>
-                        <input type="date" value="{{ special_opening.date }}" name="date" id="date">
+                        <input type="date" value="{{ event.date }}" name="date" id="date">
                     </div>
                     <div class="flex flex-col">
                         <p class="font-bold text-lg">Horaires</p>
@@ -61,14 +61,14 @@ Créer évènement
                             <div class="flex flex-col">
                                 <p>Ouverture</p>
                                 <div class="flex flex-row gap-1">
-                                    <select name="heure_ouverture_heure" value="{{ special_opening.heure_ouverture_heure }}" id="heure_ouverture_heure">
+                                    <select name="heure_ouverture_heure" value="{{ event.heure_ouverture_heure }}" id="heure_ouverture_heure">
                                         {% for i in range(6, 24) %}
-                                            <option {{ "selected" if special_opening.heure_ouverture_heure == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
+                                            <option {{ "selected" if event.heure_ouverture_heure == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
                                         {% endfor %}
                                     </select>
-                                    <select name="heure_ouverture_minutes" value="{{ special_opening.heure_ouverture_minutes }}" id="heure_ouverture_minutes">
+                                    <select name="heure_ouverture_minutes" value="{{ event.heure_ouverture_minutes }}" id="heure_ouverture_minutes">
                                         {% for i in range(0, 60) %}
-                                            <option {{ "selected" if special_opening.heure_ouverture_minutes == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}</option>
+                                            <option {{ "selected" if event.heure_ouverture_minutes == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -76,14 +76,14 @@ Créer évènement
                             <div class="flex flex-col">
                                 <p>Fermeture</p>
                                 <div class="flex flex-row gap-1">
-                                    <select name="heure_fermeture_heure" value="{{ special_opening.heure_fermeture_heure }}" id="heure_fermeture_heure">
+                                    <select name="heure_fermeture_heure" value="{{ event.heure_fermeture_heure }}" id="heure_fermeture_heure">
                                         {% for i in range(6, 24) %}
-                                            <option {{ "selected" if special_opening.heure_fermeture_heure == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
+                                            <option {{ "selected" if event.heure_fermeture_heure == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}h</option>
                                         {% endfor %}
                                     </select>
-                                    <select name="heure_fermeture_minutes" value="{{ special_opening.heure_fermeture_minutes }}" id="heure_fermeture_minutes">
+                                    <select name="heure_fermeture_minutes" value="{{ event.heure_fermeture_minutes }}" id="heure_fermeture_minutes">
                                         {% for i in range(0, 60) %}
-                                            <option {{ "selected" if special_opening.heure_fermeture_minutes == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}</option>
+                                            <option {{ "selected" if event.heure_fermeture_minutes == i else "" }} value="{{ i|pad("0", 2) }}">{{ i|pad("0", 2) }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -95,19 +95,19 @@ Créer évènement
                         <div class="flex flex-row gap-5">
                             <div>
                                 <label for="oui">Oui</label>
-                                <input type="radio" name="ouvert" {{ "checked" if special_opening.ouvert == 1 else "" }} value="1" id="oui">
+                                <input type="radio" name="ouvert" {{ "checked" if event.ouvert == 1 else "" }} value="1" id="oui">
                             </div>
                             <div>
                                 <label for="non">Non</label>
-                                <input type="radio" name="ouvert" {{ "checked" if special_opening.ouvert == 0 else "" }} value="0" id="non">
+                                <input type="radio" name="ouvert" {{ "checked" if event.ouvert == 0 else "" }} value="0" id="non">
                             </div>
                         </div>
                     </div> #}
                     <div class="flex flex-col">
-                        <label for="places" class="font-bold text-lg">Lieux concernés*</label>
+                        <label for="places" class="font-bold text-lg">Lieux concernés</label>
                         <select id="places" name="lieux" multiple>
                             {% for place in list_places %}
-                                <option {{ "selected" if special_opening.list_places_id.includes(place.id) else "" }} value="{{ place.id }}">{{ place.nom }}</option>
+                                <option {{ "selected" if event.list_places_id.includes(place.id) else "" }} value="{{ place.id }}">{{ place.nom }}</option>
                             {% endfor %}
                         </select>
                     </div>

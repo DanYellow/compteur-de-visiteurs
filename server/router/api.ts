@@ -279,6 +279,12 @@ router.get("/evenements", async (req, res) => {
                     through: {
                         attributes: [],
                     },
+                    include: [{
+                        model: VisitModel,
+                        required: true,
+                        as: 'listVisits',
+                        attributes: [],
+                    }]
                 },
             ],
             where: {

@@ -109,7 +109,7 @@ export const EventSchema = z.object({
     date: z.iso.date({
         error: `Lieux concernés : ${REQUIRED_MESSAGE}`
     }),
-    lieux: z.string(),
+    lieux: z.string().optional(),
 
 }).refine(data => {
     const timeOpen = new Date();
@@ -125,10 +125,4 @@ export const EventSchema = z.object({
     error: "Horaires : L'heure d'ouverture doit être inférieure à celle de fermeture",
     path: ['heure_ouverture_heure', 'heure_ouverture_minutes', 'heure_fermeture_heure', 'heure_fermeture_minutes']
 })
-.refine(data => {
-    const closedDays = JSON.parse(data.lieux || "[]")
-    return closedDays?.length >= 1;
-}, {
-    error: `Lieux concernés : ${REQUIRED_MESSAGE}`,
-    path: ['lieux']
-})
+

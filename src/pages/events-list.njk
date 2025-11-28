@@ -65,6 +65,7 @@ Liste des évènements
                                         {{ special_opening.heure_ouverture|date("HH'h'mm") }}-{{ special_opening.heure_fermeture|date("HH'h'mm") }}
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                        {% if special_opening.listPlaces|length %}
                                         {% set offset = 1 %}
                                         {% for place in special_opening.listPlaces %}
                                             {% if loop.index0 < offset %}
@@ -76,8 +77,9 @@ Liste des évènements
                                         {% endfor %}
                                         {% if special_opening.listPlaces|length - offset > 0 %}
                                         +{{ special_opening.listPlaces|length - offset }}
+                                        {% endif %}
                                         {% else %}
-                                            /
+                                        /
                                         {% endif %}
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">

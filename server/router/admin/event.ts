@@ -40,7 +40,7 @@ router.get(['/evenement', '/evenement/:eventId'], async (req, res) => {
     let event = null;
     if (req.params.eventId) {
         event = await EventModel.findByPk(req.params.eventId, {
-            include: [{ model: PlaceModel, as: "listPlaces", required: true, order: [["nom", "ASC"]] }]
+            include: [{ model: PlaceModel, as: "listPlaces", required: false, order: [["nom", "ASC"]] }]
         });
         if (event) {
             event = event.toJSON();
@@ -60,7 +60,7 @@ router.get(['/evenement', '/evenement/:eventId'], async (req, res) => {
     }
 
     res.render("pages/add_edit-event.njk", {
-        special_opening: {
+        event: {
             ouvert: 1,
             list_places_id: [],
             date: (DateTime.now()).toFormat("yyyy-LL-dd"),
