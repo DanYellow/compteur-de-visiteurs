@@ -4,13 +4,13 @@ import { Info } from "luxon";
 import { capitalizeFirstLetter } from '#scripts/utils.shared.ts';
 import { PlaceSchema } from "#scripts/schemas.ts";
 import { slugify } from "#scripts/utils.ts";
-import { DEFAULT_CLOSED_DAYS } from "#server/router/admin.ts";
+import { DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
 import { PlaceRaw } from "#types";
 
 const router = express.Router();
 
-// const base = "auteurs";
+const NUMBER_REGEX = /^\d+$/;
 
 router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
     let place = null
@@ -46,7 +46,11 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
         not_found: req.params.placeId && !place,
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
-}).post(['/lieu', '/lieu/:placeId'], async (req, res) => {
+}).post(['/lieu', '/lieu/:placeId'], async (req, res, next) => {
+    if ("placeId" in req.params && !NUMBER_REGEX.test(req.params.placeId)) {
+        return next();
+    }
+
     let payload = {
         ...req.body,
         jours_fermeture: JSON.stringify(req.body.jours_fermeture || [])
@@ -116,6 +120,21 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
         console.log(e)
         return res.render("pages/add_edit-place.njk");
     }
+}).post(['/lieu/suppression'], async (req, res) => {
+    try {
+        const placeToDestroy = await PlaceModel.findByPk(req.body.id)
+        if (placeToDestroy) {
+            await placeToDestroy.setListEvents([])
+            await placeToDestroy.destroy()
+
+            res.cookie('flash_message', "delete_success", { maxAge: 1000, httpOnly: true });
+        }
+    } catch (error) {
+        console.log(error)
+        res.cookie('flash_message', "delete_error", { maxAge: 1000, httpOnly: true });
+    }
+
+    res.redirect('/lieux');
 })
 
 router.get(['/lieux'], async (req, res) => {
@@ -152,19 +171,6 @@ router.get(['/lieux'], async (req, res) => {
         places_list: listPlacesComputed,
         flash_message: req.cookies.flash_message,
     });
-}).post(['/lieux/suppression'], async (req, res) => {
-    try {
-        await PlaceModel.destroy({
-            where: {
-                id: req.body.id,
-            },
-        })
-        res.cookie('flash_message', "delete_success", { maxAge: 1000, httpOnly: true });
-    } catch (error) {
-        res.cookie('flash_message', "delete_error", { maxAge: 1000, httpOnly: true });
-    }
-
-    res.redirect('/lieux');
 })
 
 export default router;

@@ -89,7 +89,7 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                         {% for business in list_business_sector %}
                             <div class="flex flex-col flex-auto">
                                 <p class="h-8">{{ business.name }}</p>
-                                <p class="text-xl place-content-end -mt-4">{{ visitors_summary[business.value] }}</p>
+                                <p class="text-xl place-content-end -mt-4">{{ visits_summary[business.value] }}</p>
                             </div>
                         {% endfor %}
                     </div>
@@ -98,9 +98,9 @@ Liste des visiteurs le {{ current_date|date("EEEE dd LLLL yyyy") }}
                 <div class="p-3 rounded-md border-solid border-black-numixs border mb-3">
                     <h2 class="title-font font-bold text-2xl">{{ place.nom }}</h2>
                     <p>Horaires réguliers : {{ place.heure_ouverture|date("HH'h'mm") }}-{{ place.heure_fermeture|date("HH'h'mm") }}</p>
-                    {% if place.event %}
+                    {% if place.listEvents %}
                     <p>Évènement(s) du jour :
-                        {% for event in place.event %}
+                        {% for event in place.listEvents %}
                             {{ event.nom }} - {{ event.heure_ouverture|date("HH'h'mm") }}-{{ event.heure_fermeture|date("HH'h'mm") }}{% if loop.last == false %}, {% endif %}
                         {% endfor %}
                     </p>

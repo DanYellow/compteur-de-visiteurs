@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type HasOneGetAssociationMixin, type HasOneCreateAssociationMixin, type BelongsToManyAddAssociationMixin, type BelongsToManyGetAssociationsMixin, type BelongsToManyAddAssociationsMixin } from 'sequelize';
+import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type HasOneGetAssociationMixin, type HasOneCreateAssociationMixin, type BelongsToManyAddAssociationMixin, type BelongsToManyGetAssociationsMixin, type BelongsToManyAddAssociationsMixin, type BelongsToManySetAssociationsMixin } from 'sequelize';
 import { RegularOpening, Event } from '.';
 
 export default class Place extends Model<InferAttributes<Place>, InferCreationAttributes<Place>> {
@@ -15,6 +15,7 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
 
     declare addEvent: BelongsToManyAddAssociationMixin<Event, number>;
     declare addListEvents: BelongsToManyAddAssociationsMixin<Event, number>;
+    declare setListEvents: BelongsToManySetAssociationsMixin<Event, number>;
 
     declare getEvent: BelongsToManyGetAssociationsMixin<Event>;
 

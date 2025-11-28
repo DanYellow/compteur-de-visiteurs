@@ -1,4 +1,5 @@
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type ForeignKey } from 'sequelize';
+import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
 
 export default class RegularOpening extends Model<InferAttributes<RegularOpening>, InferCreationAttributes<RegularOpening>> {
     declare id: CreationOptional<number>;
@@ -17,15 +18,15 @@ export default class RegularOpening extends Model<InferAttributes<RegularOpening
                 },
                 jours_fermeture: {
                     type: DataTypes.JSON,
-                    defaultValue: [],
+                    defaultValue: DEFAULT_CLOSED_DAYS,
                 },
                 heure_ouverture: {
                     type: DataTypes.TIME,
-                    defaultValue: '10:00:00',
+                    defaultValue: DEFAULT_OPEN_HOURS,
                 },
                 heure_fermeture: {
                     type: DataTypes.TIME,
-                    defaultValue: '20:00:00',
+                    defaultValue: DEFAULT_CLOSE_HOURS,
                     validate: {
                         isGreaterThanOtherField(value: number) {
                             if (Number(value) <= Number(this.heure_ouverture)) {

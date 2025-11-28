@@ -15,7 +15,7 @@ Liste des évènements
     {% endif %}
 {% endblock %}
 
-{% set active_menu_item = "evenements" %}
+{% set active_menu_item = "evenement" %}
 {% set place_selected = place.slug or "tous" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
@@ -76,6 +76,8 @@ Liste des évènements
                                         {% endfor %}
                                         {% if special_opening.listPlaces|length - offset > 0 %}
                                         +{{ special_opening.listPlaces|length - offset }}
+                                        {% else %}
+                                            /
                                         {% endif %}
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">

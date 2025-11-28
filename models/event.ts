@@ -1,4 +1,5 @@
 import { slugify } from '#scripts/utils.ts';
+import { DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin, type BelongsToManyGetAssociationsMixin } from 'sequelize';
 import Place from './place';
 
@@ -35,11 +36,11 @@ export default class Event extends Model<InferAttributes<Event>, InferCreationAt
                 },
                 heure_ouverture: {
                     type: DataTypes.TIME,
-                    defaultValue: '10:00:00'
+                    defaultValue: DEFAULT_OPEN_HOURS
                 },
                 heure_fermeture: {
                     type: DataTypes.TIME,
-                    defaultValue: '20:00:00',
+                    defaultValue: DEFAULT_CLOSE_HOURS,
                     validate: {
                         isGreaterThanOtherField(value: number) {
                             if (Number(value) <= Number(this.heure_ouverture)) {

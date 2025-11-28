@@ -7,7 +7,7 @@
 Créer évènement
 {% endif %}
 {% endblock %}
-
+{% set active_menu_item = "evenement" %}
 {% import "includes/macros.njk" as forms %}
 
 {% block scripts %}
@@ -18,7 +18,6 @@ Créer évènement
     {% endif %}
 {% endblock %}
 
-{% set active_menu_item = "exceptionnel" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
 {% block content %}

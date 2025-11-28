@@ -21,7 +21,7 @@ router.get(['/evenements'], async (req, res) => {
                 }
             }: {})
         },
-        include: [{ model: PlaceModel, as: "listPlaces", required: true, }],
+        include: [{ model: PlaceModel, as: "listPlaces", required: false, }],
     });
 
     res.render("pages/events-list.njk", {
@@ -59,7 +59,7 @@ router.get(['/evenement', '/evenement/:eventId'], async (req, res) => {
         }
     }
 
-    res.render("pages/add_edit-special-opening.njk", {
+    res.render("pages/add_edit-event.njk", {
         special_opening: {
             ouvert: 1,
             list_places_id: [],
@@ -120,17 +120,19 @@ router.get(['/evenement', '/evenement/:eventId'], async (req, res) => {
                 heure_fermeture: `${heure_fermeture_heure}:${heure_fermeture_minutes}:00`,
             });
 
-            const listPlaces = await PlaceModel.findAll({
-                where: {
-                    id: {
-                        [Op.in]: listPlacesId.filter(Boolean).map(Number)
-                    }
-                }
-            })
+            await event.setListPlaces(listPlacesId);
 
-            for (const place of listPlaces) {
-                await place.addEvent(event);
-            }
+            // const listPlaces = await PlaceModel.findAll({
+            //     where: {
+            //         id: {
+            //             [Op.in]: listPlacesId.filter(Boolean).map(Number)
+            //         }
+            //     }
+            // })
+
+            // for (const place of listPlaces) {
+            //     await place.addEvent(event);
+            // }
             res.cookie('flash_message', "create_success", { maxAge: 1000, httpOnly: true })
         }
         res.redirect('/evenements');
@@ -138,7 +140,7 @@ router.get(['/evenement', '/evenement/:eventId'], async (req, res) => {
         res.cookie('flash_message', "error", { maxAge: 1000, httpOnly: true })
 
         console.log(e);
-        return res.render("pages/add_edit-special-opening.njk");
+        return res.render("pages/add_edit-event.njk");
     }
 })
 

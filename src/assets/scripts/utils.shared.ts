@@ -239,3 +239,7 @@ export const baseConfigData: BaseConfigData = {
 export const capitalizeFirstLetter = (val: unknown) => {
     return String(val).charAt(0).toUpperCase() + String(val).slice(1);
 }
+
+export const DEFAULT_CLOSED_DAYS = ["1", "6", "7"];
+export const DEFAULT_OPEN_HOURS = "10:00:00";
+export const DEFAULT_CLOSE_HOURS = "19:30:00";

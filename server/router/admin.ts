@@ -8,7 +8,7 @@ import { CommonRegularOpening, PlaceRaw, Visit } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index.ts";
 import { Op } from "sequelize";
 
-export const DEFAULT_CLOSED_DAYS = ["1", "6", "7"];
+import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
 
 const router = express.Router();
 
@@ -88,21 +88,30 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     let regularOpening = {};
 
     if (placeSelected !== "tous") {
-        place = await PlaceModel.findOne({ where: { slug: placeSelected }, include: [
-            {
-                model: EventModel,
-                as: "listEvents",
-                attributes: {
-                    include: ["nom", "heure_ouverture", "heure_fermeture"]
-                },
-                required: false,
-                where: {
-                    date: {
-                        [Op.eq]: daySelected.toFormat("yyyy-LL-dd")
-                    }
+        place = await PlaceModel.findOne({
+            where: { slug: placeSelected },
+            include: [
+                {
+                    model: EventModel,
+                    as: "listEvents",
+                    attributes: {
+                        include: ["nom", "heure_ouverture", "heure_fermeture"]
+                    },
+                    required: false,
+                    where: {
+                        date: {
+                            [Op.eq]: daySelected.toFormat("yyyy-LL-dd")
+                        }
+                    },
+                    through: {
+                        attributes: [],
+                    },
                 }
+            ],
+            attributes: {
+                exclude: ["date_creation", "place_id"]
             }
-        ] })
+        })
 
         if (place) {
             let _regularOpening = await place.getRegularOpening();
@@ -115,7 +124,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         }
     } else {
         const openingHoursLimitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/lieux`);
-        regularOpening = (await openingHoursLimitsReq.json()).data || { heure_ouverture: "10:00:00", heure_fermeture: "19:30:00", jours_fermeture: DEFAULT_CLOSED_DAYS };
+        regularOpening = (await openingHoursLimitsReq.json()).data || { heure_ouverture: DEFAULT_OPEN_HOURS, heure_fermeture: DEFAULT_CLOSE_HOURS, jours_fermeture: DEFAULT_CLOSED_DAYS };
         closedDays = ((regularOpening as CommonRegularOpening).jours_fermeture as string[]) || [];
     }
 
@@ -127,11 +136,11 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     const listBusinessSectorSelectable = listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb));
     const listBusinessSectorKeys = listBusinessSectorSelectable.map((item) => item.value)
 
-    const visitorsSummary = Object.fromEntries(listBusinessSectorKeys.map((item) => [item, 0]))
+    const visitsSummary = Object.fromEntries(listBusinessSectorKeys.map((item) => [item, 0]))
 
     listVisits.forEach((visit: Visit) => {
         listBusinessSectorKeys.forEach((business) => {
-            visitorsSummary[business] += visit[business] === "oui" ? 1 : 0
+            visitsSummary[business] += visit[business] === "oui" ? 1 : 0
         });
     });
 
@@ -144,7 +153,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     })
 
     res.render("pages/visits-list.njk", {
-        visitors_summary: visitorsSummary,
+        visits_summary: visitsSummary,
         "visits_list": listVisits,
         "list_business_sector": listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)),
         "header_list": listVisits?.[0] ? Object.keys(listVisits[0]) : [],

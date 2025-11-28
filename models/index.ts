@@ -68,7 +68,8 @@ sequelize.models.place.belongsToMany(sequelize.models.event, {
     through: 'place_event',
     foreignKey: 'place_id',
     otherKey: 'event_id',
-    as: "event",
+    as: "listEvents",
+    onDelete: "CASCADE",
 });
 
 sequelize.models.event.belongsToMany(sequelize.models.place, {
@@ -76,8 +77,8 @@ sequelize.models.event.belongsToMany(sequelize.models.place, {
     foreignKey: 'event_id',
     otherKey: 'place_id',
     as: "listPlaces",
+    onDelete: "CASCADE",
 });
-
 
 if (process.env.NODE_ENV === "development") {
     await sequelize.sync({

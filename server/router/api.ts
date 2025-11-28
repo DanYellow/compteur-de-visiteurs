@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 
 import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel } from "#models/index.ts";
 import { CommonRegularOpening } from "#types";
-import { DEFAULT_CLOSED_DAYS } from "./admin";
+import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
 
 const router = express.Router();
 
@@ -203,18 +203,23 @@ router.get("/lieux", async (req, res) => {
 
         const commonRegularOpening = listPlaces[0] as CommonRegularOpening;
 
+        let closedDays = commonRegularOpening.jours_fermeture;
+        if (!commonRegularOpening.heure_ouverture) {
+            closedDays = JSON.stringify(DEFAULT_CLOSED_DAYS)
+        }
+
         res.status(200).json({
             data: {
-                heure_ouverture: commonRegularOpening.heure_ouverture || "10:00:00",
-                heure_fermeture: commonRegularOpening.heure_fermeture || "19:30:00",
-                jours_fermeture: JSON.parse(commonRegularOpening.jours_fermeture as string)
+                heure_ouverture: commonRegularOpening.heure_ouverture || DEFAULT_OPEN_HOURS,
+                heure_fermeture: commonRegularOpening.heure_fermeture || DEFAULT_CLOSE_HOURS,
+                jours_fermeture: JSON.parse(closedDays as string)
             }
         });
     } catch (e) {
         res.status(500).json({
             data: {
-                heure_ouverture: "10:00:00",
-                heure_fermeture: "19:30:00",
+                heure_ouverture: DEFAULT_OPEN_HOURS,
+                heure_fermeture: DEFAULT_CLOSE_HOURS,
                 jours_fermeture: DEFAULT_CLOSED_DAYS,
             }
         });

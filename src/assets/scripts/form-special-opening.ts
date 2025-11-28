@@ -1,7 +1,7 @@
 import "choices.js/public/assets/styles/choices.css";
 import Choices from "choices.js";
 
-import { SpecialOpeningSchema } from "#scripts/schemas.ts";
+import { EventSchema } from "#scripts/schemas.ts";
 
 const form = document.querySelector("[data-special-opening-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
@@ -29,7 +29,7 @@ const validForm = (e: Event) => {
     const formData = new FormData(form);
     formData.set("lieux", JSON.stringify(formData.getAll("lieux")));
 
-    const validator = SpecialOpeningSchema.safeParse(Object.fromEntries(formData));
+    const validator = EventSchema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll(".error").forEach((item) => {
         item.classList.remove("error");
