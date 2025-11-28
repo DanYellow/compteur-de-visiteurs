@@ -159,12 +159,12 @@ export const getLinearCSV = (data: Result[], { periodLabel, lieu }: LinearCSVOpt
         id: `Total : ${data.length}`,
     } as CSVLinearHeader;
 
-    delete firstRow.groupe;
+    delete (firstRow as any).groupe;
     delete firstRow.order;
 
     const csvHeaderColumns = Object.keys(firstRow);
     csvHeaderColumns[csvHeaderColumns.length - 1] = "Lieu"
-    const csvPayload = [csvHeaderColumns];
+    const csvPayload: (string[]|number[])[] = [csvHeaderColumns];
 
     data.forEach((item, idx) => {
         listGroupsInForm.forEach((group) => {

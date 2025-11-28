@@ -491,6 +491,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                         totalVisitors: {
                             text: 'Total : ' + totalVisits,
                             fontSize: "18px",
+                            totalColor: greenNumixs,
                         },
                         datalabels: {
                             color: "white",

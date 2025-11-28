@@ -63,6 +63,7 @@ export type CommonRegularOpening = {
 export type CSVLinearHeader = Omit<VisitRaw, 'id'> & {
     id: string;
     groupe?: string;
+    order?: number;
 }
 
 export interface GroupVisit {

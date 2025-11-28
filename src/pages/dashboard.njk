@@ -1,7 +1,7 @@
 {% extends "layouts/page.njk" %}
 
 {% block title %}
-Tableau de bord
+Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
 {% endblock %}
 
 {% import "includes/macros.njk" as macros %}
