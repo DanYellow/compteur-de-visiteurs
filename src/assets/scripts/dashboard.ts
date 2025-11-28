@@ -29,7 +29,8 @@ const chartTitleStyle: CustomTitleOptions = {
     }
 };
 
-const rangeOpeningHours = Math.abs(Number(placeData.heure_fermeture) - Number(placeData.heure_ouverture) + 1);
+const isCloseHourExactly = placeData.minutes_fermeture === "00";
+const rangeOpeningHours = Math.abs(Number(placeData.heure_fermeture) - Number(placeData.heure_ouverture) - (isCloseHourExactly ? 1 : 0) + 1);
 const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + placeData.heure_ouverture).map((item) => String(item));
 
 baseConfigData.jour = {
@@ -189,36 +190,43 @@ const listCharts = Object.values(configData);
         let eventData: number[] = [];
         let listEventsHours = [];
 
-        if (true) {
-            const reqEvent = await fetch(`/api/evenements?${apiQueryParams.toString()}`);
-            const resEvent = await reqEvent.json();
+        const reqEvent = await fetch(`/api/evenements?${apiQueryParams.toString()}`);
+        const resEvent = await reqEvent.json();
 
-            if (resEvent.data) {
-                resEvent.data.forEach((item) => {
-                    const [heure_ouverture_heure] = item.heure_ouverture.split(":");
-                    const [heure_fermeture_heure] = item.heure_fermeture.split(":");
-                    console.log("heure_ouverture_heure", Math.max(parseInt(heure_fermeture_heure), placeData.heure_fermeture))
-                    listEventsHours.push({
-                        date: item.date,
-                        groupe: item.groupe,
-                        heure_fermeture: Math.max(parseInt(heure_fermeture_heure), placeData.heure_fermeture),
-                        heure_ouverture: Math.min(parseInt(heure_ouverture_heure), placeData.heure_ouverture),
-                    })
-                });
+        if (resEvent.data) {
+            resEvent.data.forEach((item) => {
+                const [heure_ouverture_heure] = item.heure_ouverture.split(":");
+                const [heure_fermeture_heure, heure_fermeture_minutes] = item.heure_fermeture.split(":");
+
+                const isEventCloseAfterRegularHours = placeData.heure_fermeture > parseInt(heure_fermeture_heure);
+                const minutesToUse = isEventCloseAfterRegularHours ? placeData.minutes_fermeture : heure_fermeture_minutes;
+
+                listEventsHours.push({
+                    date: item.date,
+                    groupe: item.groupe,
+                    heure_fermeture: Math.max(parseInt(heure_fermeture_heure), placeData.heure_fermeture),
+                    heure_ouverture: Math.min(parseInt(heure_ouverture_heure), placeData.heure_ouverture),
+                    is_close_hour_exactly: minutesToUse === "00",
+                })
+            });
+
+            eventData = new Array(xLabels.length).fill(0);
+
+            if (apiKey === "jour") {
+                const {
+                    heure_fermeture = placeData.heure_fermeture,
+                    heure_ouverture = placeData.heure_ouverture,
+                    is_close_hour_exactly: isCloseHourExactly = false,
+                } = listEventsHours?.[0] || {}
+
+                const rangeOpeningHours = Math.abs(heure_fermeture - heure_ouverture - (isCloseHourExactly ? 1 : 0) + 1);
+                xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + heure_ouverture).map((item) => String(item));
 
                 eventData = new Array(xLabels.length).fill(0);
 
-                if (apiKey === "jour") {
-                    const { heure_fermeture = placeData.heure_fermeture, heure_ouverture = placeData.heure_ouverture } = listEventsHours?.[0] || {}
-                    const rangeOpeningHours = Math.abs(heure_fermeture - heure_ouverture + 1);
-                    xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + heure_ouverture).map((item) => String(item));
-
-                    eventData = new Array(xLabels.length).fill(0);
-
-                    configData.jour = {
-                        ...configData.jour,
-                        xLabels,
-                    }
+                configData.jour = {
+                    ...configData.jour,
+                    xLabels,
                 }
             }
         }

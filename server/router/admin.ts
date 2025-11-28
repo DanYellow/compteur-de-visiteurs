@@ -50,6 +50,7 @@ router.get(["/dashboard"], async (req, res) => {
             heure_fermeture: parseInt(openingHoursLimitsRes.heure_fermeture.split(":")[0]),
             heure_ouverture: parseInt(openingHoursLimitsRes.heure_ouverture.split(":")[0]),
             jours_fermeture: openingHoursLimitsRes.jours_fermeture,
+            minutes_fermeture: openingHoursLimitsRes.heure_fermeture.split(":")[1],
         };
     }
 
@@ -66,6 +67,7 @@ router.get(["/dashboard"], async (req, res) => {
                 heure_fermeture: parseInt(place.regularOpening!.heure_fermeture.split(":")[0]),
                 heure_ouverture: parseInt(place.regularOpening!.heure_ouverture.split(":")[0]),
                 jours_fermeture: listDaysClosed,
+                minutes_fermeture: place.regularOpening!.heure_fermeture.split(":")[1],
             } : globalPlace)
         },
     });

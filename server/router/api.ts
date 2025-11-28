@@ -212,7 +212,7 @@ router.get("/lieux", async (req, res) => {
             data: {
                 heure_ouverture: commonRegularOpening.heure_ouverture || DEFAULT_OPEN_HOURS,
                 heure_fermeture: commonRegularOpening.heure_fermeture || DEFAULT_CLOSE_HOURS,
-                jours_fermeture: JSON.parse(closedDays as string)
+                jours_fermeture: JSON.parse(closedDays as string),
             }
         });
     } catch (e) {

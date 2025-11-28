@@ -43,7 +43,9 @@ const greenNumixs = window
 const listBarChartColors = [
     greenNumixs,
     "white",
-    "orange",
+    "#f7633d",
+    "#0062f1",
+    "#fbd284",
 ]
 
 const modal = document.getElementById(
@@ -92,9 +94,11 @@ modal?.addEventListener("toggle", async (e: Event) => {
 
         openingDateTime.textContent = `${date} de ${heure_ouverture_heure}h${heure_ouverture_minutes} à ${heure_fermeture_heure}h${heure_fermeture_minutes}`;
 
+        const isCloseHourExactly = heure_fermeture_minutes === "00";
+
         const rangeOpeningHours = Math.abs(
             parseInt(heure_fermeture_heure) -
-            parseInt(heure_ouverture_heure) +
+            parseInt(heure_ouverture_heure) - (isCloseHourExactly ? 1 : 0) +
             1
         );
         const xLabels = Array.from(
@@ -168,7 +172,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                         display: true,
                         color: greenNumixs,
                         font: {
-                            size: 22,
+                            size: 26,
                             style: "normal",
                             weight: "normal",
                             family: "Agency FB",
@@ -186,7 +190,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                         text: `(${DateTime.fromISO(String(eventData.date)).toFormat("dd/LL/yyyy")})`,
                         color: "white",
                         font: {
-                            size: 16,
+                            size: 14,
                             style: 'normal',
                             weight: 'normal',
                             family: "Calibri"
