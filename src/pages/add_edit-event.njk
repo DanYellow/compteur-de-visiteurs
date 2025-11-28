@@ -104,7 +104,7 @@ Créer évènement
                         </div>
                     </div> #}
                     <div class="flex flex-col">
-                        <label for="places" class="font-bold text-lg">Lieux concernés</label>
+                        <label for="places" class="font-bold text-lg">Lieu(x) concerné(s)</label>
                         <select id="places" name="lieux" multiple>
                             {% for place in list_places %}
                                 <option {{ "selected" if event.list_places_id.includes(place.id) else "" }} value="{{ place.id }}">{{ place.nom }}</option>

@@ -13,19 +13,24 @@ router.get(['/evenements'], async (req, res) => {
     const today = DateTime.now();
 
     const listEvents = await EventModel.findAll({
-        order: [["date", "DESC"], ["heure_ouverture", "DESC"], ["nom", "ASC"],  [{ model: PlaceModel, as: 'listPlaces' }, "nom", "ASC"]],
+        order: [["date", "DESC"], ["heure_ouverture", "DESC"], ["nom", "ASC"], [{ model: PlaceModel, as: 'listPlaces' }, "nom", "ASC"]],
         where: {
             ...(req.query.periode ? {
                 date: {
                     [Op.gte]: `${today.toFormat("yyyy-LL-dd")}`
                 }
-            }: {})
+            } : {})
         },
-        include: [{ model: PlaceModel, as: "listPlaces", required: false, }],
+        include: [{
+            model: PlaceModel, as: "listPlaces", required: false,
+            through: {
+                attributes: []
+            }
+        }],
     });
 
     res.render("pages/events-list.njk", {
-        special_openings_list: listEvents.map((p) => p.toJSON()),
+        events_list: listEvents.map((p) => p.toJSON()),
         flash_message: req.cookies.flash_message,
         periode: req.query.periode,
     });

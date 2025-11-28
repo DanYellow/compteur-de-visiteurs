@@ -39,7 +39,7 @@ const greenNumixs = window
     .getPropertyValue("--color-green-numixs");
 
 const modal = document.getElementById(
-    "detail-special-opening"
+    "detail-event"
 ) as HTMLDialogElement;
 
 const openingDateTime = modal.querySelector("time") as HTMLTimeElement;
@@ -143,7 +143,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                 maintainAspectRatio: false,
                 plugins: {
                     title: {
-                        text: `Visites uniques ${eventData.nom}`,
+                        text: `Visites uniques "${eventData.nom}"`,
                         display: true,
                         color: greenNumixs,
                         font: {

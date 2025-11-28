@@ -73,7 +73,7 @@ new Choices(dropdownDays, {
     paste: false,
     removeItemButton: true,
     itemSelectText: 'Cliquer pour sélectionner',
-    noChoicesText: 'Plus de propositions',
+    noChoicesText: 'Aucune propositions',
     maxItemCount: 6,
     maxItemText: 'Un jour ouvrable est impératif',
     noResultsText: 'Pas de résultat trouvé',
