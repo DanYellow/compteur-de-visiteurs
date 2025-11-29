@@ -111,6 +111,18 @@ nunjucksConfig.addFilter("split", (value, char=",") => {
     return String(value).split(char).map((item) => `${item}<br />`).join("");
 });
 
+// nunjucksConfig.addFilter("filter", (array, listPredicates) => {
+//     return array.filter((item) => {
+//         return listPredicates.map((predicate) => item[predicate.key] = predicate.value)
+//     });
+// });
+
+nunjucksConfig.addFilter("filter", (array, predicate) => {
+    return array.filter((item: Record<string, unknown>) => {
+        return item[predicate.key] === predicate.value;
+    });
+});
+
 function deleteKey(object: Record<string, any>, keys: string[] = []) {
     var last = keys.pop();
     delete keys.reduce((o, k: string) => o[k], object)[last];

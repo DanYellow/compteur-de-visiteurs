@@ -6,20 +6,25 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
 
 {% import "includes/macros.njk" as macros %}
 {% block scripts %}
-{% if NODE_ENV == "development" %}
-    <script type="module" src="/src/assets/scripts/details-visit-dialog.ts" defer></script>
-{% else %}
-    <script type="module" src="/{{ manifest['src/assets/scripts/details-visit-dialog.ts'].file }}" defer></script>
-{% endif %}
+    {% if NODE_ENV == "development" %}
+        <script type="module" src="/src/assets/scripts/details-event-dialog.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/details-visit-dialog.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/download-chart.ts" defer></script>
+    {% else %}
+        <script type="module" src="/{{ manifest['src/assets/scripts/details-event-dialog.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/details-visit-dialog.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/download-chart.ts'].file }}" defer></script>
+    {% endif %}
 {% endblock %}
 
+{% set list_day_events = place.listEvents or list_events %}
 {% set active_menu_item = "visiteurs" %}
 {% set place_selected = place.slug or "tous" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
-    <div data-place='{{ place | json }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
+    <div data-place='{{ place | json }}' data-list-events='{{ list_events | json if list_events | length else place.listEvents | json }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
@@ -78,21 +83,31 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                 {% include "includes/calendar.njk" %}
                 <header class="flex mb-3 gap-3">
                     <div class="flex flex-col w-full md:w-auto bg-green-numixs p-3 pr-5 rounded-md text-black-numixs">
-                        {% if is_day_closed == false or place.listEvents | length or list_events | length %}
+                        {% if is_day_closed == false or has_event_today == true %}
                             <p class="text-2xl title-font">
                                 Nombre de visites uniques
                             </p>
                         {% endif %}
 
                         <p class="text-4xl title-font">
-                        {% if is_day_closed and place.listEvents | length and list_events | length %}
+                            {% if is_day_closed and has_event_today == false %}
                             Fermé
                         {% else %}
-                            {{ visits_list|length }}
-                        {% endif %}
+                                {{ visits_list|length }}
+                            {% endif %}
                         </p>
-                        {% if place.listEvents | length or list_events | length %}
-                        <p class='text-sm font-bold'>Ouverture exceptionnelle</p>
+                        {% if has_event_today %}
+                            <p class='text-sm font-bold md:max-w-50'>Évènement(s) du jour :<br/>
+                                {% for event in list_day_events|filter({key: "date", value: current_date|date("yyyy-LL-dd")}) %}
+                                    <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-event" command="show-modal" data-event-data='{{ event | json }}'>
+                                        {{ event.nom }}
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 inline">
+                                            <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z"/>
+                                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>{% if loop.last == false and loop.length > 1 %}, {% endif %}
+                                {% endfor %}
+                            </p>
                         {% endif %}
                         <p>{{ current_date|date("EEEE dd LLLL yyyy") }}</p>
                     </div>
@@ -107,23 +122,24 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     </div>
                 </header>
                 {% if place.nom %}
-                <div class="p-3 rounded-md border-solid border-black-numixs border mb-3">
-                    <h2 class="title-font font-bold text-2xl">{{ place.nom }}</h2>
-                    <p>Horaires réguliers : {{ place.heure_ouverture|date("HH'h'mm") }}-{{ place.heure_fermeture|date("HH'h'mm") }}</p>
+                    <div class="p-3 rounded-md border-solid border-black-numixs border mb-3">
+                        <h2 class="title-font font-bold text-2xl">{{ place.nom }}</h2>
+                        <p>Horaires réguliers : {{ place.heure_ouverture|date("HH'h'mm") }}-{{ place.heure_fermeture|date("HH'h'mm") }}</p>
 
-                    {% if place.listEvents | length %}
-                    <p>Évènement(s) du jour :
-                        {% for event in place.listEvents %}
-                            {{ event.nom }} • {{ event.heure_ouverture|date("HH'h'mm") }}-{{ event.heure_fermeture|date("HH'h'mm") }}{% if loop.last == false %}, {% endif %}
-                        {% endfor %}
-                    </p>
-                    {% endif %}
-                    {% if place.jours_fermeture_litteral | length %}
-                    <p>Fermé le {{ place.jours_fermeture_litteral | join(", ") }}</p>
-                    {% else %}
-                    <p>Ouvert tous les jours</p>
-                    {% endif %}
-                </div>
+                        {% if list_day_events | length %}
+                            <p>Évènement(s) du jour :
+                                {% for event in place.listEvents %}
+                                    {{ event.nom }} • {{ event.heure_ouverture|date("HH'h'mm") }}-{{ event.heure_fermeture|date("HH'h'mm") }}
+                                    {% if loop.last == false %}, {% endif %}
+                                {% endfor %}
+                            </p>
+                        {% endif %}
+                        {% if place.jours_fermeture_litteral | length %}
+                            <p>Fermé le {{ place.jours_fermeture_litteral | join(", ") }}</p>
+                        {% else %}
+                            <p>Ouvert tous les jours</p>
+                        {% endif %}
+                    </div>
                 {% endif %}
                 <div class="overflow-x-auto">
                     {% include "includes/form-banner-success.njk" %}
@@ -159,8 +175,8 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
                                         <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-visit" command="show-modal" data-visit-data='{{ visit | json }}'>
                                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                                <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z" />
-                                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clip-rule="evenodd" />
+                                                <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z"/>
+                                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clip-rule="evenodd"/>
                                             </svg>
                                         </button>
                                     </td>
@@ -168,9 +184,9 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             {% else %}
                                 <tr class="">
                                     <td colspan="{{ (list_business_sector | length) + 4 }}" class="px-4 py-3 text-center">
-                                        {% if is_day_closed and place.listEvents | length == 0 and list_events | length == 0 %}
+                                        {% if is_day_closed and has_event_today == false %}
                                             {{ "Aucun lieu ouvert le" if place_selected == "tous" else "Fermé le " }}
-                                                <time datetime="{{ current_date }}">{{ current_date|date("dd/LL/yyyy") }}</time>
+                                            <time datetime="{{ current_date }}">{{ current_date|date("dd/LL/yyyy") }}</time>
                                         {% else %}
                                         Pas de visites le <time datetime="{{ current_date }}">{{ current_date|date("dd/LL/yyyy") }}</time>
                                         {% endif %}
@@ -223,7 +239,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                 <p class="text-sm">
                     <span class="inline-block size-4">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4">
-                            <path fill-rule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clip-rule="evenodd" />
+                            <path fill-rule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clip-rule="evenodd"/>
                         </svg>
                     </span>
                     <span data-place-name></span> | <span data-visit-events></span></p>
@@ -241,5 +257,37 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
             <li>En réinsertion pro</li>
             <li>Entreprise Externe</li>
         </ul>
+    </dialog>
+
+    <dialog id="detail-event" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl" data-name></p>
+                <p class="text-sm">
+                    Le <time datetime="">14/11/2025 de 10:47:56 à 12:47:56</time>
+                </p>
+                <p class="text-sm" data-place-name></p>
+            </div>
+            <button type="button" command="close" commandfor="detail-event" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <p data-description=""></p>
+        <div class="p-3 rounded-2xl h-100 relative">
+            <menu class="absolute right-3 flex flex-row gap-3">
+                <li>
+                    <button data-download-chart="global-chart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer" title="Télécharger graphique">
+                        {% include "includes/icons/download-fill-icon.svg" %}
+                    </button>
+                </li>
+            </menu>
+            <canvas id="global-chart" class="w-full h-full"></canvas>
+        </div>
+        <p class="text-xl">Lieu(x) concerné(s)</p>
+        <ul class="list-disc list-inside columns-2"></ul>
     </dialog>
 {% endblock %}

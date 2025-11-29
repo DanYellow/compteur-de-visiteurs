@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { capitalizeFirstLetter } from "./utils.shared";
+import type { EventRaw } from "#types";
 
 const calendarWrapper = document.getElementById("calendar");
 const daysContainer = document.querySelector("[data-list-days]") as HTMLOListElement;
@@ -12,7 +13,9 @@ let currentDay = DateTime.now();
 const today = currentDay.toFormat("yyyy-LL-dd");
 let urlDay = today;
 let staticCurrentDayMonth = currentDay.toFormat("LL-dd");
-const placeData = JSON.parse(document.querySelector("[data-place]")?.dataset.place || "{}")
+const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")
+const listEventsData = JSON.parse((document.querySelector("[data-list-events]") as HTMLDivElement)?.dataset.listEvents || "[]")
+const listEventsDates = listEventsData.map((item: EventRaw) => item.date);
 
 const listClosedDaysIndex = placeData.jours_fermeture || [];
 
@@ -147,13 +150,15 @@ const renderCalendar = () => {
     const queryParams:URLSearchParams|string = new URLSearchParams(window.location.search );
 
     for (let i = countdownPrevMonth - 1; i > 0; i--) {
+        const dayNumber = String(lastDayLastMonth.get("day") - i + 1);
+        const yearAndMonth = `${lastDayLastMonth.get("year")}-${String(lastDayLastMonth.get("month")).padStart(2, "0")}`;
+
         const calendarDayTpl = calendarDayTplRaw.content.cloneNode(true) as HTMLElement;
         const calendarDayTplLi = calendarDayTpl.querySelector("li");
         calendarDayTplLi?.classList.add("inactive");
+        calendarDayTplLi?.classList.toggle("exceptional-opening", listEventsDates.includes(`${yearAndMonth}-${dayNumber}`))
 
         const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
-        const dayNumber = String(lastDayLastMonth.get("day") - i + 1);
-        const yearAndMonth = `${lastDayLastMonth.get("year")}-${String(lastDayLastMonth.get("month")).padStart(2, "0")}`;
 
         const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).weekday;
 
@@ -191,6 +196,7 @@ const renderCalendar = () => {
         const calendarDayTplLi = calendarDayTpl.querySelector("li");
         calendarDayTplLi?.classList.toggle("active", isDayInURL);
         calendarDayTplLi?.classList.toggle("today", isToday);
+        calendarDayTplLi?.classList.toggle("exceptional-opening", listEventsDates.includes(`${yearAndMonth}-${dayNumber}`))
 
         const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber}`).weekday;
         const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
@@ -215,12 +221,14 @@ const renderCalendar = () => {
 
     const countdownNextMonth = lastDayOfMonth.weekday === 7 ? 0 : lastDayOfMonth.weekday;
     for (let i = countdownNextMonth; i < 7; i++) { // creating li of next month first days
+        const yearAndMonth = `${firstDayNextMonth.get("year")}-${String(firstDayNextMonth.get("month")).padStart(2, "0")}`;
+        const dayNumber = String(i - countdownNextMonth + 1);
+
         const calendarDayTpl = calendarDayTplRaw.content.cloneNode(true) as HTMLElement;
         const calendarDayTplLi = calendarDayTpl.querySelector("li");
         calendarDayTplLi?.classList.add("inactive");
 
-        const yearAndMonth = `${firstDayNextMonth.get("year")}-${String(firstDayNextMonth.get("month")).padStart(2, "0")}`;
-        const dayNumber = String(i - countdownNextMonth + 1);
+        calendarDayTplLi?.classList.toggle("exceptional-opening", listEventsDates.includes(`${yearAndMonth}-${dayNumber}`))
 
         const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).weekday;
 

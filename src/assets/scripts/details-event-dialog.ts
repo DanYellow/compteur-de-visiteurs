@@ -17,8 +17,7 @@ import {
 } from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-import type EventModel from "#models/event.ts";
-import type { Place_Visits, PlaceRaw, VisitRaw } from "#types";
+import type { EventRaw, Place_Visits, PlaceRaw, VisitRaw } from "#types";
 import { TotalVisitors } from "./utils";
 
 Chart.register(
@@ -69,7 +68,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
         const sourceItem = toggleEvent.source! as HTMLButtonElement;
         const eventData = JSON.parse(
             sourceItem.dataset.eventData!
-        ) as EventModel;
+        ) as EventRaw;
 
         name.textContent = eventData.nom;
         description.textContent = "";
@@ -81,6 +80,13 @@ modal?.addEventListener("toggle", async (e: Event) => {
 
             listPlacesContainer.append(li);
         });
+
+        if (eventData.listPlaces.length === 0) {
+            const li = document.createElement("li");
+            li.textContent = "Aucun lieux";
+
+            listPlacesContainer.append(li);
+        }
 
         openingDateTime.dateTime = String(eventData.date);
         const [heure_ouverture_heure, heure_ouverture_minutes] =
@@ -155,7 +161,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
         });
 
         ; (modal.querySelector("[data-download-chart]") as HTMLButtonElement)!.dataset.chartData = JSON.stringify({
-            nom: `Lieux(x) : ${eventData.listPlaces.map((item: PlaceRaw) => item.nom).join(", ")}`
+            nom: `Lieu(x) : ${eventData.listPlaces.map((item: PlaceRaw) => item.nom).join(", ") || "Aucun"}`
         });
 
         new Chart(globalChart, {

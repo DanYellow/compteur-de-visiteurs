@@ -46,6 +46,8 @@ export type EventRaw = InferAttributes<EventModel> & {
         id: number;
         name: string;
     };
+    aujourdhui?: boolean;
+    listPlaces: PlaceRaw[];
 }
 
 export type PlaceRaw = InferAttributes<PlaceModel> & {
@@ -53,7 +55,8 @@ export type PlaceRaw = InferAttributes<PlaceModel> & {
         jours_fermeture: string;
         heure_fermeture: string;
         heure_ouverture: string;
-    }
+    };
+    listEvents: EventRaw[];
 };
 
 export type Place_Visits = InferAttributes<PlaceModel> & {

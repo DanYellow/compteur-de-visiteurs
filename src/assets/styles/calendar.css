@@ -91,6 +91,11 @@
                     a {
                         color: var(--color-gray-numixs);
                         background-color: var(--color-green-numixs);
+
+                        &:is(:hover, :focus) {
+                            color: var(--color-white-numixs);
+                            background-color: rgb(from var(--color-black-numixs) r g b / 80%);
+                        }
                     }
                 }
                 &.today {
@@ -106,6 +111,22 @@
                         background-color: rgb(
                             from var(--color-green-numixs) r g b / 33%
                         );
+                    }
+                }
+                &.exceptional-opening {
+                    &::after {
+                        content: "Évènement(s)";
+                        display: block;
+                        /* inset-inline: 0.5rem; */
+                        left: 50%;
+                        translate: -50% 0%;
+                        padding-inline: 0.35rem;
+                        font-size: 0.65rem;
+                        color: var(--color-white-numixs);
+                        background-color: var(--color-gray-numixs);
+                        top: 0.4rem;
+                        position: absolute;
+                        border-radius: 0.5rem;
                     }
                 }
             }

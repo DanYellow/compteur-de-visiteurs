@@ -4,7 +4,7 @@ import { DateTime, Info } from "luxon";
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import PlaceRouter from "#server/router/admin/place.ts";
 import EventRouter from "#server/router/admin/event.ts";
-import { CommonRegularOpening, PlaceRaw, VisitRaw } from "#types";
+import { CommonRegularOpening, EventRaw, PlaceRaw, VisitRaw } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index.ts";
 import { Op } from "sequelize";
 
@@ -88,7 +88,10 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     const placeSelected = String(req.query?.lieu || "tous");
     let place = null;
     let regularOpening = {};
-    let currentDayListEvents: EventModel[] = []
+    let listAllEvents: EventModel[] = []
+
+    const startTime = daySelected.startOf("month").minus({week: 1});
+    const endTime = daySelected.endOf("month").plus({week: 1});
 
     if (placeSelected !== "tous") {
         place = await PlaceModel.findOne({
@@ -103,7 +106,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                     required: false,
                     where: {
                         date: {
-                            [Op.eq]: daySelected.toFormat("yyyy-LL-dd")
+                            [Op.between]: [startTime.toString(), endTime.toString()],
                         }
                     },
                     through: {
@@ -124,19 +127,27 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                 jours_fermeture: closedDays,
                 jours_fermeture_litteral: Info.weekdays('long', { locale: 'fr' }).filter((_, idx) => closedDays.includes(String(idx + 1))),
             }
+            place = place.toJSON() as PlaceRaw;
         }
     } else {
         const openingHoursLimitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/lieux`);
         regularOpening = (await openingHoursLimitsReq.json()).data || { heure_ouverture: DEFAULT_OPEN_HOURS, heure_fermeture: DEFAULT_CLOSE_HOURS, jours_fermeture: DEFAULT_CLOSED_DAYS };
         closedDays = ((regularOpening as CommonRegularOpening).jours_fermeture as string[]) || [];
 
-        currentDayListEvents = await EventModel.findAll({
+        listAllEvents = await EventModel.findAll({
+            nest: true,
             where: {
                 date: {
-                    [Op.eq]: daySelected.toFormat("yyyy-LL-dd")
+                    [Op.between]: [startTime.toString(), endTime.toString()],
                 }
             },
-            raw: true,
+            include: [{
+                model: PlaceModel,
+                as: "listPlaces",
+                through: {
+                    attributes: [],
+                },
+            }]
         });
     }
 
@@ -164,6 +175,13 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         ],
     })
 
+    const listEventsComputed:EventRaw[] = (placeSelected === "tous" ? listAllEvents : place!.listEvents).map((item) => {
+        return {
+            ...(placeSelected === "tous" ? (item as EventModel).toJSON() : item),
+            aujourdhui: String(item.date) === daySelected.toFormat("yyyy-LL-dd")
+        } as EventRaw
+    });
+
     res.render("pages/visits-list.njk", {
         visits_summary: visitsSummary,
         "visits_list": listVisits,
@@ -175,10 +193,11 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "is_day_closed": isClosedDay,
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
         "list_places": listPlaces,
-        "list_events": currentDayListEvents,
+        "list_events": listEventsComputed,
+        "has_event_today": listEventsComputed.some((item) => item.aujourdhui),
         "place": {
             jours_fermeture: DEFAULT_CLOSED_DAYS,
-            ...(placeSelected !== "tous" ? { ...place!.toJSON(), ...regularOpening } : regularOpening),
+            ...(placeSelected !== "tous" ? { ...place!, ...regularOpening } : regularOpening),
         }
     });
 });
