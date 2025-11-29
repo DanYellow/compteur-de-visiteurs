@@ -1,7 +1,7 @@
 import type { Align, LineControllerDatasetOptions, TitleOptions } from "chart.js";
 import type { InferAttributes } from "sequelize";
 
-import type { Place as PlaceModel, Visit as VisitModel } from "#models/index.ts";
+import type { Place as PlaceModel, Visit as VisitModel, Event as EventModel } from "#models/index.ts";
 
 export type LineChartEntry = {
     data: Number[];
@@ -37,8 +37,16 @@ export type VisitRaw = InferAttributes<VisitModel> & {
     lieu?: string;
     date_passage: string;
     groupe: string;
+    liste_evenements?: string;
 }
 
+export type EventRaw = InferAttributes<EventModel> & {
+    groupe: string;
+    jour?: {
+        id: number;
+        name: string;
+    };
+}
 
 export type PlaceRaw = InferAttributes<PlaceModel> & {
     regularOpening?: {

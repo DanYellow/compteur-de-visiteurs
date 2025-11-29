@@ -1,10 +1,10 @@
 import express from "express";
-import { DateTime } from "luxon";
+import { DateTime, Info } from "luxon";
 import { Op } from 'sequelize';
 
 import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel } from "#models/index.ts";
-import { CommonRegularOpening } from "#types";
-import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
+import { CommonRegularOpening, EventRaw } from "#types";
+import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS, capitalizeFirstLetter } from "#scripts/utils.shared.ts";
 
 const router = express.Router();
 
@@ -300,7 +300,17 @@ router.get("/evenements", async (req, res) => {
 
         if (listEvents) {
             return res.status(200).json({
-                data: listEvents
+                data: listEvents.map((item: EventRaw) => {
+                    const listWeekDays = Info.weekdays('long', { locale: 'fr' });
+
+                    return {
+                        ...item,
+                        jour: {
+                            id: Number(item.groupe),
+                            name: capitalizeFirstLetter(listWeekDays[Number(item.groupe) - 1]),
+                        }
+                    }
+                })
             })
         }
         return res.status(404).json([])

@@ -1,9 +1,9 @@
 <label for="place-dropdown" class="text-sm">Lieu</label>
 <select data-select-redirect="lieu" id="place-dropdown" class="py-1">
     <option value="">Tous</option>
-    {% if places_list | length %}
+    {% if list_places | length %}
         <optgroup label="Lieux">
-            {% for place in places_list %}
+            {% for place in list_places %}
                 <option {{ "selected" if place_selected == place.slug else "" }} value="{{ place.slug }}">{{ place.nom }}</option>
             {% endfor %}
         </optgroup>

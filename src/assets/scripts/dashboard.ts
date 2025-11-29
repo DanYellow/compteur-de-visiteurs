@@ -3,14 +3,14 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime, Info } from "luxon";
 
-import type { ChartConfigData, CustomTitleOptions, LineChartEntry, Visit } from "#types";
+import type { ChartConfigData, CustomTitleOptions, EventRaw, LineChartEntry, VisitRaw } from "#types";
 import { capitalizeFirstLetter, baseConfigData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
 import { TotalVisitors } from './utils';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const linkDownloadChartData = document.querySelector("[data-download-chart-data='simple']") as HTMLLinkElement;
 const linkDownloadDetailedChartData = document.querySelector("[data-download-chart-data='detailed']") as HTMLLinkElement;
-const tableDetailsChart = document.getElementById("table-details-chart") as HTMLTemplateElement;
+
 
 const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")
 
@@ -183,7 +183,7 @@ const listCharts = Object.values(configData);
         const req = await fetch(`/api?${apiQueryParams.toString()}`);
         const res = await req.json();
 
-        const listVisitsGrouped = Object.groupBy(res.data as Visit[], (item) => {
+        const listVisitsGrouped = Object.groupBy(res.data as VisitRaw[], (item) => {
             return item.groupe;
         });
 
@@ -226,6 +226,20 @@ const listCharts = Object.values(configData);
 
                 configData.jour = {
                     ...configData.jour,
+                    xLabels,
+                }
+            } else if (apiKey === "semaine") {
+                xLabels = [
+                    ...xLabels,
+                    ...resEvent.data.map((item: EventRaw) => item.jour)
+                ].sort((itemA, itemB) => itemA.id - itemB.id);
+
+                xLabels = Array.from(new Set(xLabels.map((item) => JSON.stringify(item)))).map((item) => JSON.parse(item))
+
+                eventData = new Array(xLabels.length).fill(0);
+
+                configData.semaine = {
+                    ...configData.semaine,
                     xLabels,
                 }
             }

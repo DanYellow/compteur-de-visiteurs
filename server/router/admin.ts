@@ -4,7 +4,7 @@ import { DateTime, Info } from "luxon";
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import PlaceRouter from "#server/router/admin/place.ts";
 import EventRouter from "#server/router/admin/event.ts";
-import { CommonRegularOpening, PlaceRaw, Visit } from "#types";
+import { CommonRegularOpening, PlaceRaw, VisitRaw } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index.ts";
 import { Op } from "sequelize";
 
@@ -60,7 +60,7 @@ router.get(["/dashboard"], async (req, res) => {
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
         "is_day_closed": listDaysClosed.includes(String(daySelected.weekday)),
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
-        "places_list": listPlaces,
+        "list_places": listPlaces,
         "place": {
             ...(place ? {
                 ...place,
@@ -88,6 +88,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     const placeSelected = String(req.query?.lieu || "tous");
     let place = null;
     let regularOpening = {};
+    let currentDayListEvents: EventModel[] = []
 
     if (placeSelected !== "tous") {
         place = await PlaceModel.findOne({
@@ -128,6 +129,15 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         const openingHoursLimitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/lieux`);
         regularOpening = (await openingHoursLimitsReq.json()).data || { heure_ouverture: DEFAULT_OPEN_HOURS, heure_fermeture: DEFAULT_CLOSE_HOURS, jours_fermeture: DEFAULT_CLOSED_DAYS };
         closedDays = ((regularOpening as CommonRegularOpening).jours_fermeture as string[]) || [];
+
+        currentDayListEvents = await EventModel.findAll({
+            where: {
+                date: {
+                    [Op.eq]: daySelected.toFormat("yyyy-LL-dd")
+                }
+            },
+            raw: true,
+        });
     }
 
     const isClosedDay = closedDays.includes(String(daySelected.weekday));
@@ -140,7 +150,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
 
     const visitsSummary = Object.fromEntries(listBusinessSectorKeys.map((item) => [item, 0]))
 
-    listVisits.forEach((visit: Visit) => {
+    listVisits.forEach((visit: VisitRaw) => {
         listBusinessSectorKeys.forEach((business) => {
             visitsSummary[business] += visit[business] === "oui" ? 1 : 0
         });
@@ -164,7 +174,8 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
         "is_day_closed": isClosedDay,
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
-        "places_list": listPlaces,
+        "list_places": listPlaces,
+        "list_events": currentDayListEvents,
         "place": {
             jours_fermeture: DEFAULT_CLOSED_DAYS,
             ...(placeSelected !== "tous" ? { ...place!.toJSON(), ...regularOpening } : regularOpening),
