@@ -25,10 +25,42 @@ router.get(["/dashboard"], async (req, res) => {
         }
     }
 
+    const startTime = daySelected.startOf("month").minus({week: 1});
+    const endTime = daySelected.endOf("month").plus({week: 1});
+
     const listPlaces = await PlaceModel.findAll({
-        raw: true,
+        // raw: true,
         nest: true,
-        include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
+        include: [
+            {
+                model: RegularOpeningModel,
+                as: "regularOpening",
+                required: true
+            },
+            {
+                    model: EventModel,
+                    as: "listEvents",
+                    attributes: {
+                        include: ["nom", "heure_ouverture", "heure_fermeture"]
+                    },
+                    required: false,
+                    where: {
+                        date: {
+                            [Op.between]: [startTime.toString(), endTime.toString()],
+                        }
+                    },
+                    through: {
+                        attributes: [],
+                    },
+                    // include: [{
+                    //     model: PlaceModel,
+                    //     as: "listPlaces",
+                    //     through: {
+                    //         attributes: [],
+                    //     },
+                    // }]
+                }
+        ],
         order: [
             ['nom', 'ASC'],
         ],
@@ -37,10 +69,10 @@ router.get(["/dashboard"], async (req, res) => {
     let place = undefined;
 
     if (placeSelected !== "tous") {
-        place = listPlaces.find((item) => item.slug === placeSelected) as unknown as PlaceRaw
+        place = (listPlaces.find((item) => item.slug === placeSelected))?.toJSON() as unknown as PlaceRaw
     }
 
-    const listDaysClosed = place ? JSON.parse(place.regularOpening!.jours_fermeture || "[]") : DEFAULT_CLOSED_DAYS;
+    const listDaysClosed = place ? (place.regularOpening!.jours_fermeture || []) : DEFAULT_CLOSED_DAYS;
 
     let globalPlace = {}
     if (!place) {
@@ -54,6 +86,15 @@ router.get(["/dashboard"], async (req, res) => {
         };
     }
 
+    const listAllEvents = listPlaces.map((item) => item.listEvents).flat().map((item) => item.toJSON())
+
+    const listEventsComputed:EventRaw[] = (placeSelected === "tous" ? listAllEvents : place!.listEvents).map((item) => {
+        return {
+            ...item,
+            aujourdhui: String(item.date) === daySelected.toFormat("yyyy-LL-dd")
+        } as EventRaw
+    });
+
     res.render("pages/dashboard.njk", {
         "current_date": daySelected,
         "today": DateTime.now(),
@@ -61,6 +102,7 @@ router.get(["/dashboard"], async (req, res) => {
         "is_day_closed": listDaysClosed.includes(String(daySelected.weekday)),
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
         "list_places": listPlaces,
+        "list_events": listEventsComputed,
         "place": {
             ...(place ? {
                 ...place,
@@ -112,6 +154,13 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
                     through: {
                         attributes: [],
                     },
+                    include: [{
+                        model: PlaceModel,
+                        as: "listPlaces",
+                        through: {
+                            attributes: [],
+                        },
+                    }]
                 }
             ],
             attributes: {
@@ -194,7 +243,6 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
         "list_places": listPlaces,
         "list_events": listEventsComputed,
-        "has_event_today": listEventsComputed.some((item) => item.aujourdhui),
         "place": {
             jours_fermeture: DEFAULT_CLOSED_DAYS,
             ...(placeSelected !== "tous" ? { ...place!, ...regularOpening } : regularOpening),

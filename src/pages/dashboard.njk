@@ -21,7 +21,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
 {% block content %}
     {% set place_selected = place.slug %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
-    <div data-place='{{ place | json }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_auto] gap-6">
+    <div data-place='{{ place | json }}' data-list-events='{{ list_events | json  }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_auto] gap-6">
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 -mt-1.5">
