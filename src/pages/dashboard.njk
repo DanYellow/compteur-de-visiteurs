@@ -107,7 +107,6 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     </div>
                 </div>
             </div>
-        </div>
     </div>
     <dialog id="detailsChartModal" closedby="any" class="max-w-7xl w-full mx-auto text-white-numixs backdrop:bg-white-numixs/20 mt-8 bg-transparent">
         <div class="bg-black-numixs p-3 border border-green-numixs rounded-2xl mx-3 ">
@@ -115,21 +114,21 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                 <menu class="absolute right-3 flex flex-row gap-3">
                     <li>
                         {% set split_button_main_action %}
-                            <button data-download-chart="detailsChart" type="button" class="text-gray-numixs cursor-pointer">
+                        <button data-download-chart="detailsChart" type="button" class="text-gray-numixs cursor-pointer">
                                 Exporter graphique + tableau (.jpg)
                             </button>
                         {% endset %}
 
                         {% set split_button_sub_action_1 %}
-                            <a href="" data-download-chart-data="simple" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
-                                {% include "includes/icons/download-fill-icon.svg" %}
+                        <a href="" data-download-chart-data="simple" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                            {% include "includes/icons/download-fill-icon.svg" %}
                                 Télécharger les données visite par visite (.csv)
                             </a>
                         {% endset %}
                         {% set split_button_sub_action_2 %}
-                            <a href="" data-download-chart-data="detailed" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
-                                {% include "includes/icons/download-fill-icon.svg" %}
-                                Télécharger les données groupe par groupe (.csv)
+                        <a href="" data-download-chart-data="detailed" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
+                            {% include "includes/icons/download-fill-icon.svg" %}
+                                Télécharger les données simplifiée groupe par groupe (.csv)
                             </a>
                         {% endset %}
 
@@ -159,11 +158,10 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                         Détails
                     </caption>
                     <thead>
-                        <tr>
-                        </tr>
+                        <tr data-tr-period></tr>
+                        <tr data-tr-visit-type></tr>
                     </thead>
-                    <tbody>
-                    </tbody>
+                    <tbody></tbody>
                 </table>
             </div>
         </div>

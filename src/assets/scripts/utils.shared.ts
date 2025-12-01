@@ -102,18 +102,24 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
     const tableFooter = ["Total (visites)", ...tableValuesPlaceholder];
 
     listGroups.forEach((business) => {
-        const rowValues = [business.name];
+        let rowValues = [business.name];
 
-        const visitorPerTypeAndPeriod = {
-            [business.value]: new Array(columns.length || 0).fill(0),
+        const visitsPerGroupAndPeriod = {
+            [business.value]: new Array(columns.length || 0).fill([0, 0]),
         };
 
         Object.entries(data).forEach(([group, listVisits]) => {
             const totalPerGroup = (listVisits as unknown as Visit[]).reduce(
-                (acc: Record<string, number>, visit) => ((acc[business.value] = (acc[business.value] || 0) + ((visit[business.value] === "oui") ? 1 : 0)), acc),
+                (acc: Record<string, number[]>, visit) => {
+                    const isEventVisit = visit.liste_evenements !== "/";
+                    return ((acc[business.value] = [
+                        (acc[business.value]?.[0] || 0) + ((visit[business.value] === "oui" && !isEventVisit) ? 1 : 0),
+                        (acc[business.value]?.[1] || 0) + ((visit[business.value] === "oui" && isEventVisit) ? 1 : 0)
+                    ]), acc)
+                },
                 {});
 
-            let indexArray = columns.findIndex((label: string | Record<string, number>) => {
+            const indexArray = columns.findIndex((label: string | Record<string, number>) => {
                 if (typeof label === "object") {
                     return Number(label.id) === Number(group);
                 }
@@ -121,18 +127,16 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
             });
 
             if (indexArray >= 0) {
-                (tableFooter[indexArray + 1] as number) += totalPerGroup[business.value];
-                visitorPerTypeAndPeriod[business.value][indexArray] = totalPerGroup[business.value];
+                (tableFooter[indexArray + 1] as number) += totalPerGroup[business.value].reduce((acc, value) => acc + value, 0);
+                visitsPerGroupAndPeriod[business.value][indexArray] = totalPerGroup[business.value];
             }
         });
 
-        visitorPerTypeAndPeriod[business.value].forEach((value) => {
-            rowValues.push(value);
-        });
+        rowValues = [...rowValues, ...visitsPerGroupAndPeriod[business.value]]
 
-        const totalBusiness = visitorPerTypeAndPeriod[business.value].reduce((acc, value) => acc + value, 0);
+        const totalBusiness = visitsPerGroupAndPeriod[business.value].reduce((acc, value) => [acc[0] + value[0], acc[1] + value[1]], [0, 0]);
+
         rowValues.push(totalBusiness);
-
         tableValues.push(rowValues);
     });
 

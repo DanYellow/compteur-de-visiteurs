@@ -29,7 +29,6 @@ router.get(["/dashboard"], async (req, res) => {
     const endTime = daySelected.endOf("month").plus({week: 1});
 
     const listPlaces = await PlaceModel.findAll({
-        // raw: true,
         nest: true,
         include: [
             {
@@ -52,13 +51,6 @@ router.get(["/dashboard"], async (req, res) => {
                     through: {
                         attributes: [],
                     },
-                    // include: [{
-                    //     model: PlaceModel,
-                    //     as: "listPlaces",
-                    //     through: {
-                    //         attributes: [],
-                    //     },
-                    // }]
                 }
         ],
         order: [
@@ -86,7 +78,7 @@ router.get(["/dashboard"], async (req, res) => {
         };
     }
 
-    const listAllEvents = listPlaces.map((item) => item.listEvents).flat().map((item) => item.toJSON())
+    const listAllEvents = listPlaces.map((item) => (item as PlaceRaw).listEvents).flat().map((item) => item.toJSON())
 
     const listEventsComputed:EventRaw[] = (placeSelected === "tous" ? listAllEvents : place!.listEvents).map((item) => {
         return {

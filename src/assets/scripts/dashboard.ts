@@ -10,7 +10,7 @@ import { TotalVisitors } from './utils';
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const linkDownloadChartData = document.querySelector("[data-download-chart-data='simple']") as HTMLLinkElement;
 const linkDownloadDetailedChartData = document.querySelector("[data-download-chart-data='detailed']") as HTMLLinkElement;
-
+const tableDetailsChart = document.getElementById("table-details-chart") as HTMLTableElement;
 
 const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")
 
@@ -390,13 +390,17 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         linkDownloadChartData.href = downloadLink || "";
         linkDownloadDetailedChartData.href = `${downloadLink}&groupe` || "";
 
-        const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr")! as HTMLTableRowElement;
+        const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr[data-tr-period]")! as HTMLTableRowElement;
         tableDetailsChartTableHeadRow.innerHTML = "";
+
+        const tableDetailsChartTableHeadVisitTypeRow = tableDetailsChart.querySelector("thead tr[data-tr-visit-type]")! as HTMLTableRowElement;
+        tableDetailsChartTableHeadVisitTypeRow.innerHTML = "";
 
         const tableDetailsChartTableBody = tableDetailsChart.querySelector("tbody")! as HTMLTableSectionElement;
         tableDetailsChartTableBody.innerHTML = "";
 
         const lineChartDatasets: LineChartEntry[] = [];
+
         const chartDataPivotTable = getPivotTable(chartData, xLabels as [], { columnSuffix: xValuesSuffix })
 
         Object.values(chartDataPivotTable).forEach((row, index, table) => {
@@ -411,38 +415,74 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                     const th = document.createElement("th");
                     th.classList.add("px-2")
                     th.textContent = String(cell);
+                    th.colSpan = 2;
                     tableDetailsChartTableHeadRow.append(th);
+
+                    for (let indexHead = 0; indexHead < 2; indexHead++) {
+                        const th = document.createElement("th");
+                        th.classList.add("px-2")
+                        if (cellIndex !== 0) {
+                            th.textContent = indexHead % 2 ? "Evènement" : "Régulière";
+                        }
+                        tableDetailsChartTableHeadVisitTypeRow.append(th);
+                    }
+
                 } else {
-                    const td = document.createElement("td");
-                    td.textContent = String(cell);
-                    if (cellIndex === 0) {
-                        td.style.paddingLeft = "0.2rem";
-                    }
-                    if (cellIndex > 0) {
-                        td.style.textAlign = "center";
-                    }
-                    td.style.color = Number(cell) > 0 ? greenNumixs : "";
+                        const td = document.createElement("td");
 
-                    if (cellIndex === listRows.length - 1) {
-                        td.style.borderLeft = "2px solid white";
-                    }
+                        if (Array.isArray(cell)) {
+                            cell.forEach((val, idx) => {
+                                if(idx === 0) {
+                                    const tdReg = document.createElement("td");
+                                    tdReg.textContent = String(val);
+                                    tdReg.style.textAlign = "center";
+                                    tdReg.style.color = Number(val) > 0 ? greenNumixs : "";
 
-                    if (index === table.length - 1) {
-                        td.style.borderTop = "2px solid white";
-                        td.style.fontSize = "1.25rem";
-                        td.style.paddingTop = "0.35rem";
-                    }
+                                    if (cellIndex === listRows.length - 1) {
+                                        tdReg.style.borderLeft = "2px solid white";
+                                    }
+                                    trBody.append(tdReg);
+                                } else {
+                                    td.style.color = Number(val) > 0 ? greenNumixs : "";
+                                    td.textContent = String(val);
+                                }
+                            })
+                        } else {
+                            td.textContent = String(cell);
+                            td.style.color = Number(cell) > 0 ? greenNumixs : "";
+                            td.colSpan = 2;
+                        }
+                        if (cellIndex === 0) {
+                            td.style.paddingLeft = "0.2rem";
+                            td.colSpan = 2;
+                        }
+                        if (cellIndex > 0) {
+                            td.style.textAlign = "center";
+                        }
 
-                    trBody.append(td);
+                        // Last column
+                        if (cellIndex === listRows.length - 1 && !Array.isArray(cell)) {
+                            td.style.borderLeft = "2px solid white";
+                        }
+
+                        // Last row
+                        if (index === table.length - 1) {
+                            td.style.borderTop = "2px solid white";
+                            td.style.fontSize = "1.25rem";
+                            td.style.paddingTop = "0.35rem";
+                        }
+
+                        trBody.append(td);
                 }
             });
 
             if (index > 0 && index < table.length - 1) {
                 const lineData = row.slice(1, row.length - 1);
 
+                const flatData = lineData.map((item) => item.reduce((acc, value) => acc+value, 0))
                 lineChartDatasets.push({
                     label: row[0] as string,
-                    data: lineData as number[],
+                    data: flatData as number[],
                     borderColor: listBusinessSector.find((item) => item.name === row[0] as string)!.lineColor,
                     tension: 0,
                     fill: true,
