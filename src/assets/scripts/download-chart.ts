@@ -8,10 +8,9 @@ const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivE
 const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
 const WATERMARK_SCALE_FACTOR = 0.85;
 
-const [width, height] = (import.meta.env.CHART_EXPORT_SIZE || "1200x800").split("x");
-const SIZE_EXPORT = {
-    width,
-    height,
+const CHART_SIZE = {
+    width: 1900,
+    height: 950,
 }
 
 const today = DateTime.now();
@@ -44,8 +43,7 @@ listDownloadButtons.forEach((item) => {
 
         // (chartInstance.options!.plugins!.datalabels!.font! as any).size = 24;
         // chartInstance.options!.plugins!.datalabels!.backgroundColor = grayNumixs;
-        chartInstance.options.plugins!.tooltip!.enabled = false;
-        chartInstance.resize(SIZE_EXPORT.width, SIZE_EXPORT.height);
+        chartInstance.resize(CHART_SIZE.width, CHART_SIZE.height);
 
         const download = () => {
             const filename = slugify(chartInstance.config!.options!.plugins!.title!.text as string)
@@ -85,7 +83,7 @@ listDownloadButtons.forEach((item) => {
             if (chart.closest("dialog")) {
                 const table = chart.closest("dialog")?.querySelector("table");
                 const tableDetailsSVG = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="${chart.width}px" height="${chart?.offsetHeight}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="${table?.offsetWidth}px" height="${table?.offsetHeight}">
                         <foreignObject width="100%" height="100%">
                             <div xmlns="http://www.w3.org/1999/xhtml" style="color: white; font-family: Calibri, sans-serif;">
                                 ${table?.outerHTML}
@@ -99,8 +97,7 @@ listDownloadButtons.forEach((item) => {
                 const url = window.URL.createObjectURL(svg);
                 tableDetailsImg.src = url;
                 await loadImage(tableDetailsImg);
-
-                cloneCtx.drawImage(tableDetailsImg, chartClone.width - tableDetailsImg.width, chart.height + 10);
+                cloneCtx.drawImage(tableDetailsImg, chartClone.width / 2 - tableDetailsImg.width / 2, chart.height + 10);
                 window.URL.revokeObjectURL(url);
             }
 
