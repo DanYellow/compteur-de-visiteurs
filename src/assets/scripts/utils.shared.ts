@@ -192,13 +192,12 @@ const listMonths = Info.months('long', { locale: 'fr' })
         id: idx + 1
     }));
 
-const getWeeksRangeMonth = (_startDate = null) => {
-    const today = DateTime.now();
-    const startMonth = today.startOf("month");
-    const endMonth = today.endOf("month");
+export const getWeeksRangeMonth = (daySelected: DateTime) => {
+    const startMonth = daySelected.startOf("month");
+    const endMonth = daySelected.endOf("month");
 
-    const firstWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: startMonth.weekNumber });
-    const lastWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: endMonth.weekNumber });
+    const firstWeekInMonth = DateTime.fromObject({ weekYear: daySelected.year, weekNumber: startMonth.weekNumber });
+    const lastWeekInMonth = DateTime.fromObject({ weekYear: daySelected.year, weekNumber: endMonth.weekNumber });
 
     const intervalMonth = firstWeekInMonth.until(lastWeekInMonth.endOf("month"));
     if (intervalMonth.isValid) {

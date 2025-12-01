@@ -4,7 +4,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { DateTime, Info } from "luxon";
 
 import type { ChartConfigData, CustomTitleOptions, EventRaw, LineChartEntry, VisitRaw } from "#types";
-import { capitalizeFirstLetter, baseConfigData, getPivotTable, listGroups as listBusinessSector } from './utils.shared';
+import { capitalizeFirstLetter, baseConfigData, getPivotTable, listGroups as listBusinessSector, getWeeksRangeMonth } from './utils.shared';
 import { TotalVisitors } from './utils';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
@@ -124,9 +124,12 @@ if (queryParams.has("date")) {
     }
 }
 
+const placeParam = queryParams.get('lieu');
 
-const urlParams = new URLSearchParams(window.location.search);
-const placeParam = urlParams.get('lieu');
+baseConfigData.mois = {
+    ...baseConfigData.mois,
+    listColumns: getWeeksRangeMonth(daySelected)
+}
 
 const placeQueryParams = new URLSearchParams({
     ...((placeParam === "tous" || !placeParam) ? {} : { lieu: placeParam }),
