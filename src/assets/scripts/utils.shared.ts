@@ -227,7 +227,6 @@ export const baseConfigData: BaseConfigData = {
     },
     "mois": {
         apiKey: "mois",
-        listColumns: getWeeksRangeMonth(),
     },
     "annee": {
         apiKey: "annee",
