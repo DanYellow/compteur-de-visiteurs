@@ -1,4 +1,4 @@
-import type { BaseConfigData, CSVLinearHeader, PivotTableOptions, Result, Visit, WeekMonth } from "#types";
+import type { BaseConfigData, CSVLinearHeader, PivotTableOptions, VisitRaw, WeekMonth } from "#types";
 import { DateTime, Info, Interval } from "luxon";
 
 export const listGroups = [
@@ -78,7 +78,7 @@ export const listGroups = [
     },
 ];
 
-export const getPivotTable = (data: Result, columns = [], options: PivotTableOptions = { columnSuffix: "" }) => {
+export const getPivotTable = (data: Record<string, VisitRaw[]>, columns: string[] | { id: number; name: string; }[] = [], options: PivotTableOptions = { columnSuffix: "", simplified: false }) => {
     const tableValues = [];
     const totalVisits = Object.values(data)
         .flat()
@@ -88,7 +88,7 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
     const tableHeaderColumns = ["Groupe"];
     const tableValuesPlaceholder: number[] = [];
 
-    ;[...columns].forEach((label: string | Record<string, string>) => {
+    ;[...columns].forEach((label: string | Record<string, string | number>) => {
         if (typeof label === "object") {
             tableHeaderColumns.push(`${label.name}${options.columnSuffix}`);
         } else {
@@ -104,12 +104,18 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
     listGroups.forEach((business) => {
         let rowValues = [business.name];
 
-        const visitsPerGroupAndPeriod = {
+        let visitsPerGroupAndPeriod = {
             [business.value]: new Array(columns.length || 0).fill([0, 0]),
         };
 
+        if (options.simplified) {
+            visitsPerGroupAndPeriod = {
+                [business.value]: new Array(columns.length || 0).fill(0),
+            };
+        }
+
         Object.entries(data).forEach(([group, listVisits]) => {
-            const totalPerGroup = (listVisits as unknown as Visit[]).reduce(
+            let totalPerGroup: Record<string, number[] | number> = (listVisits as unknown as Visit[]).reduce(
                 (acc: Record<string, number[]>, visit) => {
                     const isEventVisit = visit.liste_evenements !== "/";
                     return ((acc[business.value] = [
@@ -118,6 +124,11 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
                     ]), acc)
                 },
                 {});
+            if (options.simplified) {
+                totalPerGroup = (listVisits as unknown as Visit[]).reduce(
+                (acc: Record<string, number>, visit) => ((acc[business.value] = (acc[business.value] || 0) + ((visit[business.value] === "oui") ? 1 : 0)), acc),
+                {});
+            }
 
             const indexArray = columns.findIndex((label: string | Record<string, number>) => {
                 if (typeof label === "object") {
@@ -127,14 +138,23 @@ export const getPivotTable = (data: Result, columns = [], options: PivotTableOpt
             });
 
             if (indexArray >= 0) {
-                (tableFooter[indexArray + 1] as number) += totalPerGroup[business.value].reduce((acc, value) => acc + value, 0);
+                if (options.simplified) {
+                    (tableFooter[indexArray + 1] as number) += (totalPerGroup as Record<string, number>)[business.value];
+                } else {
+                    (tableFooter[indexArray + 1] as number) += (totalPerGroup as Record<string, number[]>)[business.value].reduce((acc, value) => acc + value, 0);
+                }
                 visitsPerGroupAndPeriod[business.value][indexArray] = totalPerGroup[business.value];
             }
         });
 
         rowValues = [...rowValues, ...visitsPerGroupAndPeriod[business.value]]
 
-        const totalBusiness = visitsPerGroupAndPeriod[business.value].reduce((acc, value) => [acc[0] + value[0], acc[1] + value[1]], [0, 0]);
+        let totalBusiness = []
+        if (options.simplified) {
+            totalBusiness = visitsPerGroupAndPeriod[business.value].reduce((acc, value) => acc + value, 0);
+        } else {
+            totalBusiness = visitsPerGroupAndPeriod[business.value].reduce((acc, value) => [acc[0] + value[0], acc[1] + value[1]], [0, 0]);
+        }
 
         rowValues.push(totalBusiness);
         tableValues.push(rowValues);
@@ -200,7 +220,7 @@ export const getWeeksRangeMonth = (daySelected: DateTime) => {
     const startMonth = daySelected.startOf("month");
     const endMonth = daySelected.endOf("month");
     const intervalMonth = startMonth.until(endMonth);
-    
+
     if (intervalMonth.isValid) {
         const intervalWeeks = intervalMonth.splitBy({ weeks: 1 });
         const listWeeks: WeekMonth[] = [];
