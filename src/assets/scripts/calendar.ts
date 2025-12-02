@@ -222,31 +222,30 @@ const renderCalendar = () => {
     const countdownNextMonth = lastDayOfMonth.weekday === 7 ? 0 : lastDayOfMonth.weekday;
     for (let i = countdownNextMonth; i < 7; i++) { // creating li of next month first days
         const yearAndMonth = `${firstDayNextMonth.get("year")}-${String(firstDayNextMonth.get("month")).padStart(2, "0")}`;
-        const dayNumber = String(i - countdownNextMonth + 1);
+        const dayNumber = String(i - countdownNextMonth + 1).padStart(2, "0");
 
         const calendarDayTpl = calendarDayTplRaw.content.cloneNode(true) as HTMLElement;
         const calendarDayTplLi = calendarDayTpl.querySelector("li");
         calendarDayTplLi?.classList.add("inactive");
-
         calendarDayTplLi?.classList.toggle("exceptional-opening", listEventsDates.includes(`${yearAndMonth}-${dayNumber}`))
 
-        const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).weekday;
+        const weekday = DateTime.fromISO(`${yearAndMonth}-${dayNumber}`).weekday;
 
         const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
 
-        queryParams.set("date", `${yearAndMonth}-${dayNumber.padStart(2, "0")}`);
+        queryParams.set("date", `${yearAndMonth}-${dayNumber}`);
 
         calendarDayTplLink.href = `?${queryParams.toString()}`;
         calendarDayTplLink.classList.toggle("open", !listClosedDaysIndex.includes(String(weekday)));
-        calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber.padStart(2, "0")}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" });
+        calendarDayTplLink.title = DateTime.fromISO(`${yearAndMonth}-${dayNumber}`).toFormat("EEEE dd LLLL yyyy", { locale: "fr" });
         calendarDayTplLink.dataset.month = "next";
-        calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber.padStart(2, "0")}`;
+        calendarDayTplLink.dataset.date = `${yearAndMonth}-${dayNumber}`;
         calendarDayTplLink.addEventListener("mousedown", stopFocusClick);
         calendarDayTplLink.addEventListener("focus", loadMonth);
         calendarDayTplLink.tabIndex = -1;
 
         const calendarDayTplTime = calendarDayTpl.querySelector("time")!;
-        calendarDayTplTime.textContent = dayNumber;
+        calendarDayTplTime.textContent = String(i - countdownNextMonth + 1);
         calendarDayTplTime.dateTime = `${yearAndMonth}-${dayNumber}`;
 
         daysContainer?.append(calendarDayTpl);

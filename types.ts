@@ -25,10 +25,9 @@ export type CustomTitleOptions = Omit<TitleOptions, 'fullSize' | 'text' | "align
     padding?: number | { top: number; bottom: number };
 };
 
-export type Result = Record<string, string>;
-
 export interface PivotTableOptions {
     columnSuffix: string;
+    simplified: boolean;
 }
 
 export type VisitRaw = InferAttributes<VisitModel> & {

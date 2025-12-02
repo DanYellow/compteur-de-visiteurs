@@ -51,6 +51,15 @@ router.get("/", async (req, res) => {
         place = await PlaceModel.findOne({ where: { slug: String(req.query.lieu) } })
     }
 
+    let groupQuery = [sequelize.fn("trim",
+        sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime")
+    ), "groupe"]
+    if (req.query.filtre === "mois") {
+        groupQuery = [
+            sequelize.literal("(strftime('%j', date(date_passage, '-3 days', 'weekday 4')) - 1) / 7 + 1"), 'groupe'
+        ]
+    }
+
     try {
         const eventTable = EventModel.getTableName();
         const visitTable = VisitModel.getTableName();
@@ -60,9 +69,7 @@ router.get("/", async (req, res) => {
                 include: [
                     [sequelize.literal("ROW_NUMBER() OVER (ORDER by date_passage ASC)"), "order"],
                     [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"],
-                    [sequelize.fn("trim",
-                        sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime")
-                    ), "groupe"],
+                    groupQuery,
                     [
                         sequelize.literal(`
                         COALESCE(
@@ -82,7 +89,7 @@ router.get("/", async (req, res) => {
                         "liste_evenements"
                     ]
                 ],
-                exclude: ["groupe", "lieu_id"]
+                exclude: ["lieu_id"]
             },
             where: {
                 [Op.and]: [
@@ -239,16 +246,22 @@ router.get("/evenements", async (req, res) => {
 
         const filtreParam = (req.query?.filtre || "jour") as string;
 
+        let groupQuery = [sequelize.fn("trim",
+            sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime")
+        ), "groupe"]
+        if (req.query.filtre === "mois") {
+            groupQuery = [
+                sequelize.literal("(strftime('%j', date(date_passage, '-3 days', 'weekday 4')) - 1) / 7 + 1"), 'groupe'
+            ]
+        }
+
         const startTime = daySelected.startOf((dictGroupType as any)[filtreParam]?.luxon || "day");
         const endTime = daySelected.endOf((dictGroupType as any)[filtreParam]?.luxon || "day");
-
         const table = EventModel.getTableName();
         const listEvents = await EventModel.findAll({
             attributes: {
                 include: [
-                    [sequelize.fn("trim",
-                        sequelize.fn("strftime", (dictGroupType as any)[filtreParam]?.substitution, sequelize.col(`${table}.date`), "localtime")
-                    ), "groupe"],
+                    groupQuery,
                     [
                         sequelize.fn("strftime", "%H:%M", sequelize.fn('MIN', sequelize.col(`${table}.heure_ouverture`))),
                         'heure_ouverture'
@@ -262,7 +275,8 @@ router.get("/evenements", async (req, res) => {
                     "id",
                     "date_creation",
                     "description",
-                    "ouvert"
+                    "ouvert",
+                    "groupe",
                 ]
             },
             include: [
@@ -292,25 +306,29 @@ router.get("/evenements", async (req, res) => {
                     [Op.between]: [startTime.toString(), endTime.toString()],
                 },
             },
-            group: [
-                sequelize.fn('strftime', (dictGroupType as any)[filtreParam]?.substitution, sequelize.col(`${table}.date`)),
-            ],
+            // group: [
+            //     sequelize.fn('strftime', (dictGroupType as any)[filtreParam]?.substitution, sequelize.col(`${table}.date`)),
+            // ],
             raw: true,
         });
 
         if (listEvents) {
             return res.status(200).json({
-                data: listEvents.map((item: EventRaw) => {
-                    const listWeekDays = Info.weekdays('long', { locale: 'fr' });
+                data: listEvents
+                    .filter((item) => {
+                        return item.nom !== null
+                    })
+                    .map((item) => {
+                        const listWeekDays = Info.weekdays('long', { locale: 'fr' });
 
-                    return {
-                        ...item,
-                        jour: {
-                            id: Number(item.groupe),
-                            name: capitalizeFirstLetter(listWeekDays[Number(item.groupe) - 1]),
+                        return {
+                            ...item,
+                            jour: {
+                                id: Number((item as unknown as EventRaw).groupe),
+                                name: capitalizeFirstLetter(listWeekDays[Number((item as unknown as EventRaw).groupe) - 1]),
+                            }
                         }
-                    }
-                })
+                    })
             })
         }
         return res.status(404).json([])

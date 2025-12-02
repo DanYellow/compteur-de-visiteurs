@@ -93,7 +93,7 @@ const nunjucksConfig = nunjucks.configure(app.get("views"), {
 
 nunjucksConfig.addFilter("date", (value, format) => {
     if (!DateTime.fromISO(value).isValid) {
-        return DateTime.fromJSDate(new Date(value)).setLocale('fr').toFormat(format);
+        return "";
     }
 
     return DateTime.fromISO(value).setLocale('fr').toFormat(format);
@@ -111,11 +111,6 @@ nunjucksConfig.addFilter("split", (value, char=",") => {
     return String(value).split(char).map((item) => `${item}<br />`).join("");
 });
 
-// nunjucksConfig.addFilter("filter", (array, listPredicates) => {
-//     return array.filter((item) => {
-//         return listPredicates.map((predicate) => item[predicate.key] = predicate.value)
-//     });
-// });
 
 nunjucksConfig.addFilter("filter", (array, predicate) => {
     return array.filter((item: Record<string, unknown>) => {
@@ -123,26 +118,11 @@ nunjucksConfig.addFilter("filter", (array, predicate) => {
     });
 });
 
-function deleteKey(object: Record<string, any>, keys: string[] = []) {
-    var last = keys.pop();
-    delete keys.reduce((o, k: string) => o[k], object)[last];
-    return object;
-}
 
 nunjucksConfig.addFilter("json", (value, listKeysToDelete: string[] = []) => {
     if (!Array.isArray(listKeysToDelete)) {
         listKeysToDelete = []
     }
-    // listKeysToDelete.forEach((key: string) => {
-    //     if(key.split("[]").length > 1) {
-    //         const [arrayKey, subKey] = key.split("[]");
-    //         value[arrayKey].forEach((_: unknown, idx: number) => {
-    //             console.log(value[arrayKey][idx])
-    //             delete value[arrayKey][idx][subKey.replace(".", "")]
-    //         })
-    //     }
-    //     delete value[key];
-    // });
 
     if (value instanceof nunjucks.runtime.SafeString) {
         value = value.toString();
