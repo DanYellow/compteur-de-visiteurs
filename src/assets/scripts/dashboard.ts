@@ -401,7 +401,8 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
         const lineChartDatasets: LineChartEntry[] = [];
 
-        const chartDataPivotTable = getPivotTable(chartData, xLabels as [], { columnSuffix: xValuesSuffix })
+        const visitsHasEvents = Object.values(chartData).flat().some((item) => (item as VisitRaw).liste_evenements !== "/")
+        const chartDataPivotTable = getPivotTable(chartData, xLabels as [], { columnSuffix: xValuesSuffix, simplified: !visitsHasEvents })
 
         Object.values(chartDataPivotTable).forEach((row, index, table) => {
             const trBody = document.createElement("tr");
@@ -418,15 +419,16 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                     th.colSpan = 2;
                     tableDetailsChartTableHeadRow.append(th);
 
-                    for (let indexHead = 0; indexHead < 2; indexHead++) {
-                        const th = document.createElement("th");
-                        th.classList.add("px-2")
-                        if (cellIndex !== 0) {
-                            th.textContent = indexHead % 2 ? "Evènement" : "Régulière";
+                    if (visitsHasEvents) {
+                        for (let indexHead = 0; indexHead < 2; indexHead++) {
+                            const th = document.createElement("th");
+                            th.classList.add("px-2")
+                            if (cellIndex !== 0) {
+                                th.textContent = indexHead % 2 ? "Evènement" : "Régulière";
+                            }
+                            tableDetailsChartTableHeadVisitTypeRow.append(th);
                         }
-                        tableDetailsChartTableHeadVisitTypeRow.append(th);
                     }
-
                 } else {
                         const td = document.createElement("td");
 
@@ -479,7 +481,12 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
             if (index > 0 && index < table.length - 1) {
                 const lineData = row.slice(1, row.length - 1);
 
-                const flatData = lineData.map((item) => item.reduce((acc, value) => acc+value, 0))
+                let flatData = []
+                if (visitsHasEvents) {
+                    flatData = lineData.map((item) => item.reduce((acc, value) => acc+value, 0))
+                } else {
+                    flatData = lineData;
+                }
                 lineChartDatasets.push({
                     label: row[0] as string,
                     data: flatData as number[],

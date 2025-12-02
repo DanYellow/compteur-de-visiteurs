@@ -26,8 +26,8 @@ export type CustomTitleOptions = Omit<TitleOptions, 'fullSize' | 'text' | "align
 };
 
 export interface PivotTableOptions {
-    columnSuffix: string;
-    simplified: boolean;
+    columnSuffix?: string;
+    simplified?: boolean;
 }
 
 export type VisitRaw = InferAttributes<VisitModel> & {
