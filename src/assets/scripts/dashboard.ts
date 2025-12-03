@@ -388,7 +388,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         const totalVisits = Object.values(chartData).flat().length;
 
         linkDownloadChartData.href = downloadLink || "";
-        linkDownloadDetailedChartData.href = `${downloadLink}&groupe` || "";
+        linkDownloadDetailedChartData.href = `${downloadLink}&groupe&ouverture=${xLabels[0]}&fermeture=${xLabels.at(-1)}` || "";
 
         const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr[data-tr-period]")! as HTMLTableRowElement;
         tableDetailsChartTableHeadRow.innerHTML = "";

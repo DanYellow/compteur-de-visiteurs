@@ -5,7 +5,7 @@ import { fileURLToPath, URLSearchParams } from "url";
 import { stringify } from "csv-stringify/sync";
 import { DateTime, DateTimeUnit } from "luxon";
 import sequelize, { RegularOpening as RegularOpeningModel } from "#models/index.ts";
-import { baseConfigData, getLinearCSV, getPivotTable, getWeeksRangeMonth } from "#scripts/utils.shared.ts";
+import { baseConfigData, DEFAULT_CLOSE_HOURS, DEFAULT_OPEN_HOURS, getLinearCSV, getPivotTable, getWeeksRangeMonth } from "#scripts/utils.shared.ts";
 import { slugify } from "#scripts/utils.ts";
 import { PlaceRaw, VisitRaw } from "#types";
 
@@ -76,6 +76,12 @@ router.get('/', async (req, res) => {
 
         if ("mois" in req.query) {
             config.listColumns = getWeeksRangeMonth(DateTime.fromISO(req.query.mois as string));
+        } else if ("jour" in req.query) {
+            const closedHours = Number(req.query?.fermeture || DEFAULT_CLOSE_HOURS.split(":")[0]);
+            const openHours = Number(req.query?.ouverture || DEFAULT_OPEN_HOURS.split(":")[0]);
+            const rangeOpeningHours = Math.abs(closedHours - openHours + 1);
+
+            config.listColumns = Array.from(new Array(rangeOpeningHours), (_, i) => i + openHours).map((item) => String(item));
         }
         csvPayload = getPivotTable(pivotPayload, config.listColumns, { columnSuffix: config?.xValuesSuffix || "", simplified: true });
     } else {
