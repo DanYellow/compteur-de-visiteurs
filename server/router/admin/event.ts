@@ -2,7 +2,7 @@ import { Op } from "sequelize";
 import express from "express";
 import { DateTime, Info } from "luxon";
 
-import { Place as PlaceModel, Event as EventModel } from "#models/index.ts";
+import { Place as PlaceModel, Event as EventModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
 import { capitalizeFirstLetter } from '#scripts/utils.shared.ts';
 import { EventSchema } from "#scripts/schemas.ts";
 import { PlaceRaw } from "#types";
@@ -40,12 +40,24 @@ router.get(['/evenement', '/evenement/:eventId'], async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
         raw: true,
         order: [["nom", "ASC"]],
+        include: [
+            {
+                model: RegularOpeningModel,
+                as: "regularOpening",
+                required: true
+            },
+        ]
     });
 
     let event = null;
     if (req.params.eventId) {
         event = await EventModel.findByPk(req.params.eventId, {
-            include: [{ model: PlaceModel, as: "listPlaces", required: false, order: [["nom", "ASC"]] }]
+            include: [{
+                model: PlaceModel,
+                as: "listPlaces",
+                required: true,
+                order: [["nom", "ASC"]],
+            }]
         });
         if (event) {
             event = event.toJSON();

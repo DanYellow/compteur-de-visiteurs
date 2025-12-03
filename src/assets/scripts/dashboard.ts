@@ -29,9 +29,12 @@ const chartTitleStyle: CustomTitleOptions = {
     }
 };
 
-const isCloseHourExactly = placeData.minutes_fermeture === "00";
-const rangeOpeningHours = Math.abs(Number(placeData.heure_fermeture) - Number(placeData.heure_ouverture) - (isCloseHourExactly ? 1 : 0) + 1);
-const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + placeData.heure_ouverture).map((item) => String(item));
+const [heure_ouverture_heure] = placeData.regularOpening.heure_ouverture.split(":");
+const [heure_fermeture_heure, heure_fermeture_minutes] = placeData.regularOpening.heure_fermeture.split(":");
+
+const isCloseHourExactly = heure_fermeture_minutes === "00";
+const rangeOpeningHours = Math.abs(Number(heure_fermeture_heure) - Number(heure_ouverture_heure) - (isCloseHourExactly ? 1 : 0) + 1);
+const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + Number(heure_ouverture_heure)).map((item) => String(item));
 
 baseConfigData.jour = {
     ...baseConfigData.jour,
@@ -191,7 +194,7 @@ const listCharts = Object.values(configData);
         });
 
         let eventData: number[] = [];
-        let listEventsHours = [];
+        let listEventsHours = [] as {date: string, groupe: string, heure_fermeture: number, heure_ouverture: number, is_close_hour_exactly: boolean}[];
 
         const reqEvent = await fetch(`/api/evenements?${apiQueryParams.toString()}`);
         const resEvent = await reqEvent.json();
@@ -201,14 +204,14 @@ const listCharts = Object.values(configData);
                 const [heure_ouverture_heure] = item.heure_ouverture.split(":");
                 const [heure_fermeture_heure, heure_fermeture_minutes] = item.heure_fermeture.split(":");
 
-                const isEventCloseAfterRegularHours = placeData.heure_fermeture > parseInt(heure_fermeture_heure);
-                const minutesToUse = isEventCloseAfterRegularHours ? placeData.minutes_fermeture : heure_fermeture_minutes;
+                const isEventClosedAfterRegularHours = placeData.heure_fermeture > parseInt(heure_fermeture_heure);
+                const minutesToUse = isEventClosedAfterRegularHours ? placeData.minutes_fermeture : heure_fermeture_minutes;
 
                 listEventsHours.push({
                     date: item.date,
                     groupe: item.groupe,
-                    heure_fermeture: Math.max(parseInt(heure_fermeture_heure), placeData.heure_fermeture),
-                    heure_ouverture: Math.min(parseInt(heure_ouverture_heure), placeData.heure_ouverture),
+                    heure_fermeture: Math.max(Number(heure_fermeture_heure), Number(heure_fermeture_heure)),
+                    heure_ouverture: Math.min(Number(heure_ouverture_heure), Number(heure_ouverture_heure)),
                     is_close_hour_exactly: minutesToUse === "00",
                 })
             });
@@ -217,10 +220,17 @@ const listCharts = Object.values(configData);
 
             if (apiKey === "jour") {
                 const {
-                    heure_fermeture = placeData.heure_fermeture,
-                    heure_ouverture = placeData.heure_ouverture,
+                    heure_fermeture = Number(heure_fermeture_heure),
+                    heure_ouverture = Number(heure_ouverture_heure),
+                } = listEventsHours?.[0] || {}
+
+                let {
                     is_close_hour_exactly: isCloseHourExactly = false,
                 } = listEventsHours?.[0] || {}
+
+                if (!resEvent.data.length && placeData.regularOpening) {
+                    isCloseHourExactly = placeData.regularOpening.heure_fermeture.split(":")[1] === "00"
+                }
 
                 const rangeOpeningHours = Math.abs(heure_fermeture - heure_ouverture - (isCloseHourExactly ? 1 : 0) + 1);
                 xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + heure_ouverture).map((item) => String(item));
@@ -249,7 +259,6 @@ const listCharts = Object.values(configData);
         }
 
         ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
-
         const regularData: number[] = new Array(xLabels.length).fill(0);
 
         const getIndexForKey = (value: string): number => {
