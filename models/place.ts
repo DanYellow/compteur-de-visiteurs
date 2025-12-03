@@ -1,11 +1,14 @@
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type HasOneGetAssociationMixin, type HasOneCreateAssociationMixin, type BelongsToManyAddAssociationMixin, type BelongsToManyGetAssociationsMixin, type BelongsToManyAddAssociationsMixin, type BelongsToManySetAssociationsMixin } from 'sequelize';
 import { RegularOpening, Event } from '.';
+import type { PlaceType } from '#types';
+import { listPlaceTypes } from '#scripts/utils.shared.ts';
 
 export default class Place extends Model<InferAttributes<Place>, InferCreationAttributes<Place>> {
     declare id: CreationOptional<number>;
     declare nom: string;
     declare slug: string;
     declare adresse: string;
+    declare type?: PlaceType;
     declare description: string;
     declare ouvert: boolean;
     declare date_creation: CreationOptional<Date>;
@@ -37,6 +40,11 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
                 description: {
                     type: DataTypes.TEXT,
                     allowNull: true
+                },
+                type: {
+                    type: DataTypes.ENUM(...listPlaceTypes.map((item) => item.value)),
+                    defaultValue: "lab",
+                    allowNull: false,
                 },
                 ouvert: {
                     type: DataTypes.BOOLEAN,

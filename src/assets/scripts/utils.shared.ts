@@ -262,3 +262,14 @@ export const capitalizeFirstLetter = (val: unknown) => {
 export const DEFAULT_CLOSED_DAYS = ["1", "6", "7"];
 export const DEFAULT_OPEN_HOURS = "10:00:00";
 export const DEFAULT_CLOSE_HOURS = "19:30:00";
+
+export const listPlaceTypes = [{
+    label: "Fablab® Numixs",
+    value: "fablab",
+},{
+    label: "Station Numixs",
+    value: "station",
+},{
+    label: "Numixs Lab",
+    value: "lab",
+}];

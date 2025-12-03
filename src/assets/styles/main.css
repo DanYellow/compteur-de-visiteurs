@@ -149,7 +149,9 @@ dialog {
 }
 
 /* :not([type="checkbox"], [type="radio"]) */
-input.error, textarea.error, select.error {
+input.error,
+textarea.error,
+select.error {
     border: solid 1px var(--color-red-800) !important;
 }
 
@@ -325,7 +327,7 @@ button {
     height: 100vh;
 }
 
-.custom-select {
+.reset-select {
     appearance: none; /* Disable the default arrow */
     -webkit-appearance: none; /* For WebKit-based browsers */
     -moz-appearance: none; /* For Firefox */
@@ -369,10 +371,27 @@ button {
 } */
 
 .choices__inner {
-    background-color: white!important;
-    border-color: oklch(55.1% 0.027 264.364)!important;
+    background-color: white !important;
+    border-color: oklch(55.1% 0.027 264.364) !important;
 
     &:has(.error) {
         border: solid 1px var(--color-red-800) !important;
+    }
+}
+
+option::checkmark {
+    display: none;
+}
+
+.custom-select,
+::picker(.custom-select) {
+    appearance: base-select;
+
+    option {
+        display: grid;
+
+        &::checkmark {
+            display: none;
+        }
     }
 }

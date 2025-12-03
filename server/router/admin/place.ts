@@ -1,7 +1,7 @@
 import express from "express";
 import { Info } from "luxon";
 
-import { capitalizeFirstLetter } from '#scripts/utils.shared.ts';
+import { capitalizeFirstLetter, listPlaceTypes } from '#scripts/utils.shared.ts';
 import { PlaceSchema } from "#scripts/schemas.ts";
 import { slugify } from "#scripts/utils.ts";
 import { DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared.ts";
@@ -44,6 +44,10 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
         is_edit: Object.keys(place || {}).length > 0,
         flash_message: req.cookies.flash_message,
         not_found: req.params.placeId && !place,
+        list_place_types: listPlaceTypes.map((item) => ({
+            ...item,
+            logo: `${item.value}-numixs.svg`
+        })).sort((itemA, itemB) => itemA.label.localeCompare(itemB.label)),
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
 }).post(['/lieu', '/lieu/:placeId'], async (req, res, next) => {
@@ -101,6 +105,7 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
                 slug: slugify(req.body.nom),
                 description: payload.description,
                 ouvert: payload.ouvert,
+                type: payload.type,
             });
 
             const { heure_ouverture_heure, heure_ouverture_minutes, heure_fermeture_heure, heure_fermeture_minutes } = req.body

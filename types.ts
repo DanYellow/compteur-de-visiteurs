@@ -97,3 +97,5 @@ export type ChartConfigData = BaseConfigData & {
         xLabels: string[] | { id: number; name: string; }[];
     }
 }
+
+export type PlaceType = "fablab" | "station" | "lab";

@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { listGroups as listBusinessSector } from './utils.shared';
+import { listGroups as listBusinessSector, listPlaceTypes } from './utils.shared';
 
 type BusinessSectorPayload = {
     entreprise?: string;
@@ -72,6 +72,9 @@ export const PlaceSchema = z.object({
     heure_ouverture_minutes: z.string(),
     heure_fermeture_heure: z.string(),
     heure_fermeture_minutes: z.string(),
+    type: z.enum(listPlaceTypes.map((item) => item.value), {
+        error: "Vous devez définir un type de lieu"
+    }),
     ouvert: z.enum(["1", "0"], {
         error: "Vous devez définir l'ouverture du lieu"
     })

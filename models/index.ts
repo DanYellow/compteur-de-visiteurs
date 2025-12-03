@@ -83,6 +83,7 @@ sequelize.models.event.belongsToMany(sequelize.models.place, {
 if (process.env.NODE_ENV === "development") {
     await sequelize.sync({
         // force: true
+        // alter: true
     })
 }
 
