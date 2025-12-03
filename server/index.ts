@@ -8,8 +8,6 @@ import { DateTime } from "luxon";
 import ip from "ip";
 import cookieParser from "cookie-parser";
 
-import config from "#config" with { type: "json" };
-
 import router from "./router/index.ts";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -93,6 +91,10 @@ const nunjucksConfig = nunjucks.configure(app.get("views"), {
 
 nunjucksConfig.addFilter("date", (value, format) => {
     if (!DateTime.fromISO(value).isValid) {
+        const date = DateTime.fromJSDate(new Date(value));
+        if (date.isValid) {
+            return date.setLocale('fr').toFormat(format);
+        }
         return "";
     }
 
