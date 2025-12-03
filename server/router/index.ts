@@ -85,7 +85,7 @@ router.get("/", async (req, res) => {
 //     throw new Error('Cannot create order: Customer not active');
 //   }
 
-        await VisitModel.create(payload)
+        const newVisit = await VisitModel.create(payload)
         await new Promise(r => setTimeout(r, 1500));
 
         wss.clients.forEach((client) => {
@@ -94,7 +94,7 @@ router.get("/", async (req, res) => {
             }
         });
 
-        res.status(200).json({ "success": true })
+        res.status(200).json({ "success": true, data: (await newVisit.getPlace()).toJSON() })
     } catch (err) {
         console.log(err)
         res.status(500).json({ "success": false })

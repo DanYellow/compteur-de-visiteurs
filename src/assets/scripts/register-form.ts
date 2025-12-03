@@ -44,7 +44,11 @@ const submitForm = async (e: SubmitEvent) => {
     if (res.success) {
         e.submitter?.blur();
         form.reset();
-        dialogSwapContainer.append(formSuccessTplRaw.content.cloneNode(true));
+        const tplSuccess = formSuccessTplRaw.content.cloneNode(true) as HTMLDivElement;
+        const placeName = tplSuccess.querySelector("[data-place]")! as HTMLSpanElement;
+
+        placeName.textContent = res.data.nom;
+        dialogSwapContainer.append(tplSuccess);
     } else {
         dialogSwapContainer.append(formErrorTplRaw.content.cloneNode(true));
     }

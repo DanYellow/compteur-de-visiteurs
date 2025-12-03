@@ -12,9 +12,9 @@ Créer évènement
 
 {% block scripts %}
     {% if NODE_ENV == "development" %}
-        <script type="module" src="/src/assets/scripts/form-special-opening.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/event-form.ts" defer></script>
     {% else %}
-        <script type="module" src="/{{ manifest['src/assets/scripts/form-special-opening.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/event-form.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}
 

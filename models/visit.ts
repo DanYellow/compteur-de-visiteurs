@@ -1,4 +1,4 @@
-import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type ForeignKey } from 'sequelize';
+import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type ForeignKey, type HasOneGetAssociationMixin } from 'sequelize';
 
 import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import Place from '#models/place.ts';
@@ -8,6 +8,8 @@ export default class Visit extends Model<InferAttributes<Visit>, InferCreationAt
     declare place_id: ForeignKey<Place['id']>;
     declare date_passage: CreationOptional<Date>;
     declare groupe?: string;
+
+    declare getPlace: HasOneGetAssociationMixin<Place>;
 
     static initModel(sequelize: Sequelize) {
         const listBusinessSectorKeys: Record<string, any> = {}

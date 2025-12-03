@@ -55,7 +55,7 @@ router.get(['/evenement', '/evenement/:eventId'], async (req, res) => {
             include: [{
                 model: PlaceModel,
                 as: "listPlaces",
-                required: true,
+                required: false,
                 order: [["nom", "ASC"]],
             }]
         });
