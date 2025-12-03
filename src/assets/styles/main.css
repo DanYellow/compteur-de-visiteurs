@@ -379,19 +379,28 @@ button {
     }
 }
 
-option::checkmark {
-    display: none;
-}
-
-.custom-select,
-::picker(.custom-select) {
-    appearance: base-select;
+/* .custom-select {
+    &,
+    &::picker(select) {
+        appearance: base-select;
+    }
 
     option {
-        display: grid;
+        display: flex;
+        gap: 1rem;
+        padding: 0.25rem;
 
         &::checkmark {
             display: none;
         }
     }
-}
+
+    > button {
+        &:has(selectedcontent) {
+            display: flex;
+        gap: 1rem;
+        flex-direction: row;
+        padding: 0.25rem;
+        }
+    }
+} */

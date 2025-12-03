@@ -17,9 +17,10 @@ Compteur de visiteurs
     <div class="max-w-7xl mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 lg:grid-cols-[1fr_456px] justify-center gap-24 mx-auto">
         <form class="w-full" novalidate action="" method="post" data-sign-in-form>
             <header class="mb-6">
-                <img src="/images/faclab-logo-light.svg" class="w-20" alt="">
+                <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-20" alt="">
                 <p class="text-sm">{{ place.nom }}</p>
             </header>
+
             <div class="flex flex-col gap-3">
                 <div class="mb-11">
                     <p class="title-font leading-none text-7xl uppercase">À quel(s) groupe(s)<br /><span class="text-green-numixs">appartenez-vous</span> ?</p>

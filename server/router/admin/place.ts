@@ -1,7 +1,7 @@
 import express from "express";
 import { Info } from "luxon";
 
-import { capitalizeFirstLetter, listPlaceTypes } from '#scripts/utils.shared.ts';
+import { capitalizeFirstLetter, DEFAULT_CLOSE_HOURS, DEFAULT_OPEN_HOURS, listPlaceTypes } from '#scripts/utils.shared.ts';
 import { PlaceSchema } from "#scripts/schemas.ts";
 import { slugify } from "#scripts/utils.ts";
 import { DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared.ts";
@@ -16,17 +16,17 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
     let place = null
     if (req.params.placeId) {
         place = await PlaceModel.findByPk(req.params.placeId, {
-            include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
+            include: [{ model: RegularOpeningModel, as: "regularOpening", required: false }],
         });
         if (place) {
             const placeRegularOpening = await place.getRegularOpening()
 
-            const [heure_ouverture_heure, heure_ouverture_minutes] = placeRegularOpening.heure_ouverture.split(":");
-            const [heure_fermeture_heure, heure_fermeture_minutes] = placeRegularOpening.heure_fermeture.split(":");
+            const [heure_ouverture_heure, heure_ouverture_minutes] = (placeRegularOpening?.heure_ouverture || DEFAULT_OPEN_HOURS).split(":");
+            const [heure_fermeture_heure, heure_fermeture_minutes] = (placeRegularOpening?.heure_fermeture || DEFAULT_CLOSE_HOURS).split(":");
 
             place = {
                 ...place.toJSON(),
-                jours_fermeture: placeRegularOpening.jours_fermeture,
+                jours_fermeture: (placeRegularOpening?.jours_fermeture || []),
                 heure_ouverture_heure,
                 heure_ouverture_minutes,
                 heure_fermeture_heure,
@@ -145,7 +145,7 @@ router.get(['/lieu', '/lieu/:placeId'], async (req, res) => {
 router.get(['/lieux'], async (req, res) => {
     const listDays = Info.weekdays('long', { locale: 'fr' }).map(capitalizeFirstLetter);
     const listPlaces = await PlaceModel.findAll({
-        include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
+        include: [{ model: RegularOpeningModel, as: "regularOpening", required: false }],
         order: [
             ['nom', 'ASC'],
         ],
@@ -154,16 +154,17 @@ router.get(['/lieux'], async (req, res) => {
     const listPlacesComputed = await Promise.all(
         listPlaces.map(async (place) => {
             const placeRegularOpening = await place.getRegularOpening()
-            const listClosedDays = placeRegularOpening.jours_fermeture as string[];
+            const listClosedDays = (placeRegularOpening?.jours_fermeture || []) as string[];
 
-            const [heure_ouverture_heure, heure_ouverture_minutes] = placeRegularOpening.heure_ouverture.split(":");
-            const [heure_fermeture_heure, heure_fermeture_minutes] = placeRegularOpening.heure_fermeture.split(":");
+            const [heure_ouverture_heure, heure_ouverture_minutes] = (placeRegularOpening?.heure_ouverture || DEFAULT_OPEN_HOURS).split(":");
+            const [heure_fermeture_heure, heure_fermeture_minutes] = (placeRegularOpening?.heure_fermeture || DEFAULT_CLOSE_HOURS).split(":");
 
             const res = {
                 ...place.toJSON(),
                 jours_fermeture: listClosedDays.map((idxDay) => listDays[Number(idxDay) - 1]).join(', '),
                 heure_ouverture: `${heure_ouverture_heure}h${heure_ouverture_minutes}`,
                 heure_fermeture: `${heure_fermeture_heure}h${heure_fermeture_minutes}`,
+                incomplet: placeRegularOpening === null,
             } as PlaceRaw;
 
             delete res.regularOpening;

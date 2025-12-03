@@ -264,8 +264,8 @@ export const DEFAULT_OPEN_HOURS = "10:00:00";
 export const DEFAULT_CLOSE_HOURS = "19:30:00";
 
 export const listPlaceTypes = [{
-    label: "Fablab® Numixs",
-    value: "fablab",
+    label: "Faclab® Numixs",
+    value: "faclab",
 },{
     label: "Station Numixs",
     value: "station",

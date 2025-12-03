@@ -105,9 +105,10 @@ Créer nouveau lieu Numixs
                             <button>
                                 <selectedcontent></selectedcontent>
                             </button>
+
                             {% for type in list_place_types %}
                                 <option {{ "selected" if place.type == type.value else "" }} value="{{ type.value }}">
-                                    <img width="20" height="20" src="https://mobile-img.lpcdn.ca/lpca/924x/fbdffee2/307d3c3c-fdc1-11e9-82bb-0eda3a42da3c.jpg" alt="">
+                                    <img width="100" src="/images/logos/{{ type.logo }}" alt="">
                                     <span>{{ type.label }}</span>
                                 </option>
                             {% endfor %}

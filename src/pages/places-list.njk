@@ -45,7 +45,13 @@ Listes lieux numixs
                                 <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.nom }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.heure_ouverture }}-{{ place.heure_fermeture }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                        {% if place.incomplet %}
+                                            Non défini
+                                        {% else %}
+                                        {{ place.heure_ouverture }}-{{ place.heure_fermeture }}
+                                        {% endif %}
+                                    </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.jours_fermeture or "Aucun" }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ "Oui" if place.ouvert == 1 else "Non" }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">

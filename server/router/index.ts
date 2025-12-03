@@ -6,7 +6,7 @@ import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "#server/index.ts";
-import { Place as PlaceModel, Visit as VisitModel } from "#models/index.ts";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
 import parseManifest from "#server/parse-manifest.ts";
 
 import ApiRouter from "./api.ts";
@@ -109,7 +109,8 @@ router.get(["/choix-lieu"], async (req, res) => {
             ouvert: {
                 [Op.eq]: 1,
             }
-        }
+        },
+        include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
     });
 
     let place = null;

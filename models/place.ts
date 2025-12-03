@@ -43,7 +43,7 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
                 },
                 type: {
                     type: DataTypes.ENUM(...listPlaceTypes.map((item) => item.value)),
-                    defaultValue: "lab",
+                    defaultValue: listPlaceTypes.map((item) => item.value)[0],
                     allowNull: false,
                 },
                 ouvert: {
