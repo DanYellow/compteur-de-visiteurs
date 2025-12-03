@@ -1,15 +1,15 @@
 import { DateTime } from "luxon";
-import { Chart } from 'chart.js';
+import { Chart, scales } from 'chart.js';
 import { loadImage, slugify } from "./utils";
 
 const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
 const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")
 
 const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
-const WATERMARK_SCALE_FACTOR = 0.85;
+const WATERMARK_SCALE_FACTOR = 0.75;
 
 const CHART_SIZE = {
-    width: 1900,
+    width: 1600,
     height: 950,
 }
 
@@ -18,27 +18,29 @@ const PADDING = {
     y: 12,
 }
 
+const TOP_MARGIN = 20;
+const CHART_TABLE_GAP = 20;
+const BOTTOM_MARGIN = 40;
+const SIDE_PADDING = 12;
+
+
 const today = DateTime.now();
 
 listDownloadButtons.forEach((item) => {
     (item as HTMLButtonElement).addEventListener("click", async (e: MouseEvent) => {
-        const element = e.currentTarget as HTMLButtonElement;
-        const chartId = element.dataset.downloadChart!;
-        const chartData = JSON.parse(element.dataset.chartData || "{}");
+        const button = e.currentTarget as HTMLButtonElement;
+        button.inert = true;
+        const chartId = button.dataset.downloadChart!;
+        const chartData = JSON.parse(button.dataset.chartData || "{}");
 
         const link = document.createElement("a");
         const chart = document.getElementById(chartId) as HTMLCanvasElement;
-        chart.style.opacity = "0";
+
         const chartInstance = Chart.getChart(chart)!;
 
         // Compute export canvas size
         const dialog = chart.closest("dialog");
         const table = dialog?.querySelector("table") as HTMLTableElement | null;
-
-        const TOP_MARGIN = 20;
-        const CHART_TABLE_GAP = 20;
-        const BOTTOM_MARGIN = 40;
-        const SIDE_PADDING = 40;
 
         const tableWidth = table ? table.offsetWidth : 0;
         const tableHeight = table ? table.offsetHeight : 0;
@@ -84,6 +86,9 @@ listDownloadButtons.forEach((item) => {
         exportedChartConfig.options.plugins.title.font.size = 32;
         exportedChartConfig.options.plugins.subtitle.font.size = 16;
 
+        exportedChartConfig.options.scales.x.ticks.font.size = 18;
+        exportedChartConfig.options.scales.y.ticks.font.size = 18;
+
         exportedChartConfig.options.plugins.legend = {
             ...exportedChartConfig.options.plugins.legend,
             title: {
@@ -97,7 +102,7 @@ listDownloadButtons.forEach((item) => {
                 ...exportedChartConfig.options.plugins.legend.labels,
                 font: {
                     ...exportedChartConfig.options.plugins.legend.labels?.font,
-                    size: 18
+                    size: 16
                 }
             }
         }
@@ -197,9 +202,6 @@ listDownloadButtons.forEach((item) => {
         // Cleanup
         exportChart.destroy();
 
-        // Restore UI
-        setTimeout(() => {
-            chart.style.opacity = "1";
-        }, 300);
+        button.inert = false;
     });
 });

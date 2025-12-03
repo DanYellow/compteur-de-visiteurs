@@ -54,7 +54,7 @@ export const listGroups = [
     {
         "name": "numixs Lab",
         "value": "numixs_lab",
-        "lineColor": 'rgb(22, 180, 217)',
+        "lineColor": '#000',
     },
     {
         "name": "Retraité",
