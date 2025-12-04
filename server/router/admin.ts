@@ -7,6 +7,7 @@ import EventRouter from "#server/router/admin/event.ts";
 import { CommonRegularOpening, EventRaw, PlaceRaw, VisitRaw } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index.ts";
 import { Op } from "sequelize";
+import { authenticateMiddleware } from "#server/middlewares.ts";
 
 import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
 
@@ -15,7 +16,7 @@ const router = express.Router();
 router.use("/", PlaceRouter);
 router.use("/", EventRouter);
 
-router.get(["/dashboard"], async (req, res) => {
+router.get(["/dashboard"], authenticateMiddleware, async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.date) {
@@ -25,8 +26,8 @@ router.get(["/dashboard"], async (req, res) => {
         }
     }
 
-    const startTime = daySelected.startOf("month").minus({week: 1});
-    const endTime = daySelected.endOf("month").plus({week: 1});
+    const startTime = daySelected.startOf("month").minus({ week: 1 });
+    const endTime = daySelected.endOf("month").plus({ week: 1 });
 
     const listPlaces = await PlaceModel.findAll({
         nest: true,
@@ -37,21 +38,21 @@ router.get(["/dashboard"], async (req, res) => {
                 required: true
             },
             {
-                    model: EventModel,
-                    as: "listEvents",
-                    attributes: {
-                        include: ["nom", "heure_ouverture", "heure_fermeture"]
-                    },
-                    required: false,
-                    where: {
-                        date: {
-                            [Op.between]: [startTime.toString(), endTime.toString()],
-                        }
-                    },
-                    through: {
-                        attributes: [],
-                    },
-                }
+                model: EventModel,
+                as: "listEvents",
+                attributes: {
+                    include: ["nom", "heure_ouverture", "heure_fermeture"]
+                },
+                required: false,
+                where: {
+                    date: {
+                        [Op.between]: [startTime.toString(), endTime.toString()],
+                    }
+                },
+                through: {
+                    attributes: [],
+                },
+            }
         ],
         order: [
             ['nom', 'ASC'],
@@ -82,7 +83,7 @@ router.get(["/dashboard"], async (req, res) => {
 
     const listAllEvents = listPlaces.map((item) => (item as PlaceRaw).listEvents).flat().map((item) => item.toJSON())
 
-    const listEventsComputed:EventRaw[] = (placeSelected === "tous" ? listAllEvents : place!.listEvents).map((item) => {
+    const listEventsComputed: EventRaw[] = (placeSelected === "tous" ? listAllEvents : place!.listEvents).map((item) => {
         return {
             ...item,
             aujourdhui: String(item.date) === daySelected.toFormat("yyyy-LL-dd")
@@ -107,7 +108,7 @@ router.get(["/dashboard"], async (req, res) => {
     });
 })
 
-router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
+router.get(["/visiteurs", "/visites"], authenticateMiddleware, async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.date) {
@@ -124,8 +125,8 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
     let regularOpening = {};
     let listAllEvents: EventModel[] = []
 
-    const startTime = daySelected.startOf("month").minus({week: 1});
-    const endTime = daySelected.endOf("month").plus({week: 1});
+    const startTime = daySelected.startOf("month").minus({ week: 1 });
+    const endTime = daySelected.endOf("month").plus({ week: 1 });
 
     if (placeSelected !== "tous") {
         place = await PlaceModel.findOne({
@@ -216,7 +217,7 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         ],
     })
 
-    const listEventsComputed:EventRaw[] = (placeSelected === "tous" ? listAllEvents : place!.listEvents).map((item) => {
+    const listEventsComputed: EventRaw[] = (placeSelected === "tous" ? listAllEvents : place!.listEvents).map((item) => {
         return {
             ...(placeSelected === "tous" ? (item as EventModel).toJSON() : item),
             aujourdhui: String(item.date) === daySelected.toFormat("yyyy-LL-dd")
@@ -241,5 +242,6 @@ router.get(["/visiteurs", "/liste-visiteurs", "/visites"], async (req, res) => {
         }
     });
 });
+
 
 export default router;

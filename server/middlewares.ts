@@ -1,7 +1,17 @@
+import type { NextFunction, Request, Response } from "express";
 import path from "path";
 import fs from "fs/promises";
 
-export default async (manifest: string) => {
+export const authenticateMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    if (req.session.userId) {
+        next();
+    } else {
+        next();
+        // res.sendStatus(401);
+    }
+};
+
+export const parseManifest = async (manifest: string) => {
     if (process.env.NODE_ENV !== "production") {
         return {};
     }

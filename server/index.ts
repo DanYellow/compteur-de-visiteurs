@@ -1,12 +1,13 @@
 import { fileURLToPath } from "url";
 import path from "path";
 import nunjucks from "nunjucks";
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
 import { WebSocketServer } from 'ws';
 import { DateTime } from "luxon";
 import ip from "ip";
 import cookieParser from "cookie-parser";
+import session from "express-session";
 
 import router from "./router/index.ts";
 
@@ -45,6 +46,7 @@ app.use(
         ],
     })
 );
+app.use(session({ secret: 'your_session_secret', resave: false, saveUninitialized: true }));
 
 app.use((req, res, next) => {
     const context = {
@@ -109,7 +111,7 @@ nunjucksConfig.addFilter("pad", (value, char: string, nb: number) => {
     return String(value).padStart(nb, char);
 });
 
-nunjucksConfig.addFilter("split", (value, char=",") => {
+nunjucksConfig.addFilter("split", (value, char = ",") => {
     return String(value).split(char).map((item) => `${item}<br />`).join("");
 });
 
@@ -119,7 +121,6 @@ nunjucksConfig.addFilter("filter", (array, predicate) => {
         return item[predicate.key] === predicate.value;
     });
 });
-
 
 nunjucksConfig.addFilter("json", (value, listKeysToDelete: string[] = []) => {
     if (!Array.isArray(listKeysToDelete)) {

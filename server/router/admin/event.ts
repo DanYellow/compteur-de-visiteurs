@@ -5,11 +5,12 @@ import { DateTime, Info } from "luxon";
 import { Place as PlaceModel, Event as EventModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
 import { capitalizeFirstLetter } from '#scripts/utils.shared.ts';
 import { EventSchema } from "#scripts/schemas.ts";
-import { PlaceRaw } from "#types";
+import { EventRaw, PlaceRaw } from "#types";
+import { authenticateMiddleware } from "#server/middlewares.ts";
 
 const router = express.Router();
 
-router.get(['/evenements'], async (req, res) => {
+router.get(['/evenements'], authenticateMiddleware, async (req, res) => {
     const today = DateTime.now();
 
     const listEvents = await EventModel.findAll({
@@ -36,7 +37,7 @@ router.get(['/evenements'], async (req, res) => {
     });
 })
 
-router.get(['/evenement', '/evenement/:eventId'], async (req, res) => {
+router.get(['/evenement', '/evenement/:eventId'], authenticateMiddleware, async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
         raw: true,
         order: [["nom", "ASC"]],
@@ -60,7 +61,7 @@ router.get(['/evenement', '/evenement/:eventId'], async (req, res) => {
             }]
         });
         if (event) {
-            event = event.toJSON();
+            event = event.toJSON() as EventRaw;
 
             const [heure_ouverture_heure, heure_ouverture_minutes] = event.heure_ouverture.split(":");
             const [heure_fermeture_heure, heure_fermeture_minutes] = event.heure_fermeture.split(":");
@@ -89,7 +90,7 @@ router.get(['/evenement', '/evenement/:eventId'], async (req, res) => {
         list_places: listPlaces,
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
-}).post(['/evenement', '/evenement/:eventId'], async (req, res) => {
+}).post(['/evenement', '/evenement/:eventId'], authenticateMiddleware, async (req, res) => {
     const payloadValidation = {
         ...req.body,
         lieux: JSON.stringify(req.body.lieux || [])

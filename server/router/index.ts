@@ -1,13 +1,14 @@
 import express from "express";
 import { DateTime } from "luxon";
 import { Op } from 'sequelize';
+import bcrypt from "bcryptjs";
 
 import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { wss } from "#server/index.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
-import parseManifest from "#server/parse-manifest.ts";
+import { parseManifest } from "#server/middlewares.ts";
 
 import ApiRouter from "./api.ts";
 import DownloadRouter from "./download.ts";
@@ -25,7 +26,7 @@ router.use(async (req, res, next) => {
 
     next();
 });
-
+// https://apidog.com/fr/blog/node-js-express-authentication-7/
 router.use("/api", ApiRouter);
 router.use("/telecharger", DownloadRouter);
 router.use("/", AdminRouter);
@@ -67,23 +68,23 @@ router.get("/", async (req, res) => {
             lieu_id: place!.id,
         }
 
-//         const [order, created] = await sequelize.query(`
-//     INSERT INTO orders (customer_id, amount, created_at, updated_at)
-//     SELECT :customerId, :amount, NOW(), NOW()
-//     FROM customers
-//     WHERE id = :customerId AND status = 'active'
-//     RETURNING *;
-//   `, {
-//     replacements: {
-//       customerId,
-//       amount: orderData.amount
-//     },
-//     type: QueryTypes.INSERT
-//   });
+        //         const [order, created] = await sequelize.query(`
+        //     INSERT INTO orders (customer_id, amount, created_at, updated_at)
+        //     SELECT :customerId, :amount, NOW(), NOW()
+        //     FROM customers
+        //     WHERE id = :customerId AND status = 'active'
+        //     RETURNING *;
+        //   `, {
+        //     replacements: {
+        //       customerId,
+        //       amount: orderData.amount
+        //     },
+        //     type: QueryTypes.INSERT
+        //   });
 
-// if (!created || order.length === 0) {
-//     throw new Error('Cannot create order: Customer not active');
-//   }
+        // if (!created || order.length === 0) {
+        //     throw new Error('Cannot create order: Customer not active');
+        //   }
 
         const newVisit = await VisitModel.create(payload)
         await new Promise(r => setTimeout(r, 1500));
@@ -122,7 +123,7 @@ router.get(["/choix-lieu"], async (req, res) => {
 
     res.render("pages/set-place.njk", {
         "places_list": listPlaces,
-        flash_message: listFlashMessages.reduce((a: Record<string, string>, v: string) => ({ ...a, [v]: v}), {}),
+        flash_message: listFlashMessages.reduce((a: Record<string, string>, v: string) => ({ ...a, [v]: v }), {}),
         place,
     });
 }).post(["/choix-lieu"], async (req, res) => {
@@ -149,5 +150,22 @@ router.get(["/choix-lieu"], async (req, res) => {
 
     res.redirect("/choix-lieu");
 });
+
+const users = [{ id: 1, username: 'user1', password: bcrypt.hashSync('password1', 8) }];
+router.get('/connexion', async (req, res) => {
+    res.render("pages/login.njk", {
+
+    });
+}).post('/connexion', (req, res) => {
+    const { username, password } = req.body;
+    const user = users.find(u => u.username === username);
+    if (user && bcrypt.compareSync(password, user.password)) {
+        req.session.userId = user.id;
+        res.send('Logged in');
+    } else {
+        res.status(401).send('Invalid credentials');
+    }
+});
+
 
 export default router;
