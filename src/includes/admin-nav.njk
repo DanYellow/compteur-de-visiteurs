@@ -6,9 +6,9 @@
         </header>
         {% set navItemClasses = "text-white hocus:bg-green-numixs/50 hocus:text-white" %}
         {% set navItemActiveClasses = "bg-[#504F4F] text-green-numixs hocus:text-white" %}
-        <ul class="flex flex-row xl:flex-col gap-1.5">
+        <ul class="grid grid-cols-4 xl:flex flex-row xl:flex-col gap-1.5">
             <li>
-                <a href="/dashboard{{ formatQueryParams({ lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}" class="{{ navItemActiveClasses if (active_menu_item == "dashboard") else navItemClasses }} title-font text-lg xl:text-[1.75rem] py-2 px-5 rounded-md flex flex-col xl:flex-row gap-3 items-center">
+                <a href="/dashboard{{ formatQueryParams({ lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}" class="{{ navItemActiveClasses if (active_menu_item == "dashboard") else navItemClasses }} whitespace-nowrap title-font text-lg xl:text-[1.75rem] py-2 px-5 rounded-md flex flex-col xl:flex-row gap-3 items-center">
                     {% include "includes/icons/home-icon.svg" %}
                     Tableau de bord
                 </a>

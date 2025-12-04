@@ -186,6 +186,7 @@ router.get(["/visiteurs", "/visites"], authenticateMiddleware, async (req, res) 
             include: [{
                 model: PlaceModel,
                 as: "listPlaces",
+                required: true,
                 through: {
                     attributes: [],
                 },
