@@ -200,18 +200,18 @@ const listCharts = Object.values(configData);
         const resEvent = await reqEvent.json();
 
         if (resEvent.data) {
-            resEvent.data.forEach((item) => {
-                const [heure_ouverture_heure] = item.heure_ouverture.split(":");
-                const [heure_fermeture_heure, heure_fermeture_minutes] = item.heure_fermeture.split(":");
-
-                const isEventClosedAfterRegularHours = placeData.heure_fermeture > parseInt(heure_fermeture_heure);
-                const minutesToUse = isEventClosedAfterRegularHours ? placeData.minutes_fermeture : heure_fermeture_minutes;
+            resEvent.data.forEach((item: EventRaw) => {
+                const [event_heure_ouverture_heure] = item.heure_ouverture.split(":");
+                const [event_heure_fermeture_heure, event_heure_fermeture_minutes] = item.heure_fermeture.split(":");
+                
+                const isEventClosedAfterRegularHours = heure_fermeture_heure > parseInt(heure_fermeture_heure);
+                const minutesToUse = isEventClosedAfterRegularHours ? heure_fermeture_minutes : event_heure_fermeture_minutes;
 
                 listEventsHours.push({
-                    date: item.date,
+                    date: String(item.date),
                     groupe: item.groupe,
-                    heure_fermeture: Math.max(Number(heure_fermeture_heure), Number(heure_fermeture_heure)),
-                    heure_ouverture: Math.min(Number(heure_ouverture_heure), Number(heure_ouverture_heure)),
+                    heure_fermeture: Math.max(Number(event_heure_fermeture_heure), Number(heure_fermeture_heure)),
+                    heure_ouverture: Math.min(Number(event_heure_ouverture_heure), Number(heure_ouverture_heure)),
                     is_close_hour_exactly: minutesToUse === "00",
                 })
             });
