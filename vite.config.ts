@@ -13,9 +13,6 @@ export default defineConfig(({ mode }) => {
         appType: "custom",
         define: {
             'import.meta.env.FORM_RESULT_TIMEOUT': JSON.stringify(env.FORM_RESULT_TIMEOUT),
-            'import.meta.env.OPENING_HOURS': JSON.stringify(env.OPENING_HOURS),
-            'import.meta.env.CHART_EXPORT_SIZE': JSON.stringify(env.CHART_EXPORT_SIZE),
-            'import.meta.env.PLACE': JSON.stringify(env.PLACE),
         },
         server: {
             // Expose the server to the network allowing access from ip address
@@ -43,7 +40,7 @@ export default defineConfig(({ mode }) => {
                     path.resolve(__dirname, "src/assets/scripts/event-form.ts"),
                     path.resolve(__dirname, "src/assets/scripts/dashboard.ts"),
                     path.resolve(__dirname, "src/assets/scripts/download-chart.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/details-special-opening-dialog.ts"),
+                    path.resolve(__dirname, "src/assets/scripts/details-event-dialog.ts"),
                 ],
                 formats: ["es"],
             },

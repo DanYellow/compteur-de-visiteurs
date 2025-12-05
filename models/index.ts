@@ -85,6 +85,8 @@ if (process.env.NODE_ENV === "development") {
         // force: true
         // alter: true
     })
+} else {
+    await sequelize.sync()
 }
 
 export default sequelize;

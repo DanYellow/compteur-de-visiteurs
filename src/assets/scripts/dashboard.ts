@@ -492,7 +492,9 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
                 let flatData = []
                 if (visitsHasEvents) {
-                    flatData = lineData.map((item) => item.reduce((acc, value) => acc+value, 0))
+                    flatData = lineData.map((item: unknown) => {
+                        return (item as number[]).reduce((acc: number, value: number) => acc + value, 0)
+                    })
                 } else {
                     flatData = lineData;
                 }

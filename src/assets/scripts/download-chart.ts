@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { Chart, scales } from 'chart.js';
+import { Chart } from 'chart.js';
 import { loadImage, slugify } from "./utils";
 
 const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
@@ -65,7 +65,7 @@ listDownloadButtons.forEach((item) => {
         const baseConfig = chartInstance.config;
 
         const exportedChartConfig: any = {
-            type: baseConfig.type,
+            ...("type" in baseConfig ? {type: baseConfig.type} : {}),
             data: {
                 ...baseConfig.data,
                 datasets: baseConfig.data.datasets.map(ds => ({ ...ds })),
@@ -77,7 +77,7 @@ listDownloadButtons.forEach((item) => {
                 animation: false as const,
             },
             plugins: baseConfig.plugins,
-        };
+        } 
 
         // Update font sizes for export
         exportedChartConfig.options.plugins.totalVisitors.fontSize = "18px";
