@@ -3,7 +3,7 @@ import path from "path";
 import nunjucks from "nunjucks";
 import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import { WebSocketServer } from 'ws';
+import { WebSocketServer } from "ws";
 import { DateTime } from "luxon";
 import ip from "ip";
 import cookieParser from "cookie-parser";
@@ -34,8 +34,8 @@ app.set("views", path.join(__dirname, "..", "/src"));
 
 app.use(express.static(publicPath));
 app.use(cors());
-app.use(express.urlencoded())
-app.use(cookieParser())
+app.use(express.urlencoded());
+app.use(cookieParser());
 app.use(
     express.json({
         type: [
@@ -46,7 +46,13 @@ app.use(
         ],
     })
 );
-app.use(session({ secret: 'your_session_secret', resave: false, saveUninitialized: true }));
+app.use(
+    session({
+        secret: "your_session_secret",
+        resave: false,
+        saveUninitialized: true,
+    })
+);
 
 app.use((req, res, next) => {
     const context = {
@@ -60,7 +66,7 @@ app.use((req, res, next) => {
     next();
 });
 
-app.all('/', function (req, res, next) {
+app.all("/", function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     next();
@@ -71,15 +77,18 @@ app.use(router);
 app.use(function (req, res, next) {
     res.status(404);
 
-    if (req.accepts('html')) {
-        return res.render('pages/error.njk', { code: 404, message: "Page non trouvée" });
+    if (req.accepts("html")) {
+        return res.render("pages/error.njk", {
+            code: 404,
+            message: "Page non trouvée",
+        });
     }
 
-    if (req.accepts('json')) {
+    if (req.accepts("json")) {
         return res.json({ error: "Page non trouvée" });
     }
 
-    res.type('txt').send("Page non trouvée");
+    res.type("txt").send("Page non trouvée");
 });
 
 const nunjucksConfig = nunjucks.configure(app.get("views"), {
@@ -95,12 +104,12 @@ nunjucksConfig.addFilter("date", (value, format) => {
     if (!DateTime.fromISO(value).isValid) {
         const date = DateTime.fromJSDate(new Date(value));
         if (date.isValid) {
-            return date.setLocale('fr').toFormat(format);
+            return date.setLocale("fr").toFormat(format);
         }
         return "";
     }
 
-    return DateTime.fromISO(value).setLocale('fr').toFormat(format);
+    return DateTime.fromISO(value).setLocale("fr").toFormat(format);
 });
 
 nunjucksConfig.addFilter("add_days", (value, days) => {
@@ -112,9 +121,11 @@ nunjucksConfig.addFilter("pad", (value, char: string, nb: number) => {
 });
 
 nunjucksConfig.addFilter("split", (value, char = ",") => {
-    return String(value).split(char).map((item) => `${item}<br />`).join("");
+    return String(value)
+        .split(char)
+        .map((item) => `${item}<br />`)
+        .join("");
 });
-
 
 nunjucksConfig.addFilter("filter", (array, predicate) => {
     return array.filter((item: Record<string, unknown>) => {
@@ -124,7 +135,7 @@ nunjucksConfig.addFilter("filter", (array, predicate) => {
 
 nunjucksConfig.addFilter("json", (value, listKeysToDelete: string[] = []) => {
     if (!Array.isArray(listKeysToDelete)) {
-        listKeysToDelete = []
+        listKeysToDelete = [];
     }
 
     if (value instanceof nunjucks.runtime.SafeString) {
@@ -135,22 +146,29 @@ nunjucksConfig.addFilter("json", (value, listKeysToDelete: string[] = []) => {
     return jsonString;
 });
 
-nunjucksConfig.addGlobal("formatQueryParams", (obj: Record<string, string>, removeIfEmpty: boolean = false) => {
-    const params = new URLSearchParams(obj);
-    if (removeIfEmpty) {
-        Object.keys(obj).forEach((item) => {
-            if (!params.get(item)) {
-                params.delete(item);
-            }
-        })
+nunjucksConfig.addGlobal(
+    "formatQueryParams",
+    (obj: Record<string, string>, removeIfEmpty: boolean = false) => {
+        const params = new URLSearchParams(obj);
+        if (removeIfEmpty) {
+            Object.keys(obj).forEach((item) => {
+                if (!params.get(item)) {
+                    params.delete(item);
+                }
+            });
+        }
+
+        const stringifiedParams = params.toString();
+
+        return stringifiedParams.length ? `?${params.toString()}` : "";
     }
+);
 
-    const stringifiedParams = params.toString();
-
-    return stringifiedParams.length ? `?${params.toString()}` : "";
-});
-
-const listDomains: string[] = (process.env.IS_DOCKER?.toLowerCase() === "true" && process.env.NODE_ENV === "production") ? ["faclab.localhost"] : ["localhost", "0.0.0.0"];
+const listDomains: string[] =
+    process.env.IS_DOCKER?.toLowerCase() === "true" &&
+    process.env.NODE_ENV === "production"
+        ? ["faclab.localhost"]
+        : ["localhost", "0.0.0.0"];
 const port = Number(process.env.VITE_PORT || 3900);
 const server = app.listen(port, () => {
     console.log("---------------------------");
@@ -165,16 +183,18 @@ const server = app.listen(port, () => {
             if (item.includes("localhost")) {
                 prefix = "Local";
             }
-            console.log(`\x1b[35m➜\x1b[0m  ${prefix}: \x1b[35mhttp://${item}:${port}/\x1b[0m`);
+            console.log(
+                `\x1b[35m➜\x1b[0m  ${prefix}: \x1b[35mhttp://${item}:${port}/\x1b[0m`
+            );
         });
 });
 
 export const wss = new WebSocketServer({
     server,
-})
+});
 
-wss.on('connection', (ws) => {
-    ws.on('error', console.error);
+wss.on("connection", (ws) => {
+    ws.on("error", console.error);
 
     // ws.on('message', function message(data) {
     //     console.log('received: %s', data);
@@ -182,3 +202,7 @@ wss.on('connection', (ws) => {
 
     // ws.send('something');
 });
+
+export const flashMessageCookieOptions = {
+    httpOnly: true,
+};

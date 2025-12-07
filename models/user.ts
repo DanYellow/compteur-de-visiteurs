@@ -5,9 +5,9 @@ import { LIST_ROLES } from '#scripts/utils.shared.ts';
 export default class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare id: CreationOptional<number>;
     declare email: string;
-    declare mot_de_passe: string;
-    declare actif: boolean;
-    declare derniere_connexion: string;
+    declare mot_de_passe?: string;
+    declare actif?: boolean;
+    declare derniere_connexion?: string;
     declare role?: string;
 
     static initModel(sequelize: Sequelize) {
@@ -20,7 +20,7 @@ export default class User extends Model<InferAttributes<User>, InferCreationAttr
                 },
                 mot_de_passe: {
                     type: DataTypes.STRING,
-                    allowNull: false,
+                    allowNull: true,
                 },
                 email: {
                     type: DataTypes.STRING,
@@ -33,7 +33,7 @@ export default class User extends Model<InferAttributes<User>, InferCreationAttr
                 },
                 derniere_connexion: {
                     type: DataTypes.DATE,
-                    allowNull: false,
+                    allowNull: true,
                 },
                 role: {
                     type: DataTypes.ENUM(...LIST_ROLES.map((item) => item.value)),

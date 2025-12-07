@@ -41,6 +41,7 @@ export default defineConfig(({ mode }) => {
                     path.resolve(__dirname, "src/assets/scripts/dashboard.ts"),
                     path.resolve(__dirname, "src/assets/scripts/download-chart.ts"),
                     path.resolve(__dirname, "src/assets/scripts/details-event-dialog.ts"),
+                    path.resolve(__dirname, "src/assets/scripts/forms/sign-in-form.ts"),
                 ],
                 formats: ["es"],
             },

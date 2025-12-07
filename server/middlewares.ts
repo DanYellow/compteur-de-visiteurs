@@ -6,6 +6,9 @@ export const requireRoleMiddleware = (type: string = "") => {
     return function (req: Request, res: Response, next: NextFunction) {
         if (req.session.userId) {
             next();
+    //         if (req.user?.role !== role) {
+    //   return res.status(403).json({ message: "Forbidden" });
+    // }
         } else {
             next();
             // res.sendStatus(401);

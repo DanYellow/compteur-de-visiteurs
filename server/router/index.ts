@@ -5,9 +5,9 @@ import bcrypt from "bcryptjs";
 
 import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
-import { VisitorSchema } from "#scripts/schemas.ts";
-import { wss } from "#server/index.ts";
-import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
+import { SignInSchema, VisitorSchema } from "#scripts/schemas.ts";
+import { flashMessageCookieOptions, wss } from "#server/index.ts";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User as UserModel, Visit as VisitModel } from "#models/index.ts";
 import { parseManifest } from "#server/middlewares.ts";
 
 import ApiRouter from "./api.ts";
@@ -127,11 +127,6 @@ router.get(["/choix-lieu"], async (req, res) => {
         place,
     });
 }).post(["/choix-lieu"], async (req, res) => {
-    const options = {
-        // maxAge: 1000 * 60 * 15, // would expire after 15 minutes
-        httpOnly: true, // The cookie only accessible by the web server
-    }
-
     const place = await PlaceModel.findOne({ where: { slug: req.body.place, ouvert: true } });
     const listFlashMessages = []
     if (place) {
@@ -141,7 +136,7 @@ router.get(["/choix-lieu"], async (req, res) => {
         if (isClosedDay) {
             listFlashMessages.push("closed_place")
         }
-        res.cookie('lieu_numixs', req.body.place, options)
+        res.cookie('lieu_numixs', req.body.place, flashMessageCookieOptions)
         listFlashMessages.push("set_place")
     } else {
         listFlashMessages.push("not_found_place")
@@ -164,6 +159,29 @@ router.get('/connexion', async (req, res) => {
         res.send('Logged in');
     } else {
         res.status(401).send('Invalid credentials');
+    }
+});
+
+router.get('/inscription', async (req, res) => {
+    res.render("pages/sign-in.njk", {
+        flash_message: req.cookies.flash_message,
+    });
+}).post('/inscription', async (req, res) => {
+    if (true) {
+        const validator = SignInSchema.safeParse(req.body);
+        if (!validator.success) {
+            return res.status(500).json({ "success": false });
+        }
+
+        try {
+            const newUser = await UserModel.create({
+                email: String(req.body.email),
+            });
+            res.cookie('flash_message', 'register_success', flashMessageCookieOptions)
+            // res.cookie('email', req.body.email, flashMessageCookieOptions)
+        } catch (error) {
+            
+        }
     }
 });
 

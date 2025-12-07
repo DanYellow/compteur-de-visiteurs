@@ -1,0 +1,61 @@
+{% extends "layouts/page.njk" %}
+
+{% set root_class = "register" %}
+
+{% block title %}
+Inscription
+{% endblock %}
+
+{% block scripts %}
+{% if NODE_ENV == "development" %}
+    <script type="module" src="/src/assets/scripts/forms/sign-in-form.ts" defer></script>
+{% else %}
+    <script type="module" src="/{{ manifest['src/assets/scripts/forms/sign-in-form.ts'].file }}" defer></script>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mt-8 px-3 mx-auto">
+        <div>
+            <img src="/images/logos/faclab-numixs.svg" class="w-20" alt="">
+            <h1 class="text-6xl title-font text-green-numixs">Inscription</h1>
+        </div>
+        {% if flash_message.register_success %}
+        <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4 rounded-lg">Le lieu <span class="font-bold">"{{ place.nom }}"</span> a été sélectionné. Toutes les visites seront enregistrées comme appartenant au lieu <span class="font-bold">"{{ place.nom }}"</span> depuis cet appareil. <a href="/" class="underline hocus:no-underline">Accéder au formulaire.</a></p>
+        {% endif %}
+        <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4 rounded-lg">
+            Votre inscription a été prise en compte. Vous serez notifié(e) par e-mail, à l'adresse saisie précédemment, lorsque votre compte sera activé par un administrateur.
+        </p>
+        <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4 rounded-lg">
+            Vous ne pouvez pas créer un compte avec cette adresse e-mail.
+        </p>
+        <p class="p-4 bg-amber-50 text-amber-800 border-t-4 border-t-amber-800 mb-4 rounded-lg">
+            Une inscription avec l'adresse "test.test@yopmail.com" a déjà été enregistrée, veuillez attendre la validation de votre compte par un administrateur.
+        </p>
+
+        <form action="/inscription" method="post">
+            <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
+
+            <div class="flex flex-col gap-3">
+                <div class="flex flex-col">
+                    <label for="email">Adresse e-mail</label>
+                    <input type="email" name="email" class="text-black" id="email">
+                </div>
+                {# <div class="flex flex-col">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" name="" id="password" class="text-black">
+                </div>
+                <div class="flex flex-col">
+                    <label for="password">Confirmer mot de passe</label>
+                    <input type="password" name="" id="password" class="text-black">
+                </div> #}
+                <div>
+                    <button type="submit" class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                    S'inscrire
+                    {% include "includes/icons/next-arrow.svg" %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

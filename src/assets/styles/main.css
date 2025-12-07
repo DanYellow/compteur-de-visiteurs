@@ -35,7 +35,7 @@
     }
 
     .form-errors-list-container {
-        border: solid 1px var(--color-red-800);
+        border-top: solid 4px var(--color-red-800);
         background-color: var(--color-red-50);
         padding: --spacing(4);
         color: var(--color-red-800);
