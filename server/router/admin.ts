@@ -81,7 +81,7 @@ router.get(["/dashboard"], authenticateMiddleware, async (req, res) => {
         };
     }
 
-    const listAllEvents = listPlaces.map((item) => (item as PlaceRaw).listEvents).flat().map((item) => item.toJSON())
+    const listAllEvents = listPlaces.map((item) => item.listEvents).flat().map((item) => item.toJSON())
 
     const listEventsComputed: EventRaw[] = (placeSelected === "tous" ? listAllEvents : place!.listEvents).map((item) => {
         return {
@@ -90,7 +90,7 @@ router.get(["/dashboard"], authenticateMiddleware, async (req, res) => {
         } as EventRaw
     });
 
-    res.render("pages/dashboard.njk", {
+    res.render("pages/admin/dashboard.njk", {
         "current_date": daySelected,
         "today": DateTime.now(),
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
@@ -225,7 +225,7 @@ router.get(["/visiteurs", "/visites"], authenticateMiddleware, async (req, res) 
         } as EventRaw
     });
 
-    res.render("pages/visits-list.njk", {
+    res.render("pages/admin/visits-list.njk", {
         visits_summary: visitsSummary,
         "visits_list": listVisits,
         "list_business_sector": listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)),

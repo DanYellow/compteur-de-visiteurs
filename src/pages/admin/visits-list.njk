@@ -62,14 +62,14 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
 
                 {% set list_sub_actions = [split_button_sub_action_1, split_button_sub_action_2, split_button_sub_action_3] %}
 
-                <div class="hidden sm:block">
+                <div class="hidden sm:block self-start">
                     {{ macros.split_button(
                         split_button_main_action,
                         list_sub_actions
                     ) }}
                 </div>
                 <div class="block sm:hidden">
-                    <button type="button" class="text-black-numixs hocus:text-green-numixs" commandfor="download-links" command="toggle-popover">
+                    <button type="button" class="text-black-numixs hocus:text-dark-green-numixs" commandfor="download-links" command="toggle-popover">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM18.75 12a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"/>
                         </svg>

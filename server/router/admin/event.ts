@@ -30,7 +30,7 @@ router.get(['/evenements'], authenticateMiddleware, async (req, res) => {
         }],
     });
 
-    res.render("pages/events-list.njk", {
+    res.render("pages/admin/events-list.njk", {
         events_list: listEvents.map((p) => p.toJSON()),
         flash_message: req.cookies.flash_message,
         periode: req.query.periode,
@@ -77,7 +77,7 @@ router.get(['/evenement', '/evenement/:eventId'], authenticateMiddleware, async 
         }
     }
 
-    res.render("pages/add_edit-event.njk", {
+    res.render("pages/admin/add_edit-event.njk", {
         event: {
             ouvert: 1,
             list_places_id: [],
@@ -158,7 +158,7 @@ router.get(['/evenement', '/evenement/:eventId'], authenticateMiddleware, async 
         res.cookie('flash_message', "error", { maxAge: 1000, httpOnly: true })
 
         console.log(e);
-        return res.render("pages/add_edit-event.njk");
+        return res.render("pages/admin/add_edit-event.njk");
     }
 })
 

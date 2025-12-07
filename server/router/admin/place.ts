@@ -36,7 +36,7 @@ router.get(['/lieu', '/lieu/:placeId'], authenticateMiddleware, async (req, res)
         }
     }
 
-    res.render("pages/add_edit-place.njk", {
+    res.render("pages/admin/add_edit-place.njk", {
         place: {
             jours_fermeture: DEFAULT_CLOSED_DAYS,
             ouvert: 1,
@@ -124,7 +124,7 @@ router.get(['/lieu', '/lieu/:placeId'], authenticateMiddleware, async (req, res)
         res.cookie('flash_message', "error", { maxAge: 1000, httpOnly: true })
 
         console.log(e)
-        return res.render("pages/add_edit-place.njk");
+        return res.render("pages/admin/add_edit-place.njk");
     }
 }).post(['/lieu/suppression'], authenticateMiddleware, async (req, res) => {
     try {
@@ -174,7 +174,7 @@ router.get(['/lieux'], authenticateMiddleware, async (req, res) => {
         })
     );
 
-    res.render("pages/places-list.njk", {
+    res.render("pages/admin/places-list.njk", {
         places_list: listPlacesComputed,
         flash_message: req.cookies.flash_message,
     });
