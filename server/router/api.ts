@@ -74,7 +74,7 @@ router.get("/", async (req, res) => {
                         sequelize.literal(`
                         COALESCE(
                             (
-                                SELECT GROUP_CONCAT(DISTINCT so.nom)
+                                SELECT COALESCE(GROUP_CONCAT(DISTINCT so.nom), '') 
                                 FROM ${eventTable} AS so
                                 INNER JOIN "place_event" f
                                     ON f.place_id = ${visitTable}.lieu_id
