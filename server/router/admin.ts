@@ -8,7 +8,7 @@ import UserRouter from "#server/router/admin/user.ts";
 import { CommonRegularOpening, EventRaw, PlaceRaw, VisitRaw } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index.ts";
 import { Op } from "sequelize";
-import { authenticateMiddleware } from "#server/middlewares.ts";
+import { requireRoleMiddleware } from "#server/middlewares.ts";
 
 import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
 
@@ -18,7 +18,7 @@ router.use("/", PlaceRouter);
 router.use("/", EventRouter);
 router.use("/", UserRouter);
 
-router.get(["/dashboard"], authenticateMiddleware, async (req, res) => {
+router.get(["/dashboard"], requireRoleMiddleware(), async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.date) {
@@ -110,7 +110,7 @@ router.get(["/dashboard"], authenticateMiddleware, async (req, res) => {
     });
 })
 
-router.get(["/visiteurs", "/visites"], authenticateMiddleware, async (req, res) => {
+router.get(["/visiteurs", "/visites"], requireRoleMiddleware(), async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.date) {

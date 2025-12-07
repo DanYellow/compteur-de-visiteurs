@@ -6,11 +6,11 @@ import { Place as PlaceModel, Event as EventModel, RegularOpening as RegularOpen
 import { capitalizeFirstLetter } from '#scripts/utils.shared.ts';
 import { EventSchema } from "#scripts/schemas.ts";
 import { EventRaw, PlaceRaw } from "#types";
-import { authenticateMiddleware } from "#server/middlewares.ts";
+import { requireRoleMiddleware } from "#server/middlewares.ts";
 
 const router = express.Router();
 
-router.get(['/evenements'], authenticateMiddleware, async (req, res) => {
+router.get(['/evenements'], requireRoleMiddleware(), async (req, res) => {
     const today = DateTime.now();
 
     const listEvents = await EventModel.findAll({
@@ -37,7 +37,7 @@ router.get(['/evenements'], authenticateMiddleware, async (req, res) => {
     });
 })
 
-router.get(['/evenement', '/evenement/:eventId'], authenticateMiddleware, async (req, res) => {
+router.get(['/evenement', '/evenement/:eventId'], requireRoleMiddleware(), async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
         raw: true,
         order: [["nom", "ASC"]],
@@ -90,7 +90,7 @@ router.get(['/evenement', '/evenement/:eventId'], authenticateMiddleware, async 
         list_places: listPlaces,
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
-}).post(['/evenement', '/evenement/:eventId'], authenticateMiddleware, async (req, res) => {
+}).post(['/evenement', '/evenement/:eventId'], requireRoleMiddleware(), async (req, res) => {
     const payloadValidation = {
         ...req.body,
         lieux: JSON.stringify(req.body.lieux || [])

@@ -336,7 +336,7 @@ router.get("/evenements", async (req, res) => {
         console.log(e)
         return res.status(500).json([])
     }
-})
+});
 
 router.get("/evenements/:event{/:place}", async (req, res) => {
     try {
@@ -392,6 +392,6 @@ router.get("/evenements/:event{/:place}", async (req, res) => {
     }
 
     res.status(200).json({})
-})
+});
 
 export default router;
