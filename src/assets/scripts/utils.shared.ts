@@ -127,8 +127,8 @@ export const getPivotTable = (data: Record<string, VisitRaw[]>, columns: string[
                 {});
             if (options.simplified) {
                 totalPerGroup = (listVisits as unknown as VisitRaw[]).reduce(
-                (acc: Record<string, number>, visit) => ((acc[business.value] = (acc[business.value] || 0) + ((visit[business.value as keyof VisitRaw] === "oui") ? 1 : 0)), acc),
-                {});
+                    (acc: Record<string, number>, visit) => ((acc[business.value] = (acc[business.value] || 0) + ((visit[business.value as keyof VisitRaw] === "oui") ? 1 : 0)), acc),
+                    {});
             }
 
             const indexArray = columns.findIndex((label: string | Record<string, number>) => {
@@ -181,7 +181,7 @@ export const getLinearCSV = (data: Record<string, unknown>[], { periodLabel, lie
         ...Object.fromEntries(listGroupsInForm.map((item) => [item.value, 0])),
         date_passage: periodLabel,
         liste_evenements: "/",
-        ...(lieu === "tous" || !lieu ? { "place.nom": "Tous"} : {}),
+        ...(lieu === "tous" || !lieu ? { "place.nom": "Tous" } : {}),
         id: `Total : ${data.length}`,
     } as CSVLinearHeader;
 
@@ -190,7 +190,7 @@ export const getLinearCSV = (data: Record<string, unknown>[], { periodLabel, lie
 
     const csvHeaderColumns = Object.keys(firstRow);
     csvHeaderColumns[csvHeaderColumns.length - 1] = "Lieu"
-    const csvPayload: (string[]|number[])[] = [csvHeaderColumns];
+    const csvPayload: (string[] | number[])[] = [csvHeaderColumns];
 
     data.forEach((item, idx) => {
         listGroupsInForm.forEach((group) => {
@@ -208,7 +208,7 @@ export const getLinearCSV = (data: Record<string, unknown>[], { periodLabel, lie
         csvPayload.push(rowData);
     });
 
-    csvPayload.splice(1, 0, Object.values(firstRow) as (string[]|number[]));
+    csvPayload.splice(1, 0, Object.values(firstRow) as (string[] | number[]));
 
     return csvPayload;
 }
@@ -231,7 +231,7 @@ export const getWeeksRangeMonth = (daySelected: DateTime) => {
         intervalWeeks.forEach((item: Interval<true>, index: number, array: Interval<boolean>[]) => {
             listWeeks.push({
                 id: item.start!.weekNumber,
-                name: `${item.start.toFormat("dd/LL")} ➜ ${(index === array.length - 1 ? endMonth : (item.end!).minus({day: 1})).toFormat("dd/LL")}`
+                name: `${item.start.toFormat("dd/LL")} ➜ ${(index === array.length - 1 ? endMonth : (item.end!).minus({ day: 1 })).toFormat("dd/LL")}`
             });
         });
 
@@ -269,10 +269,21 @@ export const DEFAULT_CLOSE_HOURS = "19:30:00";
 export const listPlaceTypes = [{
     label: "Faclab® Numixs",
     value: "faclab",
-},{
+}, {
     label: "Station Numixs",
     value: "station",
-},{
+}, {
     label: "Numixs Lab",
     value: "lab",
 }];
+
+export const LIST_ROLES = [{
+    label: "Administrateur",
+    value: "ADMIN",
+}, {
+    label: "Numixs lab",
+    value: "NUMIXS_LAB",
+}, {
+    label: "Lecteur",
+    value: "READ_ONLY",
+}]

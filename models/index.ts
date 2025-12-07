@@ -3,6 +3,7 @@ import Place from './place';
 import Visit from './visit';
 import RegularOpening from './regular-opening';
 import Event from './event';
+import User from './user';
 
 let databaseFileName = './database.tmp.sqlite';
 
@@ -29,6 +30,7 @@ Place.initModel(sequelize);
 Visit.initModel(sequelize);
 RegularOpening.initModel(sequelize);
 Event.initModel(sequelize);
+User.initModel(sequelize);
 
 sequelize.models.place.hasMany(sequelize.models.visit, {
     foreignKey: {
@@ -82,7 +84,7 @@ sequelize.models.event.belongsToMany(sequelize.models.place, {
 
 if (process.env.NODE_ENV === "development") {
     await sequelize.sync({
-        // force: true
+        // force: true,
         // alter: true
     })
 } else {

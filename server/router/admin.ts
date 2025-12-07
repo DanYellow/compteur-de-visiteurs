@@ -4,6 +4,7 @@ import { DateTime, Info } from "luxon";
 import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import PlaceRouter from "#server/router/admin/place.ts";
 import EventRouter from "#server/router/admin/event.ts";
+import UserRouter from "#server/router/admin/user.ts";
 import { CommonRegularOpening, EventRaw, PlaceRaw, VisitRaw } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index.ts";
 import { Op } from "sequelize";
@@ -15,6 +16,7 @@ const router = express.Router();
 
 router.use("/", PlaceRouter);
 router.use("/", EventRouter);
+router.use("/", UserRouter);
 
 router.get(["/dashboard"], authenticateMiddleware, async (req, res) => {
     let daySelected = DateTime.now();

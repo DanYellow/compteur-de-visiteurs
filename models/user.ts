@@ -1,31 +1,45 @@
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin, type BelongsToManyGetAssociationsMixin } from 'sequelize';
+import bcrypt from "bcryptjs";
 
-export default class Event extends Model<InferAttributes<Event>, InferCreationAttributes<Event>> {
+import { LIST_ROLES } from '#scripts/utils.shared.ts';
+export default class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare id: CreationOptional<number>;
-    declare identifiant: string;
+    declare email: string;
     declare mot_de_passe: string;
+    declare actif: boolean;
+    declare derniere_connexion: string;
+    declare role?: string;
 
     static initModel(sequelize: Sequelize) {
-        Event.init(
+        User.init(
             {
                 id: {
                     type: DataTypes.INTEGER,
                     primaryKey: true,
                     autoIncrement: true,
                 },
-                identifiant: {
-                    type: DataTypes.STRING,
-                    unique: true,
-                    allowNull: false,
-                },
                 mot_de_passe: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
-                // role: {
-
-                // }
-
+                email: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                actif: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: false,
+                    defaultValue: false,
+                },
+                derniere_connexion: {
+                    type: DataTypes.DATE,
+                    allowNull: false,
+                },
+                role: {
+                    type: DataTypes.ENUM(...LIST_ROLES.map((item) => item.value)),
+                    allowNull: false,
+                    defaultValue: "NUMIXS_LAB",
+                }
             },
             {
                 sequelize,
@@ -34,8 +48,8 @@ export default class Event extends Model<InferAttributes<Event>, InferCreationAt
                 modelName: 'event',
                 underscored: true,
                 hooks: {
-                    beforeValidate(record) {
-                        // record.slug = `${slugify(record.nom)}-${record.date}-${String(Date.now()).slice(-6)}`
+                    beforeCreate(record) {
+                        record.mot_de_passe = bcrypt.hashSync(record.mot_de_passe, 10)
                     },
                 }
             }
