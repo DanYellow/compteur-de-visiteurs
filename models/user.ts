@@ -5,7 +5,9 @@ import { LIST_ROLES } from '#scripts/utils.shared.ts';
 export default class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare id: CreationOptional<number>;
     declare email: string;
+    declare nom?: string;
     declare mot_de_passe?: string;
+    declare prenom?: string;
     declare actif?: boolean;
     declare derniere_connexion?: string;
     declare role?: string;
@@ -25,6 +27,15 @@ export default class User extends Model<InferAttributes<User>, InferCreationAttr
                 email: {
                     type: DataTypes.STRING,
                     allowNull: false,
+                    unique: true,
+                },
+                nom: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                },
+                prenom: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
                 },
                 actif: {
                     type: DataTypes.BOOLEAN,
@@ -48,9 +59,9 @@ export default class User extends Model<InferAttributes<User>, InferCreationAttr
                 modelName: 'user',
                 underscored: true,
                 hooks: {
-                    beforeCreate(record) {
-                        record.mot_de_passe = bcrypt.hashSync(record.mot_de_passe, 10)
-                    },
+                    // beforeCreate(record) {
+                    //     record.mot_de_passe = bcrypt.hashSync(record.mot_de_passe, 10)
+                    // },
                 }
             }
         )

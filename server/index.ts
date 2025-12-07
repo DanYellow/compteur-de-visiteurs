@@ -133,6 +133,12 @@ nunjucksConfig.addFilter("filter", (array, predicate) => {
     });
 });
 
+nunjucksConfig.addFilter("find", (array, predicate) => {
+    return array.find((item: Record<string, unknown>) => {
+        return item[predicate.key] === predicate.value;
+    });
+});
+
 nunjucksConfig.addFilter("json", (value, listKeysToDelete: string[] = []) => {
     if (!Array.isArray(listKeysToDelete)) {
         listKeysToDelete = [];
@@ -205,4 +211,5 @@ wss.on("connection", (ws) => {
 
 export const flashMessageCookieOptions = {
     httpOnly: true,
+    maxAge: 1000,
 };

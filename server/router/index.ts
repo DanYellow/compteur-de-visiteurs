@@ -1,6 +1,6 @@
 import express from "express";
 import { DateTime } from "luxon";
-import { Op } from 'sequelize';
+import { Op, UniqueConstraintError } from 'sequelize';
 import bcrypt from "bcryptjs";
 
 import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
@@ -11,6 +11,7 @@ import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User as Use
 import { parseManifest } from "#server/middlewares.ts";
 
 import ApiRouter from "./api.ts";
+import ApiRouter2 from "./api/index.ts";
 import DownloadRouter from "./download.ts";
 import AdminRouter from "./admin.ts";
 
@@ -28,6 +29,7 @@ router.use(async (req, res, next) => {
 });
 // https://apidog.com/fr/blog/node-js-express-authentication-7/
 router.use("/api", ApiRouter);
+router.use("/api", ApiRouter2);
 router.use("/telecharger", DownloadRouter);
 router.use("/", AdminRouter);
 
@@ -136,12 +138,12 @@ router.get(["/choix-lieu"], async (req, res) => {
         if (isClosedDay) {
             listFlashMessages.push("closed_place")
         }
-        res.cookie('lieu_numixs', req.body.place, flashMessageCookieOptions)
+        res.cookie('lieu_numixs', req.body.place, { httpOnly: true })
         listFlashMessages.push("set_place")
     } else {
         listFlashMessages.push("not_found_place")
     }
-    res.cookie('flash_message', JSON.stringify(listFlashMessages), { maxAge: 1000, httpOnly: true })
+    res.cookie('flash_message', JSON.stringify(listFlashMessages), flashMessageCookieOptions)
 
     res.redirect("/choix-lieu");
 });
@@ -163,26 +165,46 @@ router.get('/connexion', async (req, res) => {
 });
 
 router.get('/inscription', async (req, res) => {
+    console.log(req.cookies)
     res.render("pages/sign-in.njk", {
         flash_message: req.cookies.flash_message,
+        signin_email: req.cookies.email,
     });
 }).post('/inscription', async (req, res) => {
-    if (true) {
-        const validator = SignInSchema.safeParse(req.body);
-        if (!validator.success) {
-            return res.status(500).json({ "success": false });
-        }
+    const validator = SignInSchema.safeParse(req.body);
 
-        try {
-            const newUser = await UserModel.create({
-                email: String(req.body.email),
-            });
-            res.cookie('flash_message', 'register_success', flashMessageCookieOptions)
-            // res.cookie('email', req.body.email, flashMessageCookieOptions)
-        } catch (error) {
-            
+    if (!validator.success) {
+        res.status(500)
+        res.cookie('flash_message', 'register_fail', flashMessageCookieOptions)
+        return res.redirect("/inscription");
+    }
+
+    try {
+        await UserModel.create({
+            email: String(req.body.email),
+        });
+        res.cookie('flash_message', 'register_success', flashMessageCookieOptions)
+    } catch (error) {
+        if (error instanceof UniqueConstraintError) {
+            const user = await UserModel.findOne({
+                where: { email: String(req.body.email) }
+            })
+            if (user) {}
+            if (user?.actif === false) {
+                res.cookie('flash_message', 'register_duplicate', flashMessageCookieOptions)
+            } else {
+                res.cookie('flash_message', 'user_exists', flashMessageCookieOptions)
+                res.cookie('email', req.body.email, flashMessageCookieOptions)
+
+                return res.redirect("/connexion");
+            }
+        } else {
+            res.cookie('flash_message', 'register_fail', flashMessageCookieOptions)
         }
     }
+    res.cookie('email', req.body.email, flashMessageCookieOptions)
+    return res.redirect("/inscription");
+
 });
 
 
