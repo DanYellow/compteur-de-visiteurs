@@ -8,6 +8,8 @@ import { DateTime } from "luxon";
 import ip from "ip";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import dotenv from 'dotenv';
+
 
 import router from "./router/index.ts";
 
@@ -15,6 +17,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const serverip = ip.address();
+
+dotenv.config({ path: `${process.cwd()}/.env.local` })
 
 const app = express();
 if (process.env.NODE_ENV === "development") {

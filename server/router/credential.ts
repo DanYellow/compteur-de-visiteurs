@@ -2,6 +2,7 @@ import express from "express";
 import { DateTime } from "luxon";
 import { UniqueConstraintError } from 'sequelize';
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 
 import { SignInSchema, SignInConfirmationSchema, LoginSchema } from "#scripts/schemas.ts";
@@ -12,15 +13,23 @@ const router = express.Router();
 
 const users = [{ id: 1, username: 'user1', password: bcrypt.hashSync('password1', 8) }];
 router.get('/connexion', async (req, res) => {
+    //  try {
+    //      const decoded = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET));
+    //      console.log(decoded)
+    //      console.log(process.env.JWT_SECRET)
+
+    //  } catch (error) {
+    //     console.log("error", error)
+    // }
+
     res.render("pages/login.njk", {
         flash_message: req.cookies.flash_message,
-        signin_email: req.query.email,
+        signin_email: req.query?.email || req.cookies.email,
     });
 }).post('/connexion', async (req, res) => {
     const validator = LoginSchema.safeParse(req.body);
 
     if (!validator.success) {
-        res.status(500)
         res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
 
         return res.redirect("/connexion");
@@ -34,13 +43,20 @@ router.get('/connexion', async (req, res) => {
 
     if (user && bcrypt.compareSync(mot_de_passe, user.mot_de_passe!)) {
         try {
-            UserModel.update({
+            const token = jwt.sign({ role: user.role, email }, String(process.env.JWT_SECRET));
+
+            await UserModel.update({
                 derniere_connexion: new Date().toString()
             }, {
                 where: { email: String(email) }
             })
-        } catch (error) {
 
+            res.cookie('flash_message2', 'wrong_credentials', flashMessageCookieOptions);
+            res.cookie("token", token, { httpOnly: true, secure: false });
+
+            return res.redirect("/connexion");
+        } catch (error) {
+            console.log("ee", error)
         }
     } else {
         res.cookie('flash_message', 'wrong_credentials', flashMessageCookieOptions);

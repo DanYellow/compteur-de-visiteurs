@@ -4,12 +4,12 @@ import { User as UserModel } from "#models/index.ts";
 
 const router = express.Router();
 
-router.post("/utilisateurs/statut", async (req, res) => {
-    const user = await UserModel.findByPk(Number(req.params.userId));
+router.post("/utilisateur/statut", async (req, res) => {
+    const user = await UserModel.findByPk(Number(req.body.userId));
     if (user) {
         try {
             await user.update({
-                actif: req.params.actif === "true",
+                actif: req.body.actif,
             });
             res.status(200).json({
                 success: false,

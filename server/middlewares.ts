@@ -1,17 +1,36 @@
 import type { NextFunction, Request, Response } from "express";
 import path from "path";
 import fs from "fs/promises";
+import jwt from "jsonwebtoken";
 
-export const requireRoleMiddleware = (type: string = "") => {
+import { LIST_ROLES } from "#scripts/utils.shared.ts";
+import type { UserToken } from "#types";
+
+export const requireRoleMiddleware = (role: string = "") => {
     return function (req: Request, res: Response, next: NextFunction) {
-        if (req.session.userId) {
-            next();
-    //         if (req.user?.role !== role) {
-    //   return res.status(403).json({ message: "Forbidden" });
-    // }
-        } else {
-            next();
-            // res.sendStatus(401);
+        if (role === "") {
+            return next();
+        }
+
+        const routeRoleWeight = LIST_ROLES.find((item) => item.value === role);
+
+        if (!routeRoleWeight) {
+            return res.redirect("/interdit");
+        }
+
+        try {
+            const userToken = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserToken;
+            const userRole = LIST_ROLES.find((item) => item.value === userToken.role);
+
+            if (userRole && userRole.weight >= routeRoleWeight?.weight) {
+                return next();
+            } else {
+                res.redirect("/interdit")
+            }
+        } catch (error) {
+            //         if (req.user?.role !== role) {
+            res.redirect("/interdit")
+            console.log("error", error)
         }
     };
 };

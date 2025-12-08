@@ -280,10 +280,13 @@ export const listPlaceTypes = [{
 export const LIST_ROLES = [{
     label: "Administrateur",
     value: "ADMIN",
+    weight: 100,
 }, {
     label: "Numixs lab",
     value: "NUMIXS_LAB",
+    weight: 10,
 }, {
     label: "Lecteur",
     value: "READ_ONLY",
+    weight: 1,
 }]
