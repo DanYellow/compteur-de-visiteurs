@@ -198,7 +198,7 @@ router.get(["/visiteurs", "/visites"], requireRoleMiddleware(), async (req, res)
 
     const isClosedDay = closedDays.includes(String(daySelected.weekday));
 
-    const listVisitsReq = await fetch(`${req.protocol}://${req.get('host')}/api?filtre=jour&jour=${daySelected.toFormat("yyyy-LL-dd")}&lieu=${placeSelected}`);
+    const listVisitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/visites?filtre=jour&jour=${daySelected.toFormat("yyyy-LL-dd")}&lieu=${placeSelected}`);
     const listVisits = (await listVisitsReq.json()).data || [];
 
     const listBusinessSectorSelectable = listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb));

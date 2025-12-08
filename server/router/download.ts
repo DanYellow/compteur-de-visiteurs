@@ -30,7 +30,7 @@ router.get('/', async (req, res) => {
 
     const extraParams = new URLSearchParams({ jour: req.query[configKey], lieu: req.query.lieu } as Record<string, string>);
 
-    const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}&${extraParams.toString()}`);
+    const request = await fetch(`http://${req.get('host')}/api/visites?filtre=${configKey}&${extraParams.toString()}`);
     const requestRes = await request.json();
 
     let placeName = "tous";

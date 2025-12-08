@@ -10,8 +10,7 @@ import { flashMessageCookieOptions, wss } from "#server/index.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User as UserModel, Visit as VisitModel } from "#models/index.ts";
 import { parseManifest } from "#server/middlewares.ts";
 
-import ApiRouter from "./api.ts";
-import ApiRouter2 from "./api/index.ts";
+import ApiRouter from "./api/index.ts";
 import DownloadRouter from "./download.ts";
 import AdminRouter from "./admin.ts";
 
@@ -29,7 +28,6 @@ router.use(async (req, res, next) => {
 });
 // https://apidog.com/fr/blog/node-js-express-authentication-7/
 router.use("/api", ApiRouter);
-router.use("/api", ApiRouter2);
 router.use("/telecharger", DownloadRouter);
 router.use("/", AdminRouter);
 

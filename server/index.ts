@@ -1,7 +1,7 @@
 import { fileURLToPath } from "url";
 import path from "path";
 import nunjucks from "nunjucks";
-import express, { NextFunction, Request, Response } from "express";
+import express from "express";
 import cors from "cors";
 import { WebSocketServer } from "ws";
 import { DateTime } from "luxon";

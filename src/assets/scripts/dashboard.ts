@@ -186,7 +186,7 @@ const listCharts = Object.values(configData);
             ...((placeParam === "tous" || !placeParam) ? {} : { lieu: placeParam }),
         });
 
-        const req = await fetch(`/api?${apiQueryParams.toString()}`);
+        const req = await fetch(`/api/visites?${apiQueryParams.toString()}`);
         const res = await req.json();
 
         const listVisitsGrouped = Object.groupBy(res.data as VisitRaw[], (item) => {
@@ -203,7 +203,7 @@ const listCharts = Object.values(configData);
             resEvent.data.forEach((item: EventRaw) => {
                 const [event_heure_ouverture_heure] = item.heure_ouverture.split(":");
                 const [event_heure_fermeture_heure, event_heure_fermeture_minutes] = item.heure_fermeture.split(":");
-                
+
                 const isEventClosedAfterRegularHours = heure_fermeture_heure > parseInt(heure_fermeture_heure);
                 const minutesToUse = isEventClosedAfterRegularHours ? heure_fermeture_minutes : event_heure_fermeture_minutes;
 
