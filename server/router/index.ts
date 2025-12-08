@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 
 import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
-import { SignInSchema, VisitorSchema } from "#scripts/schemas.ts";
+import { SignInSchema, VisitorSchema, SignInConfirmationSchema } from "#scripts/schemas.ts";
 import { flashMessageCookieOptions, wss } from "#server/index.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User as UserModel, Visit as VisitModel } from "#models/index.ts";
 import { parseManifest } from "#server/middlewares.ts";
@@ -13,6 +13,7 @@ import { parseManifest } from "#server/middlewares.ts";
 import ApiRouter from "./api/index.ts";
 import DownloadRouter from "./download.ts";
 import AdminRouter from "./admin.ts";
+import CredentialRouter from "./credential.ts";
 
 const router = express.Router();
 
@@ -30,6 +31,7 @@ router.use(async (req, res, next) => {
 router.use("/api", ApiRouter);
 router.use("/telecharger", DownloadRouter);
 router.use("/", AdminRouter);
+router.use("/", CredentialRouter);
 
 router.get("/", async (req, res) => {
     const nbPlaces = await PlaceModel.count();
@@ -145,65 +147,5 @@ router.get(["/choix-lieu"], async (req, res) => {
 
     res.redirect("/choix-lieu");
 });
-
-const users = [{ id: 1, username: 'user1', password: bcrypt.hashSync('password1', 8) }];
-router.get('/connexion', async (req, res) => {
-    res.render("pages/login.njk", {
-
-    });
-}).post('/connexion', (req, res) => {
-    const { username, password } = req.body;
-    const user = users.find(u => u.username === username);
-    if (user && bcrypt.compareSync(password, user.password)) {
-        req.session.userId = user.id;
-        res.send('Logged in');
-    } else {
-        res.status(401).send('Invalid credentials');
-    }
-});
-
-router.get('/inscription', async (req, res) => {
-    console.log(req.cookies)
-    res.render("pages/sign-in.njk", {
-        flash_message: req.cookies.flash_message,
-        signin_email: req.cookies.email,
-    });
-}).post('/inscription', async (req, res) => {
-    const validator = SignInSchema.safeParse(req.body);
-
-    if (!validator.success) {
-        res.status(500)
-        res.cookie('flash_message', 'register_fail', flashMessageCookieOptions)
-        return res.redirect("/inscription");
-    }
-
-    try {
-        await UserModel.create({
-            email: String(req.body.email),
-        });
-        res.cookie('flash_message', 'register_success', flashMessageCookieOptions)
-    } catch (error) {
-        if (error instanceof UniqueConstraintError) {
-            const user = await UserModel.findOne({
-                where: { email: String(req.body.email) }
-            })
-            if (user) {}
-            if (user?.actif === false) {
-                res.cookie('flash_message', 'register_duplicate', flashMessageCookieOptions)
-            } else {
-                res.cookie('flash_message', 'user_exists', flashMessageCookieOptions)
-                res.cookie('email', req.body.email, flashMessageCookieOptions)
-
-                return res.redirect("/connexion");
-            }
-        } else {
-            res.cookie('flash_message', 'register_fail', flashMessageCookieOptions)
-        }
-    }
-    res.cookie('email', req.body.email, flashMessageCookieOptions)
-    return res.redirect("/inscription");
-
-});
-
 
 export default router;

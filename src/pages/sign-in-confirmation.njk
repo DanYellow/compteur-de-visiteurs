@@ -1,0 +1,81 @@
+{% extends "layouts/page.njk" %}
+
+{% set root_class = "register" %}
+
+{% block title %}
+Confirmer création de compte
+{% endblock %}
+
+{% block scripts %}
+    {% if NODE_ENV == "development" %}
+        <script type="module" src="/src/assets/scripts/toggle-input-visibility.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/forms/sign-in-form-confirmation.ts" defer></script>
+    {% else %}
+        <script type="module" src="/{{ manifest['src/assets/scripts/toggle-input-visibility.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/forms/sign-in-form-confirmation.ts'].file }}" defer></script>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mt-8 px-3 mx-auto">
+        <div>
+            <img src="/images/logos/faclab-numixs.svg" class="w-20" alt="">
+            <h1 class="text-6xl title-font text-green-numixs">Confirmer création de compte</h1>
+        </div>
+        {% if flash_message == "register_success" %}
+            <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4 rounded-lg">
+            Votre inscription a été prise en compte. Vous serez notifié(e) par e-mail, à l'adresse <span class="font-bold">"{{ signin_email }}"</span>, lorsque votre compte sera activé par un administrateur. Vous pourrez ensuite compléter votre inscription.
+            </p>
+        {% endif %}
+
+        {% if flash_message == "form_not_valid" %}
+            <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4 rounded-lg">
+                Veuillez correctement remplir le formulaire.
+            </p>
+        {% endif %}
+
+        {% if flash_message == "account_not_found" %}
+            <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4 rounded-lg">
+                Cette adresse e-mail n'est pas associée à un compte.
+            </p>
+        {% endif %}
+
+        {% if flash_message == "account_not_active" %}
+            <p class="p-4 bg-amber-50 text-amber-800 border-t-4 border-t-amber-800 mb-4 rounded-lg">
+                Votre compte n'a pas encore été activé.
+            </p>
+        {% endif %}
+
+        <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 mb-4 rounded-lg">
+            Assurez-vous d'avoir reçu votre e-mail d'activation de compte avant de finaliser votre compte. Autrement, la complétion du formulaire entrainera un échec.
+        </p>
+
+        <form action="/confirmation" method="post" novalidate>
+            <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
+
+            <div class="flex flex-col gap-3">
+                <div class="flex flex-col">
+                    <label for="email">Adresse e-mail</label>
+                    <input type="email" name="email" class="text-black" id="email">
+                </div>
+                <div class="flex flex-col">
+                    <label for="password">Mot de passe</label>
+                    <input type="password" data-input-toggle-visibility name="password" id="password" class="text-black w-full" autocomplete="new-password">
+                    <p>Le mot de passe doit faire au minimum <span class="font-bold">six caractères</span> avec au minimum <span class="font-bold">un chiffre et un caractère spécial.</span></p>
+                </div>
+                <div class="flex flex-col">
+                    <label for="confirm_password">Confirmer mot de passe</label>
+                    <input type="password" data-input-toggle-visibility name="confirm_password" id="confirm_password" class="text-black w-full" autocomplete="new-password">
+                </div>
+                <div>
+                    <button type="submit" class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                    Créer compte
+                    {% include "includes/icons/next-arrow.svg" %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% include "includes/toggle-input-visibility.njk" %}
+{% endblock %}
