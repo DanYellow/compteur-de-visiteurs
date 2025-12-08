@@ -136,7 +136,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             </p>
                         {% endif %}
                         {% if place.jours_fermeture_litteral | length %}
-                            <p>Fermé le {{ place.jours_fermeture_litteral | join(", ") }}</p>
+                            <p>Fermé le {{ place.jours_fermeture_litteral | oxford_comma }}</p>
                         {% else %}
                             <p>Ouvert tous les jours</p>
                         {% endif %}

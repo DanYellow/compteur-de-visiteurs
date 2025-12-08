@@ -139,6 +139,10 @@ nunjucksConfig.addFilter("find", (array, predicate) => {
     });
 });
 
+nunjucksConfig.addFilter("oxford_comma", (string) => {
+    return string.slice(0, -1).join(', ') + ' et ' + string.slice(-1)
+});
+
 nunjucksConfig.addFilter("json", (value, listKeysToDelete: string[] = []) => {
     if (!Array.isArray(listKeysToDelete)) {
         listKeysToDelete = [];
@@ -172,7 +176,7 @@ nunjucksConfig.addGlobal(
 
 const listDomains: string[] =
     process.env.IS_DOCKER?.toLowerCase() === "true" &&
-    process.env.NODE_ENV === "production"
+        process.env.NODE_ENV === "production"
         ? ["faclab.localhost"]
         : ["localhost", "0.0.0.0"];
 const port = Number(process.env.VITE_PORT || 3900);
