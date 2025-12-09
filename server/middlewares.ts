@@ -20,7 +20,12 @@ export const requireRoleMiddleware = (role: string = "") => {
         try {
             const userToken = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserToken;
             const userRole = LIST_ROLES.find((item) => item.value === userToken.role);
-            console.log("fffffe")
+
+            res.locals = {
+                ...res.locals,
+                user_role: userRole || {},
+            }
+
             if (userRole && userRole.weight >= routeRoleWeight?.weight) {
                 return next();
             } else {

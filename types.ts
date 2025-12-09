@@ -38,6 +38,7 @@ export type VisitRaw = InferAttributes<VisitModel> & {
     date_passage: string;
     groupe: string;
     liste_evenements?: string;
+    "place.nom"?: string;
 }
 
 export type EventRaw = InferAttributes<EventModel> & {
@@ -75,6 +76,7 @@ export type CSVLinearHeader = Omit<VisitRaw, 'id'> & {
     id: string;
     groupe?: string;
     order?: number;
+    [key: string]: number;
 }
 
 export interface GroupVisit {

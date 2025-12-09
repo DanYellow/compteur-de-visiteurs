@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type { BaseConfigData, CSVLinearHeader, PivotTableOptions, VisitRaw, WeekMonth } from "#types";
 import { DateTime, Info, Interval } from "luxon";
 
@@ -216,7 +215,7 @@ export const getLinearCSV = (data: Record<string, unknown>[], { periodLabel, lie
         delete item.order;
         delete item['place.nom'];
 
-        const rowData: string[] = Object.values(item)
+        const rowData: string[] = Object.values(item) as string[];
 
         csvPayload.push(rowData);
     });

@@ -61,6 +61,7 @@ app.use((req, res, next) => {
     const context = {
         NODE_ENV: process.env.NODE_ENV,
         admin_prefix: `/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`,
+        user_role: {},
     };
 
     res.locals = {
