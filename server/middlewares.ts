@@ -4,7 +4,8 @@ import fs from "fs/promises";
 import jwt from "jsonwebtoken";
 
 import { LIST_ROLES } from "#scripts/utils.shared.ts";
-import type { UserToken } from "#types";
+import type { CustomSession, UserToken } from "#types";
+import { flashMessageCookieOptions } from ".";
 
 export const requireRoleMiddleware = (role: string = "") => {
     return function (req: Request, res: Response, next: NextFunction) {
@@ -33,7 +34,11 @@ export const requireRoleMiddleware = (role: string = "") => {
             }
         } catch (error) {
             //         if (req.user?.role !== role) {
+            res.cookie('flash_message', "not_logged", flashMessageCookieOptions);
+            (req.session as CustomSession).return_to = req.originalUrl; 
+
             res.redirect("/connexion")
+
             console.log("error", error)
         }
     };

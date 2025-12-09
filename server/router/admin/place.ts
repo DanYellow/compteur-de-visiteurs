@@ -13,7 +13,7 @@ const router = express.Router();
 
 const NUMBER_REGEX = /^\d+$/;
 
-router.get(['/lieu', '/lieu/:placeId'], requireRoleMiddleware(), async (req, res) => {
+router.get(['/lieu', '/lieu/:placeId'], requireRoleMiddleware("ADMIN"), async (req, res) => {
     let place = null
     if (req.params.placeId) {
         place = await PlaceModel.findByPk(req.params.placeId, {
@@ -51,7 +51,7 @@ router.get(['/lieu', '/lieu/:placeId'], requireRoleMiddleware(), async (req, res
         })).sort((itemA, itemB) => itemA.label.localeCompare(itemB.label)),
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
-}).post(['/lieu', '/lieu/:placeId'], requireRoleMiddleware(), async (req, res, next) => {
+}).post(['/lieu', '/lieu/:placeId'], requireRoleMiddleware("ADMIN"), async (req, res, next) => {
     if ("placeId" in req.params && !NUMBER_REGEX.test(req.params.placeId)) {
         return next();
     }
@@ -126,7 +126,7 @@ router.get(['/lieu', '/lieu/:placeId'], requireRoleMiddleware(), async (req, res
         console.log(e)
         return res.render("pages/admin/add_edit-place.njk");
     }
-}).post(['/lieu/suppression'], requireRoleMiddleware(), async (req, res) => {
+}).post(['/lieu/suppression'], requireRoleMiddleware("ADMIN"), async (req, res) => {
     try {
         const placeToDestroy = await PlaceModel.findByPk(req.body.id)
         if (placeToDestroy) {

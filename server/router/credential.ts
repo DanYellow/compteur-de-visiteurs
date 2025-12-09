@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import { SignInSchema, SignInConfirmationSchema, LoginSchema } from "#scripts/schemas.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 import { User as UserModel } from "#models/index.ts";
+import { CustomSession } from "#types";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` })
 
@@ -55,6 +56,10 @@ router.get('/connexion', async (req, res) => {
 
             res.cookie('flash_message', 'successful_login', flashMessageCookieOptions);
             res.cookie("token", token, { httpOnly: true, secure: false });
+
+            if ("return_to" in (req.session as CustomSession)) {
+                return res.redirect((req.session as CustomSession).return_to!);
+            }
 
             return res.redirect(`${res.locals.admin_prefix}/dashboard`);
         } catch (error) {
@@ -129,11 +134,11 @@ router.get('/confirmation', async (req, res) => {
     })
 
     if (user) {
-        // if (user.actif === false) {
-        //     res.cookie('flash_message', 'account_not_active', flashMessageCookieOptions)
+        if (user.actif === false) {
+            res.cookie('flash_message', 'account_not_active', flashMessageCookieOptions)
 
-        //     return res.redirect("/confirmation");
-        // }
+            return res.redirect("/confirmation");
+        }
 
         if (user.mot_de_passe === null || user.mot_de_passe === "") {
             const payload = {

@@ -23,19 +23,21 @@
                     Visites
                 </a>
             </li>
+            {% if user_role.weight >= 100 %}
             <li>
                 <a href="{{ admin_prefix }}/lieux" class="{{ navItemActiveClasses if (active_menu_item == "lieu") else navItemClasses }} title-font text-lg xl:text-[1.75rem] py-2 px-5 rounded-md flex flex-col xl:flex-row gap-3 items-center">
                     {% include "includes/icons/place-icon.svg" %}
                     Lieux
                 </a>
             </li>
+            {% endif %}
             <li>
                 <a href="{{ admin_prefix }}/evenements" class="{{ navItemActiveClasses if (active_menu_item == "evenement") else navItemClasses }} title-font text-lg xl:text-[1.75rem] py-2 px-5 rounded-md flex flex-col xl:flex-row gap-3 items-center">
                     {% include "includes/icons/calendar-icon.svg" %}
                     Évènements
                 </a>
             </li>
-            {% if user_role.weight >= 10 %}
+            {% if user_role.weight >= 100 %}
             <li>
                 <a href="{{ admin_prefix }}/utilisateurs" class="{{ navItemActiveClasses if (active_menu_item == "utilisateurs") else navItemClasses }} title-font text-lg xl:text-[1.75rem] py-2 px-5 rounded-md flex flex-col xl:flex-row gap-3 items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">

@@ -33,7 +33,7 @@ router.get("/", async (req, res) => {
 
     if (nbPlaces === 0) {
         res.cookie('flash_message', JSON.stringify(["no_place"]), { maxAge: 1000, httpOnly: true })
-        return res.redirect("/lieu");
+        return res.redirect(`${res.locals.admin_prefix}/lieu`);
     } else if (!("lieu_numixs" in req.cookies)) {
         res.cookie('flash_message', JSON.stringify(["unset_place"]), { maxAge: 1000, httpOnly: true })
         return res.redirect("/choix-lieu");
@@ -45,7 +45,7 @@ router.get("/", async (req, res) => {
         return res.redirect("/choix-lieu");
     }
 
-    res.render("pages/index.njk", {
+    return res.render("pages/index.njk", {
         "list_business_sector": listBusinessSector.filter((item) => (!("listInChoices" in item) || item.listInChoices)),
         place,
     });
@@ -153,5 +153,10 @@ router.use("/", CredentialRouter);
 router.use("/api", ApiRouter);
 router.use("/telecharger", requireRoleMiddleware("READ_ONLY"), DownloadRouter);
 router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, requireRoleMiddleware("READ_ONLY"), AdminRouter);
+
+if (process.env.NODE_ENV === "development") {
+    const DebugRouter = await import("./debug.ts");
+    router.use("/debug", DebugRouter.default);
+}
 
 export default router;

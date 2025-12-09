@@ -52,13 +52,15 @@ Créer utilisateur
 
                         {% if flash_message == "update_error" %}
                             <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 rounded-md">
-                                L'utilisateur a été mis à jour avec succès.
+                                Une erreur est survenue.
                             </p>
                         {% endif %}
 
                         <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
                         <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 rounded-md">Les champs avec * sont obligatoires</p>
                     </div>
+
+                    <input type="hidden" name="id" value="{{ user.id }}">
 
                     <div class="flex flex-col gap-5">
                         <div class="flex flex-col">
@@ -72,7 +74,7 @@ Créer utilisateur
 
                         <div class="flex flex-col">
                             <label for="email" class="font-bold text-lg">E-mail*</label>
-                            <input type="text" class="read-only: text-black-numixs/80" id="email" name="email" readonly value="{{ user.email }}">
+                            <input type="text" class="readonly: text-black-numixs/80" id="email" name="email" readonly value="{{ user.email }}">
                         </div>
 
                         {# <div class="flex flex-col">
@@ -81,14 +83,14 @@ Créer utilisateur
                     </div> #}
 
                         <div class="flex flex-col">
-                            <label for="email" class="font-bold text-lg inline-flex items-center gap-2">Rôle*
+                            <label for="role" class="font-bold text-lg inline-flex items-center gap-2">Rôle*
                             <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-roles" command="show-modal" data-event-data='{{ event | json }}'>
                                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
                                         <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
                                     </svg>
                                 </button>
                             </label>
-                            <select name="role" id="">
+                            <select name="role" id="role" class="inert: text-black-numixs/80" {{ "inert" if user_role.weight < 100 else "" }}>
                                 {% for role in list_roles %}
                                     <option {{ "selected" if user.role == role.value else "" }} value="{{ role.value }}">
                                         {{ role.label }}
@@ -104,7 +106,6 @@ Créer utilisateur
                             </svg>
                         </button>
                     </div>
-
                 </div>
             </form>
         </div>

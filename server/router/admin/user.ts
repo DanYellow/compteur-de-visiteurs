@@ -48,7 +48,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], requireRoleMiddleware("
         flash_message: req.cookies.flash_message,
     });
 }).post(['/utilisateur/:userId'], requireRoleMiddleware(""), async (req, res) => {
-    const user = await UserModel.findByPk(req.params.userId);
+    const user = await UserModel.findByPk(req.body.id);
 
     const payload = {
         ...req.body,
@@ -61,7 +61,6 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], requireRoleMiddleware("
         res.cookie('flash_message', "update_error", flashMessageCookieOptions);
 
     }
-
 
     res.redirect(`${res.locals.admin_prefix}/utilisateur/${req.params.userId}`);
 })

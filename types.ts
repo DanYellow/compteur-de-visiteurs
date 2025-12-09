@@ -3,6 +3,7 @@ import type { InferAttributes } from "sequelize";
 import type { JwtPayload } from "jsonwebtoken";
 
 import type { Place as PlaceModel, Visit as VisitModel, Event as EventModel } from "#models/index.ts";
+import type { SessionData } from "express-session";
 
 export type LineChartEntry = {
     data: Number[];
@@ -106,4 +107,8 @@ export type PlaceType = "fablab" | "station" | "lab";
 export interface UserToken extends JwtPayload {
     email: string;
     role: string;
+}
+
+export interface CustomSession extends SessionData {
+    return_to?: string;
 }
