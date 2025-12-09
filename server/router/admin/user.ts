@@ -9,7 +9,7 @@ import { UserToken } from "#types";
 
 const router = express.Router();
 
-router.get(['/utilisateurs'], requireRoleMiddleware(""), async (req, res) => {
+router.get(['/utilisateurs'], requireRoleMiddleware("ADMIN"), async (req, res) => {
 
     const listUsers = await UserModel.findAll({
         raw: true,
@@ -63,7 +63,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], requireRoleMiddleware("
     }
 
 
-    res.redirect(`/utilisateur/${req.params.userId}`);
+    res.redirect(`${res.locals.admin_prefix}/utilisateur/${req.params.userId}`);
 })
 
 

@@ -74,13 +74,13 @@ Liste utilisateurs
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.derniere_connexion|date("dd/LL/yyyy 'à' HH:mm") }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <div class="flex flex-row gap-3">
-                                            <a href="/utilisateur/{{ user.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                            <a href="{{ admin_prefix }}/utilisateur/{{ user.id }}" class="font-bold hocus:opacity-75">Éditer</a>
                                         </div>
                                     </td>
                                 </tr>
                             {% else %}
                                 <tr class="">
-                                    <td colspan="/" class="px-4 py-3 text-center">
+                                    <td colspan="8" class="px-4 py-3 text-center">
                                         Pas d'utilisateurs
                                     </td>
                                 </tr>

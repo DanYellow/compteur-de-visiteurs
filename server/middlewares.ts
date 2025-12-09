@@ -33,7 +33,7 @@ export const requireRoleMiddleware = (role: string = "") => {
             }
         } catch (error) {
             //         if (req.user?.role !== role) {
-            res.redirect("/interdit")
+            res.redirect("/connexion")
             console.log("error", error)
         }
     };
