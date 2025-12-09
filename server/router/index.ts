@@ -1,14 +1,13 @@
 import express from "express";
 import { DateTime } from "luxon";
-import { Op, UniqueConstraintError } from 'sequelize';
-import bcrypt from "bcryptjs";
+import { Op } from 'sequelize';
 
 import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
-import { SignInSchema, VisitorSchema, SignInConfirmationSchema } from "#scripts/schemas.ts";
+import { VisitorSchema } from "#scripts/schemas.ts";
 import { flashMessageCookieOptions, wss } from "#server/index.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User as UserModel, Visit as VisitModel } from "#models/index.ts";
-import { parseManifest } from "#server/middlewares.ts";
+import { parseManifest, requireRoleMiddleware } from "#server/middlewares.ts";
 
 import ApiRouter from "./api/index.ts";
 import DownloadRouter from "./download.ts";
@@ -22,16 +21,12 @@ router.use(async (req, res, next) => {
     res.locals = {
         ...res.locals,
         manifest,
-        lieu: req.query.lieu
+        lieu: req.query.lieu,
     };
 
     next();
 });
 // https://apidog.com/fr/blog/node-js-express-authentication-7/
-router.use("/api", ApiRouter);
-router.use("/telecharger", DownloadRouter);
-router.use("/", AdminRouter);
-router.use("/", CredentialRouter);
 
 router.get("/", async (req, res) => {
     const nbPlaces = await PlaceModel.count();
@@ -147,5 +142,17 @@ router.get(["/choix-lieu"], async (req, res) => {
 
     res.redirect("/choix-lieu");
 });
+
+router.get("/interdit", async (req, res) => {
+
+    res.render("pages/not-allowed.njk", {
+    });
+})
+
+router.use("/", CredentialRouter);
+router.use("/api", ApiRouter);
+router.use("/telecharger", requireRoleMiddleware("READ_ONLY"), DownloadRouter);
+console.log(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, process.env)
+router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, requireRoleMiddleware("READ_ONLY"), AdminRouter);
 
 export default router;

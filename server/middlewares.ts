@@ -13,7 +13,6 @@ export const requireRoleMiddleware = (role: string = "") => {
         }
 
         const routeRoleWeight = LIST_ROLES.find((item) => item.value === role);
-
         if (!routeRoleWeight) {
             return res.redirect("/interdit");
         }
@@ -21,7 +20,7 @@ export const requireRoleMiddleware = (role: string = "") => {
         try {
             const userToken = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserToken;
             const userRole = LIST_ROLES.find((item) => item.value === userToken.role);
-
+            console.log("fffffe")
             if (userRole && userRole.weight >= routeRoleWeight?.weight) {
                 return next();
             } else {
@@ -41,7 +40,6 @@ export const parseManifest = async (manifest: string) => {
     }
 
     const manifestPath = path.join(path.resolve(), "dist", manifest);
-
     const manifestFile = await fs.readFile(manifestPath);
 
     return JSON.parse(manifestFile.toString());

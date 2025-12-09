@@ -10,7 +10,6 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import dotenv from 'dotenv';
 
-
 import router from "./router/index.ts";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -61,6 +60,7 @@ app.use(
 app.use((req, res, next) => {
     const context = {
         NODE_ENV: process.env.NODE_ENV,
+        admin_prefix: `/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`,
     };
 
     res.locals = {

@@ -39,10 +39,12 @@ Liste utilisateurs
                         <thead>
                             <tr class="bg-gray-200">
                                 <td class="font-bold px-4 py-3 text-left">#</td>
+                                <td class="font-bold px-4 py-3 text-left">Prénom / Nom</td>
                                 <td class="font-bold px-4 py-3 text-left">Adresse e-mail</td>
                                 <td class="font-bold px-4 py-3 text-left">Rôle</td>
                                 <td class="font-bold px-4 py-3 text-left">Actif</td>
                                 <td class="font-bold px-4 py-3 text-left">Activer</td>
+                                <td class="font-bold px-4 py-3 text-left">Dernière connexion</td>
                                 <td class="font-bold px-4 py-3 text-left"></td>
                             </tr>
                         </thead>
@@ -50,6 +52,7 @@ Liste utilisateurs
                             {% for user in list_users %}
                                 <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.prenom }} {{ user.nom }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.email }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <span class="inline-flex items-center gap-2">
@@ -68,6 +71,7 @@ Liste utilisateurs
                                             <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-checked:bg-green-numixs rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-focus:ring-dark-green-numixs/30"></div>
                                         </label>
                                     </td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.derniere_connexion|date("dd/LL/yyyy 'à' HH:mm") }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <div class="flex flex-row gap-3">
                                             <a href="/utilisateur/{{ user.id }}" class="font-bold hocus:opacity-75">Éditer</a>
@@ -76,7 +80,7 @@ Liste utilisateurs
                                 </tr>
                             {% else %}
                                 <tr class="">
-                                    <td colspan="6" class="px-4 py-3 text-center">
+                                    <td colspan="/" class="px-4 py-3 text-center">
                                         Pas d'utilisateurs
                                     </td>
                                 </tr>
@@ -88,23 +92,5 @@ Liste utilisateurs
         </div>
     </div>
 
-    <dialog id="detail-roles" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
-        <header class="flex flex-row justify-between items-start">
-            <div>
-                <p class="title-font text-4xl">Détails rôles</p>
-            </div>
-            <button type="button" command="close" commandfor="detail-roles" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-
-        </header>
-        <ul class="list-disc list-inside">
-            <li><span class="font-bold">Lecteur :</span> Peut lire les données</li>
-            <li><span class="font-bold">Numixs lab :</span> Rôle du lecteur + Peut créer/éditer des évènements</li>
-            <li><span class="font-bold">Administrateur :</span> Rôle Numixs Lab + Peut activer des comptes et créer/éditer des lieux</li>
-        </ul>
-
-    </dialog>
+    {% include "includes/detail-roles.njk" %}
 {% endblock %}

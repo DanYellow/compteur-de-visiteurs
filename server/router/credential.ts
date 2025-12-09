@@ -3,11 +3,13 @@ import { DateTime } from "luxon";
 import { UniqueConstraintError } from 'sequelize';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-
+import dotenv from 'dotenv';
 
 import { SignInSchema, SignInConfirmationSchema, LoginSchema } from "#scripts/schemas.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 import { User as UserModel } from "#models/index.ts";
+
+dotenv.config({ path: `${process.cwd()}/.env.local` })
 
 const router = express.Router();
 
@@ -51,15 +53,16 @@ router.get('/connexion', async (req, res) => {
                 where: { email: String(email) }
             })
 
-            res.cookie('flash_message2', 'wrong_credentials', flashMessageCookieOptions);
+            res.cookie('flash_message', 'successful_login', flashMessageCookieOptions);
             res.cookie("token", token, { httpOnly: true, secure: false });
 
-            return res.redirect("/connexion");
+            return res.redirect(`${res.locals.admin_prefix}/dashboard`);
         } catch (error) {
             console.log("ee", error)
         }
     } else {
         res.cookie('flash_message', 'wrong_credentials', flashMessageCookieOptions);
+
         return res.redirect("/connexion");
     }
 });

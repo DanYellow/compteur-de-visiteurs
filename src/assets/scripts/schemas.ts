@@ -166,3 +166,14 @@ export const LoginSchema = z.object({
         error: `Mot de passe : ${REQUIRED_MESSAGE}`
     })
 });
+
+export const UserSchema = z.object({
+    email: z.email({
+        error: `Email : ${REQUIRED_MESSAGE}`
+    }),
+    nom: z.string().optional(),
+    prenom: z.string().optional(),
+    mot_de_passe: z.string({
+        error: `Mot de passe : ${REQUIRED_MESSAGE}`
+    }).optional()
+});
