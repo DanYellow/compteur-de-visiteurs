@@ -17,6 +17,7 @@ const sequelize = new Sequelize({
     define: {
         freezeTableName: true,
     },
+    logging: false,
 });
 
 try {

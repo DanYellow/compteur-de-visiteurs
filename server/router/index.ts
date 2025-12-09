@@ -152,7 +152,6 @@ router.get("/interdit", async (req, res) => {
 router.use("/", CredentialRouter);
 router.use("/api", ApiRouter);
 router.use("/telecharger", requireRoleMiddleware("READ_ONLY"), DownloadRouter);
-console.log(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, process.env)
 router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, requireRoleMiddleware("READ_ONLY"), AdminRouter);
 
 export default router;

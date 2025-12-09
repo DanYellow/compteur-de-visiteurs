@@ -116,9 +116,7 @@ router.get("/visites", async (req, res) => {
                 model: PlaceModel,
                 as: "place",
                 required: true,
-                attributes: {
-                    exclude: ["adresse", "slug", "ouvert", "id", "description", "date_creation"]
-                },
+                attributes: ["nom"],
                 include: [
                     {
                         model: RegularOpeningModel,

@@ -176,20 +176,30 @@ type LinearCSVOptions = {
 export const getLinearCSV = (data: Record<string, unknown>[], { periodLabel, lieu }: LinearCSVOptions) => {
     const listGroupsInForm = listGroups.filter((item) => (!("listInDb" in item) || item.listInDb))
 
+    const copyFirstEntry = data?.[0] || {};
+    delete copyFirstEntry.id;
+    delete copyFirstEntry.date_passage;
+
     const firstRow = {
-        ...data?.[0],
-        ...Object.fromEntries(listGroupsInForm.map((item) => [item.value, 0])),
-        date_passage: periodLabel,
-        liste_evenements: "/",
-        ...(lieu === "tous" || !lieu ? { "place.nom": "Tous" } : {}),
         id: `Total : ${data.length}`,
+        date_passage: periodLabel,
+        ...copyFirstEntry,
+        ...Object.fromEntries(listGroupsInForm.map((item) => [item.value, 0])),
+        liste_evenements: "/",
     } as CSVLinearHeader;
 
-    // delete (firstRow as any).groupe;
+    firstRow.lieu = firstRow['place.nom'];
+
+    if (lieu === "tous" || !lieu) {
+        firstRow.lieu = "Tous";
+    }
+
+    delete (firstRow as any).groupe;
     delete firstRow.order;
+    delete firstRow['place.nom'];
 
     const csvHeaderColumns = Object.keys(firstRow);
-    csvHeaderColumns[csvHeaderColumns.length - 1] = "Lieu"
+
     const csvPayload: (string[] | number[])[] = [csvHeaderColumns];
 
     data.forEach((item, idx) => {
@@ -199,9 +209,12 @@ export const getLinearCSV = (data: Record<string, unknown>[], { periodLabel, lie
         })
 
         item.id = String(idx + 1);
+        item.lieu = item['place.nom'];
+
         delete item.lieu_id;
         delete item.groupe;
         delete item.order;
+        delete item['place.nom'];
 
         const rowData: string[] = Object.values(item)
 
