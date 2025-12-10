@@ -111,4 +111,10 @@ export interface UserToken extends JwtPayload {
 
 export interface CustomSession extends SessionData {
     return_to?: string;
+    user?: {
+        nom: string;
+        id: number;
+        prenom: string;
+        email: string;
+    }
 }

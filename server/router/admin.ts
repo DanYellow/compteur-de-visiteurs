@@ -5,7 +5,7 @@ import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#script
 import PlaceRouter from "#server/router/admin/place.ts";
 import EventRouter from "#server/router/admin/event.ts";
 import UserRouter from "#server/router/admin/user.ts";
-import { CommonRegularOpening, EventRaw, PlaceRaw, VisitRaw } from "#types";
+import { CommonRegularOpening, CustomSession, EventRaw, PlaceRaw, VisitRaw } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index.ts";
 import { Op } from "sequelize";
 import { requireRoleMiddleware } from "#server/middlewares.ts";
@@ -13,6 +13,15 @@ import { requireRoleMiddleware } from "#server/middlewares.ts";
 import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
 
 const router = express.Router();
+
+router.use(async (req, res, next) => {
+    res.locals = {
+        ...res.locals,
+        user: (req.session?.user as CustomSession) || {} 
+    };
+
+    next();
+});
 
 router.use("/", PlaceRouter);
 router.use("/", EventRouter);

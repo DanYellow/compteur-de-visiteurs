@@ -36,4 +36,25 @@ router.get("/confirmation", async (req, res) => {
     return res.status(500).json({"message": "erreur"});
 });
 
+router.get("/promote", async (req, res) => {
+    if (req.query.email) {
+        const user = await UserModel.findOne({
+            where: { email: String(req.query.email) },
+        });
+
+        if (user) {
+            await user.update({
+                role: String(req.query?.role || "ADMIN"),
+            });
+
+            const token = jwt.sign({ role: user.role, email: user.email }, String(process.env.JWT_SECRET));
+            res.cookie("token", token, { httpOnly: true, secure: false });
+
+            return res.status(200).json({"message": "succès"});
+        }
+    }
+    
+    return res.status(500).json({"message": "erreur"});
+});
+
 export default router;

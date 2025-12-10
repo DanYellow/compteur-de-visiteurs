@@ -56,6 +56,7 @@ router.get('/connexion', async (req, res) => {
 
             res.cookie('flash_message', 'successful_login', flashMessageCookieOptions);
             res.cookie("token", token, { httpOnly: true, secure: false });
+            (req.session as CustomSession).user = user.toJSON(); 
 
             if ("return_to" in (req.session as CustomSession)) {
                 return res.redirect((req.session as CustomSession).return_to!);
