@@ -1,15 +1,15 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 
-import { requireRoleMiddleware } from "#server/middlewares.ts";
+import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
 import { User as UserModel } from "#models/index.ts";
 import { LIST_ROLES } from "#scripts/utils.shared.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
-import { CustomSession, UserToken } from "#types";
+import { CustomSession, UserTokenData } from "#types";
 
 const router = express.Router();
 
-router.get(['/utilisateurs'], requireRoleMiddleware("ADMIN"), async (req, res) => {
+router.get(['/utilisateurs'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
 
     const listUsers = await UserModel.findAll({
         raw: true,
@@ -21,14 +21,14 @@ router.get(['/utilisateurs'], requireRoleMiddleware("ADMIN"), async (req, res) =
     });
 })
 
-router.get(['/utilisateur/:userId', '/utilisateur/moi'], requireRoleMiddleware(""), async (req, res) => {
+router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMiddleware(""), async (req, res) => {
     let user = await UserModel.findByPk(req.params.userId, {
         raw: true,
     });
 
     if (req.params.userId === "moi") {
         try {
-            const token = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserToken;
+            const token = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserTokenData;
 
             user = await UserModel.findOne({
                 where: {
@@ -37,7 +37,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], requireRoleMiddleware("
                 raw: true,
             });
         } catch (error) {
-            console.log("ee", error)
+            console.log(error)
         }
     }
 
@@ -47,7 +47,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], requireRoleMiddleware("
         list_roles: LIST_ROLES,
         flash_message: req.cookies.flash_message,
     });
-}).post(['/utilisateur/:userId'], requireRoleMiddleware(""), async (req, res) => {
+}).post(['/utilisateur/:userId'], getUser, requireRoleMiddleware(""), async (req, res) => {
     const user = await UserModel.findByPk(req.body.id);
     const payload = {
         ...req.body,

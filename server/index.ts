@@ -65,6 +65,7 @@ app.use((req, res, next) => {
     };
 
     res.locals = {
+        ...res.locals,
         ...context,
     };
 
@@ -120,6 +121,12 @@ nunjucksConfig.addFilter("date", (value, format) => {
 nunjucksConfig.addFilter("add_days", (value, days) => {
     return DateTime.fromISO(value).plus({ days });
 });
+
+nunjucksConfig.addFilter("uppercase", (value) => {
+    return String(value).toLocaleUpperCase();
+});
+
+
 
 nunjucksConfig.addFilter("pad", (value, char: string, nb: number) => {
     return String(value).padStart(nb, char);
@@ -221,4 +228,5 @@ wss.on("connection", (ws) => {
 export const flashMessageCookieOptions = {
     httpOnly: true,
     maxAge: 1000,
+    // sameSite: 'strict',
 };

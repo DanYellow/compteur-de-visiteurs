@@ -46,7 +46,7 @@ router.get('/connexion', async (req, res) => {
 
     if (user && bcrypt.compareSync(mot_de_passe, user.mot_de_passe!)) {
         try {
-            const token = jwt.sign({ role: user.role, email }, String(process.env.JWT_SECRET));
+            const token = jwt.sign({ role: user.role, email, id: user.id }, String(process.env.JWT_SECRET));
 
             await UserModel.update({
                 derniere_connexion: new Date().toString()
@@ -54,9 +54,17 @@ router.get('/connexion', async (req, res) => {
                 where: { email: String(email) }
             })
 
+            // res.locals.user = user.toJSON();
+            // // res.locals = {
+            // //     ...res.locals,
+            // //     user: user.toJSON(),
+            // // }
+            // req.user = user.toJSON();
+
+            // console.log("fff", res.locals)
+
             res.cookie('flash_message', 'successful_login', flashMessageCookieOptions);
-            res.cookie("token", token, { httpOnly: true, secure: false });
-            (req.session as CustomSession).user = user.toJSON(); 
+            res.cookie("token", token, { httpOnly: true, secure: false, sameSite: 'strict' });
 
             if ("return_to" in (req.session as CustomSession)) {
                 return res.redirect((req.session as CustomSession).return_to!);

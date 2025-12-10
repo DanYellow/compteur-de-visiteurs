@@ -2,7 +2,7 @@ import type { Align, LineControllerDatasetOptions, TitleOptions } from "chart.js
 import type { InferAttributes } from "sequelize";
 import type { JwtPayload } from "jsonwebtoken";
 
-import type { Place as PlaceModel, Visit as VisitModel, Event as EventModel } from "#models/index.ts";
+import type { Place as PlaceModel, Visit as VisitModel, Event as EventModel, User as UserModel } from "#models/index.ts";
 import type { SessionData } from "express-session";
 
 export type LineChartEntry = {
@@ -104,7 +104,7 @@ export type ChartConfigData = BaseConfigData & {
 
 export type PlaceType = "fablab" | "station" | "lab";
 
-export interface UserToken extends JwtPayload {
+export interface UserTokenData extends JwtPayload {
     email: string;
     role: string;
 }
@@ -116,5 +116,18 @@ export interface CustomSession extends SessionData {
         id: number;
         prenom: string;
         email: string;
+    }
+}
+
+declare global {
+    namespace Express {
+        interface Request {
+            user?: InferAttributes<UserModel>;
+        }
+
+        interface Locals {
+            user: InferAttributes<UserModel> | null;
+            isAuthenticated: boolean;
+        }
     }
 }

@@ -4,11 +4,12 @@ import fs from "fs/promises";
 import jwt from "jsonwebtoken";
 
 import { LIST_ROLES } from "#scripts/utils.shared.ts";
-import type { CustomSession, UserToken } from "#types";
+import type { CustomSession, UserTokenData } from "#types";
 import { flashMessageCookieOptions } from ".";
+import { User as UserModel } from "#models/index.ts";
 
 export const requireRoleMiddleware = (role: string = "") => {
-    return function (req: Request, res: Response, next: NextFunction) {
+    return async (req: Request, res: Response, next: NextFunction) => {
         if (role === "") {
             return next();
         }
@@ -19,15 +20,15 @@ export const requireRoleMiddleware = (role: string = "") => {
         }
 
         try {
-            const userToken = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserToken;
-            const userRole = LIST_ROLES.find((item) => item.value === userToken.role);
+            const token = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserTokenData;
+            const userRoleData = LIST_ROLES.find((item) => item.value === token.role);
 
             res.locals = {
                 ...res.locals,
-                user_role: userRole || {},
+                user_role: userRoleData || {},
             }
 
-            if (userRole && userRole.weight >= routeRoleWeight?.weight) {
+            if (userRoleData && userRoleData.weight >= routeRoleWeight?.weight) {
                 return next();
             } else {
                 res.redirect("/interdit")
@@ -35,7 +36,7 @@ export const requireRoleMiddleware = (role: string = "") => {
         } catch (error) {
             //         if (req.user?.role !== role) {
             res.cookie('flash_message', "not_logged", flashMessageCookieOptions);
-            (req.session as CustomSession).return_to = req.originalUrl; 
+            (req.session as CustomSession).return_to = req.originalUrl;
 
             res.redirect("/connexion")
 
@@ -54,3 +55,22 @@ export const parseManifest = async (manifest: string) => {
 
     return JSON.parse(manifestFile.toString());
 };
+
+export const getUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const token = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserTokenData;
+
+        const user = await UserModel.findByPk(token.id, {
+            attributes: ['id', 'nom', 'email', 'prenom', "role"]
+        });
+
+        if (user) {
+            res.locals.user = user.toJSON();
+            req.user = user.toJSON();
+        }
+    } catch (error) {
+        res.locals.user = null;
+    }
+
+    next();
+}
