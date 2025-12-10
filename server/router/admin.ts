@@ -18,7 +18,7 @@ router.use("/", PlaceRouter);
 router.use("/", EventRouter);
 router.use("/", UserRouter);
 
-router.get(["/dashboard", "/tableau-de-bord"], getUser, requireRoleMiddleware("NUMIXS_LAB"), async (req, res) => {
+router.get(["/", "/dashboard", "/tableau-de-bord"], getUser, requireRoleMiddleware("NUMIXS_LAB"), async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.date) {

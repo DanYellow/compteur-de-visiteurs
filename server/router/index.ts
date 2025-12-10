@@ -147,7 +147,14 @@ router.get("/interdit", async (req, res) => {
 
     res.render("pages/not-allowed.njk", {
     });
-})
+});
+
+router.post('/deconnexion', (req, res) => {
+    res.cookie('flash_message', "success_logout", flashMessageCookieOptions)
+    res.clearCookie("token");
+    res.redirect('/connexion');
+});
+
 
 router.use("/", CredentialRouter);
 router.use("/api", ApiRouter);

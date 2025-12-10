@@ -99,6 +99,27 @@ Créer utilisateur
                             </select>
                         </div>
 
+                        <div class="flex flex-col">
+                            <p class="font-bold text-lg">Activer</p>
+                            <div class="flex flex-row gap-5 has-disabled:opacity-80">
+                                <div>
+                                    <label for="oui">Oui</label>
+                                    <input type="radio" name="actif" {{ "disabled" if user.actif == 1 and user.role == "ADMIN" else "" }} {{ "checked" if user.actif == 1 else "" }} id="oui" value="1">
+                                </div>
+                                <div>
+                                    <label for="nom">Non</label>
+                                    <input type="radio" name="actif" {{ "disabled" if user.actif == 1 and user.role == "ADMIN" else "" }} {{ "checked" if user.actif == 0 else "" }} id="nom" value="0">
+                                </div>
+                            </div>
+                            {# <label for="role" class="font-bold text-lg inline-flex items-center gap-2">Rôle*
+                            <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-roles" command="show-modal" data-event-data='{{ event | json }}'>
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+                                        <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
+                                    </svg>
+                                </button>
+                            </label> #}
+                        </div>
+
                         <button type="submit" class="text-black-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:opacity-70 items-center">
                     Soumettre
                     <svg width="23" height="22" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg">
