@@ -63,9 +63,13 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
             attributes: ['id', 'nom', 'email', 'prenom', "role"]
         });
 
-        if (user) {
+        if (user && user.actif === true) {
             res.locals.current_user = user.toJSON();
             req.current_user = user.toJSON();
+        } else {
+            res.cookie('flash_message', "forced_logout", flashMessageCookieOptions)
+            res.clearCookie("token");
+            return res.redirect('/connexion');
         }
     } catch (error) {
         res.locals.current_user = null;

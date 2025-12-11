@@ -12,10 +12,10 @@ Liste utilisateurs
 
 {% block scripts %}
     {% if NODE_ENV == "development" %}
-        <script type="module" src="/src/assets/scripts/delete-place-dialog.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/delete-list-item-dialog.ts" defer></script>
         <script type="module" src="/src/assets/scripts/toggle-user-status.ts" defer></script>
     {% else %}
-        <script type="module" src="/{{ manifest['src/assets/scripts/delete-place-dialog.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/delete-list-item-dialog.ts'].file }}" defer></script>
         <script type="module" src="/{{ manifest['src/assets/scripts/toggle-user-status.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}
@@ -53,7 +53,8 @@ Liste utilisateurs
                             {% for user in list_users %}
                                 <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.prenom }} {{ user.nom }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.prenom }}
+                                        {{ user.nom }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.email }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <span class="inline-flex items-center gap-2">
@@ -76,6 +77,7 @@ Liste utilisateurs
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <div class="flex flex-row gap-3">
                                             <a href="{{ admin_prefix }}/utilisateur/{{ user.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                            <button type="button" class="font-bold text-red-800 hover:text-red-950" commandfor="delete-user" command="show-modal" data-item-id="{{ user.id }}">Supprimer</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -92,6 +94,26 @@ Liste utilisateurs
             </div>
         </div>
     </div>
+
+    <dialog id="delete-user" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-2xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Supprimer utilisateur</p>
+            </div>
+        </header>
+
+        <hr class="pb-1 mt-1 border-red-800">
+
+        <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Cette action est irréversible.</p>
+
+        <form method="post" action="/utilisateur/suppression">
+            <input type="hidden" name="id" value=""/>
+            <div class="flex flex-row gap-3">
+                <button type="submit" class="text-white-numixs bg-red-800 hocus:bg-red-950 px-3 py-1.5 rounded-xl">Supprimer</button>
+                <button type="button" command="close" commandfor="delete-user" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white-numixs">Annuler</button>
+            </div>
+        </form>
+    </dialog>
 
     {% include "includes/detail-roles.njk" %}
 {% endblock %}

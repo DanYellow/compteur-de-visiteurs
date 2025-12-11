@@ -1,4 +1,4 @@
-const deleteModal = document.getElementById("delete-place") as HTMLDialogElement;
+const deleteModal = document.querySelector("[data-delete-item-dialog]") as HTMLDialogElement;
 
 deleteModal?.addEventListener("toggle", async (e: Event) => {
     const toggleEvent = e as ToggleEvent;
@@ -6,8 +6,8 @@ deleteModal?.addEventListener("toggle", async (e: Event) => {
 
     if (isOpened) {
         const sourceItem = toggleEvent.source! as HTMLButtonElement;
-        const placeId = sourceItem.dataset.placeId;
+        const itemId = sourceItem.dataset.itemId;
 
-        (deleteModal.querySelector("input[type='hidden']") as HTMLInputElement).value = String(placeId);
+        (deleteModal.querySelector("input[type='hidden']") as HTMLInputElement).value = String(itemId);
     }
 });

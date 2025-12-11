@@ -12,9 +12,9 @@ Liste lieux numixs
 
 {% block scripts %}
     {% if NODE_ENV == "development" %}
-        <script type="module" src="/src/assets/scripts/delete-place-dialog.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/delete-list-item-dialog.ts" defer></script>
     {% else %}
-        <script type="module" src="/{{ manifest['src/assets/scripts/delete-place-dialog.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/delete-list-item-dialog.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}
 {% block content %}
@@ -62,8 +62,8 @@ Liste lieux numixs
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ "Oui" if place.ouvert == 1 else "Non" }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <div class="flex flex-row gap-3">
-                                            <a href="/lieu/{{ place.id }}" class="font-bold hocus:opacity-75">Éditer</a>
-                                            <button type="button" class="font-bold text-red-800 hover:text-red-950" commandfor="delete-place" command="show-modal" data-place-id="{{ place.id }}">Supprimer</button>
+                                            <a href="{{ admin_prefix }}/lieu/{{ place.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                            <button type="button" class="font-bold text-red-800 hover:text-red-950" commandfor="delete-place" command="show-modal" data-item-id="{{ place.id }}">Supprimer</button>
                                         </div>
                                     </td>
                                 </tr>
@@ -81,7 +81,7 @@ Liste lieux numixs
         </div>
     </div>
 
-    <dialog id="delete-place" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-2xl border border-solid border-green-numixs">
+    <dialog id="delete-place" data-delete-item-dialog class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-2xl border border-solid border-green-numixs">
         <header class="flex flex-row justify-between items-start">
             <div>
                 <p class="title-font text-4xl">Supprimer</p>

@@ -54,8 +54,8 @@ export default class User extends Model<InferAttributes<User>, InferCreationAttr
             },
             {
                 sequelize,
+                createdAt: 'date_inscription',
                 updatedAt: false,
-                createdAt: false,
                 modelName: 'user',
                 underscored: true,
                 hooks: {

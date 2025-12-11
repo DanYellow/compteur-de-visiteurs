@@ -96,7 +96,7 @@ Créer utilisateur
                                     </svg>
                                 </button>
                             </label>
-                            <select name="role" id="role" class="inert:text-black-numixs/80 inert:cursor-not-allowed" {{ "inert" if user_role.weight < 100 else "" }}>
+                            <select name="role" id="role" class="inert:text-black-numixs/80 inert:cursor-not-allowed" {{ "inert" if user_role.weight < 100 or (current_user.id != user.id and user.role == "ADMIN") else "" }}>
                                 {% for role in list_roles %}
                                     <option {{ "selected" if user.role == role.value else "" }} value="{{ role.value }}">
                                         {{ role.label }}

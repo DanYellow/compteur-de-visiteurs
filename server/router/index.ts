@@ -144,9 +144,7 @@ router.get(["/choix-lieu"], async (req, res) => {
 });
 
 router.get("/interdit", async (req, res) => {
-
-    res.render("pages/not-allowed.njk", {
-    });
+    res.render("pages/not-allowed.njk");
 });
 
 router.post('/deconnexion', (req, res) => {
