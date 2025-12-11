@@ -5,7 +5,7 @@ import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
 import { User as UserModel } from "#models/index.ts";
 import { LIST_ROLES } from "#scripts/utils.shared.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
-import { CustomSession, UserTokenData } from "#types";
+import { UserTokenData } from "#types";
 
 const router = express.Router();
 
@@ -55,8 +55,8 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
 
     if (user) {
         await user.update(payload);
-        if (String(user.id) === String((req.session as CustomSession).user!.id)) {
-            (req.session as CustomSession).user = user.toJSON();
+        if (String(user.id) === String(req.current_user!.id)) {
+            req.current_user = user.toJSON();
         }
         res.cookie('flash_message', "update_success", flashMessageCookieOptions);
     } else {

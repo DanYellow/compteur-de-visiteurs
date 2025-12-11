@@ -59,17 +59,16 @@ export const parseManifest = async (manifest: string) => {
 export const getUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const token = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserTokenData;
-
         const user = await UserModel.findByPk(token.id, {
             attributes: ['id', 'nom', 'email', 'prenom', "role"]
         });
 
         if (user) {
-            res.locals.user = user.toJSON();
-            req.user = user.toJSON();
+            res.locals.current_user = user.toJSON();
+            req.current_user = user.toJSON();
         }
     } catch (error) {
-        res.locals.user = null;
+        res.locals.current_user = null;
     }
 
     next();

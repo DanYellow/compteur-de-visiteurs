@@ -14,20 +14,16 @@ dotenv.config({ path: `${process.cwd()}/.env.local` })
 
 const router = express.Router();
 
-const users = [{ id: 1, username: 'user1', password: bcrypt.hashSync('password1', 8) }];
 router.get('/connexion', async (req, res) => {
-    //  try {
-    //      const decoded = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET));
-    //      console.log(decoded)
-    //      console.log(process.env.JWT_SECRET)
+    try {
+        jwt.verify(req.cookies.token, String(process.env.JWT_SECRET));
+        return res.redirect(`${res.locals.admin_prefix}/dashboard`);
 
-    //  } catch (error) {
-    //     console.log("error", error)
-    // }
+    } catch (error) {}
 
     res.render("pages/login.njk", {
         flash_message: req.cookies.flash_message,
-        signin_email: req.query?.email || req.cookies.email,
+        user_email: req.query?.email || req.cookies.email,
     });
 }).post('/connexion', async (req, res) => {
     const validator = LoginSchema.safeParse(req.body);
@@ -41,7 +37,7 @@ router.get('/connexion', async (req, res) => {
     const { email, mot_de_passe } = req.body;
 
     const user = await UserModel.findOne({
-        where: { email: String(req.body.email) }
+        where: { email: String(req.body.email), actif: true }
     })
 
     if (user && bcrypt.compareSync(mot_de_passe, user.mot_de_passe!)) {
@@ -51,17 +47,8 @@ router.get('/connexion', async (req, res) => {
             await UserModel.update({
                 derniere_connexion: new Date().toString()
             }, {
-                where: { email: String(email) }
+                where: { email: String(email), actif: true }
             })
-
-            // res.locals.user = user.toJSON();
-            // // res.locals = {
-            // //     ...res.locals,
-            // //     user: user.toJSON(),
-            // // }
-            // req.user = user.toJSON();
-
-            // console.log("fff", res.locals)
 
             res.cookie('flash_message', 'successful_login', flashMessageCookieOptions);
             res.cookie("token", token, { httpOnly: true, secure: false, sameSite: 'strict' });

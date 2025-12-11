@@ -12,18 +12,18 @@ router.post("/utilisateur/statut", async (req, res) => {
                 actif: req.body.actif,
             });
             res.status(200).json({
-                success: false,
+                success: true,
                 message: "Utilisateur mis à jour"
             });
         } catch (e) {
             res.status(404).json({
-                success: true,
+                success: false,
                 message: "Utilisateur inconnu",
             });
         }
     } else {
         res.status(500).json({
-            success: true,
+            success: false,
             message: "Une erreur est survenue",
         });
     }

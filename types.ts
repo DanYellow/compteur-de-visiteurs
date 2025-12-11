@@ -122,11 +122,11 @@ export interface CustomSession extends SessionData {
 declare global {
     namespace Express {
         interface Request {
-            user?: InferAttributes<UserModel>;
+            current_user?: InferAttributes<UserModel>;
         }
 
         interface Locals {
-            user: InferAttributes<UserModel> | null;
+            current_user: InferAttributes<UserModel> | null;
             isAuthenticated: boolean;
         }
     }

@@ -122,11 +122,9 @@ nunjucksConfig.addFilter("add_days", (value, days) => {
     return DateTime.fromISO(value).plus({ days });
 });
 
-nunjucksConfig.addFilter("uppercase", (value) => {
-    return String(value).toLocaleUpperCase();
+nunjucksConfig.addFilter("uppercase", (value = "") => {
+    return String(value || "").toLocaleUpperCase();
 });
-
-
 
 nunjucksConfig.addFilter("pad", (value, char: string, nb: number) => {
     return String(value).padStart(nb, char);
