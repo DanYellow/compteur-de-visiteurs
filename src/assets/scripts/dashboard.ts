@@ -349,7 +349,7 @@ const listCharts = Object.values(configData);
                                     color: '#FFF',
                                 },
                                 title: {
-                                    display: true,
+                                    display: false,
                                     text: "Visites",
                                     color: '#FFF',
                                 }
