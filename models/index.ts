@@ -4,6 +4,7 @@ import Visit from './visit';
 import RegularOpening from './regular-opening';
 import Event from './event';
 import User from './user';
+import UserPublicKeyCredentials from './user-public-key-credentials';
 
 let databaseFileName = './database.tmp.sqlite';
 
@@ -32,6 +33,7 @@ Visit.initModel(sequelize);
 RegularOpening.initModel(sequelize);
 Event.initModel(sequelize);
 User.initModel(sequelize);
+UserPublicKeyCredentials.initModel(sequelize);
 
 sequelize.models.place.hasMany(sequelize.models.visit, {
     foreignKey: {
@@ -81,6 +83,25 @@ sequelize.models.event.belongsToMany(sequelize.models.place, {
     otherKey: 'place_id',
     as: "listPlaces",
     onDelete: "CASCADE",
+});
+
+
+// User <-> Public keys
+sequelize.models.user.hasMany(sequelize.models.user_public_key_credentials, {
+    foreignKey: {
+        name: 'user_id',
+        allowNull: false,
+    },
+    as: 'listPublicKeys',
+    onDelete: 'CASCADE',
+});
+
+sequelize.models.user_public_key_credentials.belongsTo(sequelize.models.user, {
+    foreignKey: {
+        name: 'user_id',
+        allowNull: false,
+    },
+    as: 'user',
 });
 
 if (process.env.NODE_ENV === "development") {
