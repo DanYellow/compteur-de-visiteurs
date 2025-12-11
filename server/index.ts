@@ -9,6 +9,7 @@ import ip from "ip";
 import cookieParser from "cookie-parser";
 import session from "express-session";
 import dotenv from 'dotenv';
+import fs from "fs";
 
 import router from "./router/index.ts";
 
@@ -190,24 +191,40 @@ const listDomains: string[] =
         ? ["faclab.localhost"]
         : ["localhost", "0.0.0.0"];
 const port = Number(process.env.VITE_PORT || 3900);
-const server = app.listen(port, () => {
-    console.log("---------------------------");
-    console.log(
-        "Express server running at (ctrl/cmd + click to open in your browser):"
-    );
-    [serverip, ...listDomains]
-        .filter(Boolean)
-        .filter((item) => item !== "::")
-        .forEach((item) => {
-            let prefix = "Network";
-            if (item.includes("localhost")) {
-                prefix = "Local";
-            }
-            console.log(
-                `\x1b[35m➜\x1b[0m  ${prefix}: \x1b[35mhttp://${item}:${port}/\x1b[0m`
-            );
-        });
-});
+
+let server = null;
+
+if (process.env.NODE_ENV === 'development') {
+    const https = await import("https");
+
+    const options = {
+        key: fs.readFileSync(path.join('localhost-key.pem')),
+        cert: fs.readFileSync(path.join('localhost.pem'))
+    };
+
+    server = https.createServer(options, app).listen(port, () => {
+        console.log("---------------------------");
+        console.log(
+            "HTTPS Express server running at (ctrl/cmd + click to open in your browser):"
+        );
+        [serverip, ...listDomains]
+            .filter(Boolean)
+            .filter((item) => item !== "::")
+            .forEach((item) => {
+                let prefix = "Network";
+                if (item.includes("localhost")) {
+                    prefix = "Local";
+                }
+                console.log(
+                    `\x1b[35m➜\x1b[0m  ${prefix}: \x1b[35mhttps://${item}:${port}/\x1b[0m`
+                );
+            });
+    });
+} else {
+    server = app.listen(port, () => {
+
+    });
+}
 
 export const wss = new WebSocketServer({
     server,

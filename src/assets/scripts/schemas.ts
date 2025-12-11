@@ -129,6 +129,7 @@ export const EventSchema = z.object({
     path: ['heure_ouverture_heure', 'heure_ouverture_minutes', 'heure_fermeture_heure', 'heure_fermeture_minutes']
 })
 
+// https://github.com/colinhacks/zod/discussions/4051
 export const SignInSchema = z.object({
     email: z.email({
         error: `Email : ${REQUIRED_MESSAGE}`
