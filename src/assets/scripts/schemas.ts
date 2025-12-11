@@ -137,7 +137,7 @@ export const SignInSchema = z.object({
 
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&|;,])[A-Za-z\d@$!%*#?&|;,]{6,}$/
 
-export const SignInConfirmationSchema = z.object({
+export const SignInActivationSchema = z.object({
     email: z.email({
         error: `Email : ${REQUIRED_MESSAGE}`
     }),

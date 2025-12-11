@@ -1,11 +1,10 @@
 import express from "express";
-import { DateTime } from "luxon";
 import { UniqueConstraintError } from 'sequelize';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 
-import { SignInSchema, SignInConfirmationSchema, LoginSchema } from "#scripts/schemas.ts";
+import { SignInSchema, SignInActivationSchema, LoginSchema } from "#scripts/schemas.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 import { User as UserModel } from "#models/index.ts";
 import { CustomSession } from "#types";
@@ -111,18 +110,18 @@ router.get('/inscription', async (req, res) => {
     return res.redirect("/inscription");
 });
 
-router.get('/confirmation', async (req, res) => {
-    res.render("pages/sign-in-confirmation.njk", {
+router.get('/activation', async (req, res) => {
+    res.render("pages/sign-in-activation.njk", {
         flash_message: req.cookies.flash_message,
         signin_email: req.cookies.email,
     });
-}).post('/confirmation', async (req, res) => {
-    const validator = SignInConfirmationSchema.safeParse(req.body);
+}).post('/activation', async (req, res) => {
+    const validator = SignInActivationSchema.safeParse(req.body);
 
     if (!validator.success) {
         res.status(500)
         res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions)
-        return res.redirect("/confirmation");
+        return res.redirect("/activation");
     }
 
     const user = await UserModel.findOne({
@@ -133,7 +132,7 @@ router.get('/confirmation', async (req, res) => {
         if (user.actif === false) {
             res.cookie('flash_message', 'account_not_active', flashMessageCookieOptions)
 
-            return res.redirect("/confirmation");
+            return res.redirect("/activation");
         }
 
         if (user.mot_de_passe === null || user.mot_de_passe === "") {
@@ -159,7 +158,7 @@ router.get('/confirmation', async (req, res) => {
         res.cookie('flash_message', 'account_not_found', flashMessageCookieOptions)
     }
 
-    return res.redirect("/confirmation");
+    return res.redirect("/activation");
 });
 
 
