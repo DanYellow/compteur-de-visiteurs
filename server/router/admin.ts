@@ -72,7 +72,8 @@ router.get(["/", "/dashboard", "/tableau-de-bord"], getUser, requireRoleMiddlewa
     let globalPlace = {}
     if (!place) {
         const openingHoursLimitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/lieux`);
-        const openingHoursLimitsRes = (await openingHoursLimitsReq.json()).data
+        const openingHoursLimitsRes = (await openingHoursLimitsReq.json()).data;
+
         globalPlace = {
             regularOpening: {
                 heure_ouverture: openingHoursLimitsRes.heure_ouverture,

@@ -9,10 +9,11 @@ Connexion
 {% block scripts %}
     {% if NODE_ENV == "development" %}
         <script type="module" src="/src/assets/scripts/toggle-input-visibility.ts" defer></script>
-        <script type="module" src="/src/assets/scripts/forms/login-form.ts" defer></script>
+        {# <script type="module" src="/src/assets/scripts/forms/login-form.ts" defer></script> #}
+        <script type="module" src="/src/assets/scripts/forms/login-form-2.ts" defer></script>
     {% else %}
         <script type="module" src="/{{ manifest['src/assets/scripts/toggle-input-visibility.ts'].file }}" defer></script>
-        <script type="module" src="/{{ manifest['src/assets/scripts/forms/login-form.ts'].file }}" defer></script>
+        {# <script type="module" src="/{{ manifest['src/assets/scripts/forms/login-form.ts'].file }}" defer></script> #}
     {% endif %}
 {% endblock %}
 
@@ -76,6 +77,7 @@ Connexion
                     <label for="mot_de_passe">Mot de passe</label>
                     <input type="password" name="mot_de_passe" id="mot_de_passe" class="text-black w-full" data-input-toggle-visibility>
                 </div>
+                <button type="button" data-test>Toast 222</button>
                 <div>
                     <button type="submit" class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
                     Se connecter
