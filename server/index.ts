@@ -10,8 +10,6 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import dotenv from 'dotenv';
 import fs from "fs";
-import { verifyRegistrationResponse } from "@simplewebauthn/server";
-import base64url from "base64url";
 
 import router from "#server/router/index.ts";
 
@@ -180,14 +178,9 @@ const listDomains: string[] =
         : ["localhost", "0.0.0.0"];
 const port = Number(process.env.VITE_PORT || 3900);
 
-let users = {};
-let challenges = {};
-const rpId = 'localhost';
-const expectedOrigin = [`http://localhost:${port}`];
-
 let server = null;
 
-if (process.env.NODE_ENV === 'development') {
+if (false && process.env.NODE_ENV === 'development') {
     const https = await import("https");
 
     const options = {
@@ -214,62 +207,25 @@ if (process.env.NODE_ENV === 'development') {
             });
     });
 } else {
-    server = app.listen(port);
+    server = app.listen(port, () => {
+        console.log("---------------------------");
+        console.log(
+            "Express server running at (ctrl/cmd + click to open in your browser):"
+        );
+        [serverip, ...listDomains]
+            .filter(Boolean)
+            .filter((item) => item !== "::")
+            .forEach((item) => {
+                let prefix = "Network";
+                if (item.includes("localhost")) {
+                    prefix = "Local";
+                }
+                console.log(
+                    `\x1b[35m➜\x1b[0m  ${prefix}: \x1b[35mhttp://${item}:${port}/\x1b[0m`
+                );
+            });
+    });
 }
-
-function getNewChallenge() {
-    return Math.random().toString(36).substring(2);
-}
-function convertChallenge(challenge) {
-    return btoa(challenge).replaceAll('=', '');
-}
-
-app.post('/register/start', (req, res) => {
-    console.log("req.body", req.body)
-    let username = req.body.username;
-    let challenge = getNewChallenge();
-    challenges[username] = convertChallenge(challenge);
-    const pubKey = {
-        challenge: challenge,
-        rp: { id: rpId, name: 'webauthn-app' },
-        user: { id: username, name: username, displayName: username },
-        pubKeyCredParams: [
-            { type: 'public-key', alg: -7 },
-            { type: 'public-key', alg: -257 },
-        ],
-        authenticatorSelection: {
-            authenticatorAttachment: 'platform',
-            userVerification: 'required',
-            residentKey: 'preferred',
-            requireResidentKey: false,
-        }
-    };
-    res.json(pubKey);
-});
-
-
-app.post('/register/finish', async (req, res) => {
-    const username = req.body.username;
-    // Verify the attestation response
-    let verification;
-    try {
-        verification = await verifyRegistrationResponse({
-            response: req.body.data,
-            expectedChallenge: challenges[username],
-            expectedOrigin: expectedOrigin
-        });
-    } catch (error) {
-        console.error(error);
-        return res.status(400).send({ error: error.message });
-    }
-    const { verified, registrationInfo } = verification;
-    if (verified) {
-        users[username] = registrationInfo;
-        return res.status(200).send(true);
-    }
-    res.status(500).send(false);
-});
-
 
 app.use(function (req, res, next) {
     res.status(404);
@@ -287,7 +243,6 @@ app.use(function (req, res, next) {
 
     res.type("txt").send("Page non trouvée");
 });
-
 
 
 export const wss = new WebSocketServer({
