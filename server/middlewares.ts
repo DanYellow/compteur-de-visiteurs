@@ -60,7 +60,7 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     try {
         const token = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserTokenData;
         const user = await UserModel.findByPk(token.id, {
-            attributes: ['id', 'nom', 'email', 'prenom', "role"]
+            attributes: ['id', 'nom', 'email', 'prenom', "role", "actif"]
         });
 
         if (user && user.actif === true) {
@@ -69,6 +69,7 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
         } else {
             res.cookie('flash_message', "forced_logout", flashMessageCookieOptions)
             res.clearCookie("token");
+
             return res.redirect('/connexion');
         }
     } catch (error) {

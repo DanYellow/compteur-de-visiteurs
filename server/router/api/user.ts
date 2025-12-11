@@ -1,6 +1,7 @@
 import express from "express";
 import nodemailer from "nodemailer";
 import dotenv from 'dotenv';
+import nunjucks from "nunjucks";
 
 import { User as UserModel } from "#models/index.ts";
 
@@ -34,12 +35,17 @@ router.post("/utilisateur/statut", async (req, res) => {
                 actif: req.body.actif,
             });
 
+            const html = nunjucks.render('pages/emails/activation.njk', {
+                title: 'Hello',
+                items: [1, 2, 3]
+            });
+
             const info = await transporter.sendMail({
                 from: `"Maddison Foo Koch" <${process.env.EMAIL_NOREPLY}>`,
                 to: user.email,
                 subject: "Hello ✔",
                 text: "Hello world?", // plain‑text body
-                html: "<b>Hello world?</b>", // HTML body
+                html: html, // HTML body
             });
             console.log("Message sent:", info.messageId);
 

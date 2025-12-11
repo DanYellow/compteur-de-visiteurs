@@ -8,7 +8,7 @@ dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const router = express.Router();
 
-router.get("/confirmation", async (req, res) => {
+router.get("/activation", async (req, res) => {
     if (req.query.email) {
         const user = await UserModel.findOne({
             where: { email: String(req.query.email) },
@@ -19,11 +19,11 @@ router.get("/confirmation", async (req, res) => {
                 actif: true,
             });
 
-            return res.status(200).json({"message": "succès"});
+            return res.status(200).json({"message": "Succès. Vous allez être déconnecté(e)."});
         }
     }
 
-    return res.status(500).json({"message": "erreur"});
+    return res.status(500).json({"message": "Erreur"});
 });
 
 router.get("/promote", async (req, res) => {

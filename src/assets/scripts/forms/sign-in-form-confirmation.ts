@@ -1,4 +1,4 @@
-import { SignInConfirmationSchema } from "#scripts/schemas.ts";
+import { SignInActivationSchema } from "#scripts/schemas.ts";
 
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
@@ -23,7 +23,7 @@ const validForm = (e: Event) => {
     }
 
     const formData = new FormData(form);
-    const validator = SignInConfirmationSchema.safeParse(Object.fromEntries(formData));
+    const validator = SignInActivationSchema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll("input.error").forEach((item) => {
         item.classList.remove("error");
