@@ -107,6 +107,7 @@ export type PlaceType = "fablab" | "station" | "lab";
 export interface UserTokenData extends JwtPayload {
     email: string;
     role: string;
+    userId?: number;
 }
 
 export interface CustomSession extends SessionData {

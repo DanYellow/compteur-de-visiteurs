@@ -10,7 +10,6 @@ import { UserTokenData } from "#types";
 const router = express.Router();
 
 router.get(['/utilisateurs'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
-
     const listUsers = await UserModel.findAll({
         raw: true,
     });

@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import { SignInSchema, SignInActivationSchema, LoginSchema } from "#scripts/schemas.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 import { User as UserModel } from "#models/index.ts";
-import { CustomSession } from "#types";
+import { CustomSession, UserTokenData } from "#types";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` })
 
@@ -18,7 +18,7 @@ router.get('/connexion', async (req, res) => {
         jwt.verify(req.cookies.token, String(process.env.JWT_SECRET));
         return res.redirect(`${res.locals.admin_prefix}/dashboard`);
 
-    } catch (error) {}
+    } catch (error) { }
 
     res.render("pages/login.njk", {
         flash_message: req.cookies.flash_message,
@@ -39,7 +39,7 @@ router.get('/connexion', async (req, res) => {
         where: { email: String(req.body.email), actif: true }
     })
 
-    if (user && bcrypt.compareSync(mot_de_passe, user.mot_de_passe!)) {
+    if (user && user.mot_de_passe && bcrypt.compareSync(mot_de_passe, user.mot_de_passe!)) {
         try {
             const token = jwt.sign({ role: user.role, email, id: user.id }, String(process.env.JWT_SECRET));
 
@@ -110,29 +110,61 @@ router.get('/inscription', async (req, res) => {
     return res.redirect("/inscription");
 });
 
-router.get('/activation', async (req, res) => {
+router.get('/activation/:token', async (req, res) => {
+    let error_key = "";
+    try {
+        const { token } = req.params;
+        const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
+
+        const user = await UserModel.findByPk(decoded.userId);
+
+        if (!user) {
+            throw new Error("user_not_found");
+        }
+
+        if (user?.actif) {
+            throw new Error("user_not_active");
+        }
+    } catch (error: any) {
+        if (error.name === "TokenExpiredError") {
+            error_key = 'expired_token'
+        } else if (error.name === "JsonWebTokenError") {
+            error_key = 'invalid_token'
+        } else {
+            error_key = error as string
+        }
+    }
+
     res.render("pages/sign-in-activation.njk", {
-        flash_message: req.cookies.flash_message,
+        flash_message: req.cookies?.flash_message || error_key,
         signin_email: req.cookies.email,
     });
-}).post('/activation', async (req, res) => {
+}).post('/activation/:token', async (req, res) => {
+    let error_key = "";
+    const { token } = req.params;
+
     const validator = SignInActivationSchema.safeParse(req.body);
 
     if (!validator.success) {
         res.status(500)
-        res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions)
-        return res.redirect("/activation");
+        res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
+
+        return res.redirect(`/activation/${token}`);
     }
 
-    const user = await UserModel.findOne({
-        where: { email: String(req.body.email) }
-    })
+    try {
+        jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!);
 
-    if (user) {
-        if (user.actif === false) {
-            res.cookie('flash_message', 'account_not_active', flashMessageCookieOptions)
+        const user = await UserModel.findOne({
+            where: { email: String(req.body.email) }
+        })
 
-            return res.redirect("/activation");
+        if (!user) {
+            throw new Error("user_not_found");
+        }
+
+        if (!user?.actif) {
+            throw new Error("user_not_active");
         }
 
         if (user.mot_de_passe === null || user.mot_de_passe === "") {
@@ -140,26 +172,29 @@ router.get('/activation', async (req, res) => {
                 mot_de_passe: bcrypt.hashSync(req.body.password, 8)
             }
 
-            await UserModel.update(payload,
-                {
-                    where: { email: String(req.body.email) }
-                })
+            await user.update(payload);
+
             res.cookie('email', req.body.email, flashMessageCookieOptions);
             res.cookie('flash_message', 'account_created', flashMessageCookieOptions);
-
-            return res.redirect("/connexion");
         } else {
             res.cookie('email', req.body.email, flashMessageCookieOptions);
             res.cookie('flash_message', 'account_already_created', flashMessageCookieOptions);
-
-            return res.redirect("/connexion");
         }
-    } else {
-        res.cookie('flash_message', 'account_not_found', flashMessageCookieOptions)
+
+        return res.redirect("/connexion");
+    } catch (error: any) {
+        if (error.name === "TokenExpiredError") {
+            error_key = 'expired_token';
+        } else if (error.name === "JsonWebTokenError") {
+            error_key = 'invalid_token';
+        } else {
+            error_key = error as string
+        }
     }
 
-    return res.redirect("/activation");
-});
+    res.cookie('flash_message', error_key, flashMessageCookieOptions);
 
+    return res.redirect(`/activation/${token}`);
+});
 
 export default router;

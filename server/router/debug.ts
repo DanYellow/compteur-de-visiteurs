@@ -1,6 +1,7 @@
 import express from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
 
 import { User as UserModel } from "#models/index.ts";
 
@@ -17,6 +18,9 @@ router.get("/activation", async (req, res) => {
         if (user) {
             await user.update({
                 actif: true,
+                ...(req.query.mot_de_passe ? {
+                    mot_de_passe: bcrypt.hashSync(String(req.query.mot_de_passe), 8)
+                } : {})
             });
 
             return res.status(200).json({"message": "Succès. Vous allez être déconnecté(e)."});

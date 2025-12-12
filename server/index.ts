@@ -37,7 +37,11 @@ app.set("view engine", "nunjucks");
 app.set("views", path.join(__dirname, "..", "/src"));
 
 app.use(express.static(publicPath));
-app.use(cors({ origin: '*' }));
+app.use(cors({
+    origin: "*",
+    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+}));
 app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(
