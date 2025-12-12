@@ -34,7 +34,6 @@ export const requireRoleMiddleware = (role: string = "") => {
                 res.redirect("/interdit")
             }
         } catch (error) {
-            //         if (req.user?.role !== role) {
             res.cookie('flash_message', "not_logged", flashMessageCookieOptions);
             (req.session as CustomSession).return_to = req.originalUrl;
 

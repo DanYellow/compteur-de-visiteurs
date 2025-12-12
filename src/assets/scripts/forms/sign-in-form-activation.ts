@@ -1,9 +1,10 @@
 import { fido2Get, fido2Create } from '@ownid/webauthn';
 
-import { LoginSchema } from "#scripts/schemas.ts";
+import { SignInActivationSchema } from "#scripts/schemas.ts";
 
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
+const passkeyItems = document.querySelectorAll("[data-passkey-toggle]") as NodeListOf<HTMLElement>
 
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -25,7 +26,7 @@ const validForm = (e: Event) => {
     }
 
     const formData = new FormData(form);
-    const validator = LoginSchema.safeParse(Object.fromEntries(formData));
+    const validator = SignInActivationSchema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll("input.error").forEach((item) => {
         item.classList.remove("error");
@@ -65,8 +66,15 @@ const validForm = (e: Event) => {
 form?.addEventListener("submit", submitForm);
 form?.addEventListener("input", validForm);
 
-document.querySelector("[data-test]")?.addEventListener("click", async () => {
-    const publicKey = await fetch('/register/start', {
+Array.from(passkeyItems).forEach(async (item) => {
+    if (!(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())) {
+        // (item.parentNode as HTMLElement)!.classList.replace("md:grid-cols-[1fr_auto_1fr]", "md:grid-cols-1");
+        // item.remove();
+    }
+})
+
+document.querySelector("[data-passkey-register]")?.addEventListener("click", async () => {
+    const publicKey = await fetch('/passkey/start', {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
@@ -77,7 +85,7 @@ document.querySelector("[data-test]")?.addEventListener("click", async () => {
     const fidoData = await fido2Create(await publicKey.json(), "ddd");
     console.log("publicKey", fidoData)
 
-    const response = await fetch('/register/finish', {
+    const response = await fetch('/passkey/finish', {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
@@ -85,6 +93,5 @@ document.querySelector("[data-test]")?.addEventListener("click", async () => {
         body: JSON.stringify(fidoData)
     })
 
-    // this.http.post<boolean>('/register/finish', fidoData).toPromise();
     console.log(response);
 })
