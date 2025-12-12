@@ -115,4 +115,4 @@ if (process.env.NODE_ENV === "development") {
 
 export default sequelize;
 
-export { Place, Visit, RegularOpening, Event, User }
+export { Place, Visit, RegularOpening, Event, User, UserPublicKeyCredentials }

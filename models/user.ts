@@ -1,7 +1,7 @@
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin, type BelongsToManyGetAssociationsMixin } from 'sequelize';
-import bcrypt from "bcryptjs";
-
 import { LIST_ROLES } from '#scripts/utils.shared.ts';
+import type UserPublicKeyCredentials from './user-public-key-credentials';
+
 export default class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     declare id: CreationOptional<number>;
     declare email: string;
@@ -11,6 +11,9 @@ export default class User extends Model<InferAttributes<User>, InferCreationAttr
     declare actif?: boolean;
     declare derniere_connexion?: string;
     declare role?: string;
+
+    declare setListPublicKeys: BelongsToManySetAssociationsMixin<UserPublicKeyCredentials, number>;
+    declare getListPublicKeys: BelongsToManyGetAssociationsMixin<UserPublicKeyCredentials>;
 
     static initModel(sequelize: Sequelize) {
         User.init(

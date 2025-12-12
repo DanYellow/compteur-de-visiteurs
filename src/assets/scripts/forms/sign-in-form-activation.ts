@@ -68,12 +68,18 @@ const validForm = (e: Event) => {
 form?.addEventListener("submit", submitForm);
 form?.addEventListener("input", validForm);
 
-Array.from(passkeyItems).forEach(async (item) => {
-    if (!(await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable())) {
-        // (item.parentNode as HTMLElement)!.classList.replace("md:grid-cols-[1fr_auto_1fr]", "md:grid-cols-1");
-        // item.remove();
+Promise.all([
+    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
+    PublicKeyCredential.isConditionalMediationAvailable(),
+]).then(results => {
+    if (results.some(r => r === false)) {
+        Array.from(passkeyItems).forEach(async (item) => {
+            // (item.parentNode as HTMLElement)!.classList.replace("md:grid-cols-[1fr_auto_1fr]", "md:grid-cols-1");
+            // item.remove();
+
+        })
     }
-})
+});
 
 emailInput.addEventListener("input", (e) => {
     const input = e.currentTarget as HTMLInputElement;
@@ -93,15 +99,33 @@ createPasskeyBtn?.addEventListener("click", async () => {
         body: JSON.stringify({ email: emailInput.value })
     })
 
-    const fidoData = await fido2Create(await publicKey.json(), emailInput.value);
+    const options = PublicKeyCredential.parseCreationOptionsFromJSON(await publicKey.json());
 
-    const response = await fetch('/passkey/finish', {
+    const credential = await navigator.credentials.create({
+        publicKey: options
+    }) as PublicKeyCredential;
+
+    const serializedPublicKey = JSON.stringify(credential.toJSON());
+
+    // const fidoData = await fido2Create(await publicKey.json(), emailInput.value);
+
+    const response = await fetch('/passkey/retour', {
         method: "POST",
+        credentials: 'same-origin',
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify(fidoData)
+        body: serializedPublicKey
     })
 
-    console.log(response);
+    // if (response.status === 404) {
+    //     if (PublicKeyCredential.signalUnknownCredential()) {
+    //         await PublicKeyCredential.signalUnknownCredential({
+    //             rpId: "example.com",
+    //             credentialId: "vI0qOggiE3OT01ZRWBYz5l4MEgU0c7PmAA" // base64url encoded credential ID
+    //         });
+    //     }
+    // }
+
+    // console.log(response);
 })

@@ -2,6 +2,7 @@ import express from "express";
 import nodemailer from "nodemailer";
 import dotenv from 'dotenv';
 import nunjucks from "nunjucks";
+import jwt from "jsonwebtoken";
 
 import { User as UserModel } from "#models/index.ts";
 
@@ -35,10 +36,19 @@ router.post("/utilisateur/statut", async (req, res) => {
                 actif: req.body.actif,
             });
 
+            const token = jwt.sign(
+                { userId: user.id },
+                String(process.env.JWT_ACTIVATION_SECRET),
+                { expiresIn: process.env?.JWT_ACTIVATION_EXPIRES || "1d" }
+            );
+
             const html = nunjucks.render('pages/emails/activation.njk', {
                 title: 'Hello',
                 items: [1, 2, 3]
             });
+
+            const activationLink = `${req.protocol}://${req.get('host')}/activation/${token}`;
+            console.log(activationLink);
 
             const info = await transporter.sendMail({
                 from: `"Maddison Foo Koch" <${process.env.EMAIL_NOREPLY}>`,
