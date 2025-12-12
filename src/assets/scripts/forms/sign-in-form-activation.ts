@@ -1,5 +1,3 @@
-import { fido2Get, fido2Create } from '@ownid/webauthn';
-
 import { SignInActivationSchema } from "#scripts/schemas.ts";
 
 const form = document.querySelector("form") as HTMLFormElement;
@@ -91,7 +89,7 @@ emailInput.addEventListener("input", (e) => {
 })
 
 createPasskeyBtn?.addEventListener("click", async () => {
-    const publicKey = await fetch('/passkey/start', {
+    const publicKey = await fetch('/passkey/enregistrement', {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
@@ -106,8 +104,6 @@ createPasskeyBtn?.addEventListener("click", async () => {
     }) as PublicKeyCredential;
 
     const serializedPublicKey = JSON.stringify(credential.toJSON());
-
-    // const fidoData = await fido2Create(await publicKey.json(), emailInput.value);
 
     const response = await fetch('/passkey/retour', {
         method: "POST",
@@ -127,5 +123,5 @@ createPasskeyBtn?.addEventListener("click", async () => {
     //     }
     // }
 
-    // console.log(response);
+    console.log(response);
 })

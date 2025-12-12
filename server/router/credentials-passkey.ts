@@ -2,7 +2,7 @@ import express from "express";
 import { verifyRegistrationResponse, generateRegistrationOptions, AuthenticatorTransportFuture } from "@simplewebauthn/server";
 import base64url from "base64url";
 import dotenv from 'dotenv';
-import { isoUint8Array, isoBase64URL } from '@simplewebauthn/server/helpers';
+import { isoUint8Array } from '@simplewebauthn/server/helpers';
 
 import { User as UserModel, UserPublicKeyCredentials as UserPublicKeyCredentialsModel } from "#models/index.ts";
 
@@ -78,8 +78,9 @@ router.post('/passkey/enregistrement', async (req, res) => {
                 },
             });
 
-            req.session.challenge = pubKey.challenge;
-
+            req.session.challenge = options.challenge;
+            req.session.email = username;
+            
             return res.json(options);
             // const external_id = convertChallenge(challenge);
 
@@ -110,12 +111,12 @@ router.post('/passkey/enregistrement', async (req, res) => {
 router.post('/passkey/retour', async (req, res) => {
     const expectedChallenge = req.session.challenge;
 
-    const expectedOrigin = [req.get('host')!];
+    const expectedOrigin = [`${req.protocol}://${req.get('host')}`!];
     // Verify the attestation response
     let verification;
     try {
         verification = await verifyRegistrationResponse({
-            response: req.body.data,
+            response: req.body,
             expectedChallenge,
             expectedOrigin,
         });
@@ -137,7 +138,7 @@ router.post('/passkey/retour', async (req, res) => {
 
         const user = await UserModel.findOne({
             where: {
-                email: String(req.body.email),
+                email: String(req.session.email),
             }
         })
 
@@ -152,7 +153,7 @@ router.post('/passkey/retour', async (req, res) => {
                 aaguid,
             })
 
-            user.setListPublicKeys([credentials]);
+            await user.setListPublicKeys([credentials]);
         }
 
         return res.status(200).send(true);

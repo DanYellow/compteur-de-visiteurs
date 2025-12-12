@@ -110,38 +110,102 @@ router.get('/inscription', async (req, res) => {
     return res.redirect("/inscription");
 });
 
-router.get('/activation/:token', async (req, res) => {
-    let error_key = "";
-    try {
-        const { token } = req.params;
-        const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
+// router.get('/activation/:token', async (req, res) => {
+//     let error_key = "";
+//     try {
+//         const { token } = req.params;
+//         const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
 
-        const user = await UserModel.findByPk(decoded.userId);
+//         const user = await UserModel.findByPk(decoded.userId);
 
-        if (!user) {
-            throw new Error("user_not_found");
-        }
+//         if (!user) {
+//             throw new Error("user_not_found");
+//         }
 
-        if (user?.actif) {
-            throw new Error("user_not_active");
-        }
-    } catch (error: any) {
-        if (error.name === "TokenExpiredError") {
-            error_key = 'expired_token'
-        } else if (error.name === "JsonWebTokenError") {
-            error_key = 'invalid_token'
-        } else {
-            error_key = error as string
-        }
-    }
+//         if (user?.actif) {
+//             throw new Error("user_not_active");
+//         }
+//     } catch (error: any) {
+//         if (error.name === "TokenExpiredError") {
+//             error_key = 'expired_token'
+//         } else if (error.name === "JsonWebTokenError") {
+//             error_key = 'invalid_token'
+//         } else {
+//             error_key = error as string
+//         }
+//     }
 
+//     res.render("pages/sign-in-activation.njk", {
+//         flash_message: req.cookies?.flash_message || error_key,
+//         signin_email: req.cookies.email,
+//     });
+// }).post('/activation/:token', async (req, res) => {
+//     let error_key = "";
+//     const { token } = req.params;
+
+//     const validator = SignInActivationSchema.safeParse(req.body);
+
+//     if (!validator.success) {
+//         res.status(500)
+//         res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
+
+//         return res.redirect(`/activation/${token}`);
+//     }
+
+//     try {
+//         jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!);
+
+//         const user = await UserModel.findOne({
+//             where: { email: String(req.body.email) }
+//         })
+
+//         if (!user) {
+//             throw new Error("user_not_found");
+//         }
+
+//         if (!user?.actif) {
+//             throw new Error("user_not_active");
+//         }
+
+//         if (user.mot_de_passe === null || user.mot_de_passe === "") {
+//             const payload = {
+//                 mot_de_passe: bcrypt.hashSync(req.body.password, 8)
+//             }
+
+//             await user.update(payload);
+
+//             res.cookie('email', req.body.email, flashMessageCookieOptions);
+//             res.cookie('flash_message', 'account_created', flashMessageCookieOptions);
+//         } else {
+//             res.cookie('email', req.body.email, flashMessageCookieOptions);
+//             res.cookie('flash_message', 'account_already_created', flashMessageCookieOptions);
+//         }
+
+//         return res.redirect("/connexion");
+//     } catch (error: any) {
+//         if (error.name === "TokenExpiredError") {
+//             error_key = 'expired_token';
+//         } else if (error.name === "JsonWebTokenError") {
+//             error_key = 'invalid_token';
+//         } else {
+//             error_key = error as string
+//         }
+//     }
+
+//     res.cookie('flash_message', error_key, flashMessageCookieOptions);
+
+//     return res.redirect(`/activation/${token}`);
+// });
+
+router.get('/activation', async (req, res) => {
+    let error_key = null;
+    console.log("req.get('host')", req.get('host'))
     res.render("pages/sign-in-activation.njk", {
         flash_message: req.cookies?.flash_message || error_key,
         signin_email: req.cookies.email,
     });
-}).post('/activation/:token', async (req, res) => {
+}).post('/activation', async (req, res) => {
     let error_key = "";
-    const { token } = req.params;
 
     const validator = SignInActivationSchema.safeParse(req.body);
 
@@ -153,8 +217,6 @@ router.get('/activation/:token', async (req, res) => {
     }
 
     try {
-        jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!);
-
         const user = await UserModel.findOne({
             where: { email: String(req.body.email) }
         })
@@ -194,7 +256,7 @@ router.get('/activation/:token', async (req, res) => {
 
     res.cookie('flash_message', error_key, flashMessageCookieOptions);
 
-    return res.redirect(`/activation/${token}`);
+    return res.redirect(`/activation`);
 });
 
 export default router;
