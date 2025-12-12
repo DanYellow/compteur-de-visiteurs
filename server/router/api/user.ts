@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
             rejectUnauthorized: false
         },
     } : {
-        host: "smtp.laposte.net",
+        host: process.env.EMAIL_SERVER_NOREPLY,
         port: 587,
         secure: false, // true for 465, false for other ports
         auth: {

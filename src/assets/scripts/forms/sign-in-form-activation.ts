@@ -5,6 +5,8 @@ import { SignInActivationSchema } from "#scripts/schemas.ts";
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
 const passkeyItems = document.querySelectorAll("[data-passkey-toggle]") as NodeListOf<HTMLElement>
+const createPasskeyBtn = document.querySelector("[data-passkey-register]") as HTMLButtonElement;
+const emailInput = document.querySelector("[name=\"email\"]") as HTMLInputElement;
 
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
@@ -73,17 +75,25 @@ Array.from(passkeyItems).forEach(async (item) => {
     }
 })
 
-document.querySelector("[data-passkey-register]")?.addEventListener("click", async () => {
+emailInput.addEventListener("input", (e) => {
+    const input = e.currentTarget as HTMLInputElement;
+    const validator = SignInActivationSchema.pick({ email: true }).safeParse({ email: input.value });
+
+    if (createPasskeyBtn) {
+        createPasskeyBtn.inert = !validator.success;
+    }
+})
+
+createPasskeyBtn?.addEventListener("click", async () => {
     const publicKey = await fetch('/passkey/start', {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username: "ddd" })
+        body: JSON.stringify({ email: emailInput.value })
     })
 
-    const fidoData = await fido2Create(await publicKey.json(), "ddd");
-    console.log("publicKey", fidoData)
+    const fidoData = await fido2Create(await publicKey.json(), emailInput.value);
 
     const response = await fetch('/passkey/finish', {
         method: "POST",
