@@ -1,8 +1,24 @@
-import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin, type BelongsToManyGetAssociationsMixin } from 'sequelize';
-import { LIST_ROLES } from '#scripts/utils.shared.ts';
-import type UserPublicKeyCredentials from './user-public-key-credentials';
+import {
+    DataTypes,
+    Sequelize,
+    Model,
+    type InferAttributes,
+    type InferCreationAttributes,
+    type CreationOptional,
+    type BelongsToManySetAssociationsMixin,
+    type BelongsToManyGetAssociationsMixin,
+} from "sequelize";
+import { LIST_ROLES } from "#scripts/utils.shared.ts";
+import type UserPublicKeyCredentials from "./user-public-key-credentials";
 
-export default class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+import dotenv from "dotenv";
+
+dotenv.config({ path: `${process.cwd()}/.env.local` });
+
+export default class User extends Model<
+    InferAttributes<User>,
+    InferCreationAttributes<User>
+> {
     declare id: CreationOptional<number>;
     declare email: string;
     declare nom?: string;
@@ -12,8 +28,11 @@ export default class User extends Model<InferAttributes<User>, InferCreationAttr
     declare derniere_connexion?: string;
     declare role?: string;
 
-    declare setListPublicKeys: BelongsToManySetAssociationsMixin<UserPublicKeyCredentials, number>;
-    declare getListPublicKeys: BelongsToManyGetAssociationsMixin<UserPublicKeyCredentials>;
+    declare setListPasskeys: BelongsToManySetAssociationsMixin<
+        UserPublicKeyCredentials,
+        number
+    >;
+    declare getListPasskeys: BelongsToManyGetAssociationsMixin<UserPublicKeyCredentials>;
 
     static initModel(sequelize: Sequelize) {
         User.init(
@@ -50,24 +69,42 @@ export default class User extends Model<InferAttributes<User>, InferCreationAttr
                     allowNull: true,
                 },
                 role: {
-                    type: DataTypes.ENUM(...LIST_ROLES.map((item) => item.value)),
+                    type: DataTypes.ENUM(
+                        ...LIST_ROLES.map((item) => item.value)
+                    ),
                     allowNull: false,
                     defaultValue: "NUMIXS_LAB",
-                }
+                },
             },
             {
                 sequelize,
-                createdAt: 'date_inscription',
+                createdAt: "date_inscription",
                 updatedAt: false,
-                modelName: 'user',
+                modelName: "user",
                 underscored: true,
                 hooks: {
-                    // beforeCreate(record) {
-                    //     record.mot_de_passe = bcrypt.hashSync(record.mot_de_passe, 10)
-                    // },
-                }
+                    afterCreate(record, options) {
+                        deleteFirstAdmin(record);
+                    },
+                    afterUpdate(record, options) {
+                        deleteFirstAdmin(record);
+                    },
+                },
             }
-        )
+        );
     }
 }
 
+const deleteFirstAdmin = async (record: User) => {
+    const adminCount = await User.count({
+        where: { role: "admin" },
+    });
+
+    if (record.role === "ADMIN" && adminCount > 1) {
+        await User.destroy({
+            where: {
+                email: "admin@admin.com",
+            },
+        });
+    }
+};

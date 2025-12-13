@@ -130,7 +130,7 @@ router.post("/passkey/creation", async (req, res) => {
                 compteur: 0,
             });
 
-            await user.setListPublicKeys([credentials]);
+            await user.setListPasskeys([credentials]);
 
             res.cookie(
                 "flash_message",
@@ -186,7 +186,7 @@ router.post("/passkey/connexion", async (req, res) => {
             },
             include: [
                 {
-                    as: "listPublicKeys",
+                    as: "listPasskeys",
                     model: UserPublicKeyCredentialsModel,
                     where: { id_externe: base64url.encode(payload.id) },
                     attributes: [],

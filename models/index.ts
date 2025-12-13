@@ -1,19 +1,21 @@
-import { Sequelize } from 'sequelize';
-import Place from './place';
-import Visit from './visit';
-import RegularOpening from './regular-opening';
-import Event from './event';
-import User from './user';
-import UserPublicKeyCredentials from './user-public-key-credentials';
+import { Sequelize } from "sequelize";
+import Place from "./place";
+import Visit from "./visit";
+import RegularOpening from "./regular-opening";
+import Event from "./event";
+import User from "./user";
+import UserPublicKeyCredentials from "./user-public-key-credentials";
 
-let databaseFileName = './database.tmp.sqlite';
+import bcrypt from "bcryptjs";
+
+let databaseFileName = "./database.tmp.sqlite";
 
 if (process.env.NODE_ENV === "production") {
-    databaseFileName = './database-prod.tmp.sqlite';
+    databaseFileName = "./database-prod.tmp.sqlite";
 }
 
 const sequelize = new Sequelize({
-    dialect: 'sqlite',
+    dialect: "sqlite",
     storage: databaseFileName,
     define: {
         freezeTableName: true,
@@ -23,9 +25,9 @@ const sequelize = new Sequelize({
 
 try {
     await sequelize.authenticate();
-    console.log('Connection has been established successfully.');
+    console.log("Connection has been established successfully.");
 } catch (error) {
-    console.error('Unable to connect to the database:', error);
+    console.error("Unable to connect to the database:", error);
 }
 
 Place.initModel(sequelize);
@@ -37,82 +39,95 @@ UserPublicKeyCredentials.initModel(sequelize);
 
 sequelize.models.place.hasMany(sequelize.models.visit, {
     foreignKey: {
-        name: 'lieu_id',
+        name: "lieu_id",
         allowNull: false,
     },
-    as: 'listVisits',
-    onDelete: 'CASCADE',
+    as: "listVisits",
+    onDelete: "CASCADE",
 });
 
 sequelize.models.visit.belongsTo(sequelize.models.place, {
     foreignKey: {
-        name: 'lieu_id',
+        name: "lieu_id",
         allowNull: false,
     },
-    as: 'place',
+    as: "place",
 });
 
 sequelize.models.place.hasOne(sequelize.models.regular_opening, {
     foreignKey: {
-        name: 'place_id',
+        name: "place_id",
         allowNull: false,
     },
-    onDelete: 'CASCADE',
+    onDelete: "CASCADE",
     as: "regularOpening",
 });
 
 sequelize.models.regular_opening.belongsTo(sequelize.models.place, {
     foreignKey: {
-        name: 'place_id',
+        name: "place_id",
         allowNull: false,
     },
-    as: 'place',
+    as: "place",
 });
 
 sequelize.models.place.belongsToMany(sequelize.models.event, {
-    through: 'place_event',
-    foreignKey: 'place_id',
-    otherKey: 'event_id',
+    through: "place_event",
+    foreignKey: "place_id",
+    otherKey: "event_id",
     as: "listEvents",
     onDelete: "CASCADE",
 });
 
 sequelize.models.event.belongsToMany(sequelize.models.place, {
-    through: 'place_event',
-    foreignKey: 'event_id',
-    otherKey: 'place_id',
+    through: "place_event",
+    foreignKey: "event_id",
+    otherKey: "place_id",
     as: "listPlaces",
     onDelete: "CASCADE",
 });
 
-
 // User <-> Public keys
 sequelize.models.user.hasMany(sequelize.models.user_public_key_credentials, {
     foreignKey: {
-        name: 'user_id',
+        name: "user_id",
         allowNull: false,
     },
-    as: 'listPublicKeys',
-    onDelete: 'CASCADE',
+    as: "listPasskeys",
+    onDelete: "CASCADE",
 });
 
 sequelize.models.user_public_key_credentials.belongsTo(sequelize.models.user, {
     foreignKey: {
-        name: 'user_id',
+        name: "user_id",
         allowNull: false,
     },
-    as: 'user',
+    as: "user",
 });
 
 if (process.env.NODE_ENV === "development") {
     await sequelize.sync({
         // force: true,
         // alter: true
-    })
+    });
 } else {
-    await sequelize.sync()
+    await sequelize.sync();
+}
+
+const adminCount = await User.count({
+    where: { role: "ADMIN" },
+});
+
+if (adminCount === 0) {
+    await User.create({
+        email: "admin@admin.com",
+        mot_de_passe: bcrypt.hashSync(process.env.DEFAULT_ADMIN_PASSWORD!, 8),
+        role: "ADMIN",
+        actif: true,
+    });
+    console.log("✅ Admin account created");
 }
 
 export default sequelize;
 
-export { Place, Visit, RegularOpening, Event, User, UserPublicKeyCredentials }
+export { Place, Visit, RegularOpening, Event, User, UserPublicKeyCredentials };

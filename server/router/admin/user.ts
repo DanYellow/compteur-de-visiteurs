@@ -2,7 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 
 import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
-import { User as UserModel } from "#models/index.ts";
+import { User as UserModel, UserPublicKeyCredentials as UserPublicKeyCredentialsModel } from "#models/index.ts";
 import { LIST_ROLES } from "#scripts/utils.shared.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 import { UserTokenData } from "#types";
@@ -66,5 +66,38 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
     res.redirect(`${res.locals.admin_prefix}/utilisateur/${req.params.userId}`);
 })
 
+router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res) => {
+    let user = await UserModel.findByPk(req.params.userId, {
+        nest: true,
+        include: [{
+            model: UserPublicKeyCredentialsModel,
+            as: "listPasskeys",
+        }]
+    });
+
+    if (req.params.userId === "moi") {
+        try {
+            const token = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserTokenData;
+
+            user = await UserModel.findOne({
+                where: {
+                    email: token.email
+                },
+                nest: true,
+                include: [{
+                    model: UserPublicKeyCredentialsModel,
+                    as: "listPasskeys",
+                }]
+            });
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    res.render("pages/admin/add_edit-user-passkeys.njk", {
+        user,
+        flash_message: req.cookies.flash_message,
+    });
+})
 
 export default router;
