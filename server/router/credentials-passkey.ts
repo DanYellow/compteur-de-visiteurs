@@ -17,6 +17,7 @@ import {
     UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
 } from "#models/index.ts";
 import { flashMessageCookieOptions } from "..";
+import { CustomSession } from "#types";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
@@ -26,12 +27,13 @@ const rpId = process.env.HOSTNAME || "localhost";
 
 router.post("/passkey/creation-options", async (req, res) => {
     const username = req.body.email;
+    const session: CustomSession = req.session;
 
     if (process.env.NODE_ENV === "development") {
-        await UserPublicKeyCredentialsModel.destroy({
-            where: {},
-            truncate: true,
-        });
+        // await UserPublicKeyCredentialsModel.destroy({
+        //     where: {},
+        //     truncate: true,
+        // });
     }
 
     try {
@@ -69,8 +71,8 @@ router.post("/passkey/creation-options", async (req, res) => {
                 },
             });
 
-            req.session.challenge = options.challenge;
-            req.session.email = username;
+            session.challenge = options.challenge;
+            session.email = username;
 
             return res.json(options);
         } else {
@@ -83,7 +85,8 @@ router.post("/passkey/creation-options", async (req, res) => {
 });
 
 router.post("/passkey/creation", async (req, res) => {
-    const expectedChallenge = req.session.challenge;
+    const session: CustomSession = req.session;
+    const expectedChallenge = session.challenge!;
 
     const expectedOrigin = [`${req.protocol}://${req.get("host")}`!];
     // Verify the attestation response
@@ -109,7 +112,7 @@ router.post("/passkey/creation", async (req, res) => {
 
         const user = await UserModel.findOne({
             where: {
-                email: String(req.session.email),
+                email: String(session.email),
             },
         });
 
@@ -134,7 +137,7 @@ router.post("/passkey/creation", async (req, res) => {
                 "account_created",
                 flashMessageCookieOptions
             );
-            res.cookie("email", req.session.email, flashMessageCookieOptions);
+            res.cookie("email", session.email, flashMessageCookieOptions);
 
             return res.redirect("/connexion");
         }
@@ -145,21 +148,24 @@ router.post("/passkey/creation", async (req, res) => {
 });
 
 router.post("/passkey/connexion-options", async (req, res) => {
+    const session: CustomSession = req.session;
+
     try {
         const options = await generateAuthenticationOptions({
             rpID: rpId,
             allowCredentials: [],
         });
 
-        req.session.challenge = options.challenge;
+        session.challenge = options.challenge;
 
         return res.json(options);
     } catch (error) {}
 });
 
 router.post("/passkey/connexion", async (req, res) => {
+    const session: CustomSession = req.session;
     const payload = req.body;
-    const expectedChallenge = req.session.challenge;
+    const expectedChallenge = session.challenge!;
     const expectedOrigin = [`${req.protocol}://${req.get("host")}`!];
     const expectedRPID = process.env.HOSTNAME!;
 
@@ -212,7 +218,7 @@ router.post("/passkey/connexion", async (req, res) => {
             throw new Error("auth_failed");
         }
 
-        delete req.session.challenge;
+        delete session.challenge;
 
         const token = jwt.sign(
             { role: user.role, email: user.email, id: user.id },
@@ -249,7 +255,7 @@ router.post("/passkey/connexion", async (req, res) => {
         return res.redirect(`${res.locals.admin_prefix}/dashboard`);
     } catch (error) {
         console.log(error);
-        return "null";
+        return res.redirect('/connexion');
     }
 });
 

@@ -117,7 +117,9 @@ export interface CustomSession extends SessionData {
         id: number;
         prenom: string;
         email: string;
-    }
+    };
+    email?: string;
+    challenge?: string;
 }
 
 declare global {

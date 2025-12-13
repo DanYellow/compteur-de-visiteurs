@@ -65,11 +65,6 @@ export default class UserPublicKeyCredentials extends Model<
                 updatedAt: false,
                 modelName: "user_public_key_credentials",
                 underscored: true,
-                // hooks: {
-                //     afterUpdate(instance, options) {
-                //         instance.compteur += 1;
-                //     },
-                // }
             }
         );
     }
