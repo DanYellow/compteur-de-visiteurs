@@ -67,7 +67,8 @@ const validForm = (e: Event) => {
 form?.addEventListener("submit", submitForm);
 form?.addEventListener("input", validForm);
 
-document.querySelector("[data-test]")?.addEventListener("click", async (e) => {
+const passkeyLoginButton = document.querySelector("[data-passkey-login]") as HTMLButtonElement;
+passkeyLoginButton?.addEventListener("click", async () => {
     const publicKey = await fetch("/passkey/connexion-options", {
         method: "POST",
         headers: {
