@@ -100,7 +100,7 @@ emailInput.addEventListener("input", (e) => {
 });
 
 createPasskeyBtn?.addEventListener("click", async () => {
-    const publicKey = await fetch("/passkey/enregistrement", {
+    const publicKey = await fetch("/passkey/creation-options", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -118,7 +118,7 @@ createPasskeyBtn?.addEventListener("click", async () => {
 
     const serializedPublicKey = JSON.stringify(credential.toJSON());
 
-    const response = await fetch("/passkey/retour", {
+    const response = await fetch("/passkey/creation", {
         method: "POST",
         credentials: "same-origin",
         headers: {

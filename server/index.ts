@@ -266,5 +266,5 @@ wss.on("connection", (ws) => {
 export const flashMessageCookieOptions = {
     httpOnly: true,
     maxAge: 1000,
-    // sameSite: 'strict',
+    // sameSite: 'strict' as const,
 };

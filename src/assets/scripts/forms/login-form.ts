@@ -1,12 +1,14 @@
 import { LoginSchema } from "#scripts/schemas.ts";
 
 const form = document.querySelector("form") as HTMLFormElement;
-const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
+const errorsContainer = document.querySelector(
+    "[data-form-errors]"
+) as HTMLUListElement;
 
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
 
-    const form = (e.currentTarget as HTMLFormElement);
+    const form = e.currentTarget as HTMLFormElement;
     form.dataset.isDirty = "";
 
     if (!validForm(e)) {
@@ -17,9 +19,9 @@ const submitForm = async (e: SubmitEvent) => {
 };
 
 const validForm = (e: Event) => {
-    const form = (e.currentTarget as HTMLFormElement)
+    const form = e.currentTarget as HTMLFormElement;
     if (!("isDirty" in form.dataset)) {
-        return
+        return;
     }
 
     const formData = new FormData(form);
@@ -29,26 +31,28 @@ const validForm = (e: Event) => {
         item.classList.remove("error");
         item.removeAttribute("aria-invalid");
         item.removeAttribute("aria-errormessage");
-    })
+    });
 
     errorsContainer.innerHTML = "";
 
     if (!validator.success) {
         validator.error.issues.forEach((item) => {
-            const li = document.createElement('li');
+            const li = document.createElement("li");
             li.textContent = item.message;
 
             item.path.forEach((path) => {
-                const inputRelated = form.querySelector(`input[name="${String(path)}"]`);
+                const inputRelated = form.querySelector(
+                    `input[name="${String(path)}"]`
+                );
 
                 if (inputRelated) {
                     inputRelated.classList.add("error");
                     inputRelated.ariaInvalid = "true";
                 }
-            })
+            });
 
             errorsContainer.appendChild(li);
-        })
+        });
 
         if (e.type === "submit") {
             errorsContainer.scrollIntoView({ behavior: "auto" });
@@ -58,7 +62,41 @@ const validForm = (e: Event) => {
     }
 
     return true;
-}
+};
 
 form?.addEventListener("submit", submitForm);
 form?.addEventListener("input", validForm);
+
+document.querySelector("[data-test]")?.addEventListener("click", async (e) => {
+    const publicKey = await fetch("/passkey/connexion-options", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+
+    const options = PublicKeyCredential.parseRequestOptionsFromJSON(
+        await publicKey.json()
+    );
+
+    const credential = (await navigator.credentials.get({
+        publicKey: options,
+    })) as PublicKeyCredential;
+
+    const serializedPublicKey = JSON.stringify(credential.toJSON());
+
+    const response = await fetch("/passkey/connexion", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: serializedPublicKey,
+    });
+
+    if (response.redirected) {
+        window.location.href = response.url;
+    } else {
+        alert("Une erreur est survenue")
+    }
+});

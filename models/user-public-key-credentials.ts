@@ -1,13 +1,27 @@
-import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin, type BelongsToManyGetAssociationsMixin, ForeignKey } from 'sequelize';
+import {
+    DataTypes,
+    Sequelize,
+    Model,
+    type InferAttributes,
+    type InferCreationAttributes,
+    type CreationOptional,
+    type BelongsToManySetAssociationsMixin,
+    type BelongsToManyGetAssociationsMixin,
+    ForeignKey,
+} from "sequelize";
 
-export default class UserPublicKeyCredentials extends Model<InferAttributes<UserPublicKeyCredentials>, InferCreationAttributes<UserPublicKeyCredentials>> {
+export default class UserPublicKeyCredentials extends Model<
+    InferAttributes<UserPublicKeyCredentials>,
+    InferCreationAttributes<UserPublicKeyCredentials>
+> {
     declare id: CreationOptional<number>;
     declare user_id: ForeignKey<number>;
-    declare public_key: string;
-    declare external_id: string;
+    declare cle_publique: string;
+    declare id_externe: string;
     declare derniere_utilisation?: string;
     declare nom?: string;
     declare aaguid: string;
+    declare compteur: number;
 
     static initModel(sequelize: Sequelize) {
         UserPublicKeyCredentials.init(
@@ -18,7 +32,7 @@ export default class UserPublicKeyCredentials extends Model<InferAttributes<User
                     autoIncrement: true,
                     allowNull: false,
                 },
-                public_key: {
+                cle_publique: {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
@@ -26,7 +40,7 @@ export default class UserPublicKeyCredentials extends Model<InferAttributes<User
                     type: DataTypes.STRING,
                     allowNull: true,
                 },
-                external_id: {
+                id_externe: {
                     type: DataTypes.STRING,
                     allowNull: false,
                     unique: true,
@@ -38,16 +52,25 @@ export default class UserPublicKeyCredentials extends Model<InferAttributes<User
                 aaguid: {
                     type: DataTypes.STRING,
                     allowNull: false,
-                }
+                },
+                compteur: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    defaultValue: 0,
+                },
             },
             {
                 sequelize,
-                createdAt: 'date_creation',
+                createdAt: "date_creation",
                 updatedAt: false,
-                modelName: 'user_public_key_credentials',
+                modelName: "user_public_key_credentials",
                 underscored: true,
+                // hooks: {
+                //     afterUpdate(instance, options) {
+                //         instance.compteur += 1;
+                //     },
+                // }
             }
-        )
+        );
     }
 }
-

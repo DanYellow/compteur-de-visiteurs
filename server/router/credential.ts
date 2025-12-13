@@ -43,10 +43,8 @@ router.get('/connexion', async (req, res) => {
         try {
             const token = jwt.sign({ role: user.role, email, id: user.id }, String(process.env.JWT_SECRET));
 
-            await UserModel.update({
+            await user.update({
                 derniere_connexion: new Date().toString()
-            }, {
-                where: { email: String(email), actif: true }
             })
 
             res.cookie('flash_message', 'successful_login', flashMessageCookieOptions);
