@@ -76,6 +76,7 @@ router.get('/inscription', async (req, res) => {
     if (!validator.success) {
         res.status(500)
         res.cookie('flash_message', 'register_fail', flashMessageCookieOptions)
+        
         return res.redirect("/inscription");
     }
 
@@ -109,7 +110,7 @@ router.get('/inscription', async (req, res) => {
 });
 
 // router.get('/activation/:token', async (req, res) => {
-//     let error_key = "";
+//     let errorKey = "";
 //     try {
 //         const { token } = req.params;
 //         const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
@@ -125,20 +126,20 @@ router.get('/inscription', async (req, res) => {
 //         }
 //     } catch (error: any) {
 //         if (error.name === "TokenExpiredError") {
-//             error_key = 'expired_token'
+//             errorKey = 'expired_token'
 //         } else if (error.name === "JsonWebTokenError") {
-//             error_key = 'invalid_token'
+//             errorKey = 'invalid_token'
 //         } else {
-//             error_key = error as string
+//             errorKey = error as string
 //         }
 //     }
 
 //     res.render("pages/sign-in-activation.njk", {
-//         flash_message: req.cookies?.flash_message || error_key,
+//         flash_message: req.cookies?.flash_message || errorKey,
 //         signin_email: req.cookies.email,
 //     });
 // }).post('/activation/:token', async (req, res) => {
-//     let error_key = "";
+//     let errorKey = "";
 //     const { token } = req.params;
 
 //     const validator = SignInActivationSchema.safeParse(req.body);
@@ -182,28 +183,27 @@ router.get('/inscription', async (req, res) => {
 //         return res.redirect("/connexion");
 //     } catch (error: any) {
 //         if (error.name === "TokenExpiredError") {
-//             error_key = 'expired_token';
+//             errorKey = 'expired_token';
 //         } else if (error.name === "JsonWebTokenError") {
-//             error_key = 'invalid_token';
+//             errorKey = 'invalid_token';
 //         } else {
-//             error_key = error as string
+//             errorKey = error as string
 //         }
 //     }
 
-//     res.cookie('flash_message', error_key, flashMessageCookieOptions);
+//     res.cookie('flash_message', errorKey, flashMessageCookieOptions);
 
 //     return res.redirect(`/activation/${token}`);
 // });
 
 router.get('/activation', async (req, res) => {
-    let error_key = null;
-    console.log("req.get('host')", req.get('host'))
+    let errorKey = null;
     res.render("pages/sign-in-activation.njk", {
-        flash_message: req.cookies?.flash_message || error_key,
+        flash_message: req.cookies?.flash_message || errorKey,
         signin_email: req.cookies.email,
     });
 }).post('/activation', async (req, res) => {
-    let error_key = "";
+    let errorKey = "";
 
     const validator = SignInActivationSchema.safeParse(req.body);
 
@@ -211,7 +211,7 @@ router.get('/activation', async (req, res) => {
         res.status(500)
         res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
 
-        return res.redirect(`/activation/${token}`);
+        return res.redirect(`/activation`);
     }
 
     try {
@@ -244,15 +244,15 @@ router.get('/activation', async (req, res) => {
         return res.redirect("/connexion");
     } catch (error: any) {
         if (error.name === "TokenExpiredError") {
-            error_key = 'expired_token';
+            errorKey = 'expired_token';
         } else if (error.name === "JsonWebTokenError") {
-            error_key = 'invalid_token';
+            errorKey = 'invalid_token';
         } else {
-            error_key = error as string
+            errorKey = error as string
         }
     }
 
-    res.cookie('flash_message', error_key, flashMessageCookieOptions);
+    res.cookie('flash_message', errorKey, flashMessageCookieOptions);
 
     return res.redirect(`/activation`);
 });

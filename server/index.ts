@@ -8,7 +8,7 @@ import { DateTime } from "luxon";
 import ip from "ip";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 import fs from "fs";
 
 import router from "#server/router/index.ts";
@@ -18,7 +18,7 @@ const __dirname = path.dirname(__filename);
 
 const serverip = ip.address();
 
-dotenv.config({ path: `${process.cwd()}/.env.local` })
+dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const app = express();
 if (process.env.NODE_ENV === "development") {
@@ -37,11 +37,13 @@ app.set("view engine", "nunjucks");
 app.set("views", path.join(__dirname, "..", "/src"));
 
 app.use(express.static(publicPath));
-app.use(cors({
-    origin: "*",
-    allowedHeaders: ["Content-Type", "Authorization"],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-}));
+app.use(
+    cors({
+        origin: "*",
+        allowedHeaders: ["Content-Type", "Authorization"],
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    })
+);
 app.use(express.urlencoded());
 app.use(cookieParser());
 app.use(
@@ -65,7 +67,9 @@ app.use(
 app.use((req, res, next) => {
     const context = {
         NODE_ENV: process.env.NODE_ENV,
-        admin_prefix: `/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`,
+        admin_prefix: `/admin${
+            process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""
+        }`,
         user_role: {},
     };
 
@@ -84,8 +88,6 @@ app.all("/", function (req, res, next) {
 });
 
 app.use(router);
-
-
 
 const nunjucksConfig = nunjucks.configure(app.get("views"), {
     autoescape: true,
@@ -140,7 +142,7 @@ nunjucksConfig.addFilter("find", (array, predicate) => {
 });
 
 nunjucksConfig.addFilter("oxford_comma", (string) => {
-    return string.slice(0, -1).join(', ') + ' et ' + string.slice(-1)
+    return string.slice(0, -1).join(", ") + " et " + string.slice(-1);
 });
 
 nunjucksConfig.addFilter("json", (value, listKeysToDelete: string[] = []) => {
@@ -174,22 +176,21 @@ nunjucksConfig.addGlobal(
     }
 );
 
-
 const listDomains: string[] =
     process.env.IS_DOCKER?.toLowerCase() === "true" &&
-        process.env.NODE_ENV === "production"
+    process.env.NODE_ENV === "production"
         ? ["faclab.localhost"]
         : ["localhost", "0.0.0.0"];
 const port = Number(process.env.VITE_PORT || 3900);
 
 let server = null;
 
-if (false && process.env.NODE_ENV === 'development') {
+if (false && process.env.NODE_ENV === "development") {
     const https = await import("https");
 
     const options = {
-        key: fs.readFileSync(path.join('localhost-key.pem')),
-        cert: fs.readFileSync(path.join('localhost.pem'))
+        key: fs.readFileSync(path.join("localhost-key.pem")),
+        cert: fs.readFileSync(path.join("localhost.pem")),
     };
 
     server = https.createServer(options, app).listen(port, () => {
@@ -248,7 +249,6 @@ app.use(function (req, res, next) {
     res.type("txt").send("Page non trouvée");
 });
 
-
 export const wss = new WebSocketServer({
     server,
 });
@@ -266,5 +266,11 @@ wss.on("connection", (ws) => {
 export const flashMessageCookieOptions = {
     httpOnly: true,
     maxAge: 1000,
-    // sameSite: 'strict' as const,
+    sameSite: "strict" as const,
+};
+
+export const userLoggedCookiesOptions = {
+    httpOnly: true,
+    sameSite: "strict" as const,
+    secure: false,
 };

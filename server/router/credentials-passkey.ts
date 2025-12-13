@@ -253,8 +253,14 @@ router.post("/passkey/connexion", async (req, res) => {
         });
 
         return res.redirect(`${res.locals.admin_prefix}/dashboard`);
-    } catch (error) {
-        console.log(error);
+    } catch (error: any) {
+        let errorKey = error.message;
+        if ("name" in error) {
+            // errorKey = error.name;
+        }
+
+        res.cookie('flash_message', errorKey, flashMessageCookieOptions);
+
         return res.redirect('/connexion');
     }
 });

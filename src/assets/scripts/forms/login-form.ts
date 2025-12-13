@@ -1,4 +1,5 @@
 import { LoginSchema } from "#scripts/schemas.ts";
+import "#scripts/forms/passkey-triggers.ts";
 
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector(

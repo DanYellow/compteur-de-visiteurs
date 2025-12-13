@@ -19,7 +19,7 @@ const submitForm = async (e: SubmitEvent) => {
 const validForm = (e: Event) => {
     const form = (e.currentTarget as HTMLFormElement)
     if (!("isDirty" in form.dataset)) {
-        return
+        return;
     }
 
     const formData = new FormData(form);

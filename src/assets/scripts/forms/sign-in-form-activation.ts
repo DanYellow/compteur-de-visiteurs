@@ -1,12 +1,11 @@
 import { SignInActivationSchema } from "#scripts/schemas.ts";
+import "#scripts/forms/passkey-triggers.ts";
 
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector(
     "[data-form-errors]"
 ) as HTMLUListElement;
-const passkeyItems = document.querySelectorAll(
-    "[data-passkey-toggle]"
-) as NodeListOf<HTMLElement>;
+
 const createPasskeyBtn = document.querySelector(
     "[data-passkey-register]"
 ) as HTMLButtonElement;
@@ -75,18 +74,6 @@ const validForm = (e: Event) => {
 
 form?.addEventListener("submit", submitForm);
 form?.addEventListener("input", validForm);
-
-Promise.all([
-    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-    PublicKeyCredential.isConditionalMediationAvailable(),
-]).then((results) => {
-    if (results.some((r) => r === false)) {
-        Array.from(passkeyItems).forEach(async (item) => {
-            // (item.parentNode as HTMLElement)!.classList.replace("md:grid-cols-[1fr_auto_1fr]", "md:grid-cols-1");
-            // item.remove();
-        });
-    }
-});
 
 emailInput.addEventListener("input", (e) => {
     const input = e.currentTarget as HTMLInputElement;
