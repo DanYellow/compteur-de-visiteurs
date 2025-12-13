@@ -1,5 +1,11 @@
 import { SignInActivationSchema } from "#scripts/schemas.ts";
-import "#scripts/forms/passkey-triggers.ts";
+import {
+    getPasskeyOptions,
+    createPasskey,
+    togglePasskeysVisibility,
+} from "#scripts/passkey-manager.ts";
+
+togglePasskeysVisibility();
 
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector(
@@ -87,38 +93,16 @@ emailInput.addEventListener("input", (e) => {
 });
 
 createPasskeyBtn?.addEventListener("click", async () => {
-    const publicKey = await fetch("/passkey/creation-options", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: emailInput.value }),
-    });
+    const email = emailInput.value;
 
-    const options = PublicKeyCredential.parseCreationOptionsFromJSON(
-        await publicKey.json()
-    );
+    if (email) {
+        const serializedPublicKey = await getPasskeyOptions(email);
+        const passkey = await createPasskey(serializedPublicKey);
 
-    const credential = (await navigator.credentials.create({
-        publicKey: options,
-    })) as PublicKeyCredential;
-
-    const serializedPublicKey = JSON.stringify(credential.toJSON());
-
-    const response = await fetch("/passkey/creation", {
-        method: "POST",
-        credentials: "same-origin",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: serializedPublicKey,
-    });
-
-    if (response.redirected) {
-        window.location.href = response.url;
-    } else {
-        alert("Une erreur est survenue")
+        if (passkey.redirected) {
+            window.location.href = passkey.url;
+        } else {
+            alert("Une erreur est survenue");
+        }
     }
-
-    // console.log(response);
-});
+})

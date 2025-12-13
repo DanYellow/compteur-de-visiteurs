@@ -17,7 +17,7 @@ import {
     UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
 } from "#models/index.ts";
 import { flashMessageCookieOptions } from "..";
-import { CustomSession } from "#types";
+import { CustomSession, UserTokenData } from "#types";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
@@ -99,6 +99,7 @@ router.post("/passkey/creation", async (req, res) => {
         });
     } catch (error: any) {
         console.error(error);
+
         return res.status(400).send({ error: error.message });
     }
     const { verified, registrationInfo } = verification;
@@ -132,14 +133,25 @@ router.post("/passkey/creation", async (req, res) => {
 
             await user.setListPasskeys([credentials]);
 
-            res.cookie(
-                "flash_message",
-                "account_created",
-                flashMessageCookieOptions
-            );
-            res.cookie("email", session.email, flashMessageCookieOptions);
+            try {
+                jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserTokenData;
+                res.cookie(
+                    "flash_message",
+                    "passkey_created",
+                    flashMessageCookieOptions
+                );
 
-            return res.redirect("/connexion");
+                return res.redirect("/");
+            } catch (error) {
+                res.cookie(
+                    "flash_message",
+                    "account_created",
+                    flashMessageCookieOptions
+                );
+                res.cookie("email", session.email, flashMessageCookieOptions);
+
+                return res.redirect("/connexion");
+            }
         }
 
         return res.status(500).send(true);
