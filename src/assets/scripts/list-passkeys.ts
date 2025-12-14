@@ -25,3 +25,19 @@ createPasskeyBtn?.addEventListener("click", async (e: Event) => {
         }
     }
 });
+
+const editPasskeyModal = document.getElementById("manage-passkey") as HTMLDialogElement;
+
+editPasskeyModal.addEventListener("toggle", (e) => {
+    const toggleEvent = e as ToggleEvent;
+    const isOpened = toggleEvent.newState === "open";
+
+    const idInput = editPasskeyModal.querySelector("#id") as HTMLInputElement;
+    const nameInput = editPasskeyModal.querySelector("#nom") as HTMLInputElement;
+    const passkeyData = JSON.parse(e.source?.dataset.passkey || "{}");
+
+    if (isOpened) {
+        idInput!.value = passkeyData.id;
+        nameInput!.value = passkeyData.nom;
+    }
+})

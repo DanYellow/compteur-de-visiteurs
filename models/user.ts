@@ -7,6 +7,7 @@ import {
     type CreationOptional,
     type BelongsToManySetAssociationsMixin,
     type BelongsToManyGetAssociationsMixin,
+    Op,
 } from "sequelize";
 import { LIST_ROLES } from "#scripts/utils.shared.ts";
 import type UserPublicKeyCredentials from "./user-public-key-credentials";
@@ -97,7 +98,13 @@ export default class User extends Model<
 
 const deleteFirstAdmin = async (record: User) => {
     const adminCount = await User.count({
-        where: { role: "admin" },
+        where: { 
+            role: "admin", 
+            actif: true, 
+            mot_de_passe: {
+                [Op.ne]: ""
+            } 
+        },
     });
 
     if (record.role === "ADMIN" && adminCount > 1) {

@@ -98,6 +98,31 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUs
         user,
         flash_message: req.cookies.flash_message,
     });
+}).post(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res) => {
+    console.log("req.body", req.body, req.params)
+
+    try {
+        let passkey = await UserPublicKeyCredentialsModel.findOne({
+            where: {
+                id: Number(req.body.id),
+                user_id: req.current_user!.id,
+            }
+        })
+
+        if (!passkey) {
+            throw new Error("error");
+        }
+
+        await passkey.update(req.body)
+
+        res.cookie('flash_message', "update_success", flashMessageCookieOptions);
+        res.redirect(`${res.locals.admin_prefix}/utilisateur/moi/passkeys`)
+    } catch (error) {
+        console.log("error", error)
+
+        res.redirect(`${res.locals.admin_prefix}/utilisateur/moi/passkeys`)
+    }
+
 })
 
 export default router;
