@@ -8,6 +8,7 @@ import { DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
 import { PlaceRaw } from "#types";
 import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
+import { flashMessageCookieOptions } from "#server/index.ts";
 
 const router = express.Router();
 
@@ -117,11 +118,15 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
                 heure_ouverture: `${heure_ouverture_heure}:${heure_ouverture_minutes}:00`,
                 heure_fermeture: `${heure_fermeture_heure}:${heure_fermeture_minutes}:00`,
             })
-            res.cookie('flash_message', "create_success", { maxAge: 1000, httpOnly: true });
+            res.cookie('flash_message', "create_success", flashMessageCookieOptions);
         }
-        res.redirect('/lieux');
+        if (req.params.placeId) {
+            res.redirect(`${res.locals.admin_prefix}/lieu/${req.params.placeId}`);
+        } else {
+            res.redirect(`${res.locals.admin_prefix}/lieux`);
+        }
     } catch (e) {
-        res.cookie('flash_message', "error", { maxAge: 1000, httpOnly: true })
+        res.cookie('flash_message', "error", flashMessageCookieOptions)
 
         console.log(e)
         return res.render("pages/admin/add_edit-place.njk");
@@ -133,14 +138,14 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
             await placeToDestroy.setListEvents([])
             await placeToDestroy.destroy()
 
-            res.cookie('flash_message', "delete_success", { maxAge: 1000, httpOnly: true });
+            res.cookie('flash_message', "delete_success", flashMessageCookieOptions);
         }
     } catch (error) {
         console.log(error)
-        res.cookie('flash_message', "delete_error", { maxAge: 1000, httpOnly: true });
+        res.cookie('flash_message', "delete_error", flashMessageCookieOptions);
     }
 
-    res.redirect('/lieux');
+    res.redirect(`${res.locals.admin_prefix}/lieux`);
 })
 
 router.get(['/lieux'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {

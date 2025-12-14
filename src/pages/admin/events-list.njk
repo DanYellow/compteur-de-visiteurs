@@ -34,7 +34,7 @@ Liste des évènements
                         <option {{ "selected" if periode == "a-venir" else "" }} value="a-venir">A venir</option>
                     </select>
                 </div>
-                <a href="/evenement" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Créer un évènement</a>
+                <a href="{{ admin_prefix }}/evenement" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Créer un évènement</a>
             </header>
             {% include "includes/hello-banner.njk" %}
             <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 mb-4">Les évènements associés à un lieu s'afficheront dans le calendrier</p>
