@@ -99,8 +99,6 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUs
         flash_message: req.cookies.flash_message,
     });
 }).post(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res) => {
-    console.log("req.body", req.body, req.params)
-
     try {
         let passkey = await UserPublicKeyCredentialsModel.findOne({
             where: {
@@ -122,7 +120,35 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUs
 
         res.redirect(`${res.locals.admin_prefix}/utilisateur/moi/passkeys`)
     }
+}).post(['/utilisateur/passkey/suppression'], getUser, requireRoleMiddleware(""), async (req, res) => {
+    try {
+        const user = await UserModel.findByPk(req.body.userId, {
+            include: [{
+                model: UserPublicKeyCredentialsModel,
+                as: "listPasskeys",
+            }]
+        })
 
+        if (!user) {
+            throw new Error("user_not_found");
+        }
+
+        if (user.listPasskeys.length == 1 && user.utilise_mdp === false) {
+            throw new Error("no_auth_method");
+        }
+
+        await UserPublicKeyCredentialsModel.destroy({
+            where: {
+                id: req.body.passkeyId,
+            }
+        })
+
+        res.cookie('flash_message', "delete_success", flashMessageCookieOptions);
+    } catch (error: any) {
+        res.cookie('flash_message', error.message, flashMessageCookieOptions);
+    }
+
+    res.redirect(`${res.locals.admin_prefix}/utilisateur/moi/passkeys`)
 })
 
 export default router;

@@ -48,7 +48,7 @@ deletePasskeyModal.addEventListener("toggle", (e) => {
     const toggleEvent = e as ToggleEvent;
     const isOpened = toggleEvent.newState === "open";
 
-    const idInput = editPasskeyModal.querySelector("#id") as HTMLInputElement;
+    const idInput = editPasskeyModal.querySelector("#passkeyId") as HTMLInputElement;
     const passkeyData = JSON.parse(e.source?.dataset.passkey || "{}");
 
     if (isOpened) {

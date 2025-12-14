@@ -48,7 +48,7 @@ Créer utilisateur
                 {% include "includes/form-banner-success.njk" %}
 
                 <h2 class="text-lg font-bold">Mes passkeys</h2>
-                {{ user | json}}
+                {# {{ user | json}} #}
                 <ul class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4.5 mt-2">
                     <li>
                         <button type="button" class="inert:!cursor-not-allowed inert:opacity-60 p-3 border h-full w-full bg-green-numixs text-black-numixs border-dark-green-numixs hocus:bg-dark-green-numixs hocus:text-black hocus:border-black rounded-md" data-passkey-register="{{ user.email }}">
@@ -60,7 +60,7 @@ Créer utilisateur
                             </span>
                         </button>
                     </li>
-                    {% set can_delete_passkey = user.mot_de_passe != "" and user.listPasskeys | length == 1 %}
+                    {% set can_delete_passkey = (user.mot_de_passe != ""  and user.utilise_mdp == true) or user.listPasskeys | length > 1 %}
                     {% for passkey in user.listPasskeys %}
                         <li class="grid grid-cols-[1fr_auto] gap-2">
                             <button data-passkey="{{ passkey | json }}" command="show-modal" commandfor="manage-passkey" class="flex flex-col items-start border-black-numixs border p-3 w-full hocus:bg-black-numixs hocus:text-white-numixs rounded-md" type="button">
@@ -120,8 +120,9 @@ Créer utilisateur
 
     <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Cette action est irréversible.</p>
 
-    <form method="post" action="{{ admin_prefix }}/utilisateur/passkey/suppression">
-        <input type="hidden" name="id" value=""/>
+    <form method="POST" action="{{ admin_prefix }}/utilisateur/passkey/suppression">
+        <input type="hidden" name="passkeyId" value=""/>
+        <input type="hidden" name="userId" value="{{ user.id }}"/>
         <div class="flex flex-row gap-3">
             <button type="submit" class="text-white-numixs bg-red-800 hocus:bg-red-950 px-3 py-1.5 rounded-md">Supprimer</button>
             <button type="button" command="close" commandfor="delete-passkey" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-md text-white-numixs">Annuler</button>
