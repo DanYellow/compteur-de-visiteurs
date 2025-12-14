@@ -12,9 +12,7 @@ Liste lieux numixs
 
 {% block scripts %}
     {% if NODE_ENV == "development" %}
-        <script type="module" src="/src/assets/scripts/delete-list-item-dialog.ts" defer></script>
     {% else %}
-        <script type="module" src="/{{ manifest['src/assets/scripts/delete-list-item-dialog.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}
 {% block content %}

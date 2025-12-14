@@ -2,9 +2,10 @@ import "../styles/main.css";
 import "../styles/notification.css";
 import "../styles/calendar.css";
 
-import "./dropdown-redirect.ts";
-import "./calendar.ts";
-import "./members-poll.ts";
+import "#scripts/dropdown-redirect.ts";
+import "#scripts/calendar.ts";
+import "#scripts/members-poll.ts";
+import "#scripts/delete-list-item-dialog.ts";
 
 document.querySelectorAll("dialog").forEach((item) => {
     item.addEventListener("click", (e) => {

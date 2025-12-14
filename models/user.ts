@@ -28,6 +28,7 @@ export default class User extends Model<
     declare actif?: boolean;
     declare derniere_connexion?: string;
     declare role?: string;
+    declare utilise_mdp?: boolean;
 
     declare setListPasskeys: BelongsToManySetAssociationsMixin<
         UserPublicKeyCredentials,
@@ -68,6 +69,10 @@ export default class User extends Model<
                 derniere_connexion: {
                     type: DataTypes.DATE,
                     allowNull: true,
+                },
+                utilise_mdp: {
+                    type: DataTypes.BOOLEAN,
+                    defaultValue: true,
                 },
                 role: {
                     type: DataTypes.ENUM(

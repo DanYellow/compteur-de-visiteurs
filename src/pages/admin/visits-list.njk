@@ -28,7 +28,6 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
     <div data-place='{{ place | json }}' data-list-events='{{ all_events | json }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
-
             <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
                 <div class="text-black-numixs flex flex-col items-start">
                     <h1 class="text-black-numixs title-font font-bold text-6xl">Visites</h1>
@@ -36,15 +35,15 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                 </div>
                 {% set split_button_main_action %}
                 <a href="/telecharger?jour={{ current_date|date("yyyy-MM-dd") }}&lieu={{ place_selected }}" download class="px-3.5 py-2.5 rounded-tl-xl rounded-bl-xl text-white">
-                        Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)
-                    </a>
+                    Télécharger les données du {{ current_date|date("dd/MM/yyyy") }} (.csv)
+                </a>
                 {% endset %}
 
                 {% set split_button_sub_action_1 %}
                 <a href="/telecharger?semaine={{ current_date|date("yyyy-MM-dd") }}&lieu={{ place_selected }}" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-xl text-black hocus:bg-slate-300">
                     {% include "includes/icons/download-fill-icon.svg" %}
-                        Télécharger toutes les données de la semaine (.csv)
-                    </a>
+                    Télécharger toutes les données de la semaine (.csv)
+                </a>
                 {% endset %}
 
                 {% set split_button_sub_action_2 %}

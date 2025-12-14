@@ -41,3 +41,34 @@ editPasskeyModal.addEventListener("toggle", (e) => {
         nameInput!.value = passkeyData.nom;
     }
 })
+
+const deletePasskeyModal = document.getElementById("delete-passkey") as HTMLDialogElement;
+
+deletePasskeyModal.addEventListener("toggle", (e) => {
+    const toggleEvent = e as ToggleEvent;
+    const isOpened = toggleEvent.newState === "open";
+
+    const idInput = editPasskeyModal.querySelector("#id") as HTMLInputElement;
+    const passkeyData = JSON.parse(e.source?.dataset.passkey || "{}");
+
+    if (isOpened) {
+        idInput!.value = passkeyData.id;
+    }
+})
+
+const passwordActivationSwitch = document.querySelector("[data-change-user-pass-activation]") as HTMLInputElement;
+
+passwordActivationSwitch.addEventListener("change", async (e:Event) => {
+    const input = e.currentTarget as HTMLInputElement;
+    const userId = input.dataset.userId;
+
+    const req = await fetch("/api/utilisateur/mdp-activation", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            userId,
+        })
+    })
+})

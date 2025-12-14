@@ -1,34 +1,39 @@
 import express from "express";
 import nodemailer from "nodemailer";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 import nunjucks from "nunjucks";
 import jwt from "jsonwebtoken";
 
-import { User as UserModel } from "#models/index.ts";
+import {
+    User as UserModel,
+    UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
+} from "#models/index.ts";
 
-dotenv.config({ path: `${process.cwd()}/.env.local` })
+dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const router = express.Router();
 
 const transporter = nodemailer.createTransport({
-    ...(process.env.NODE_ENV === "development" ? {
-        port: 1025,
-        host: 'localhost',
-        tls: {
-            rejectUnauthorized: false
-        },
-    } : {
-        host: process.env.EMAIL_SERVER_NOREPLY,
-        port: 587,
-        secure: false, // true for 465, false for other ports
-        auth: {
-            user: process.env.EMAIL_NOREPLY,
-            pass: process.env.EMAIL_PASSWORD_NOREPLY,
-        },
-    })
+    ...(process.env.NODE_ENV === "development"
+        ? {
+              port: 1025,
+              host: "localhost",
+              tls: {
+                  rejectUnauthorized: false,
+              },
+          }
+        : {
+              host: process.env.EMAIL_SERVER_NOREPLY,
+              port: 587,
+              secure: false, // true for 465, false for other ports
+              auth: {
+                  user: process.env.EMAIL_NOREPLY,
+                  pass: process.env.EMAIL_PASSWORD_NOREPLY,
+              },
+          }),
 });
 
-router.post("/utilisateur/statut", async (req, res) => {
+router.post("/utilisateur/activation", async (req, res) => {
     const user = await UserModel.findByPk(Number(req.body.userId));
     if (user) {
         try {
@@ -38,22 +43,28 @@ router.post("/utilisateur/statut", async (req, res) => {
 
             const token = jwt.sign(
                 { userId: user.id },
-                String(process.env.JWT_ACTIVATION_SECRET),
-                { expiresIn: process.env?.JWT_ACTIVATION_EXPIRES || "1d" }
+                process.env.JWT_ACTIVATION_SECRET as string,
+                {
+                    expiresIn: String(
+                        process.env?.JWT_ACTIVATION_EXPIRES || "1d"
+                    ),
+                }
             );
 
-            const html = nunjucks.render('pages/emails/activation.njk', {
-                title: 'Hello',
-                items: [1, 2, 3]
-            });
-
-            const activationLink = `${req.protocol}://${req.get('host')}/activation/${token}`;
+            const activationLink = `${req.protocol}://${req.get(
+                "host"
+            )}/activation/${token}`;
             console.log(activationLink);
 
+            const html = nunjucks.render("pages/emails/activation.njk", {
+                title: "Hello",
+                items: [1, 2, 3],
+            });
+
             const info = await transporter.sendMail({
-                from: `"Maddison Foo Koch" <${process.env.EMAIL_NOREPLY}>`,
+                from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
                 to: user.email,
-                subject: "Hello ✔",
+                subject: "Activation de votre compte Fablab Numixs",
                 text: "Hello world?", // plain‑text body
                 html: html, // HTML body
             });
@@ -61,10 +72,10 @@ router.post("/utilisateur/statut", async (req, res) => {
 
             res.status(200).json({
                 success: true,
-                message: "Utilisateur mis à jour"
+                message: "Utilisateur mis à jour",
             });
         } catch (e) {
-            console.log("e", e)
+            console.log("e", e);
             res.status(404).json({
                 success: false,
                 message: "Utilisateur inconnu",
@@ -76,6 +87,28 @@ router.post("/utilisateur/statut", async (req, res) => {
             message: "Une erreur est survenue",
         });
     }
+});
+
+router.post("/utilisateur/mdp-activation", async (req, res) => {
+    const user = await UserModel.findByPk(req.body.userId, {
+        include: [{
+            model: UserPublicKeyCredentialsModel,
+            as: "listPasskeys",
+        }]
+    });
+
+    if (user && user.listPasskeys.length > 0) {
+        try {
+            await user.update({
+                utilise_mdp: !user.utilise_mdp,
+            });
+
+            res.json({ erreur: false });
+        } catch (error) {
+            res.status(500).json({ erreur: true });
+        }
+    }
+    res.status(500).json({ erreur: true });
 });
 
 export default router;

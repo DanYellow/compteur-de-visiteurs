@@ -12,10 +12,8 @@ Liste utilisateurs
 
 {% block scripts %}
     {% if NODE_ENV == "development" %}
-        <script type="module" src="/src/assets/scripts/delete-list-item-dialog.ts" defer></script>
         <script type="module" src="/src/assets/scripts/toggle-user-status.ts" defer></script>
     {% else %}
-        <script type="module" src="/{{ manifest['src/assets/scripts/delete-list-item-dialog.ts'].file }}" defer></script>
         <script type="module" src="/{{ manifest['src/assets/scripts/toggle-user-status.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}
@@ -97,7 +95,7 @@ Liste utilisateurs
         </div>
     </div>
 
-    <dialog id="delete-user" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-2xl border border-solid border-green-numixs">
+    <dialog id="delete-user" data-delete-item-dialog class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-2xl border border-solid border-green-numixs">
         <header class="flex flex-row justify-between items-start">
             <div>
                 <p class="title-font text-4xl">Supprimer utilisateur</p>
@@ -108,7 +106,7 @@ Liste utilisateurs
 
         <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Cette action est irréversible.</p>
 
-        <form method="post" action="/utilisateur/suppression">
+        <form method="post" action="{{ admin_prefix }}/utilisateur/suppression">
             <input type="hidden" name="id" value=""/>
             <div class="flex flex-row gap-3">
                 <button type="submit" class="text-white-numixs bg-red-800 hocus:bg-red-950 px-3 py-1.5 rounded-xl">Supprimer</button>
