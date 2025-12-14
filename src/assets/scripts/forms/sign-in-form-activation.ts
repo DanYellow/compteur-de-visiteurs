@@ -98,7 +98,7 @@ createPasskeyBtn?.addEventListener("click", async () => {
     if (email) {
         const serializedPublicKey = await getPasskeyOptions(email);
         const passkey = await createPasskey(serializedPublicKey);
-
+        
         if (passkey.redirected) {
             window.location.href = passkey.url;
         } else {

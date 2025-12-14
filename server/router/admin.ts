@@ -5,7 +5,7 @@ import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#script
 import PlaceRouter from "#server/router/admin/place.ts";
 import EventRouter from "#server/router/admin/event.ts";
 import UserRouter from "#server/router/admin/user.ts";
-import { CommonRegularOpening, CustomSession, EventRaw, PlaceRaw, VisitRaw } from "#types";
+import { CommonRegularOpening, EventRaw, PlaceRaw, VisitRaw } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index.ts";
 import { Op } from "sequelize";
 import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";

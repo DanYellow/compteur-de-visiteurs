@@ -26,49 +26,58 @@ createPasskeyBtn?.addEventListener("click", async (e: Event) => {
     }
 });
 
-const editPasskeyModal = document.getElementById("manage-passkey") as HTMLDialogElement;
+const editPasskeyModal = document.getElementById(
+    "manage-passkey"
+) as HTMLDialogElement;
 
 editPasskeyModal.addEventListener("toggle", (e) => {
     const toggleEvent = e as ToggleEvent;
     const isOpened = toggleEvent.newState === "open";
 
     const idInput = editPasskeyModal.querySelector("#id") as HTMLInputElement;
-    const nameInput = editPasskeyModal.querySelector("#nom") as HTMLInputElement;
+    const nameInput = editPasskeyModal.querySelector(
+        "#nom"
+    ) as HTMLInputElement;
     const passkeyData = JSON.parse(e.source?.dataset.passkey || "{}");
 
     if (isOpened) {
         idInput!.value = passkeyData.id;
         nameInput!.value = passkeyData.nom;
     }
-})
+});
 
-const deletePasskeyModal = document.getElementById("delete-passkey") as HTMLDialogElement;
+const deletePasskeyModal = document.getElementById(
+    "delete-passkey"
+) as HTMLDialogElement;
 
 deletePasskeyModal.addEventListener("toggle", (e) => {
     const toggleEvent = e as ToggleEvent;
     const isOpened = toggleEvent.newState === "open";
 
-    const idInput = editPasskeyModal.querySelector("#passkeyId") as HTMLInputElement;
-    const passkeyData = JSON.parse(e.source?.dataset.passkey || "{}");
-
-    if (isOpened) {
-        idInput!.value = passkeyData.id;
+    const idInput = deletePasskeyModal.querySelector(
+        "#passkeyId"
+    ) as HTMLInputElement;
+    const passkeyId = e.source?.dataset.itemId;
+    if (isOpened && passkeyId) {
+        idInput!.value = passkeyId;
     }
-})
+});
 
-const passwordActivationSwitch = document.querySelector("[data-change-user-pass-activation]") as HTMLInputElement;
+const passwordActivationSwitch = document.querySelector(
+    "[data-change-user-pass-activation]"
+) as HTMLInputElement;
 
-passwordActivationSwitch.addEventListener("change", async (e:Event) => {
+passwordActivationSwitch.addEventListener("change", async (e: Event) => {
     const input = e.currentTarget as HTMLInputElement;
     const userId = input.dataset.userId;
 
     const req = await fetch("/api/utilisateur/mdp-activation", {
         method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
         },
         body: JSON.stringify({
             userId,
-        })
-    })
-})
+        }),
+    });
+});

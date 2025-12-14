@@ -29,10 +29,10 @@ Créer utilisateur
                 <h1 class=" title-font font-bold text-4xl md:text-6xl">
                     Liste Passkeys
                 </h1>
-                <label class="cursor-pointer has-disabled:opacity-80 has-disabled:cursor-not-allowed">
+                <label class="cursor-pointer has-disabled:opacity-80 has-disabled:cursor-not-allowed flex gap-2">
+                    Se connecter avec un mot de passe
                     <input type="checkbox" value="{{ user.utilise_mdp }}" {{ "checked" if user.utilise_mdp == 1 else "" }} {{ "disabled" if user.listPasskeys|length == 0 else "" }} data-change-user-pass-activation data-user-id="{{ user.id }}" class="sr-only peer">
                     <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-checked:bg-green-numixs rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-focus:ring-dark-green-numixs/30"></div>
-                        Désactiver
                 </label>
             </header>
 
@@ -121,7 +121,7 @@ Créer utilisateur
     <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Cette action est irréversible.</p>
 
     <form method="POST" action="{{ admin_prefix }}/utilisateur/passkey/suppression">
-        <input type="hidden" name="passkeyId" value=""/>
+        <input type="hidden" name="passkeyId" id="passkeyId" value=""/>
         <input type="hidden" name="userId" value="{{ user.id }}"/>
         <div class="flex flex-row gap-3">
             <button type="submit" class="text-white-numixs bg-red-800 hocus:bg-red-950 px-3 py-1.5 rounded-md">Supprimer</button>

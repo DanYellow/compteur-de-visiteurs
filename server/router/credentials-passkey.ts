@@ -2,7 +2,6 @@ import express from "express";
 import {
     verifyRegistrationResponse,
     generateRegistrationOptions,
-    AuthenticatorTransportFuture,
     generateAuthenticationOptions,
     verifyAuthenticationResponse,
     WebAuthnCredential,
@@ -16,7 +15,7 @@ import {
     User as UserModel,
     UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
 } from "#models/index.ts";
-import { flashMessageCookieOptions } from "..";
+import { flashMessageCookieOptions } from "#server/index.ts";
 import { CustomSession, UserTokenData } from "#types";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
@@ -44,18 +43,21 @@ router.post("/passkey/creation-options", async (req, res) => {
         });
 
         if (user) {
-            const excludeCredentials: AuthenticatorTransportFuture[] = [];
+            const excludeCredentials = [];
 
-            // const credentials = Credentials.findByUserId(user.id);
-            // if (credentials.length > 0) {
-            //     for (const cred of credentials) {
-            //         excludeCredentials.push({
-            //             id: isoBase64URL.toBuffer(cred.id),
-            //             type: 'public-key',
-            //             transports: cred.transports,
-            //         });
-            //     }
-            // }
+            const listUserCredentials =
+                await UserPublicKeyCredentialsModel.findAll({
+                    where: {
+                        user_id: user.id,
+                    },
+                });
+            for (const cred of listUserCredentials) {
+                excludeCredentials.push({
+                    id: cred.id_externe,
+                    type: 'public-key',
+                    // transports: cred.transports,
+                });
+            }
 
             const options = await generateRegistrationOptions({
                 rpName: "webauthn-app",
@@ -64,7 +66,7 @@ router.post("/passkey/creation-options", async (req, res) => {
                 userName: username,
                 userDisplayName: `${username || ""} - Numixs`,
                 attestationType: "none",
-                // excludeCredentials,
+                excludeCredentials,
                 authenticatorSelection: {
                     authenticatorAttachment: "platform",
                     requireResidentKey: true,
@@ -102,8 +104,8 @@ router.post("/passkey/creation", async (req, res) => {
 
         return res.status(400).send({ error: error.message });
     }
-    const { verified, registrationInfo } = verification;
 
+    const { verified, registrationInfo } = verification;
     if (verified) {
         const {
             aaguid,
@@ -121,9 +123,10 @@ router.post("/passkey/creation", async (req, res) => {
             const base64CredentialID = base64url.encode(
                 Buffer.from(credentialID)
             );
+
             const base64PublicKey = base64url.encode(Buffer.from(publicKey));
 
-            const credentials = await UserPublicKeyCredentialsModel.create({
+            await UserPublicKeyCredentialsModel.create({
                 user_id: user.id,
                 id_externe: base64CredentialID,
                 cle_publique: base64PublicKey,
@@ -131,17 +134,20 @@ router.post("/passkey/creation", async (req, res) => {
                 compteur: 0,
             });
 
-            await user.setListPasskeys([credentials]);
-
             try {
-                jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserTokenData;
+                jwt.verify(
+                    req.cookies.token,
+                    String(process.env.JWT_SECRET)
+                ) as UserTokenData;
                 res.cookie(
                     "flash_message",
                     "passkey_created",
                     flashMessageCookieOptions
                 );
 
-                return res.redirect("/");
+                return res.redirect(
+                    `${res.locals.admin_prefix}/utilisateur/moi/passkeys`
+                );
             } catch (error) {
                 res.cookie(
                     "flash_message",
@@ -271,9 +277,9 @@ router.post("/passkey/connexion", async (req, res) => {
             // errorKey = error.name;
         }
 
-        res.cookie('flash_message', errorKey, flashMessageCookieOptions);
+        res.cookie("flash_message", errorKey, flashMessageCookieOptions);
 
-        return res.redirect('/connexion');
+        return res.redirect("/connexion");
     }
 });
 
