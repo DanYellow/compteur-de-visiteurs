@@ -1,5 +1,7 @@
 import { LoginSchema } from "#scripts/schemas.ts";
-import "#scripts/forms/passkey-triggers.ts";
+import { togglePasskeysVisibility } from "#scripts/passkey-manager.ts";
+
+togglePasskeysVisibility();
 
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector(
