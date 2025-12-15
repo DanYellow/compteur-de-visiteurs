@@ -290,6 +290,10 @@ export const listPlaceTypes = [{
 }];
 
 export const LIST_ROLES = [{
+    label: "Super Administrateur",
+    value: "SUPER_ADMIN",
+    weight: 1000,
+}, {
     label: "Administrateur",
     value: "ADMIN",
     weight: 100,

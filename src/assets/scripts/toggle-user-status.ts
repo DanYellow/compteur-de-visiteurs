@@ -4,7 +4,7 @@ const toggleUserStatus = async (e:Event) => {
     const input = e.currentTarget as HTMLInputElement;
     const userId = input.dataset.changeUserStatus;
 
-    const req = await fetch("/api/utilisateur/statut", {
+    const req = await fetch("/api/utilisateur/activation", {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'

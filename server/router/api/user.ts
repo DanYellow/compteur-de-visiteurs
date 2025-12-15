@@ -8,6 +8,7 @@ import {
     User as UserModel,
     UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
 } from "#models/index.ts";
+import { requireRoleMiddleware } from "#server/middlewares.ts";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
@@ -16,24 +17,24 @@ const router = express.Router();
 const transporter = nodemailer.createTransport({
     ...(process.env.NODE_ENV === "development"
         ? {
-              port: 1025,
-              host: "localhost",
-              tls: {
-                  rejectUnauthorized: false,
-              },
-          }
+            port: 1025,
+            host: "localhost",
+            tls: {
+                rejectUnauthorized: false,
+            },
+        }
         : {
-              host: process.env.EMAIL_SERVER_NOREPLY,
-              port: 587,
-              secure: false, // true for 465, false for other ports
-              auth: {
-                  user: process.env.EMAIL_NOREPLY,
-                  pass: process.env.EMAIL_PASSWORD_NOREPLY,
-              },
-          }),
+            host: process.env.EMAIL_SERVER_NOREPLY,
+            port: 587,
+            secure: false, // true for 465, false for other ports
+            auth: {
+                user: process.env.EMAIL_NOREPLY,
+                pass: process.env.EMAIL_PASSWORD_NOREPLY,
+            },
+        }),
 });
 
-router.post("/utilisateur/activation", async (req, res) => {
+router.post("/utilisateur/activation", requireRoleMiddleware("ADMIN"), async (req, res) => {
     const user = await UserModel.findByPk(Number(req.body.userId));
     if (user) {
         try {
@@ -41,34 +42,31 @@ router.post("/utilisateur/activation", async (req, res) => {
                 actif: req.body.actif,
             });
 
-            const token = jwt.sign(
-                { userId: user.id },
-                process.env.JWT_ACTIVATION_SECRET as string,
-                {
-                    expiresIn: String(
-                        process.env?.JWT_ACTIVATION_EXPIRES || "1d"
-                    ),
-                }
-            );
+            if (req.body.actif) {
+                const token = jwt.sign(
+                    { userId: user.id },
+                    String(process.env.JWT_ACTIVATION_SECRET),
+                    {
+                        expiresIn: (process.env.JWT_ACTIVATION_EXPIRES ?? '1d' ) as jwt.SignOptions['expiresIn'],
+                    }
+                );
 
-            const activationLink = `${req.protocol}://${req.get(
-                "host"
-            )}/activation/${token}`;
-            console.log(activationLink);
+                const activationLink = `${req.protocol}://${req.get(
+                    "host"
+                )}/activation/${token}`;
+                const html = nunjucks.render("pages/emails/activation.njk", {
+                    activation_link: activationLink,
+                });
 
-            const html = nunjucks.render("pages/emails/activation.njk", {
-                title: "Hello",
-                items: [1, 2, 3],
-            });
-
-            const info = await transporter.sendMail({
-                from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
-                to: user.email,
-                subject: "Activation de votre compte Fablab Numixs",
-                text: "Hello world?", // plain‑text body
-                html: html, // HTML body
-            });
-            console.log("Message sent:", info.messageId);
+                const info = await transporter.sendMail({
+                    from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
+                    to: user.email,
+                    subject: "Activation de votre compte Fablab Numixs",
+                    text: "Hello world?", // plain‑text body
+                    html: html, // HTML body
+                });
+                console.log("Message sent:", info.messageId);
+            }
 
             res.status(200).json({
                 success: true,

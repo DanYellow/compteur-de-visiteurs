@@ -60,7 +60,7 @@ Liste utilisateurs
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.email }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <span class="inline-flex items-center gap-2">
-                                            {{ (list_roles|find({key: "value", value: user.role})).label }}
+                                            {{ user.role.label }}
                                             <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-roles" command="show-modal" data-event-data='{{ event | json }}'>
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
                                                     <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
@@ -71,7 +71,7 @@ Liste utilisateurs
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ "Oui" if user.actif == 1 else "Non" }}</td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <label class="cursor-pointer has-disabled:opacity-80 has-disabled:cursor-not-allowed">
-                                            <input type="checkbox" value="{{ user.actif }}" {{ "checked" if user.actif == 1 else "" }} {{ "disabled" if user.actif == 1 and user.role == "ADMIN" else "" }} data-change-user-status="{{ user.id }}" class="sr-only peer">
+                                            <input type="checkbox" value="{{ user.actif }}" {{ "checked" if user.actif == 1 else "" }} {{ "disabled" if user.actif == 1 and user.role.weight >= 100 else "" }} data-change-user-status="{{ user.id }}" class="sr-only peer">
                                             <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-checked:bg-green-numixs rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-focus:ring-dark-green-numixs/30"></div>
                                         </label>
                                     </td>
@@ -85,7 +85,9 @@ Liste utilisateurs
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <div class="flex flex-row gap-3">
                                             <a href="{{ admin_prefix }}/utilisateur/{{ user.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                            {% if (user.role.weight < 100 and user_role.weight >= 100) or (user_role.weight >= 1000) %}
                                             <button type="button" class="font-bold text-red-800 hover:text-red-950" commandfor="delete-user" command="show-modal" data-item-id="{{ user.id }}">Supprimer</button>
+                                            {% endif %}
                                         </div>
                                     </td>
                                 </tr>

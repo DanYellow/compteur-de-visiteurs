@@ -36,7 +36,7 @@ router.get('/connexion', async (req, res) => {
     const { email, mot_de_passe } = req.body;
 
     const user = await UserModel.findOne({
-        where: { email: String(req.body.email), actif: true }
+        where: { email: String(req.body.email), actif: true, utilise_mdp: true, }
     })
 
     if (user && user.mot_de_passe && bcrypt.compareSync(mot_de_passe, user.mot_de_passe!)) {
@@ -76,7 +76,7 @@ router.get('/inscription', async (req, res) => {
     if (!validator.success) {
         res.status(500)
         res.cookie('flash_message', 'register_fail', flashMessageCookieOptions)
-        
+
         return res.redirect("/inscription");
     }
 
@@ -109,101 +109,42 @@ router.get('/inscription', async (req, res) => {
     return res.redirect("/inscription");
 });
 
-// router.get('/activation/:token', async (req, res) => {
-//     let errorKey = "";
-//     try {
-//         const { token } = req.params;
-//         const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
+router.get('/activation/:token', async (req, res) => {
+    let errorKey = "";
+    let user = null;
+    let isTokenValid = false;
+    try {
+        const { token } = req.params;
+        const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
 
-//         const user = await UserModel.findByPk(decoded.userId);
+        user = await UserModel.findByPk(decoded.userId);
 
-//         if (!user) {
-//             throw new Error("user_not_found");
-//         }
+        if (!user) {
+            throw new Error("user_not_found");
+        }
 
-//         if (user?.actif) {
-//             throw new Error("user_not_active");
-//         }
-//     } catch (error: any) {
-//         if (error.name === "TokenExpiredError") {
-//             errorKey = 'expired_token'
-//         } else if (error.name === "JsonWebTokenError") {
-//             errorKey = 'invalid_token'
-//         } else {
-//             errorKey = error as string
-//         }
-//     }
+        if (user.actif === false) {
+            throw new Error("user_not_active");
+        }
+        isTokenValid = true;
+    } catch (error: any) {
+        if (error.name === "TokenExpiredError") {
+            errorKey = 'expired_token'
+        } else if (error.name === "JsonWebTokenError") {
+            errorKey = 'invalid_token'
+        } else {
+            errorKey = error.message
+        }
+    }
 
-//     res.render("pages/sign-in-activation.njk", {
-//         flash_message: req.cookies?.flash_message || errorKey,
-//         signin_email: req.cookies.email,
-//     });
-// }).post('/activation/:token', async (req, res) => {
-//     let errorKey = "";
-//     const { token } = req.params;
-
-//     const validator = SignInActivationSchema.safeParse(req.body);
-
-//     if (!validator.success) {
-//         res.status(500)
-//         res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
-
-//         return res.redirect(`/activation/${token}`);
-//     }
-
-//     try {
-//         jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!);
-
-//         const user = await UserModel.findOne({
-//             where: { email: String(req.body.email) }
-//         })
-
-//         if (!user) {
-//             throw new Error("user_not_found");
-//         }
-
-//         if (!user?.actif) {
-//             throw new Error("user_not_active");
-//         }
-
-//         if (user.mot_de_passe === null || user.mot_de_passe === "") {
-//             const payload = {
-//                 mot_de_passe: bcrypt.hashSync(req.body.password, 8)
-//             }
-
-//             await user.update(payload);
-
-//             res.cookie('email', req.body.email, flashMessageCookieOptions);
-//             res.cookie('flash_message', 'account_created', flashMessageCookieOptions);
-//         } else {
-//             res.cookie('email', req.body.email, flashMessageCookieOptions);
-//             res.cookie('flash_message', 'account_already_created', flashMessageCookieOptions);
-//         }
-
-//         return res.redirect("/connexion");
-//     } catch (error: any) {
-//         if (error.name === "TokenExpiredError") {
-//             errorKey = 'expired_token';
-//         } else if (error.name === "JsonWebTokenError") {
-//             errorKey = 'invalid_token';
-//         } else {
-//             errorKey = error as string
-//         }
-//     }
-
-//     res.cookie('flash_message', errorKey, flashMessageCookieOptions);
-
-//     return res.redirect(`/activation/${token}`);
-// });
-
-router.get('/activation', async (req, res) => {
-    let errorKey = null;
     res.render("pages/sign-in-activation.njk", {
         flash_message: req.cookies?.flash_message || errorKey,
-        signin_email: req.cookies.email,
+        signin_email: user?.email || "",
+        is_token_valid: isTokenValid,
     });
-}).post('/activation', async (req, res) => {
+}).post('/activation/:token', async (req, res) => {
     let errorKey = "";
+    const { token } = req.params;
 
     const validator = SignInActivationSchema.safeParse(req.body);
 
@@ -211,13 +152,13 @@ router.get('/activation', async (req, res) => {
         res.status(500)
         res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
 
-        return res.redirect(`/activation`);
+        return res.redirect(`/activation/${token}`);
     }
 
     try {
-        const user = await UserModel.findOne({
-            where: { email: String(req.body.email) }
-        })
+        const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
+
+        const user = await UserModel.findByPk(decoded.userId);
 
         if (!user) {
             throw new Error("user_not_found");
@@ -254,7 +195,8 @@ router.get('/activation', async (req, res) => {
 
     res.cookie('flash_message', errorKey, flashMessageCookieOptions);
 
-    return res.redirect(`/activation`);
+    return res.redirect(`/activation/${token}`);
 });
+
 
 export default router;

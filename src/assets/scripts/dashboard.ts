@@ -144,7 +144,7 @@ const configData: ChartConfigData = {
         ...baseConfigData.jour,
         id: "dailyChart",
         chartTitle: `Visites uniques du ${daySelected.toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?jour=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        downloadLink: `/telecharger?jour=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
         xTitle: 'Tranche horaire',
         xLabels: baseConfigData.jour.listColumns!,
     },
@@ -152,7 +152,7 @@ const configData: ChartConfigData = {
         ...baseConfigData.semaine,
         id: "weeklyChart",
         chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        downloadLink: `/telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
         xTitle: 'Jours',
         xLabels: baseConfigData.semaine.listColumns!,
     },
@@ -160,7 +160,7 @@ const configData: ChartConfigData = {
         ...baseConfigData.mois,
         id: "monthlyChart",
         chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        downloadLink: `/telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
         xTitle: 'Semaines',
         xLabels: baseConfigData.mois.listColumns!,
     },
@@ -168,7 +168,7 @@ const configData: ChartConfigData = {
         ...baseConfigData.annee,
         id: "yearlyChart",
         chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        downloadLink: `/telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
         xTitle: 'Mois',
         xLabels: baseConfigData.annee.listColumns!,
     }
@@ -276,7 +276,7 @@ const listCharts = Object.values(configData);
             const idx = getIndexForKey(key);
 
             listVisits?.forEach((visit) => {
-                if (visit.liste_evenements === "/") {
+                if (visit.liste_evenements === "") {
                     regularData[idx] += 1;
                 } else {
                     eventData[idx] += 1;
@@ -410,7 +410,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
         const lineChartDatasets: LineChartEntry[] = [];
 
-        const visitsHasEvents = Object.values(chartData).flat().some((item) => (item as VisitRaw).liste_evenements !== "/")
+        const visitsHasEvents = Object.values(chartData).flat().some((item) => (item as VisitRaw).liste_evenements !== "")
         const chartDataPivotTable = getPivotTable(chartData, xLabels as [], { columnSuffix: xValuesSuffix, simplified: !visitsHasEvents })
 
         Object.values(chartDataPivotTable).forEach((row, index, table) => {

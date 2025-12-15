@@ -23,8 +23,12 @@ router.get(['/utilisateurs'], getUser, requireRoleMiddleware("ADMIN"), async (re
     });
 
     res.render("pages/admin/list-users.njk", {
-        list_users: listUsers,
-        list_roles: LIST_ROLES,
+        list_users: listUsers.map((item) => {
+            return {
+                ...item,
+                role: LIST_ROLES.find((role) => item.role === role.value)
+            }
+        }),
         actif: req.query.actif,
     });
 })
