@@ -76,7 +76,12 @@ Liste utilisateurs
                                         </label>
                                     </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.date_inscription|date("dd/LL/yyyy 'à' HH:mm") }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.derniere_connexion|date("dd/LL/yyyy 'à' HH:mm") }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                        {% set has_been_used = (user.derniere_connexion | date("yyyy") == "1970") %}
+                                        {% set date = user.derniere_connexion | date("dd/LL/yyyy 'à' HH:mm") %}
+
+                                        {{ "Jamais" if has_been_used else date }}
+                                    </td>
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                         <div class="flex flex-row gap-3">
                                             <a href="{{ admin_prefix }}/utilisateur/{{ user.id }}" class="font-bold hocus:opacity-75">Éditer</a>
@@ -107,9 +112,11 @@ Liste utilisateurs
 
         <hr class="pb-1 mt-1 border-red-800">
 
-        <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Cette action est irréversible.</p>
+        <div class="mb-4">
+            {{ macros.error_banner("Cette action est irréversible.")}}
+        </div>
 
-        <form method="post" action="{{ admin_prefix }}/utilisateur/suppression">
+        <form method="POST" action="{{ admin_prefix }}/utilisateur/suppression">
             <input type="hidden" name="id" value=""/>
             <div class="flex flex-row gap-3">
                 <button type="submit" class="text-white-numixs bg-red-800 hocus:bg-red-950 px-3 py-1.5 rounded-xl">Supprimer</button>

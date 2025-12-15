@@ -6,17 +6,26 @@ import { User as UserModel, UserPublicKeyCredentials as UserPublicKeyCredentials
 import { LIST_ROLES } from "#scripts/utils.shared.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 import { UserTokenData } from "#types";
+import { Op } from "sequelize";
+
+const NUMBER_REGEX = /^\d+$/;
 
 const router = express.Router();
 
 router.get(['/utilisateurs'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
     const listUsers = await UserModel.findAll({
         raw: true,
+        ...( req.query?.actif && {
+            where: {
+                actif: false
+            }
+        })
     });
 
     res.render("pages/admin/list-users.njk", {
         list_users: listUsers,
         list_roles: LIST_ROLES,
+        actif: req.query.actif,
     });
 })
 
@@ -43,10 +52,14 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
     res.render("pages/admin/add_edit-user.njk", {
         user,
         is_edit: true,
-        list_roles: LIST_ROLES,
+        list_roles: LIST_ROLES.filter((item) => item.value !== "SUPER_ADMIN"),
         flash_message: req.cookies.flash_message,
     });
-}).post(['/utilisateur/:userId'], getUser, requireRoleMiddleware(""), async (req, res) => {
+}).post(['/utilisateur/:userId'], getUser, requireRoleMiddleware(""), async (req, res, next) => {
+    if ("userId" in req.params && !NUMBER_REGEX.test(req.params.userId)) {
+        return next();
+    }
+
     const user = await UserModel.findByPk(req.body.id);
     const payload = {
         ...req.body,
@@ -64,6 +77,21 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
     }
 
     res.redirect(`${res.locals.admin_prefix}/utilisateur/${req.params.userId}`);
+}).post(['/utilisateur/suppression'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
+    try {
+        await UserModel.destroy({
+            where: {
+                id: req.body.id,
+                role: { [Op.notIn]: ["ADMIN"] }
+            }
+        })
+        res.cookie('flash_message', "delete_success", flashMessageCookieOptions);
+    } catch (error) {
+        console.log(error)
+        res.cookie('flash_message', "delete_error", flashMessageCookieOptions);
+    }
+
+    res.redirect(`${res.locals.admin_prefix}/utilisateurs`);
 })
 
 router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res) => {
