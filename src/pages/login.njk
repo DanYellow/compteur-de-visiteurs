@@ -73,11 +73,13 @@ Connexion
                         <label for="mot_de_passe">Mot de passe</label>
                         <input type="password" name="mot_de_passe" id="mot_de_passe" class="text-black w-full" data-input-toggle-visibility>
                     </div>
-                    <div>
+                    <div class="flex flex-row justify-between">
                         <button type="submit" class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
                             Se connecter
                             {% include "includes/icons/next-arrow.svg" %}
                         </button>
+                        <a href="/mot-de-passe-oublie" class="text-white-numixs w-fit title-font text-2xl py-3.5 font-bold hocus:text-white">Mot de passe oublié ?</a>
+
                     </div>
                 </div>
                 <p class="text-lg text-center" data-passkey-toggle>ou</p>

@@ -71,7 +71,7 @@ passwordActivationSwitch.addEventListener("change", async (e: Event) => {
     const input = e.currentTarget as HTMLInputElement;
     const userId = input.dataset.userId;
 
-    const req = await fetch("/api/utilisateur/mdp-activation", {
+    await fetch("/api/utilisateur/mdp-activation", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

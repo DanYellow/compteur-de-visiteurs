@@ -47,14 +47,14 @@ router.post("/utilisateur/activation", requireRoleMiddleware("ADMIN"), async (re
                     { userId: user.id },
                     String(process.env.JWT_ACTIVATION_SECRET),
                     {
-                        expiresIn: (process.env.JWT_ACTIVATION_EXPIRES ?? '1d' ) as jwt.SignOptions['expiresIn'],
+                        expiresIn: (process.env.JWT_ACTIVATION_EXPIRES ?? '1d') as jwt.SignOptions['expiresIn'],
                     }
                 );
 
                 const activationLink = `${req.protocol}://${req.get(
                     "host"
                 )}/activation/${token}`;
-                const html = nunjucks.render("pages/emails/activation.njk", {
+                const html = nunjucks.render("pages/emails/user-activation.njk", {
                     activation_link: activationLink,
                 });
 
@@ -107,6 +107,45 @@ router.post("/utilisateur/mdp-activation", async (req, res) => {
         }
     }
     res.status(500).json({ erreur: true });
+});
+
+router.post("/utilisateur/generer-nouveau-mdp", async (req, res) => {
+    const user = await UserModel.findByPk(req.body.userId, {
+        include: [{
+            model: UserPublicKeyCredentialsModel,
+            as: "listPasskeys",
+        }]
+    });
+
+    if (!user) {
+        return res.status(200).json({});
+    }
+
+    const token = jwt.sign(
+        { userId: user.id },
+        String(process.env.JWT_ACTIVATION_SECRET),
+        {
+            expiresIn: (process.env.JWT_ACTIVATION_EXPIRES ?? '1d') as jwt.SignOptions['expiresIn'],
+        }
+    );
+
+    const activationLink = `${req.protocol}://${req.get(
+        "host"
+    )}/recuperation-mot-de-passe/${token}`;
+    const html = nunjucks.render("pages/emails/new-password.njk", {
+        activation_link: activationLink,
+    });
+
+    const info = await transporter.sendMail({
+        from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
+        to: user.email,
+        subject: "Récupération de votre mot de passe Fablab Numixs",
+        text: "Hello world?", // plain‑text body
+        html: html, // HTML body
+    });
+    console.log("Message sent:", info.messageId);
+
+    res.status(200).json({});
 });
 
 export default router;

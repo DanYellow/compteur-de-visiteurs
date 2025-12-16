@@ -136,7 +136,7 @@ export const SignInSchema = z.object({
     }),
 })
 
-const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&|;,])[A-Za-z\d@$!%*#?&|;,]{6,}$/
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&|;,_-])[A-Za-z\d@$!%*#?&|;,_-]{6,}$/
 
 export const SignInActivationSchema = z.object({
     email: z.email({
@@ -165,7 +165,7 @@ export const LoginSchema = z.object({
     }),
     mot_de_passe: z.string({
         error: `Mot de passe : ${REQUIRED_MESSAGE}`
-    })
+    }),
 });
 
 export const UserSchema = z.object({
@@ -176,5 +176,8 @@ export const UserSchema = z.object({
     prenom: z.string().optional(),
     mot_de_passe: z.string({
         error: `Mot de passe : ${REQUIRED_MESSAGE}`
-    }).optional()
+    }).optional(),
 });
+
+export const PasswordRecoverySchema = LoginSchema.pick({ email: true })
+export const ChangePasswordSchema = SignInActivationSchema.pick({ password: true, confirm_password: true })

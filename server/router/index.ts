@@ -14,6 +14,7 @@ import DownloadRouter from "./download.ts";
 import AdminRouter from "./admin.ts";
 import CredentialRouter from "./credential.ts";
 import CredentialsPasskeyRouter from "./credentials-passkey.ts";
+import PasswordRouter from "./password.ts";
 
 const router = express.Router();
 
@@ -155,8 +156,9 @@ router.post('/deconnexion', (req, res) => {
 });
 
 
-router.use("/", CredentialRouter);
+router.use(CredentialRouter);
 router.use(CredentialsPasskeyRouter);
+router.use(PasswordRouter);
 router.use("/api", ApiRouter);
 router.use("/telecharger", requireRoleMiddleware("READ_ONLY"), DownloadRouter);
 router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, requireRoleMiddleware("READ_ONLY"), AdminRouter);
