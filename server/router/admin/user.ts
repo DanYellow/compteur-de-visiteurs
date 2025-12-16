@@ -60,7 +60,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
         flash_message: req.cookies.flash_message,
     });
 }).post(['/utilisateur/:userId'], getUser, requireRoleMiddleware(""), async (req, res, next) => {
-    if ("userId" in req.params && !NUMBER_REGEX.test(req.params.userId)) {
+    if ("userId" in req.params && !NUMBER_REGEX.test(req.params.userId) && req.params.userId !== "moi") {
         return next();
     }
 
@@ -98,8 +98,12 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
     res.redirect(`${res.locals.admin_prefix}/utilisateurs`);
 })
 
-router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res) => {
-    let user = await UserModel.findByPk(req.params.userId, {
+router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res, next) => {
+    if (req.params.userId !== "moi" && String(req.params.userId) !== String(res.locals.current_user!.id)) {
+        return res.redirect("/interdit");
+    }
+
+    const user = await UserModel.findByPk(req.params.userId === "moi" ? res.locals.current_user!.id : req.params.userId, {
         nest: true,
         include: [{
             model: UserPublicKeyCredentialsModel,
@@ -107,32 +111,17 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUs
         }]
     });
 
-    if (req.params.userId === "moi") {
-        try {
-            const token = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserTokenData;
-
-            user = await UserModel.findOne({
-                where: {
-                    email: token.email
-                },
-                nest: true,
-                include: [{
-                    model: UserPublicKeyCredentialsModel,
-                    as: "listPasskeys",
-                }]
-            });
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     res.render("pages/admin/add_edit-user-passkeys.njk", {
         user,
         flash_message: req.cookies.flash_message,
     });
 }).post(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res) => {
+    if (req.params.userId !== "moi" && String(req.params.userId) !== String(res.locals.current_user!.id)) {
+        return res.redirect("/interdit");
+    }
+
     try {
-        let passkey = await UserPublicKeyCredentialsModel.findOne({
+        const passkey = await UserPublicKeyCredentialsModel.findOne({
             where: {
                 id: Number(req.body.id),
                 user_id: req.current_user!.id,

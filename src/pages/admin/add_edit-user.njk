@@ -2,13 +2,21 @@
 
 {% block title %}
     {% if is_edit %}
-Éditer utilisateur
-{% else %}
-Créer utilisateur
-{% endif %}
+        Éditer utilisateur
+    {% else %}
+        Créer utilisateur
+    {% endif %}
 {% endblock %}
-{% set active_menu_item = "utilisateurs" %}
-{% import "includes/macros.njk" as forms %}
+
+{% if current_user.id == user.id %}
+    {% set active_menu_item = "mon-compte" %}
+{% else %}
+    {% set active_menu_item = "utilisateurs" %}
+{% endif %}
+
+{% set active_user_menu_item = "infos" %}
+
+{% import "includes/macros.njk" as macros %}
 
 {% block scripts %}
     {% if NODE_ENV == "development" %}
@@ -24,9 +32,11 @@ Créer utilisateur
 {% set root_class = "admin" %}
 {% block content %}
     <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
+
     <div class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
+            {% include "includes/admin-user-nav.njk" %}
             <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
                 <h1 class="text-black-numixs title-font font-bold text-4xl md:text-6xl">
                     {% if is_edit %}
@@ -42,24 +52,17 @@ Créer utilisateur
             <div class="text-black-numixs">
                 <form action="" method="post" data-special-opening-form>
                     <div class="flex flex-col gap-4">
-                        {% if flash_message == "error" %}
+                        {% if flash_message == "error" or flash_message == "update_error" %}
+                            {{ macros.error_banner("Une erreur est survenue.")}}
                             <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 rounded-md">Une erreur est survenue</p>
                         {% endif %}
 
                         {% if is_edit and user | length == 0 %}
-                            <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 rounded-md">Utilisateur non trouvé</p>
+                            {{ macros.error_banner("Cet utilisateur n'existe pas.")}}
                         {% endif %}
 
                         {% if flash_message == "update_success" %}
-                            <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 rounded-md">
-                                L'utilisateur a été mis à jour avec succès.
-                            </p>
-                        {% endif %}
-
-                        {% if flash_message == "update_error" %}
-                            <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 rounded-md">
-                                Une erreur est survenue.
-                            </p>
+                            {{ macros.success_banner("L'utilisateur a été mis à jour avec succès.")}}
                         {% endif %}
 
                         <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
@@ -96,13 +99,15 @@ Créer utilisateur
                                     </svg>
                                 </button>
                             </label>
-                            <select name="role" id="role" class="inert:text-black-numixs/80 inert:cursor-not-allowed" {{ "inert" if user_role.weight < 100 or (current_user.id != user.id and user.role == "ADMIN") else "" }}>
-                                {% for role in list_roles %}
-                                    <option {{ "selected" if user.role == role.value else "" }} value="{{ role.value }}">
-                                        {{ role.label }}
-                                    </option>
-                                {% endfor %}
-                            </select>
+                            <div class="has-inert:cursor-not-allowed">
+                                <select name="role" id="role" class="inert:text-black-numixs/80 w-full" {{ "inert" if user_role.weight < 100 or user.role == "ADMIN" else "" }}>
+                                    {% for role in list_roles %}
+                                        <option {{ "selected" if user.role == role.value else "" }} value="{{ role.value }}">
+                                            {{ role.label }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
 
                         <div class="flex flex-col">
