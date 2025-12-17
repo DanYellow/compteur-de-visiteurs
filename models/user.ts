@@ -89,10 +89,10 @@ export default class User extends Model<
                 modelName: "user",
                 underscored: true,
                 hooks: {
-                    afterCreate(record, options) {
+                    afterCreate(record) {
                         deleteFirstAdmin(record);
                     },
-                    afterUpdate(record, options) {
+                    afterUpdate(record) {
                         deleteFirstAdmin(record);
                     },
                 },

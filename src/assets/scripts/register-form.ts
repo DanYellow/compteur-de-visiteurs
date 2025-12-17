@@ -1,5 +1,4 @@
 import { VisitorSchema } from "#scripts/schemas.ts";
-import config from "#config" with { type: "json" };
 
 import { cancellableSleep } from "./utils";
 
@@ -54,7 +53,7 @@ const submitForm = async (e: SubmitEvent) => {
     }
 
     try {
-        await cancellableSleep(Number(config.FORM_RESULT_TIMEOUT), sleepController.signal);
+        await cancellableSleep(Number(import.meta.env.FORM_RESULT_TIMEOUT), sleepController.signal);
         dialog.close();
     } finally {
     }

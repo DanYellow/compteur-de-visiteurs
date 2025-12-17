@@ -130,7 +130,7 @@ export const getPivotTable = (data: Record<string, VisitRaw[]>, columns: string[
                     {});
             }
 
-            const indexArray = columns.findIndex((label: string | Record<string, number>) => {
+            const indexArray = columns.findIndex(label => {
                 if (typeof label === "object") {
                     return Number(label.id) === Number(group);
                 }
@@ -185,7 +185,7 @@ export const getLinearCSV = (data: Record<string, unknown>[], { periodLabel, lie
         ...copyFirstEntry,
         ...Object.fromEntries(listGroupsInForm.map((item) => [item.value, 0])),
         liste_evenements: "/",
-    } as CSVLinearHeader;
+    } as unknown as CSVLinearHeader;
 
     firstRow.lieu = firstRow['place.nom'];
 
@@ -204,7 +204,9 @@ export const getLinearCSV = (data: Record<string, unknown>[], { periodLabel, lie
     data.forEach((item, idx) => {
         listGroupsInForm.forEach((group) => {
             const key = group.value! as keyof CSVLinearHeader;
-            firstRow[key] += item[group.value] === "oui" ? 1 : 0;
+            if (firstRow[key]) {
+                firstRow[key] += item[group.value] === "oui" ? 1 : 0;
+            }
         })
 
         item.id = String(idx + 1);

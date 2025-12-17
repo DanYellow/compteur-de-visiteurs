@@ -5,9 +5,7 @@ import {
     type InferAttributes,
     type InferCreationAttributes,
     type CreationOptional,
-    type BelongsToManySetAssociationsMixin,
-    type BelongsToManyGetAssociationsMixin,
-    ForeignKey,
+    type ForeignKey,
 } from "sequelize";
 
 export default class UserPublicKeyCredentials extends Model<
