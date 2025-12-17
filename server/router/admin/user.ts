@@ -71,6 +71,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
 
     if (user) {
         await user.update(payload);
+
         if (String(user.id) === String(req.current_user!.id)) {
             req.current_user = user.toJSON();
         }

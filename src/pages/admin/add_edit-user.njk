@@ -113,13 +113,14 @@
                         <div class="flex flex-col">
                             <p class="font-bold text-lg">Activer</p>
                             <div class="flex flex-row gap-5 has-disabled:opacity-80 has-disabled:cursor-not-allowed">
+                                {% set can_edit_active_status = (user.actif == 1 and user.role == "ADMIN") or user_role.weight < 100 %}
                                 <div>
                                     <label for="oui">Oui</label>
-                                    <input type="radio" name="actif" {{ "disabled" if user_role.weight < 100 else "" }} {{ "disabled" if user.actif == 1 and user.role == "ADMIN" else "" }} {{ "checked" if user.actif == 1 else "" }} id="oui" value="1">
+                                    <input type="radio" name="actif" {{ "disabled" if can_edit_active_status else "" }} {{ "checked" if user.actif == 1 else "" }} id="oui" value="1">
                                 </div>
                                 <div>
                                     <label for="non">Non</label>
-                                    <input type="radio" name="actif" {{ "disabled" if user_role.weight < 100 else "" }} {{ "disabled" if user.actif == 1 and user.role == "ADMIN" else "" }} {{ "checked" if user.actif == 0 else "" }} id="non" value="0">
+                                    <input type="radio" name="actif" {{ "disabled" if can_edit_active_status else "" }} {{ "checked" if user.actif == 0 else "" }} id="non" value="0">
                                 </div>
                             </div>
                         </div>
