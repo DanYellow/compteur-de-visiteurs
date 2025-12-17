@@ -1,3 +1,5 @@
+import { createNotification } from '#scripts/notifications-manager.ts';
+
 const listSwitches = document.querySelectorAll(
     "[data-change-user-status]"
 ) as NodeListOf<HTMLInputElement>;
@@ -32,11 +34,10 @@ Array.from(listActivationButtons).forEach((item) => {
         const element = e.currentTarget as HTMLButtonElement;
         const userId = element.dataset.sendActivationEmail;
 
-        await fetch("/api/utilisateur/activation", {
+        const req = await fetch("/api/utilisateur/activation", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                // cookie: req.headers.cookie ?? "",
             },
             credentials: "include",
             body: JSON.stringify({
@@ -44,5 +45,8 @@ Array.from(listActivationButtons).forEach((item) => {
                 actif: true,
             }),
         });
+        const res = await req.json();
+    
+        createNotification(`Email d'activation envoyé à "${res.utilisateur.email}"`)
     });
 });

@@ -71,6 +71,7 @@ router.post("/utilisateur/activation", requireRoleMiddleware("ADMIN"), async (re
             res.status(200).json({
                 success: true,
                 message: "Utilisateur mis à jour",
+                utilisateur: user.toJSON(),
             });
         } catch (e) {
             console.log("e", e);

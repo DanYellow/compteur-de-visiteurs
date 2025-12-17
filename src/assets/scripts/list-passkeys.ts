@@ -3,6 +3,7 @@ import {
     createPasskey,
     togglePasskeysVisibility,
 } from "#scripts/passkey-manager.ts";
+import { createNotification } from '#scripts/notifications-manager.ts';
 
 togglePasskeysVisibility();
 
@@ -80,4 +81,5 @@ passwordActivationSwitch.addEventListener("change", async (e: Event) => {
             userId,
         }),
     });
+    createNotification("Mise à jour prise en compte")
 });
