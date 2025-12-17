@@ -85,14 +85,11 @@ export default class User extends Model<
             {
                 sequelize,
                 createdAt: "date_inscription",
-                updatedAt: false,
+                updatedAt: 'updated_at',
                 modelName: "user",
                 underscored: true,
                 hooks: {
-                    afterCreate(record) {
-                        deleteFirstAdmin(record);
-                    },
-                    afterUpdate(record) {
+                    afterSave(record) {
                         deleteFirstAdmin(record);
                     },
                 },
@@ -103,12 +100,12 @@ export default class User extends Model<
 
 const deleteFirstAdmin = async (record: User) => {
     const adminCount = await User.count({
-        where: { 
-            role: "admin", 
-            actif: true, 
+        where: {
+            role: "ADMIN",
+            actif: true,
             mot_de_passe: {
                 [Op.ne]: ""
-            } 
+            }
         },
     });
 

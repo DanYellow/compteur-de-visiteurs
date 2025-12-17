@@ -5,8 +5,13 @@
 {% set root_class = "register" %}
 {% block content %}
     <div class="max-w-7xl mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] justify-center gap-24 mx-auto">
+        <header class="mb-6">
+            <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-20" alt="">
+            {% if place %}
+                <p class="text-sm">{{ place.nom }}</p>
+            {% endif %}
+        </header>
         <div class="flex flex-col gap-3 mb-3">
-
             {% if flash_message.unset_place %}
                 {{ macros.warning_banner("Vous devez sélectionner un lieu avant de pouvoir mettre en place l'enregistrement de vos visiteurs.") }}
             {% endif %}
@@ -26,12 +31,6 @@
                 {{ macros.error_banner("Le lieu sélectionné n'a pas été trouvé ou est fermé. Veuillez sélectionner un autre lieu.") }}
             {% endif %}
         </div>
-        <header class="mb-6">
-            <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-20" alt="">
-            {% if place %}
-                <p class="text-sm">{{ place.nom }}</p>
-            {% endif %}
-        </header>
         <form action="" method="post">
             <div class="flex flex-col">
                 <label for="place" class="title-font text-green-numixs text-5xl">Sélectionner le lieu</label>
