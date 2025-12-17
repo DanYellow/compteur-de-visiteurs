@@ -270,7 +270,7 @@ router.post("/passkey/connexion", async (req, res) => {
             sameSite: "strict",
         });
 
-        return res.redirect(`${res.locals.admin_prefix}/dashboard`);
+        return res.redirect((req.session as CustomSession)?.return_to || `${res.locals.admin_prefix}/tableau-de-bord`);
     } catch (error: any) {
         let errorKey = error.message;
         if ("name" in error) {

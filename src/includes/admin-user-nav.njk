@@ -6,7 +6,7 @@
 
         {% if current_user.id == user.id %}
         <li>
-            <a href="{{ admin_prefix }}/utilisateur/moi/passkeys" class="{{ "font-bold border-b-4" if active_user_menu_item == "passkeys" else "opacity-65" }} hocus:opacity-100 pb-2">Passkeys</a>
+            <a href="{{ admin_prefix }}/utilisateur/moi/passkeys" class="{{ "font-bold border-b-4" if active_user_menu_item == "passkeys" else "opacity-65" }} hocus:opacity-100 pb-2">Passkeys et mot de passe</a>
         </li>
         {% endif %}
     </ul>

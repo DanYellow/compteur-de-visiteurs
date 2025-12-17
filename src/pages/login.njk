@@ -35,6 +35,10 @@ Connexion
                 {{ macros.success_banner("Vous avez été déconnecté(e) avec succès.") }}
             {% endif %}
 
+            {% if flash_message == "password_updated" %}
+                {{ macros.success_banner("Votre mot de passe a été mis à jour, vous pouvez l'utiliser dès maintenant.") }}
+            {% endif %}
+
             {% if flash_message == "forced_logout" %}
                 {{ macros.warning_banner("Une erreur est survenue, vous avez été déconnecté(e).") }}
             {% endif %}
