@@ -145,7 +145,7 @@ export const SignInActivationSchema = z.object({
     password: z.string({
         error: `Mot de passe : ${REQUIRED_MESSAGE}`
     })
-    .refine((value) => PASSWORD_REGEX.test(value ?? ""), 'Le mot de passe ne correspond pas aux critères attendus : un nombre et un caractère spécial minimum'),
+        .refine((value) => PASSWORD_REGEX.test(value ?? ""), 'Le mot de passe ne correspond pas aux critères attendus : un nombre et un caractère spécial minimum'),
     confirm_password: z.string({
         error: `Confirmer mot de passe : ${REQUIRED_MESSAGE}`
     })
@@ -180,4 +180,12 @@ export const UserSchema = z.object({
 });
 
 export const PasswordRecoverySchema = LoginSchema.pick({ email: true })
-export const ChangePasswordSchema = SignInActivationSchema.pick({ password: true, confirm_password: true })
+export const ChangePasswordSchema = SignInActivationSchema.omit({ email: true }).superRefine(({ confirm_password, password }, ctx) => {
+    if (confirm_password !== password) {
+        ctx.addIssue({
+            code: "custom",
+            message: "Les mots de passe ne correspondent pas",
+            path: ['confirm_password']
+        });
+    }
+});
