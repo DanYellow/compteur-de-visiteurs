@@ -5,9 +5,10 @@ import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 
 import { SignInSchema, SignInActivationSchema, LoginSchema } from "#scripts/schemas.ts";
-import { flashMessageCookieOptions } from "#server/index.ts";
+import { flashMessageCookieOptions, wss } from "#server/index.ts";
 import { User as UserModel } from "#models/index.ts";
 import { CustomSession, UserTokenData } from "#types";
+import { SOCKET_EVENTS } from "#scripts/utils.ts";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` })
 
@@ -84,7 +85,14 @@ router.get('/inscription', async (req, res) => {
         await UserModel.create({
             email: String(req.body.email),
         });
-        res.cookie('flash_message', 'register_success', flashMessageCookieOptions)
+
+        res.cookie('flash_message', 'register_success', flashMessageCookieOptions);
+
+        wss.clients.forEach((client) => {
+            if (client.readyState === client.OPEN) {
+                client.send(JSON.stringify({ type: SOCKET_EVENTS.NEW_USER, payload: {} }));
+            }
+        });
     } catch (error) {
         if (error instanceof UniqueConstraintError) {
             const user = await UserModel.findOne({

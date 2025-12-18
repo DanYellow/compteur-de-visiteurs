@@ -46,7 +46,8 @@ export const cancellableSleep = (duration: number, signal: AbortSignal) => {
 }
 
 export const SOCKET_EVENTS = {
-    VISITOR_REGISTERED: "VISITOR_REGISTERED"
+    VISITOR_REGISTERED: "VISITOR_REGISTERED",
+    NEW_USER: "NEW_USER",
 }
 
 export const TotalVisitors = {
