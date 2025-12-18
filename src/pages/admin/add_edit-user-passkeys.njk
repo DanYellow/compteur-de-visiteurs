@@ -30,15 +30,10 @@
         {% include "includes/admin-nav.njk" %}
         <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
             {% include "includes/admin-user-nav.njk" %}
-            <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
+            <header class="mb-10 -mt-1.5">
                 <h1 class=" title-font font-bold text-4xl md:text-6xl">
-                    Liste Passkeys
+                    Passkeys et mot de passe
                 </h1>
-                <label class="cursor-pointer has-disabled:opacity-80 has-disabled:cursor-not-allowed flex gap-2">
-                    Se connecter avec un mot de passe
-                    <input type="checkbox" value="{{ user.utilise_mdp }}" {{ "checked" if user.utilise_mdp == 1 else "" }} {{ "disabled" if user.listPasskeys|length == 0 else "" }} data-change-user-pass-activation data-user-id="{{ user.id }}" class="sr-only peer">
-                    <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-checked:bg-green-numixs rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-focus:ring-dark-green-numixs/30"></div>
-                </label>
             </header>
 
             <div>
@@ -53,9 +48,9 @@
             <div class="text-black-numixs mt-5">
                 {% include "includes/form-banner-success.njk" %}
 
-                <h2 class="text-lg font-bold">Mes passkeys</h2>
+                <h2 class="text-xl font-bold">Mes passkeys</h2>
 
-                <ul class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4.5 mt-2">
+                <ul class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4.5 mt-1">
                     <li data-passkey-toggle>
                         <button type="button" class="inert:!cursor-not-allowed inert:opacity-60 p-3 border h-full w-full bg-green-numixs text-black-numixs border-dark-green-numixs hocus:bg-dark-green-numixs hocus:text-black hocus:border-black rounded-md" data-passkey-register="{{ user.email }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8 inline">
@@ -88,6 +83,39 @@
                         <li class="text-lg">Aucun passkey n'a été enregistré</li>
                     {% endfor %}
                 </ul>
+
+                <header class="flex flex-row justify-between md:items-center">
+                    <h2 class="text-xl font-bold mt-5">Changer mot de passe</h2>
+                    <label class="cursor-pointer has-disabled:opacity-80 has-disabled:cursor-not-allowed flex gap-2">
+                        Se connecter avec un mot de passe
+                        <input type="checkbox" value="{{ user.utilise_mdp }}" {{ "checked" if user.utilise_mdp == 1 else "" }} {{ "disabled" if user.listPasskeys|length == 0 else "" }} data-change-user-pass-activation data-user-id="{{ user.id }}" class="sr-only peer">
+                        <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-checked:bg-green-numixs rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-focus:ring-dark-green-numixs/30"></div>
+                    </label>
+                </header>
+                <form action="" method="POST" class="mt-1">
+                    <div class="flex flex-col gap-3">
+                        <div class="flex flex-col">
+                            <label for="password">Ancien mot de passe</label>
+                            <input type="password" data-input-toggle-visibility name="password" id="password" class="text-black w-full">
+                        </div>
+                        <div class="flex flex-col">
+                            <label for="new_password">Nouveau mot de passe</label>
+                            <input type="password" data-input-toggle-visibility name="new_password" id="new_password" class="text-black w-full" autocomplete="new-password">
+                            <p class="leading-none">Le mot de passe doit faire au minimum <span class="font-bold">six caractères</span> avec au minimum <span class="font-bold">un chiffre et un caractère spécial.</span></p>
+                        </div>
+                        <div class="flex flex-col">
+                            <label for="confirm_password">Confirmer nouveau mot de passe</label>
+                            <input type="password" data-input-toggle-visibility name="confirm_password" id="confirm_password" class="text-black w-full" autocomplete="new-password">
+                        </div>
+
+                        <div>
+                            <button type="submit" class="text-black-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:opacity-70 items-center">
+                            Changer de mot de passe
+                            {% include "includes/icons/next-arrow.svg" %}
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
