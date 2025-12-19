@@ -4,13 +4,15 @@
     Éditer passkey
 {% endblock %}
 {% set active_menu_item = "utilisateurs" %}
-{% import "includes/macros.njk" as forms %}
+{% import "includes/macros.njk" as macros %}
 
 {% block scripts %}
     {% if NODE_ENV == "development" %}
         <script type="module" src="/src/assets/scripts/list-passkeys.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/toggle-input-visibility.ts" defer></script>
     {% else %}
         <script type="module" src="/{{ manifest['src/assets/scripts/list-passkeys.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/toggle-input-visibility.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}
 
@@ -154,8 +156,10 @@
     </header>
     <hr class="pb-1 mt-1 border-red-800">
 
-    <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Cette action est irréversible.</p>
-
+    <div class="mb-4">
+        {{ macros.error_banner("Cette action est irréversible.") }}
+    </div>
+        
     <form method="POST" action="{{ admin_prefix }}/utilisateur/passkey/suppression">
         <input type="hidden" name="passkeyId" id="passkeyId" value=""/>
         <input type="hidden" name="userId" value="{{ user.id }}"/>
@@ -165,4 +169,5 @@
         </div>
     </form>
 </dialog>
+{% include "includes/toggle-input-visibility.njk" %}
 {% endblock %}
