@@ -59,6 +59,7 @@
         "#server/*.ts": "./server/*.ts",
         "#models/*.ts": "./models/*.ts",
         "#scripts/*.ts": "./src/assets/scripts/*.ts",
-        "#types": "./types.ts"
+        "#types": "./types.ts",
+        "#styles": "./src/assets/styles/*.css"
     }
 }

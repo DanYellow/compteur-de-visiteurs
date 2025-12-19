@@ -379,6 +379,19 @@ button {
     }
 }
 
+.passkey-item {
+    display: grid;
+    gap: 0.35em;
+
+    grid-auto-flow: column;
+    grid-template-columns: 0fr 1fr;
+    transition: grid-template-columns ease-in-out 0.15s;
+
+    &:hover {
+        grid-template-columns: 0.2fr 1fr;
+    }
+}
+
 /* .custom-select {
     &,
     &::picker(select) {
