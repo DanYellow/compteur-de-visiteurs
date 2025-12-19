@@ -1,12 +1,12 @@
 <nav class="text-black-numixs mb-10 text-2xl title-font">
-    <ul class="flex flex-row gap-6">
+    <ul class="flex flex-row gap-6 overflow-auto">
         <li>
-            <a href="{{ admin_prefix }}/utilisateur/moi" class="{{ "font-bold border-b-4" if active_user_menu_item == "infos" else "opacity-65" }} hocus:opacity-100 pb-2">Informations complémentaires</a>
+            <a href="{{ admin_prefix }}/utilisateur/moi" class="{{ "font-bold border-b-4" if active_user_menu_item == "infos" else "opacity-65" }} block whitespace-nowrap hocus:opacity-100 pb-2">Informations complémentaires</a>
         </li>
 
         {% if current_user.id == user.id %}
         <li>
-            <a href="{{ admin_prefix }}/utilisateur/moi/passkeys" class="{{ "font-bold border-b-4" if active_user_menu_item == "passkeys" else "opacity-65" }} hocus:opacity-100 pb-2">Passkeys et mot de passe</a>
+            <a href="{{ admin_prefix }}/utilisateur/moi/passkeys" class="{{ "font-bold border-b-4" if active_user_menu_item == "passkeys" else "opacity-65" }} block whitespace-nowrap hocus:opacity-100 pb-2">Passkeys et mot de passe</a>
         </li>
         {% endif %}
     </ul>

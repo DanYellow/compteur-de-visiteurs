@@ -102,12 +102,12 @@ router.post("/utilisateur/mdp-activation", async (req, res) => {
                 utilise_mdp: !user.utilise_mdp,
             });
 
-            res.json({ erreur: false });
+            return res.json({ erreur: false });
         } catch (error) {
-            res.status(500).json({ erreur: true });
+            return res.status(500).json({ erreur: true });
         }
     }
-    res.status(500).json({ erreur: true });
+    return res.status(500).json({ erreur: true });
 });
 
 router.post("/utilisateur/generer-nouveau-mdp", async (req, res) => {

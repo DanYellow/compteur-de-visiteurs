@@ -43,6 +43,8 @@
                 <p>Un passkey est un mot de passe de moderne et infalsifiable. Il vient combler les limites des mots de passe traditionnels qui peuvent être volés. En effet, le passkey permet l'authentification biométrique (empreinte digitale, reconnaissance faciale, yubikey...), ainsi plus de mots de passe à retenir et mots de passe invulnérables à toute compromission de base de données.</p>
                 <p class="mt-2">Vous pouvez avoir plusieurs passkeys, il vous suffira de les gérer depuis votre espace "mon compte". Car chaque passkey est <span class="font-bold">associé à un appareil.</span> Toutefois, il existe des passkeys dit "synchronisés" qui sont liés à votre compte Apple, Google ou Microsoft.</p>
                 <p class="mt-2">Si vous avez enregistré un passkey, vous pouvez augmenter la sécurité de votre compte en désactivant la connexion par mot de passe.</p>
+                <p class="mt-2">Note : Le passkey ne fonctionnera pas si vous n'avez pas activé l'authentification biométrique sur votre terminal.</p>
+                <p class="mt-2">Note 2 : Le changement de mot de passe, suite à une perte, réactive la connexion par mot de passe.</p>
             </div>
 
             {% include "includes/hello-banner.njk" %}
@@ -52,7 +54,7 @@
 
                 <h2 class="text-xl font-bold">Mes passkeys</h2>
 
-                <ul class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4.5 mt-1">
+                <ul class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3.5 mt-1 auto-rows-[1fr]">
                     <li data-passkey-toggle>
                         <button type="button" class="inert:!cursor-not-allowed inert:opacity-60 p-3 border h-full w-full bg-green-numixs text-black-numixs border-dark-green-numixs hocus:bg-dark-green-numixs hocus:text-black hocus:border-black rounded-md" data-passkey-register="{{ user.email }}">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8 inline">
@@ -66,12 +68,22 @@
                     {% set can_delete_passkey = (user.mot_de_passe != ""  and user.utilise_mdp == true) or user.listPasskeys | length > 1 %}
                     {% for passkey in user.listPasskeys %}
                         <li class="grid grid-cols-[1fr_auto] gap-2">
-                            <button data-passkey="{{ passkey | json }}" command="show-modal" commandfor="manage-passkey" class="flex flex-col items-start border-black-numixs border p-3 w-full hocus:bg-black-numixs hocus:text-white-numixs rounded-md" type="button">
-                                {% set has_been_used = (passkey.derniere_utilisation | date("yyyy") == "1970") %}
-                                {% set date = passkey.derniere_utilisation | date("dd/LL/yyyy 'à' HH:mm") %}
-                                <span class="text-lg font-bold leading-normal">{{ passkey.nom }}</span>
-                                <span class="text-sm font-bold leading-none">Dernière utilisation : {{ "Jamais" if has_been_used else date }}</span>
-                                <span class="text-sm leading-none">Crée le {{ passkey.date_creation | date("dd/LL/yyyy 'à' HH:mm") }}</span>
+                            <button data-passkey="{{ passkey | json }}" command="show-modal" commandfor="manage-passkey" class="border-black-numixs border p-3 w-full hocus:bg-black-numixs hocus:text-white-numixs rounded-md passkey-item" type="button">
+                                <div class="flex flex-col items-center justify-center overflow-hidden">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-8">
+                                        <path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712ZM19.513 8.199l-3.712-3.712-8.4 8.4a5.25 5.25 0 0 0-1.32 2.214l-.8 2.685a.75.75 0 0 0 .933.933l2.685-.8a5.25 5.25 0 0 0 2.214-1.32l8.4-8.4Z" />
+                                        <path d="M5.25 5.25a3 3 0 0 0-3 3v10.5a3 3 0 0 0 3 3h10.5a3 3 0 0 0 3-3V13.5a.75.75 0 0 0-1.5 0v5.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5V8.25a1.5 1.5 0 0 1 1.5-1.5h5.25a.75.75 0 0 0 0-1.5H5.25Z" />
+                                    </svg>
+                                    <p class="text-white-numixs text-xs"> Éditer</p>
+                                </div>
+
+                                <div class="flex flex-col items-start">
+                                    {% set has_been_used = (passkey.derniere_utilisation | date("yyyy") == "1970") %}
+                                    {% set date = passkey.derniere_utilisation | date("dd/LL/yyyy 'à' HH:mm") %}
+                                    <span class="text-lg font-bold leading-normal">{{ passkey.nom }}</span>
+                                    <span class="text-sm font-bold leading-none">Dernière utilisation : {{ "Jamais" if has_been_used else date }}</span>
+                                    <span class="text-sm leading-none">Crée le {{ passkey.date_creation | date("dd/LL/yyyy 'à' HH:mm") }}</span>
+                                </div>
                             </button>
                             <div class="has-inert:cursor-not-allowed aspect-square h-full">
                                 <button {{ "" if can_delete_passkey else "inert" }} data-item-id="{{ passkey.id }}" type="button" class="bg-red-800 text-white-numixs inert:opacity-75 hocus:text-red-800 hocus:bg-transparent p-3 aspect-square h-full rounded-md flex items-center justify-center border border-red-800" command="show-modal" commandfor="delete-passkey">
@@ -86,7 +98,7 @@
                     {% endfor %}
                 </ul>
 
-                <header class="flex flex-row justify-between md:items-center">
+                <header class="flex flex-col justify-between md:flex-row md:items-center">
                     <h2 class="text-xl font-bold mt-5">Changer mot de passe</h2>
                     <label class="cursor-pointer has-disabled:opacity-80 has-disabled:cursor-not-allowed flex gap-2">
                         Se connecter avec un mot de passe
@@ -125,7 +137,7 @@
 <dialog id="manage-passkey" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
     <header class="flex flex-row justify-between items-start">
         <div>
-            <p class="title-font text-4xl">Éditer passkey</p>
+            <p class="title-font text-4xl">Renommer passkey</p>
         </div>
     </header>
     <hr class="pb-1 mt-1 border-green-numixs">
@@ -134,7 +146,7 @@
             <input type="hidden" name="id" id="id">
             <div class="flex flex-col">
                 <label for="nom">Nom</label>
-                <input class="text-black-numixs" type="text" name="nom" id="nom">
+                <input class="text-black-numixs" type="text" name="nom" id="nom" placeholder="">
             </div>
             <div class="flex flex-row gap-3 mt-5">
                 <button type="submit" class="rounded-md gap-2.5 px-3 py-1.5 bg-green-numixs text-black-numixs hocus:bg-dark-green-numixs hocus:text-black items-center">
