@@ -117,7 +117,7 @@ router.get('/inscription', async (req, res) => {
     return res.redirect("/inscription");
 });
 
-router.get('/activation/:token', async (req, res) => {
+router.get(['/activation/{:token}'], async (req, res) => {
     let errorKey = "";
     let user = null;
     let isTokenValid = false;
@@ -150,7 +150,7 @@ router.get('/activation/:token', async (req, res) => {
         signin_email: user?.email || "",
         is_token_valid: isTokenValid,
     });
-}).post('/activation/:token', async (req, res) => {
+}).post('/activation/{:token}', async (req, res) => {
     let errorKey = "";
     const { token } = req.params;
 
@@ -164,6 +164,10 @@ router.get('/activation/:token', async (req, res) => {
     }
 
     try {
+        if (!token) {
+            throw new Error("missing_token");
+        }
+
         const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
 
         const user = await UserModel.findByPk(decoded.userId);

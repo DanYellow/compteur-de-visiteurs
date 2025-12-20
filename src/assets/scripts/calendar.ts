@@ -5,8 +5,8 @@ import type { EventRaw } from "#types";
 const calendarWrapper = document.getElementById("calendar");
 const daysContainer = document.querySelector("[data-list-days]") as HTMLOListElement;
 const navigationMonthsBtns = document.querySelectorAll("[data-navigation-month]");
-const listSiblingsMonthLabel = document.querySelectorAll("[data-month]") as unknown as HTMLSpanElement[];
-const selectYearAndMonth = document.querySelectorAll("[data-calendar-select]") as unknown as HTMLSelectElement[];
+const listSiblingsMonthLabel = document.querySelectorAll("[data-month]") as NodeListOf<HTMLSpanElement>;
+const selectYearAndMonth = document.querySelectorAll("[data-calendar-select]") as NodeListOf<HTMLSelectElement>;
 const calendarDayTplRaw = document.querySelector("[data-template-id='calendar-day']") as HTMLTemplateElement;
 
 let currentDay = DateTime.now();
@@ -70,6 +70,17 @@ const moveToDay = async (date: DateTime) => {
     dayLink = (calendarWrapper!.querySelector(`[data-date="${daySelected}"]`) as HTMLLinkElement);
     dayLink.tabIndex = 0;
     dayLink.focus();
+}
+
+const handleWindowArrowNavigation = (e: KeyboardEvent) => {
+    const isPopoverOpened = calendarWrapper!.matches(':popover-open');
+    if (!isPopoverOpened) {
+        return;
+    }
+
+    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
 }
 
 const handleArrowNavigation = (e: KeyboardEvent) => {
@@ -300,7 +311,7 @@ renderCalendar();
 updateDropdowns();
 
 calendarWrapper?.addEventListener("command", (event) => {
-    if (event.command === "toggle-popover" ) {
+    if (event.command === "toggle-popover") {
         const isOpen = !calendarWrapper!.matches(':popover-open');
         const triggerEl = event.source!;
 
@@ -311,3 +322,5 @@ calendarWrapper?.addEventListener("command", (event) => {
         }
     }
 });
+
+window.addEventListener("keydown", handleWindowArrowNavigation, false);

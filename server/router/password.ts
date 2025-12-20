@@ -52,12 +52,12 @@ router.get('/mot-de-passe-oublie', async (req, res) => {
     return res.redirect("/mot-de-passe-oublie");
 });
 
-router.get('/recuperation-mot-de-passe/:token', async (req, res) => {
+router.get(['/recuperation-mot-de-passe/{:token}'], async (req, res) => {
     let user = null;
     let errorKey = "";
+    const { token } = req.params;
 
     try {
-        const { token } = req.params;
         const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
 
         user = await UserModel.findByPk(decoded.userId);
@@ -83,7 +83,7 @@ router.get('/recuperation-mot-de-passe/:token', async (req, res) => {
         flash_message: errorKey,
         user_email: user?.email,
     });
-}).post('/recuperation-mot-de-passe/:token', async (req, res) => {
+}).post('/recuperation-mot-de-passe/{:token}', async (req, res) => {
     const validator = ChangePasswordSchema.safeParse(req.body);
     const { token } = req.params;
 
@@ -97,6 +97,10 @@ router.get('/recuperation-mot-de-passe/:token', async (req, res) => {
     let errorKey = "";
 
     try {
+        if (!token) {
+            throw new Error("missing_token");
+        }
+
         const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
 
         user = await UserModel.findByPk(decoded.userId);
@@ -110,7 +114,8 @@ router.get('/recuperation-mot-de-passe/:token', async (req, res) => {
         }
 
         await user.update({
-            mot_de_passe: bcrypt.hashSync(String(req.body.password), 8)
+            mot_de_passe: bcrypt.hashSync(String(req.body.password), 8),
+            utilise_mdp: true,
         })
 
         res.render("pages/login.njk", {

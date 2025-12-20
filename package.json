@@ -60,6 +60,6 @@
         "#models/*.ts": "./models/*.ts",
         "#scripts/*.ts": "./src/assets/scripts/*.ts",
         "#types": "./types.ts",
-        "#styles": "./src/assets/styles/*.css"
+        "#styles/*.css": "./src/assets/styles/*.css"
     }
 }

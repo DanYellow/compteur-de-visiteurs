@@ -12,7 +12,7 @@
                 <div class="py-2 px-5">
                     <div class="flex flex-row gap-3">
                         <div class="overflow-hidden">
-                            <p class="title-font text-[1.75rem] text-ellipsis overflow-hidden">
+                            <p title="{{ current_user.prenom ~ " " ~ current_user.nom|uppercase }}" class="title-font text-[1.75rem] text-ellipsis overflow-hidden whitespace-nowrap">
                                 {{ current_user.prenom }}
                                 {{ current_user.nom|uppercase }}
                             </p>
