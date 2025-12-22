@@ -8,6 +8,31 @@ const errorsContainer = document.querySelector(
     "[data-form-errors]"
 ) as HTMLUListElement;
 
+const abortController = new AbortController();
+
+function isFirefox() {
+    return navigator.userAgent.toLowerCase().includes("firefox");
+}
+
+const isConditionalMediationSupported =
+    window.PublicKeyCredential?.isConditionalMediationAvailable &&
+    (await PublicKeyCredential.isConditionalMediationAvailable()) &&
+    !isFirefox();
+
+if (isConditionalMediationSupported) {
+    const passkeyItems = document.querySelectorAll(
+        "[data-passkey-toggle]"
+    ) as NodeListOf<HTMLElement>;
+
+    Array.from(passkeyItems).forEach(async (item) => {
+        (item.parentNode as HTMLElement)!.classList.replace(
+            "md:grid-cols-[1fr_auto_1fr]",
+            "md:grid-cols-1"
+        );
+        item.remove();
+    });
+}
+
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
 
@@ -70,8 +95,7 @@ const validForm = (e: Event) => {
 form?.addEventListener("submit", submitForm);
 form?.addEventListener("input", validForm);
 
-const passkeyLoginButton = document.querySelector("[data-passkey-login]") as HTMLButtonElement;
-passkeyLoginButton?.addEventListener("click", async () => {
+const passkeyConnexion = async (isConditional = false) => {
     const publicKey = await fetch("/passkey/connexion-options", {
         method: "POST",
         headers: {
@@ -83,11 +107,13 @@ passkeyLoginButton?.addEventListener("click", async () => {
         await publicKey.json()
     );
 
-    const credential = (await navigator.credentials.get({
+    const credentials = (await navigator.credentials.get({
+        ...(isConditional && {mediation: "conditional"}),
         publicKey: options,
+        signal: abortController.signal,
     })) as PublicKeyCredential;
 
-    const serializedPublicKey = JSON.stringify(credential.toJSON());
+    const serializedPublicKey = JSON.stringify(credentials.toJSON());
 
     const response = await fetch("/passkey/connexion", {
         method: "POST",
@@ -101,6 +127,21 @@ passkeyLoginButton?.addEventListener("click", async () => {
     if (response.redirected) {
         window.location.href = response.url;
     } else {
-        alert("Une erreur est survenue")
+        alert("Une erreur est survenue");
     }
+};
+
+const passkeyLoginButton = document.querySelector(
+    "[data-passkey-login]"
+) as HTMLButtonElement;
+passkeyLoginButton?.addEventListener("click", async () => {
+    await passkeyConnexion();
 });
+
+(async () => {
+    if (!isConditionalMediationSupported) {
+        return;
+    }
+
+    await passkeyConnexion(true);
+})();

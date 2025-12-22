@@ -70,6 +70,8 @@ router.post("/passkey/creation-options", async (req, res) => {
                 authenticatorSelection: {
                     authenticatorAttachment: "platform",
                     requireResidentKey: true,
+                    residentKey: "required",
+                    userVerification: "preferred",
                 },
             });
 
