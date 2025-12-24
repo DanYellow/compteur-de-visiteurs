@@ -41,15 +41,13 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
                         <menu class="absolute right-3 flex flex-row gap-3">
                             <li>
-                                <button data-download-chart="dailyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                                <button data-download-chart="dailyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                                     {% include "includes/icons/download-fill-icon.svg" %}
                                 </button>
                             </li>
                             <li>
-                                <button data-details-chart="jour" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                                    </svg>
+                                <button data-details-chart="jour" type="button" command="show-modal" commandfor="detailsChartModal" title="Afficher la vue détaillée" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
+                                    {% include "includes/icons/zoom-icon.svg" %}
                                 </button>
                             </li>
                         </menu>
@@ -58,15 +56,13 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
                         <menu class="absolute right-3 flex flex-row gap-3">
                             <li>
-                                <button data-download-chart="weeklyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                                <button data-download-chart="weeklyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                                     {% include "includes/icons/download-fill-icon.svg" %}
                                 </button>
                             </li>
                             <li>
-                                <button data-details-chart="semaine" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                                    </svg>
+                                <button data-details-chart="semaine" type="button" command="show-modal" commandfor="detailsChartModal" title="Afficher la vue détaillée" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
+                                    {% include "includes/icons/zoom-icon.svg" %}
                                 </button>
                             </li>
                         </menu>
@@ -75,15 +71,13 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     <div class="bg-black-numixs p-3 rounded-2xl h-80 relative col-span-full lg:col-[initial]">
                         <menu class="absolute right-3 flex flex-row gap-3">
                             <li>
-                                <button data-download-chart="monthlyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                                <button data-download-chart="monthlyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                                     {% include "includes/icons/download-fill-icon.svg" %}
                                 </button>
                             </li>
                             <li>
-                                <button data-details-chart="mois" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                                    </svg>
+                                <button data-details-chart="mois" type="button" command="show-modal" commandfor="detailsChartModal" title="Afficher la vue détaillée" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
+                                    {% include "includes/icons/zoom-icon.svg" %}
                                 </button>
                             </li>
                         </menu>
@@ -92,15 +86,13 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     <div class="col-span-full bg-black-numixs p-3 rounded-2xl h-96 relative">
                         <menu class="absolute right-3 flex flex-row gap-3">
                             <li>
-                                <button data-download-chart="yearlyChart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                                <button data-download-chart="yearlyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                                     {% include "includes/icons/download-fill-icon.svg" %}
                                 </button>
                             </li>
                             <li>
-                                <button data-details-chart="annee" type="button" command="show-modal" commandfor="detailsChartModal" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
-                                    </svg>
+                                <button data-details-chart="annee" type="button" command="show-modal" commandfor="detailsChartModal" title="Afficher la vue détaillée" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
+                                    {% include "includes/icons/zoom-icon.svg" %}
                                 </button>
                             </li>
                         </menu>
