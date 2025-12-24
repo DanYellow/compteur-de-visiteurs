@@ -117,7 +117,7 @@ router.get('/inscription', async (req, res) => {
     return res.redirect("/inscription");
 });
 
-router.get(['/activation/{:token}'], async (req, res) => {
+router.get(['/activation{/:token}'], async (req, res) => {
     let errorKey = "";
     let user = null;
     let isTokenValid = false;
@@ -150,7 +150,7 @@ router.get(['/activation/{:token}'], async (req, res) => {
         signin_email: user?.email || "",
         is_token_valid: isTokenValid,
     });
-}).post('/activation/{:token}', async (req, res) => {
+}).post('/activation{/:token}', async (req, res) => {
     let errorKey = "";
     const { token } = req.params;
 

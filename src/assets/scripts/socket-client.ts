@@ -1,7 +1,7 @@
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
 import { createNotification } from '#scripts/notifications-manager.ts';
 
-const ws = new WebSocket(`ws://localhost:${import.meta.env.VITE_PORT || 3900}`);
+const ws = new WebSocket(`ws://${window.location.host}`);
 
 ws.addEventListener("message", (event) => {
     const { type } = JSON.parse(event.data);
