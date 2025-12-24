@@ -113,7 +113,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
         ).map((item) => String(item));
 
         const req = await fetch(
-            `api/evenements/${eventData.id}`
+            `/api/evenements/${eventData.id}`
         );
         const res = await req.json();
 

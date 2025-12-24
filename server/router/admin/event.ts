@@ -153,7 +153,12 @@ router.get(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware
             // }
             res.cookie('flash_message', "create_success", { maxAge: 1000, httpOnly: true })
         }
-        res.redirect('/evenements');
+
+        if (req.params.eventId) {
+            res.redirect(`${res.locals.admin_prefix}/evenement/${req.params.eventId}`);
+        } else {
+            res.redirect(`${res.locals.admin_prefix}/evenements`);
+        }
     } catch (e) {
         res.cookie('flash_message', "error", { maxAge: 1000, httpOnly: true })
 
