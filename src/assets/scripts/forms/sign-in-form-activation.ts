@@ -12,6 +12,8 @@ const errorsContainer = document.querySelector(
     "[data-form-errors]"
 ) as HTMLUListElement;
 
+const errorEmailDialog = document.getElementById("error-email")! as HTMLDialogElement;
+
 const createPasskeyBtn = document.querySelector(
     "[data-passkey-register]"
 ) as HTMLButtonElement;
@@ -104,5 +106,7 @@ createPasskeyBtn?.addEventListener("click", async () => {
         } else {
             alert("Une erreur est survenue");
         }
+    } else {
+        errorEmailDialog.showModal();
     }
 })
