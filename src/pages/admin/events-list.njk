@@ -41,6 +41,17 @@ Liste des évènements
 
             <div class="text-black-numixs">
                 {% include "includes/form-banner-success.njk" %}
+
+                <ul class="flex flex-row gap-2 text-xl mb-1.5">
+                    <li>
+                        <a href="?" class="mr-3 hocus:text-dark-green-numixs {{ "border-b-2" if (current_year == year) else "" }}">Tous</a>
+                    </li>
+                    {% for year in list_years %}
+                    <li>
+                        <a href="?annee={{ year }}" class="hocus:text-dark-green-numixs {{ "border-b-2" if (current_year == year) else "" }}">{{ year }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
                 <div class="overflow-x-auto">
                     <table class="w-full bg-white border-collapse whitespace-nowrap">
                         <thead>

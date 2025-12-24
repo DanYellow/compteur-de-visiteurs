@@ -2,7 +2,7 @@ import { Op } from "sequelize";
 import express from "express";
 import { DateTime, Info } from "luxon";
 
-import { Place as PlaceModel, Event as EventModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
+import sequelize, { Place as PlaceModel, Event as EventModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
 import { capitalizeFirstLetter } from '#scripts/utils.shared.ts';
 import { EventSchema } from "#scripts/schemas.ts";
 import { EventRaw, PlaceRaw } from "#types";
@@ -13,14 +13,26 @@ const router = express.Router();
 router.get(['/evenements'], getUser, requireRoleMiddleware(), async (req, res) => {
     const today = DateTime.now();
 
+    const yearSelected = Number(req.query?.annee || today.get("year"));
+    const startDate = new Date(`${yearSelected}-01-01T00:00:00.000Z`);
+    const endDate = new Date(`${yearSelected + 1}-01-01T00:00:00.000Z`);
+
     const listEvents = await EventModel.findAll({
         order: [["date", "DESC"], ["heure_ouverture", "DESC"], ["nom", "ASC"], [{ model: PlaceModel, as: 'listPlaces' }, "nom", "ASC"]],
         where: {
-            ...(req.query.periode ? {
+            ...((req.query?.periode || req.query?.annee) && {
                 date: {
-                    [Op.gte]: `${today.toFormat("yyyy-LL-dd")}`
+                    ...(req.query?.periode && {
+                        [Op.gte]: `${today.toFormat("yyyy-LL-dd")}`,
+                    }),
+                    ...(req.query?.annee && {
+                        [Op.and]: {
+                            [Op.gte]: startDate,
+                            [Op.lt]: endDate
+                        }
+                    }),
                 }
-            } : {})
+            })
         },
         include: [{
             model: PlaceModel, as: "listPlaces", required: false,
@@ -30,10 +42,21 @@ router.get(['/evenements'], getUser, requireRoleMiddleware(), async (req, res) =
         }],
     });
 
+    const listYears = await EventModel.findAll({
+        attributes: [
+            [sequelize.fn('strftime', '%Y', sequelize.col('date')), 'annee']
+        ],
+        group: ['annee'],
+        order: [[sequelize.literal('annee'), 'DESC']],
+        raw: true,
+    });
+
     res.render("pages/admin/events-list.njk", {
         events_list: listEvents.map((p) => p.toJSON()),
         flash_message: req.cookies.flash_message,
         periode: req.query.periode,
+        current_year: req.query?.annee,
+        list_years: (listYears as unknown as {annee: number}[]).map(item => Number(item.annee)),
     });
 })
 

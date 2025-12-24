@@ -362,14 +362,6 @@ button {
     }
 }
 
-/* .choices__list--multiple {
-    .choices__item {
-        background-color: var(--color-green-numixs)!important;
-        border-color: var(--color-dark-green-numixs)!important;
-        color: var(--color-black-numixs)!important;
-    }
-} */
-
 .choices__inner {
     background-color: white !important;
     border-color: oklch(55.1% 0.027 264.364) !important;
@@ -392,28 +384,34 @@ button {
     }
 }
 
-/* .custom-select {
-    &,
-    &::picker(select) {
-        appearance: base-select;
+.pagination, .pagination-active {
+    position: relative;
+    &::after {
+        display: block;
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        aspect-ratio: 1 / 1;
+        z-index: 0;
+        translate: 0 -50%;
+        top: 50%;
     }
 
-    option {
-        display: flex;
-        gap: 1rem;
-        padding: 0.25rem;
-
-        &::checkmark {
-            display: none;
-        }
+    &:is(:focus, :hover)::after {
+        content: "";
     }
+}
 
-    > button {
-        &:has(selectedcontent) {
-            display: flex;
-        gap: 1rem;
-        flex-direction: row;
-        padding: 0.25rem;
-        }
+.pagination-active {
+    color: var(--color-white-numixs);
+    &::after {
+        content: "";
+        background-color: var(--color-gray-numixs);
     }
-} */
+}
+
+.pagination {
+    &::after {
+        background-color: var(--color-green-numixs);
+    }
+}
