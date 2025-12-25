@@ -15,6 +15,7 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
   - Il est aussi possible de télécharger le zip
 - Installer les dépendances : `npm install` dans le dossier du projet
 - Copier et renommer le fichier ".env.dist" en ".env.local"
+    > Note : Pensez à définir toutes les variables sinon des comportements inattendus peuvent survenir
 
 ## Utilisation
 **Développement**
@@ -31,6 +32,7 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 - zod
 - nunjucks
 - expressjs
+- typescript
 
 ## Licence
 

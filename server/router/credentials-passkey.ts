@@ -22,7 +22,7 @@ dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const router = express.Router();
 
-const rpId = process.env.HOSTNAME || "localhost";
+const rpId = process.env.HOSTNAME;
 
 router.post("/passkey/creation-options", async (req, res) => {
     const username = req.body.email;
@@ -172,7 +172,7 @@ router.post("/passkey/connexion-options", async (req, res) => {
 
     try {
         const options = await generateAuthenticationOptions({
-            rpID: rpId,
+            rpID: rpId!,
             allowCredentials: [],
         });
 
