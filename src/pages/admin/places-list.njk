@@ -1,4 +1,4 @@
-{% extends "layouts/page.njk" %}
+{% extends "layouts/admin.njk" %}
 
 {% block title %}
 Liste lieux numixs
@@ -16,64 +16,61 @@ Liste lieux numixs
     {% endif %}
 {% endblock %}
 {% block content %}
-    <div class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
-        {% include "includes/admin-nav.njk" %}
-        <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
-            <header class="flex flex-col md:flex-row gap-y-3 justify-between md:items-center mb-10 -mt-1.5">
-                <h1 class="text-black-numixs title-font font-bold text-6xl">Lieux numixs</h1>
-                {% if user_role.weight >= 100 %}
-                <a href="{{ admin_prefix }}/lieu" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Créer un nouvel lieu</a>
-                {% endif %}
-            </header>
+    <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
+        <header class="flex flex-col md:flex-row gap-y-3 justify-between md:items-center mb-10 -mt-1.5">
+            <h1 class="text-black-numixs title-font font-bold text-6xl">Lieux numixs</h1>
+            {% if user_role.weight >= 100 %}
+            <a href="{{ admin_prefix }}/lieu" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Créer un nouvel lieu</a>
+            {% endif %}
+        </header>
 
-            {% include "includes/hello-banner.njk" %}
-            {# <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 mb-4">Les lieux avec des heures d'ouverture non définis ne peuvent pas être définis pour un évènement ou comme lieu de receuil de visites</p> #}
+        {% include "includes/hello-banner.njk" %}
+        {# <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 mb-4">Les lieux avec des heures d'ouverture non définis ne peuvent pas être définis pour un évènement ou comme lieu de receuil de visites</p> #}
 
-            <div class="text-black-numixs">
-                <div class="overflow-x-auto">
-                    {% include "includes/form-banner-success.njk" %}
-                    <table class="w-full bg-white border-collapse whitespace-nowrap">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <td class="font-bold px-4 py-3 text-left">#</td>
-                                <td class="font-bold px-4 py-3 text-left">Nom</td>
-                                <td class="font-bold px-4 py-3 text-left">Heures d'ouverture</td>
-                                <td class="font-bold px-4 py-3 text-left">Jours fermés</td>
-                                <td class="font-bold px-4 py-3 text-left">Ouvert</td>
-                                <td class="font-bold px-4 py-3 text-left"></td>
+        <div class="text-black-numixs">
+            <div class="overflow-x-auto">
+                {% include "includes/form-banner-success.njk" %}
+                <table class="w-full bg-white border-collapse whitespace-nowrap">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <td class="font-bold px-4 py-3 text-left">#</td>
+                            <td class="font-bold px-4 py-3 text-left">Nom</td>
+                            <td class="font-bold px-4 py-3 text-left">Heures d'ouverture</td>
+                            <td class="font-bold px-4 py-3 text-left">Jours fermés</td>
+                            <td class="font-bold px-4 py-3 text-left">Ouvert</td>
+                            <td class="font-bold px-4 py-3 text-left"></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for place in places_list %}
+                            <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.nom }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                    {% if place.incomplet %}
+                                        Non défini
+                                    {% else %}
+                                    {{ place.heure_ouverture }}-{{ place.heure_fermeture }}
+                                    {% endif %}
+                                </td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.jours_fermeture or "Aucun" }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ "Oui" if place.ouvert == 1 else "Non" }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                    <div class="flex flex-row gap-3">
+                                        <a href="{{ admin_prefix }}/lieu/{{ place.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                        <button type="button" class="font-bold text-red-800 hover:text-red-950" commandfor="delete-place" command="show-modal" data-item-id="{{ place.id }}">Supprimer</button>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {% for place in places_list %}
-                                <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.nom }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                        {% if place.incomplet %}
-                                            Non défini
-                                        {% else %}
-                                        {{ place.heure_ouverture }}-{{ place.heure_fermeture }}
-                                        {% endif %}
-                                    </td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.jours_fermeture or "Aucun" }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ "Oui" if place.ouvert == 1 else "Non" }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                        <div class="flex flex-row gap-3">
-                                            <a href="{{ admin_prefix }}/lieu/{{ place.id }}" class="font-bold hocus:opacity-75">Éditer</a>
-                                            <button type="button" class="font-bold text-red-800 hover:text-red-950" commandfor="delete-place" command="show-modal" data-item-id="{{ place.id }}">Supprimer</button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            {% else %}
-                                <tr class="">
-                                    <td colspan="6" class="px-4 py-3 text-center">
-                                        Pas de lieux
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                        {% else %}
+                            <tr class="">
+                                <td colspan="6" class="px-4 py-3 text-center">
+                                    Pas de lieux
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

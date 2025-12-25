@@ -1,4 +1,4 @@
-{% extends "layouts/page.njk" %}
+{% extends "layouts/admin.njk" %}
 
 {% block title %}
 Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
@@ -20,9 +20,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
 {% endblock %}
 {% block content %}
     {% set place_selected = place.slug %}
-    <div data-place='{{ place | json }}' data-list-events='{{ list_events | json  }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_auto] gap-6">
-        {% include "includes/admin-nav.njk" %}
-        <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
+    <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13" data-place="{{ place | json }}" data-list-events="{{ list_events | json  }}">
             <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 -mt-1.5">
                 <div class="text-black-numixs flex flex-col items-start">
                     <h1 class="title-font font-bold text-6xl">Tableau de bord</h1>
@@ -99,7 +97,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     </div>
                 </div>
             </div>
-    </div>
+
     <dialog id="detailsChartModal" closedby="any" class="max-w-7xl w-full mx-auto text-white-numixs backdrop:bg-white-numixs/20 mt-8 bg-transparent">
         <div class="bg-black-numixs p-3 border border-green-numixs rounded-2xl mx-3 ">
             <div class="relative">

@@ -15,3 +15,7 @@ export const createNotification = (message: string) => {
 
     notificationsContainer?.append(notification);
 }
+
+if (import.meta.env.DEV) {
+    window.createNotification = createNotification;
+}

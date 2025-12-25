@@ -1,4 +1,4 @@
-{% extends "layouts/page.njk" %}
+{% extends "layouts/admin.njk" %}
 
 {% block title %}
 Liste des évènements
@@ -20,105 +20,102 @@ Liste des évènements
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
 {% block content %}
-    <div data-place='{{ place | json }}' class="mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 xl:grid-cols-[260px_minmax(0,_1fr)] gap-6">
-        {% include "includes/admin-nav.njk" %}
-        <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
-            <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 -mt-1.5 gap-3">
-                <div class="text-black-numixs flex flex-col items-start">
-                    <h1 class="title-font font-bold text-6xl">Évènements</h1>
-                    <p>Gestion des ouvertures des lieux en dehors des horaires habituels</p>
-                    <label for="dropdown" class="text-sm">Période</label>
-                    <select data-select-redirect="periode" id="dropdown" class="py-1">
-                        <option value="">Tous</option>
-                        <option {{ "selected" if periode == "a-venir" else "" }} value="a-venir">A venir</option>
-                    </select>
-                </div>
-                <a href="{{ admin_prefix }}/evenement" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Créer un évènement</a>
-            </header>
-            {% include "includes/hello-banner.njk" %}
-            <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 mb-4">Les évènements associés à un lieu s'afficheront dans le calendrier</p>
-
-            <div class="text-black-numixs">
-                {% include "includes/form-banner-success.njk" %}
-
-                <ul class="flex flex-row gap-2 text-xl mb-1.5">
-                    <li>
-                        <a href="?" class="mr-3 hocus:text-dark-green-numixs {{ "border-b-2" if (current_year == year) else "" }}">Tous</a>
-                    </li>
-                    {% for year in list_years %}
-                    <li>
-                        <a href="?annee={{ year }}" class="hocus:text-dark-green-numixs {{ "border-b-2" if (current_year == year) else "" }}">{{ year }}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
-                <div class="overflow-x-auto">
-                    <table class="w-full bg-white border-collapse whitespace-nowrap">
-                        <thead>
-                            <tr class="bg-gray-200">
-                                <td class="font-bold px-4 py-3 text-left">#</td>
-                                <td class="font-bold px-4 py-3 text-left">Nom</td>
-                                <td class="font-bold px-4 py-3 text-left">Jour</td>
-                                <td class="font-bold px-4 py-3 text-left">Heures d'ouverture</td>
-                                <td class="font-bold px-4 py-3 text-left">Lieux concernés</td>
-                                <td class="font-bold px-4 py-3 text-left"></td>
-                                <td class="font-bold px-4 py-3 text-left"></td>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for event in events_list %}
-                                <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ event.nom }}</td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                        <time datetime="{{ event.date }}">
-                                            {{ event.date|date("dd/LL/yyyy") }}
-                                        </time>
-                                    </td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                        {{ event.heure_ouverture|date("HH'h'mm") }}-{{ event.heure_fermeture|date("HH'h'mm") }}
-                                    </td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                        {% if event.listPlaces | length %}
-                                            {% set offset = 1 %}
-                                            {% for place in event.listPlaces %}
-                                                {% if loop.index0 < offset %}
-                                                    {{ place.nom }}
-                                                    {% if loop.index0 < loop.last - 1 %}
-                                                ,
-                                                {% endif %}
-                                                {% endif %}
-                                            {% endfor %}
-                                            {% if event.listPlaces|length - offset > 0 %}
-                                        +{{ event.listPlaces|length - offset }}
-                                            {% endif %}
-                                        {% else %}
-                                        Aucun
-                                        {% endif %}
-                                    </td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                        <a href="{{ admin_prefix }}/evenement/{{ event.id }}" class="font-bold hocus:opacity-75">Éditer</a>
-                                    </td>
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
-                                        <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-event" command="show-modal" data-event-data='{{ event | json }}'>
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
-                                                <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z"/>
-                                                <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                    </td>
-                                </tr>
-                            {% else %}
-                                <tr class="">
-                                    <td colspan="7" class="px-4 py-3 text-center">
-                                        Aucune données
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                {# {% include "includes/pagination.njk" %} #}
+    <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13" data-place='{{ place | json }}'>
+        <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 -mt-1.5 gap-3">
+            <div class="text-black-numixs flex flex-col items-start">
+                <h1 class="title-font font-bold text-6xl">Évènements</h1>
+                <p>Gestion des ouvertures des lieux en dehors des horaires habituels</p>
+                <label for="dropdown" class="text-sm">Période</label>
+                <select data-select-redirect="periode" id="dropdown" class="py-1">
+                    <option value="">Tous</option>
+                    <option {{ "selected" if periode == "a-venir" else "" }} value="a-venir">A venir</option>
+                </select>
             </div>
+            <a href="{{ admin_prefix }}/evenement" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white self-start md:self-auto">Créer un évènement</a>
+        </header>
+        {% include "includes/hello-banner.njk" %}
+        <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 mb-4">Les évènements associés à un lieu s'afficheront dans le calendrier</p>
+
+        <div class="text-black-numixs">
+            {% include "includes/form-banner-success.njk" %}
+
+            <ul class="flex flex-row gap-2 text-xl mb-1.5">
+                <li>
+                    <a href="?" class="mr-3 hocus:text-dark-green-numixs {{ "border-b-2" if (current_year == year) else "" }}">Tous</a>
+                </li>
+                {% for year in list_years %}
+                <li>
+                    <a href="?annee={{ year }}" class="hocus:text-dark-green-numixs {{ "border-b-2" if (current_year == year) else "" }}">{{ year }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+            <div class="overflow-x-auto">
+                <table class="w-full bg-white border-collapse whitespace-nowrap">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <td class="font-bold px-4 py-3 text-left">#</td>
+                            <td class="font-bold px-4 py-3 text-left">Nom</td>
+                            <td class="font-bold px-4 py-3 text-left">Jour</td>
+                            <td class="font-bold px-4 py-3 text-left">Heures d'ouverture</td>
+                            <td class="font-bold px-4 py-3 text-left">Lieux concernés</td>
+                            <td class="font-bold px-4 py-3 text-left"></td>
+                            <td class="font-bold px-4 py-3 text-left"></td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for event in events_list %}
+                            <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ event.nom }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                    <time datetime="{{ event.date }}">
+                                        {{ event.date|date("dd/LL/yyyy") }}
+                                    </time>
+                                </td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                    {{ event.heure_ouverture|date("HH'h'mm") }}-{{ event.heure_fermeture|date("HH'h'mm") }}
+                                </td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                    {% if event.listPlaces | length %}
+                                        {% set offset = 1 %}
+                                        {% for place in event.listPlaces %}
+                                            {% if loop.index0 < offset %}
+                                                {{ place.nom }}
+                                                {% if loop.index0 < loop.last - 1 %}
+                                            ,
+                                            {% endif %}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if event.listPlaces|length - offset > 0 %}
+                                    +{{ event.listPlaces|length - offset }}
+                                        {% endif %}
+                                    {% else %}
+                                    Aucun
+                                    {% endif %}
+                                </td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                    <a href="{{ admin_prefix }}/evenement/{{ event.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                </td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
+                                    <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-event" command="show-modal" data-event-data='{{ event | json }}'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+                                            <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z"/>
+                                            <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr class="">
+                                <td colspan="7" class="px-4 py-3 text-center">
+                                    Aucune données
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {# {% include "includes/pagination.njk" %} #}
         </div>
     </div>
 
