@@ -1,10 +1,11 @@
 {% extends "layouts/base.njk" %}
 {% block root %}
     <main class="mt-10 mb-8">
+        <div data-notifications-container class="fixed left-2 top-2 z-50 empty:h-0"></div>
         {% block content %}{% endblock %}
     </main>
 
-    <template data-template-id="new-member-notification">
+    <template data-template-id="notification">
         <div class="flex items-center w-full max-w-96 p-4 mb-4 text-gray-500 bg-white rounded-lg shadow-sm notification" data-notification role="alert">
             <div class="inline-flex items-center justify-center shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg">
                 <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">

@@ -1,4 +1,4 @@
-const notificationTplRaw = document.querySelector("[data-template-id='new-member-notification']") as HTMLTemplateElement;
+const notificationTplRaw = document.querySelector("[data-template-id='notification']") as HTMLTemplateElement;
 const notificationsContainer = document.querySelector("[data-notifications-container]");
 
 export const createNotification = (message: string) => {
