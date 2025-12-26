@@ -361,7 +361,7 @@ const listCharts = Object.values(configData);
                         })
                         ,
                         totalVisitors: {
-                            text: 'Total : ' + res.data.length,
+                            text: 'Visites : ' + res.data.length,
                             totalColor: greenNumixs,
                         },
                         datalabels: {
@@ -563,7 +563,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                             },
                         },
                         totalVisitors: {
-                            text: 'Total : ' + totalVisits,
+                            text: 'Visites : ' + totalVisits,
                             fontSize: "18px",
                             totalColor: greenNumixs,
                         },

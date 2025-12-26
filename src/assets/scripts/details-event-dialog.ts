@@ -188,7 +188,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                         }
                     },
                     totalVisitors: {
-                        text: "Total : " + allVisits.length,
+                        text: "Visites : " + allVisits.length,
                         totalColor: greenNumixs,
                     },
                     subtitle: {

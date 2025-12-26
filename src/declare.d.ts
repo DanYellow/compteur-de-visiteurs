@@ -16,4 +16,8 @@ declare global {
         source?: HTMLElement | null;
         command?: string | null;
     }
+
+    interface Window {
+        createNotification: (message: string) => void;
+    }
 }

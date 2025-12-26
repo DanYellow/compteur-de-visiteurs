@@ -31,9 +31,6 @@ export const createPasskey = async (publicKey: string) => {
     });
 };
 
-export const isPasskeysSupported =
-  window.PublicKeyCredential &&
-  typeof PublicKeyCredential === "function";
 
 export const togglePasskeysVisibility = () => {
     const passkeyItems = document.querySelectorAll(
@@ -50,16 +47,12 @@ export const togglePasskeysVisibility = () => {
         });
     }
 
-    if (!isPasskeysSupported) {
+    if (!window.PublicKeyCredential) {
         return hideElements();
     }
 
-    Promise.all([
-        PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(),
-        PublicKeyCredential.isConditionalMediationAvailable(),
-    ]).then((results) => {
-        if (results.some((r) => r === false)) {
-            hideElements();
-        }
+    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+    .then((isAvailable) => {
+      if (!isAvailable) hideElements();
     });
 };

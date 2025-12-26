@@ -19,20 +19,6 @@ const isConditionalMediationSupported =
     (await PublicKeyCredential.isConditionalMediationAvailable()) &&
     !isFirefox();
 
-if (isConditionalMediationSupported) {
-    const passkeyItems = document.querySelectorAll(
-        "[data-passkey-toggle]"
-    ) as NodeListOf<HTMLElement>;
-
-    Array.from(passkeyItems).forEach(async (item) => {
-        (item.parentNode as HTMLElement)!.classList.replace(
-            "md:grid-cols-[1fr_auto_1fr]",
-            "md:grid-cols-1"
-        );
-        item.remove();
-    });
-}
-
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
 
@@ -112,6 +98,7 @@ const passkeyConnexion = async (isConditional = false) => {
         publicKey: options,
         signal: abortController.signal,
     })) as PublicKeyCredential;
+
 
     const serializedPublicKey = JSON.stringify(credentials.toJSON());
 
