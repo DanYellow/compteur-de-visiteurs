@@ -524,6 +524,8 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                 type: 'line',
                 data: data,
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: chartScales(xTitle, 18),
                     plugins: {
                         legend: {
