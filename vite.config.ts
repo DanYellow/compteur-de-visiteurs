@@ -3,6 +3,8 @@ import { defineConfig, loadEnv, type UserConfig } from "vite";
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
 
+const isDocker = process.env.IS_DOCKER === 'true';
+
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '');
 
@@ -17,16 +19,26 @@ export default defineConfig(({ mode }) => {
         server: {
             // Expose the server to the network allowing access from ip address
             host: true,
+            port: 5173,
             hmr: {
-                port: 24678,
+                host: isDocker ? 'localhost' : undefined,
+                port: 5173,
+                protocol: 'ws',
             },
             middlewareMode: true,
-            // origin: "http://0.0.0.0:8080",
-            // ...(process.env.VITE_USE_POLLING === "true" ? {
-            //     watch: {
-            //         usePolling: true,
-            //     }
-            // } : {})
+            ...(isDocker ? {
+                watch: {
+                    usePolling: true,
+                    interval: 100,
+                }
+            } : {}),
+            fs: {
+                strict: true,
+                allow: [
+                    'public',
+                    'src'
+                ]
+            },
         },
         build: {
             emptyOutDir: false,
