@@ -1,0 +1,27 @@
+@import "tailwindcss";
+
+@theme {
+    --color-gray-numixs: #312f2f;
+    /* #373736 */
+    --color-black-numixs: #312f2f;
+    /* --color-black-numixs: #2c3344; */
+    --color-gray-input-border-numixs: #b6bcc8;
+    --color-gray-input-numixs: #d9d5d5;
+    --color-green-numixs: #d5d916;
+    --color-dark-green-numixs: #acb115;
+    --color-disabled: #f5f5f5;
+    --color-white-numixs: #f5f5f5;
+
+    --color-lime-*: initial;
+    --color-fuchsia-*: initial;
+    --color-cyan-*: initial;
+    --color-orange-*: initial;
+    --color-pink-*: initial;
+    --color-teal-*: initial;
+    --color-emerald-*: initial;
+    --color-purple-*: initial;
+}
+
+@utility title-font {
+    font-family: "Agency FB", sans-serif;
+}

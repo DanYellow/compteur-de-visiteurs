@@ -166,6 +166,9 @@ router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` :
 if (process.env.NODE_ENV === "development") {
     const DebugRouter = await import("./debug.ts");
     router.use("/debug", DebugRouter.default);
+
+    const EmailRouter = await import("./email.ts");
+    router.use("/email", EmailRouter.default);
 }
 
 export default router;

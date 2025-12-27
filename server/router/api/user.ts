@@ -1,5 +1,4 @@
 import express from "express";
-import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import nunjucks from "nunjucks";
 import jwt from "jsonwebtoken";
@@ -8,31 +7,12 @@ import {
     User as UserModel,
     UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
 } from "#models/index.ts";
+import { mailTransporter } from "#server/utils.ts";
 import { requireRoleMiddleware } from "#server/middlewares.ts";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const router = express.Router();
-
-const transporter = nodemailer.createTransport({
-    ...(process.env.NODE_ENV === "development"
-        ? {
-            port: 1025,
-            host: "localhost",
-            tls: {
-                rejectUnauthorized: false,
-            },
-        }
-        : {
-            host: process.env.EMAIL_SERVER_NOREPLY,
-            port: 587,
-            secure: false, // true for 465, false for other ports
-            auth: {
-                user: process.env.EMAIL_NOREPLY,
-                pass: process.env.EMAIL_PASSWORD_NOREPLY,
-            },
-        }),
-});
 
 router.post("/utilisateur/activation", requireRoleMiddleware("ADMIN"), async (req, res) => {
     const user = await UserModel.findByPk(Number(req.body.userId));
@@ -58,7 +38,7 @@ router.post("/utilisateur/activation", requireRoleMiddleware("ADMIN"), async (re
                     activation_link: activationLink,
                 });
 
-                const info = await transporter.sendMail({
+                const info = await mailTransporter.sendMail({
                     from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
                     to: user.email,
                     subject: "Activation de votre compte Fablab Numixs",

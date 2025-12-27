@@ -10,6 +10,8 @@ import base64url from "base64url";
 import dotenv from "dotenv";
 import { isoBase64URL, isoUint8Array } from "@simplewebauthn/server/helpers";
 import jwt from "jsonwebtoken";
+import nunjucks from "nunjucks";
+import juice from "juice";
 
 import {
     User as UserModel,
@@ -17,12 +19,30 @@ import {
 } from "#models/index.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 import { CustomSession, UserTokenData } from "#types";
+import { mailTransporter, renderEmail } from "#server/utils.ts";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const router = express.Router();
 
 const rpId = process.env.HOSTNAME;
+
+router.get("/passkey", async (req, res) => {
+    const activationLink = `${req.protocol}://${req.get(
+        "host"
+    )}/activation`;
+
+    const info = await mailTransporter.sendMail({
+        from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
+        to: "user.email@test.com",
+        subject: "Validation d'un nouveau passkey pour votre compte Fablab Numixs",
+        text: "Hello world?", // plain‑text body
+        html: renderEmail("emails/new-passkey.njk"), // HTML body
+    });
+    // console.log("Message sent:", info.messageId);
+
+    res.send("rrrr");
+})
 
 router.post("/passkey/creation-options", async (req, res) => {
     const username = req.body.email;
@@ -61,7 +81,7 @@ router.post("/passkey/creation-options", async (req, res) => {
 
             const options = await generateRegistrationOptions({
                 rpName: "webauthn-app",
-                rpID: rpId,
+                rpID: rpId!,
                 userID: isoUint8Array.fromUTF8String(String(user.id)),
                 userName: username,
                 userDisplayName: `${username || ""} - Numixs`,
@@ -93,7 +113,7 @@ router.post("/passkey/creation", async (req, res) => {
     const expectedChallenge = session.challenge!;
 
     const expectedOrigin = [`${req.protocol}://${req.get("host")}`!];
-    // Verify the attestation response
+    // Verify the attestation response https://web.dev/articles/passkey-registration?hl=fr
     let verification;
     try {
         verification = await verifyRegistrationResponse({
@@ -126,15 +146,15 @@ router.post("/passkey/creation", async (req, res) => {
                 Buffer.from(credentialID)
             );
 
-            const base64PublicKey = base64url.encode(Buffer.from(publicKey));
+            // const base64PublicKey = base64url.encode(Buffer.from(publicKey));
 
-            await UserPublicKeyCredentialsModel.create({
-                user_id: user.id,
-                id_externe: base64CredentialID,
-                cle_publique: base64PublicKey,
-                aaguid,
-                compteur: 0,
-            });
+            // await UserPublicKeyCredentialsModel.create({
+            //     user_id: user.id,
+            //     id_externe: base64CredentialID,
+            //     cle_publique: base64PublicKey,
+            //     aaguid,
+            //     compteur: 0,
+            // });
 
             try {
                 jwt.verify(
@@ -146,6 +166,28 @@ router.post("/passkey/creation", async (req, res) => {
                     "passkey_created",
                     flashMessageCookieOptions
                 );
+
+                const token = jwt.sign(
+                    { userId: user.id, challenge: expectedChallenge, },
+                    String(process.env.JWT_ACTIVATION_SECRET),
+                    {
+                        expiresIn: (process.env.JWT_ACTIVATION_EXPIRES ?? '1d') as jwt.SignOptions['expiresIn'],
+                    }
+                );
+
+                const activationLink = `${req.protocol}://${req.get(
+                    "host"
+                )}/activation/${token}`;
+                const html = nunjucks.render("pages/emails/new-passkey.njk");
+
+                const info = await mailTransporter.sendMail({
+                    from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
+                    to: user.email,
+                    subject: "Validation d'un nouveau passkey pour votre compte Fablab Numixs",
+                    text: "Hello world?", // plain‑text body
+                    html: html, // HTML body
+                });
+                console.log("Message sent:", info.messageId);
 
                 return res.redirect(
                     `${res.locals.admin_prefix}/utilisateur/moi/passkeys`
