@@ -110,6 +110,12 @@ export interface UserTokenData extends JwtPayload {
     userId?: number;
 }
 
+export interface PasskeyTokenData extends JwtPayload {
+    email: string;
+    role: string;
+    userId?: number;
+}
+
 export interface CustomSession extends SessionData {
     return_to?: string;
     user?: {

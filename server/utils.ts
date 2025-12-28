@@ -34,14 +34,16 @@ export const renderEmail = (template: string, data: Record<string, any> = {}) =>
         "utf8"
     );
 
-    const html = nunjucks.render(template, {
+    const rawHtml = nunjucks.render(template, {
         ...data,
-        tailwindCss
+        tailwindCss,
     });
 
-    return juice(html, {
+    return juice(rawHtml, {
         applyStyleTags: true,
         removeStyleTags: true,
-        preserveMediaQueries: true
-    });
+        resolveCSSVariables: true,
+        // preserveMediaQueries: true,
+        // insertPreservedExtraCss: true,
+    }).replace(/<style[\s\S]*?<\/style>/gi, '');
 }

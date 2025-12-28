@@ -1,16 +1,71 @@
 import express from "express";
 import dotenv from "dotenv";
-import bcrypt from "bcryptjs";
 
-import { mailTransporter, renderEmail } from "#server/utils.ts";
-import { User as UserModel } from "#models/index.ts";
+import { DateTime } from "luxon";
+import nunjucks from "nunjucks";
+
+import { renderEmail } from "#server/utils.ts";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const router = express.Router();
 
 router.get("/passkey", async (req, res) => {
-    return res.send(renderEmail("emails/new-passkey.njk"));
+    const activationLink = `${req.protocol}://${req.get("host")}/passkey/activation/`;
+
+    if ("text" in req.query) {
+        return res.send(
+            nunjucks.render("emails/new-passkey.txt.njk", {
+                date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
+                activation_link: activationLink,
+            })
+        );
+    }
+
+    return res.send(renderEmail("emails/new-passkey.njk", {
+        date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
+        activation_link: activationLink,
+        nom: "Thomas",
+        prenom: "Marc",
+    }));
+});
+
+router.get("/changement-mdp", async (req, res) => {
+    const activationLink = `${req.protocol}://${req.get("host")}/passkey/activation/`;
+
+    if ("text" in req.query) {
+        return res.send(
+            nunjucks.render("emails/new-password.txt.njk", {
+                date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
+                activation_link: activationLink,
+            })
+        );
+    }
+    return res.send(renderEmail("emails/new-password.njk", {
+        date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
+        activation_link: activationLink,
+        nom: "Thomas",
+        prenom: "Marc",
+    }));
+});
+
+router.get("/activation", async (req, res) => {
+    const activationLink = `${req.protocol}://${req.get("host")}/passkey/activation/`;
+
+    if ("text" in req.query) {
+        return res.send(
+            nunjucks.render("emails/user-activation.txt.njk", {
+                date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
+                activation_link: activationLink,
+            })
+        );
+    }
+    return res.send(renderEmail("emails/user-activation.njk", {
+        date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
+        activation_link: activationLink,
+        nom: "Thomas",
+        prenom: "Marc",
+    }));
 });
 
 

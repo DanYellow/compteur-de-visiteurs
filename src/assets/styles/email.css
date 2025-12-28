@@ -1,0 +1,7 @@
+@import "tailwindcss/utilities";
+
+@config "../../../tailwind.email.config.ts";
+
+/* @config "../../../tailwind.email.config.js"; */
+
+/* npx @tailwindcss/cli -i ./src/assets/styles/email.css -o ./dist/tailwind-email.css  */
