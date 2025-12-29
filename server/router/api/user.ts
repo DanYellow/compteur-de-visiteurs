@@ -37,6 +37,7 @@ router.post("/utilisateur/activation", requireRoleMiddleware("ADMIN"), async (re
                 )}/activation/${token}`;
                 const html = renderEmail("emails/user-activation.njk", {
                     activation_link: activationLink,
+                    host_path: `${req.protocol}://${req.get("host")}`,
                 });
 
                 const info = await mailTransporter.sendMail({
@@ -116,16 +117,20 @@ router.post("/utilisateur/generer-nouveau-mdp", async (req, res) => {
     const activationLink = `${req.protocol}://${req.get(
         "host"
     )}/recuperation-mot-de-passe/${token}`;
-    const html = nunjucks.render("pages/emails/new-password.njk", {
+
+    const html = renderEmail("emails/new-password.njk", {
         activation_link: activationLink,
+        host_path: `${req.protocol}://${req.get("host")}`,
     });
 
     const info = await mailTransporter.sendMail({
         from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
         to: user.email,
         subject: "Récupération de votre mot de passe Fablab Numixs",
-        text: "Hello world?", // plain‑text body
-        html: html, // HTML body
+        text: nunjucks.render("emails/new-password.txt.njk", {
+            activation_link: activationLink,
+        }),
+        html, // HTML body
     });
     console.log("Message sent:", info.messageId);
 

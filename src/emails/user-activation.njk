@@ -1,11 +1,14 @@
 {% extends "layouts/email.njk" %}
 
+
+{% block title %}
+    Activation de compte numixs
+{% endblock %}
 {% block content %}
-    <p>Bonjour <span class="font-bold">{{ prenom }}
-            {{ nom|uppercase }},</span></p>
-    <p>Votre compte a été activé. Pour finaliser votre compte suivez les étapes suivantes :</p>
+    <p>Bonjour,</p>
+    <p>Votre compte a été activé. Pour finaliser votre compte suivez les étapes suivantes&nbsp;:</p>
     <div>
-        <p>1.&nbsp;&nbsp;Accéder à la page d'activation via le lien dédié :</p>
+        <p>1.&nbsp;&nbsp;Accédez à la page d'activation via le lien dédié :</p>
         <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                     <td align="center" class="py-3">
@@ -24,5 +27,5 @@
                 Attention lien n'est actif que 24 heures. S'il expire, il faudra demander à un administrateur d'envoyer un autre lien.
             </p>
     </div>
-    <p>2.&nbsp;&nbsp;Définissez un mot de passe ou un Passkey (si votre appareil le permet)</p>
+    <p>2.&nbsp;&nbsp;Suivez les étapes sur la page d'activation de votre compte</p>
 {% endblock %}

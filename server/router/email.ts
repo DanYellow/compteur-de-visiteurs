@@ -12,7 +12,6 @@ const router = express.Router();
 
 router.get("/passkey", async (req, res) => {
     const activationLink = `${req.protocol}://${req.get("host")}/passkey/activation/`;
-
     if ("text" in req.query) {
         return res.send(
             nunjucks.render("emails/new-passkey.txt.njk", {
@@ -27,6 +26,7 @@ router.get("/passkey", async (req, res) => {
         activation_link: activationLink,
         nom: "Thomas",
         prenom: "Marc",
+        host_path: `${req.protocol}://${req.get("host")}`,
     }));
 });
 
@@ -46,6 +46,7 @@ router.get("/changement-mdp", async (req, res) => {
         activation_link: activationLink,
         nom: "Thomas",
         prenom: "Marc",
+        host_path: `${req.protocol}://${req.get("host")}`,
     }));
 });
 
@@ -65,6 +66,7 @@ router.get("/activation", async (req, res) => {
         activation_link: activationLink,
         nom: "Thomas",
         prenom: "Marc",
+        host_path: `${req.protocol}://${req.get("host")}`,
     }));
 });
 

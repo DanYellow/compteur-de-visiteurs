@@ -14,17 +14,10 @@ export default {
             'green-numixs': '#d5d916',
             'white-numixs': '#f5f5f5',
             'gray-numixs': '#312f2f',
-            gray: {
-                100: '#fff001',
-                300: '#d1d5db',
-                600: '#4b5563',
-            },
             amber: {
                 50: '#fffbeb',
                 800: '#973c00',
             },
-            primary: '#2563eb',
-            danger: '#dc2626',
         },
         fontFamily: {
             sans: ['Calibri', 'sans-serif'],
@@ -48,30 +41,7 @@ export default {
             base: "18px",
         },
 
-        extend: {
-            // colors: {
-            //     'gray-numixs': 'red',
-            // },
-        },
+        extend: {},
     },
-    corePlugins: {
-        preflight: false,
-        ringWidth: false,
-        ringColor: false,
-        ringOpacity: false,
-        ringOffsetWidth: false,
-        ringOffsetColor: false,
-        ringOffsetOpacity: false,
-        outline: false,
-    },
-    variants: {
-        ringWidth: [],
-        ringColor: [],
-        ringOpacity: [],
-        ringOffsetWidth: [],
-        ringOffsetColor: [],
-        ringOffsetOpacity: [],
-        outline: [],
-    }
 };
 // https://tailwindcss.com/docs/upgrade-guide#using-a-javascript-config-file

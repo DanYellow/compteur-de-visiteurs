@@ -3,15 +3,20 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Document</title>
         <style>
             {{tailwindCss | safe}}
         </style>
+        <title>
+            {% block title %}
+                E-mail numixs
+            {% endblock %}
+        </title>
     </head>
     <body class="p-0 m-0">
         <table width="100%" class="bg-gray-numixs text-white-numixs px-3 font-sans text-base" role="presentation" width="100%" cellpadding="0" cellspacing="0" bgcolor="red">
             <tr>
                 <td align="center">
+                    <img src="{{ host_path }}/images/header-email.jpg" class="rounded-md mt-2 w-full h-auto" alt="">
                     {% block content %}{% endblock %}
                 </td>
             </tr>
