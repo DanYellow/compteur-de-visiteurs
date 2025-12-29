@@ -24,7 +24,7 @@ Liste utilisateurs
                 <h1 class="title-font font-bold text-6xl">Utilisateurs</h1>
                 <select data-select-redirect="actif" id="dropdown" class="py-1">
                     <option value="">Tous</option>
-                    <option {{ "selected" if actif == "1" else "" }}  value="1">A activer</option>
+                    <option {{ "selected" if actif == "1" else "" }}  value="1">A approuver</option>
                 </select>
             </div>
         </header>
@@ -40,9 +40,27 @@ Liste utilisateurs
                             <td class="font-bold px-4 py-3 text-left">#</td>
                             <td class="font-bold px-4 py-3 text-left">Prénom / Nom</td>
                             <td class="font-bold px-4 py-3 text-left">Adresse e-mail</td>
-                            <td class="font-bold px-4 py-3 text-left">Rôle</td>
-                            <td class="font-bold px-4 py-3 text-left">Actif</td>
+                            <td class="font-bold px-4 py-3 text-left">
+                                <span class="inline-flex items-center gap-2">
+                                    Rôle
+                                    <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-roles" command="show-modal" data-event-data='{{ event | json }}'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+                                            <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                </span>
+                            </td>
                             <td class="font-bold px-4 py-3 text-left">Activer</td>
+                            <td class="font-bold px-4 py-3 text-left">
+                                <span class="inline-flex items-center gap-2">
+                                    Approuver
+                                    <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="approved-status" command="show-modal" data-event-data='{{ event | json }}'>
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
+                                            <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </button>
+                                </span>
+                            </td>
                             <td class="font-bold px-4 py-3 text-left">Date inscription</td>
                             <td class="font-bold px-4 py-3 text-left">Dernière connexion</td>
                             <td class="font-bold px-4 py-3 text-left"></td>
@@ -50,39 +68,37 @@ Liste utilisateurs
                     </thead>
                     <tbody>
                         {% for user in list_users %}
+                            {% set has_never_been_used = (user.derniere_connexion | date("yyyy") == "1970") %}
                             <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.prenom }}
                                     {{ user.nom }}</td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.email }}</td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                    <span class="inline-flex items-center gap-2">
-                                        {{ user.role.label }}
-                                        <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-roles" command="show-modal" data-event-data='{{ event | json }}'>
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
-                                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
-                                            </svg>
-                                        </button>
-                                    </span>
+                                    {{ user.role.label }}
                                 </td>
-                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ "Oui" if user.actif == 1 else "Non" }}</td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                     <label class="cursor-pointer has-disabled:opacity-80 has-disabled:cursor-not-allowed">
-                                        <input type="checkbox" value="{{ user.actif }}" {{ "checked" if user.actif == 1 else "" }} {{ "disabled" if user.actif == 1 and user.role.weight >= 100 else "" }} data-change-user-status="{{ user.id }}" class="sr-only peer">
+                                        <input type="checkbox" value="{{ user.actif }}" {{ "checked" if user.actif == 1 else "" }} {{ "disabled" if user.actif == 1 and user.role.weight >= 100 else "" }} data-change-user-status='{"id": {{ user.id }}, "key": "actif"}' class="sr-only peer">
+                                        <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-checked:bg-green-numixs rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-focus:ring-dark-green-numixs/30"></div>
+                                    </label>
+                                </td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                    <label class="cursor-pointer has-disabled:opacity-80 has-disabled:cursor-not-allowed">
+                                        <input type="checkbox" value="{{ user.approuve }}" {{ "checked" if user.approuve == 1 else "" }} {{ "disabled" if user.approuve == 1 else "" }} data-change-user-status='{"id": {{ user.id }}, "key": "approuve"}' class="sr-only peer">
                                         <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-checked:bg-green-numixs rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-focus:ring-dark-green-numixs/30"></div>
                                     </label>
                                 </td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ user.date_inscription|date("dd/LL/yyyy 'à' HH:mm") }}</td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
-                                    {% set has_been_used = (user.derniere_connexion | date("yyyy") == "1970") %}
                                     {% set date = user.derniere_connexion | date("dd/LL/yyyy 'à' HH:mm") %}
 
-                                    {{ "Jamais" if has_been_used else date }}
+                                    {{ "Jamais" if has_never_been_used else date }}
                                 </td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                     <div class="flex flex-col gap-1.5 items-start">
-                                        {% if user.actif == false and user_role.weight >= 100 %}
-                                        <button type="button" data-send-activation-email="{{ user.id }}" class="font-bold hocus:opacity-75">Envoyer e-mail d'activation</button>
+                                        {% if user.approuve == true and user_role.weight >= 100 and has_never_been_used %}
+                                        <button type="button" data-send-activation-email="{{ user.id }}" class="font-bold hocus:opacity-75">Envoyer e-mail d'approbation</button>
                                         {% endif %}
                                         <a href="{{ admin_prefix }}/utilisateur/{{ user.id }}" class="font-bold hocus:opacity-75">Éditer</a>
                                         {% if (user.role.weight < 100 and user_role.weight >= 100) or (user_role.weight >= 1000) %}
@@ -124,6 +140,31 @@ Liste utilisateurs
                 <button type="button" command="close" commandfor="delete-user" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-xl text-white-numixs">Annuler</button>
             </div>
         </form>
+    </dialog>
+
+
+    <dialog id="approved-status" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-2xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Statut de l'utilisateur</p>
+            </div>
+            <button type="button" command="close" commandfor="approved-status" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <ul class="list-disc list-inside">
+            <li>
+                <span class="font-bold">Approuver :</span> Permet à utilisateur de finaliser son compte pour lui permettre de se connecter
+            </li>
+            <li>
+                <span class="font-bold">Activer :</span> Permet à utilisateur de se connecter ou non
+            </li>
+        </ul>
+        <p>Un compte approuvé ne peut pas être désapprouvé. En revanche, un administrateur peut toujours le désactiver. Une désactivation bloque la connexion de l'utilisateur.</p>
     </dialog>
 
     {% include "includes/detail-roles.njk" %}

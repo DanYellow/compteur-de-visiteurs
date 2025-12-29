@@ -152,7 +152,7 @@ router.post("/passkey/creation", async (req, res) => {
 
                 const token = jwt.sign(
                     { userId: user.id, challenge: expectedChallenge, },
-                    String(process.env.JWT_ACTIVATION_SECRET),
+                    String(process.env.JWT_APPROVAL_SECRET),
                     {
                         expiresIn: (process.env.JWT_ACTIVATION_EXPIRES ?? '1d') as jwt.SignOptions['expiresIn'],
                     }
@@ -209,7 +209,7 @@ router.get("/passkey/activation{/:token}/", async (req, res) => {
         }
 
         const expectedOrigin = [`${req.protocol}://${req.get("host")}`!];
-        const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as PasskeyTokenData;
+        const decoded = jwt.verify(token, process.env.JWT_APPROVAL_SECRET!) as PasskeyTokenData;
 
         // Verify the attestation response https://web.dev/articles/passkey-registration?hl=fr
         const { verified, registrationInfo } = await verifyRegistrationResponse({

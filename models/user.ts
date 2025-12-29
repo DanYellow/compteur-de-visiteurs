@@ -26,6 +26,7 @@ export default class User extends Model<
     declare mot_de_passe?: string;
     declare prenom?: string;
     declare actif?: boolean;
+    declare approuve?: boolean;
     declare derniere_connexion?: string;
     declare role?: string;
     declare utilise_mdp?: boolean;
@@ -62,6 +63,11 @@ export default class User extends Model<
                     allowNull: true,
                 },
                 actif: {
+                    type: DataTypes.BOOLEAN,
+                    allowNull: false,
+                    defaultValue: false,
+                },
+                approuve: {
                     type: DataTypes.BOOLEAN,
                     allowNull: false,
                     defaultValue: false,

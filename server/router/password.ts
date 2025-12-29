@@ -58,7 +58,7 @@ router.get(['/recuperation-mot-de-passe/{:token}'], async (req, res) => {
     const { token } = req.params;
 
     try {
-        const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
+        const decoded = jwt.verify(token, process.env.JWT_APPROVAL_SECRET!) as UserTokenData;
 
         user = await UserModel.findByPk(decoded.userId);
 

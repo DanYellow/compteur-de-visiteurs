@@ -9,7 +9,7 @@ dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const router = express.Router();
 
-router.get("/activation", async (req, res) => {
+router.get("/approbation", async (req, res) => {
     if (req.query.email) {
         const user = await UserModel.findOne({
             where: { email: String(req.query.email) },

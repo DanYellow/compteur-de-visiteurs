@@ -33,6 +33,9 @@ export default {
             6: '6px',
             8: '8px',
         },
+        width: {
+            14: "56px",
+        },
         borderStyle: {
             solid: 'solid',
             none: 'none',

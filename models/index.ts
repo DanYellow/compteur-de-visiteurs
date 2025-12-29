@@ -124,6 +124,7 @@ if (adminCount === 0) {
         mot_de_passe: bcrypt.hashSync(process.env.DEFAULT_ADMIN_PASSWORD!, 8),
         role: "ADMIN",
         actif: true,
+        approuve: true,
     });
     console.log("✅ Admin account created");
 }

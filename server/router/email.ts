@@ -50,8 +50,8 @@ router.get("/changement-mdp", async (req, res) => {
     }));
 });
 
-router.get("/activation", async (req, res) => {
-    const activationLink = `${req.protocol}://${req.get("host")}/passkey/activation/`;
+router.get("/approbation", async (req, res) => {
+    const activationLink = `${req.protocol}://${req.get("host")}/passkey/approbation/`;
 
     if ("text" in req.query) {
         return res.send(

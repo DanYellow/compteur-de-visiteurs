@@ -37,7 +37,7 @@ router.get('/connexion', async (req, res) => {
     const { email, mot_de_passe } = req.body;
 
     const user = await UserModel.findOne({
-        where: { email: String(req.body.email), actif: true, utilise_mdp: true, }
+        where: { email: String(req.body.email), actif: true, approuve: true, utilise_mdp: true, }
     })
 
     if (user && user.mot_de_passe && bcrypt.compareSync(mot_de_passe, user.mot_de_passe!)) {
@@ -117,13 +117,13 @@ router.get('/inscription', async (req, res) => {
     return res.redirect("/inscription");
 });
 
-router.get(['/activation{/:token}'], async (req, res) => {
+router.get(['/approbation{/:token}'], async (req, res) => {
     let errorKey = "";
     let user = null;
     let isTokenValid = false;
     try {
         const { token } = req.params;
-        const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
+        const decoded = jwt.verify(token, process.env.JWT_APPROVAL_SECRET!) as UserTokenData;
 
         user = await UserModel.findByPk(decoded.userId);
 
@@ -150,7 +150,7 @@ router.get(['/activation{/:token}'], async (req, res) => {
         signin_email: user?.email || "",
         is_token_valid: isTokenValid,
     });
-}).post('/activation{/:token}', async (req, res) => {
+}).post('/approbation{/:token}', async (req, res) => {
     let errorKey = "";
     const { token } = req.params;
 
@@ -160,7 +160,7 @@ router.get(['/activation{/:token}'], async (req, res) => {
         res.status(500)
         res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
 
-        return res.redirect(`/activation/${token}`);
+        return res.redirect(`/approbation/${token}`);
     }
 
     try {
@@ -168,7 +168,7 @@ router.get(['/activation{/:token}'], async (req, res) => {
             throw new Error("missing_token");
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_ACTIVATION_SECRET!) as UserTokenData;
+        const decoded = jwt.verify(token, process.env.JWT_APPROVAL_SECRET!) as UserTokenData;
 
         const user = await UserModel.findByPk(decoded.userId);
 
@@ -207,7 +207,7 @@ router.get(['/activation{/:token}'], async (req, res) => {
 
     res.cookie('flash_message', errorKey, flashMessageCookieOptions);
 
-    return res.redirect(`/activation/${token}`);
+    return res.redirect(`/approbation/${token}`);
 });
 
 

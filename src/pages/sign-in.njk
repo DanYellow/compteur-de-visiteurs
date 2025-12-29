@@ -6,6 +6,8 @@
 Inscription
 {% endblock %}
 
+{% import "includes/macros.njk" as macros %}
+
 {% block scripts %}
     {% if NODE_ENV == "development" %}
         <script type="module" src="/src/assets/scripts/forms/sign-in-form.ts" defer></script>
@@ -20,28 +22,27 @@ Inscription
             <img src="/images/logos/faclab-numixs.svg" class="w-20" alt="">
             <h1 class="text-6xl title-font text-green-numixs">Inscription</h1>
         </div>
-        {% if flash_message == "register_success" %}
-            <p class="p-4 bg-green-50 text-green-800 border-t-4 border-t-green-800 mb-4 rounded-lg">
-            Votre inscription a été prise en compte. Vous serez notifié(e) par e-mail, à l'adresse <span class="font-bold">"{{ signin_email }}"</span>, lorsque votre compte sera activé par un administrateur. Vous pourrez ensuite compléter votre inscription.
-            </p>
-        {% endif %}
+        <div class="flex flex-col gap-3 mb-4">
+            {% if flash_message == "register_success" %}
+                {% set banner_content %}
+                    Votre inscription a été prise en compte. Vous serez notifié(e) par e-mail, à l'adresse <span class="font-bold">"{{ signin_email }}"</span>, lorsque votre compte sera activé par un administrateur. Vous pourrez ensuite compléter votre inscription.
+                {% endset %}
+                {{ macros.success_banner(banner_content)}}
+            {% endif %}
 
-        {% if flash_message == "register_fail" %}
-            <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4 rounded-lg">
-            Vous ne pouvez pas créer un compte avec cette adresse e-mail.
-            </p>
-        {% endif %}
+            {% if flash_message == "register_fail" %}
+                {{ macros.error_banner("Vous ne pouvez pas créer un compte avec cette adresse e-mail.")}}
+            {% endif %}
 
-        {% if flash_message == "register_duplicate" %}
-        <p class="p-4 bg-amber-50 text-amber-800 border-t-4 border-t-amber-800 mb-4 rounded-lg">
-            Une inscription avec l'adresse <span class="font-bold">"{{ signin_email }}"</span> a déjà été enregistrée, veuillez attendre la validation de votre compte par un administrateur. Vous serez notifié(e) par e-mail lorsque votre inscription sera validée.
-        </p>
-        {% endif %}
+            {% if flash_message == "register_duplicate" %}
+                {% set banner_content %}
+                    Une inscription avec l'adresse <span class="font-bold">"{{ signin_email }}"</span> a déjà été enregistrée, veuillez attendre la validation de votre compte par un administrateur. Vous serez notifié(e) par e-mail lorsque votre inscription sera validée.
+                {% endset %}
+                {{ macros.warning_banner(banner_content)}}
+            {% endif %}
 
-        <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 mb-4 rounded-lg">
-            Votre compte ne sera pas activé automatiquement. Il sera activé par un administrateur et vous serez notifié(e) par e-mail.
-        </p>
-
+            {{ macros.info_banner("Votre compte ne sera pas utilisable immédiatement. Il doit être approuvé par un administrateur et vous serez notifié(e) par e-mail.")}}
+        </div>
         <form action="/inscription" method="post" novalidate>
             <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
 

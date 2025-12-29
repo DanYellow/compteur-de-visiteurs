@@ -3,7 +3,7 @@
 {% set root_class = "register" %}
 
 {% block title %}
-Activation de compte
+Finalisation de compte
 {% endblock %}
 
 {% import "includes/macros.njk" as macros %}
@@ -22,7 +22,7 @@ Activation de compte
     <div class="max-w-7xl mt-8 px-3 mx-auto">
         <div>
             <img src="/images/logos/faclab-numixs.svg" class="w-20" alt="">
-            <h1 class="text-6xl title-font text-green-numixs">Activation de compte</h1>
+            <h1 class="text-6xl title-font text-green-numixs">Finalisation de compte</h1>
         </div>
 
         <div class="flex flex-col gap-3 mb-4">
@@ -88,7 +88,7 @@ Activation de compte
                 </div>
 
                 <div>
-                    <button type="submit" class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center inert:!cursor-not-allowed inert:opacity-60">
+                    <button type="submit" {{ "" if is_token_valid else "inert" }} class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center inert:!cursor-not-allowed inert:opacity-60">
                     Créer compte
                     {% include "includes/icons/next-arrow.svg" %}
                     </button>

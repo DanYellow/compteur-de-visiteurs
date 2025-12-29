@@ -9,6 +9,6 @@ ws.addEventListener("message", (event) => {
     if (type === SOCKET_EVENTS.VISITOR_REGISTERED) {
         // createNotification("U");
     } else if (type === SOCKET_EVENTS.NEW_USER) {
-        createNotification("Un nouvel utilisateur vient de s'inscrire. Veuillez valider ou supprimer ce compte.");
+        createNotification("Un nouvel utilisateur vient de s'inscrire. Veuillez approuver ou supprimer ce compte.");
     }
 });

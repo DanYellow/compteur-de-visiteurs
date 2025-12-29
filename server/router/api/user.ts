@@ -15,27 +15,31 @@ dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const router = express.Router();
 
-router.post("/utilisateur/activation", requireRoleMiddleware("ADMIN"), async (req, res) => {
+router.post("/utilisateur/approbation", requireRoleMiddleware("ADMIN"), async (req, res) => {
     const user = await UserModel.findByPk(Number(req.body.userId));
     if (user) {
         try {
             await user.update({
-                actif: req.body.actif,
+                ...("actif" in req.body && {actif: req.body.actif}),
+                ...("approuve" in req.body && {
+                    approuve: req.body.approuve,
+                    ...(req.body.approuve === true && { actif: true })
+                }),
             });
 
-            if (req.body.actif) {
+            if ("approuve" in req.body && req.body.approuve) {
                 const token = jwt.sign(
                     { userId: user.id },
-                    String(process.env.JWT_ACTIVATION_SECRET),
+                    String(process.env.JWT_APPROVAL_SECRET),
                     {
-                        expiresIn: (process.env.JWT_ACTIVATION_EXPIRES ?? '1d') as jwt.SignOptions['expiresIn'],
+                        expiresIn: (process.env.JWT_APPROVAL_EXPIRE_TIME ?? '1d') as jwt.SignOptions['expiresIn'],
                     }
                 );
 
                 const activationLink = `${req.protocol}://${req.get(
                     "host"
-                )}/activation/${token}`;
-                const html = renderEmail("emails/user-activation.njk", {
+                )}/approbation/${token}`;
+                const html = renderEmail("emails/user-approved.njk", {
                     activation_link: activationLink,
                     host_path: `${req.protocol}://${req.get("host")}`,
                 });
@@ -43,8 +47,8 @@ router.post("/utilisateur/activation", requireRoleMiddleware("ADMIN"), async (re
                 const info = await mailTransporter.sendMail({
                     from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
                     to: user.email,
-                    subject: "Activation de votre compte Fablab Numixs",
-                    text: nunjucks.render("emails/user-activation.txt.njk", {
+                    subject: "Approbation de votre compte Fablab® Numixs",
+                    text: nunjucks.render("emails/user-approved.txt.njk", {
                         activation_link: activationLink,
                     }),
                     html: html, // HTML body

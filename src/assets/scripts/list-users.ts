@@ -6,7 +6,7 @@ const listSwitches = document.querySelectorAll(
 
 const toggleUserStatus = async (e: Event) => {
     const input = e.currentTarget as HTMLInputElement;
-    const userId = input.dataset.changeUserStatus;
+    const userPayload = JSON.parse(input.dataset.changeUserStatus!);
 
     const req = await fetch("/api/utilisateur/activation", {
         method: "POST",
@@ -14,8 +14,8 @@ const toggleUserStatus = async (e: Event) => {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            actif: input.checked,
-            userId,
+            [userPayload.key]: input.checked,
+            userId: userPayload.id,
         }),
     });
     console.log(await req.json());
@@ -34,7 +34,7 @@ Array.from(listActivationButtons).forEach((item) => {
         const element = e.currentTarget as HTMLButtonElement;
         const userId = element.dataset.sendActivationEmail;
 
-        const req = await fetch("/api/utilisateur/activation", {
+        const req = await fetch("/api/utilisateur/approbation", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -42,11 +42,11 @@ Array.from(listActivationButtons).forEach((item) => {
             credentials: "include",
             body: JSON.stringify({
                 userId,
-                actif: true,
+                approuve: true,
             }),
         });
         const res = await req.json();
-    
+
         createNotification(`Email d'activation envoyé à "${res.utilisateur.email}"`)
     });
 });
