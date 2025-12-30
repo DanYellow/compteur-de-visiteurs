@@ -8,7 +8,7 @@ const toggleUserStatus = async (e: Event) => {
     const input = e.currentTarget as HTMLInputElement;
     const userPayload = JSON.parse(input.dataset.changeUserStatus!);
 
-    const req = await fetch("/api/utilisateur/activation", {
+    const req = await fetch("/api/utilisateur/statut", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -34,7 +34,7 @@ Array.from(listActivationButtons).forEach((item) => {
         const element = e.currentTarget as HTMLButtonElement;
         const userId = element.dataset.sendActivationEmail;
 
-        const req = await fetch("/api/utilisateur/approbation", {
+        const req = await fetch("/api/utilisateur/statut", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -47,6 +47,6 @@ Array.from(listActivationButtons).forEach((item) => {
         });
         const res = await req.json();
 
-        createNotification(`Email d'activation envoyé à "${res.utilisateur.email}"`)
+        createNotification(`Email d'approbation envoyé à "${res.utilisateur.email}"`)
     });
 });

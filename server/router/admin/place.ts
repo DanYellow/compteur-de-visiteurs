@@ -5,7 +5,7 @@ import { capitalizeFirstLetter, DEFAULT_CLOSE_HOURS, DEFAULT_OPEN_HOURS, listPla
 import { PlaceSchema } from "#scripts/schemas.ts";
 import { slugify } from "#scripts/utils.ts";
 import { DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared.ts";
-import { Place as PlaceModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User } from "#models/index.ts";
 import { PlaceRaw } from "#types";
 import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
@@ -18,7 +18,10 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
     let place = null
     if (req.params.placeId) {
         place = await PlaceModel.findByPk(req.params.placeId, {
-            include: [{ model: RegularOpeningModel, as: "regularOpening", required: false }],
+            include: [
+                { model: RegularOpeningModel, as: "regularOpening", required: false },
+                { model: User, as: 'dernier_editeur', required: false }
+            ],
         });
         if (place) {
             const placeRegularOpening = await place.getRegularOpening()
@@ -69,7 +72,8 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
 
     payload = {
         ...req.body,
-        jours_fermeture: req.body.jours_fermeture
+        jours_fermeture: req.body.jours_fermeture,
+        dernier_editeur_id: res.locals.current_user!.id,
     };
 
     try {

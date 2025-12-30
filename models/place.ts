@@ -1,9 +1,26 @@
-import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type HasOneGetAssociationMixin, type HasOneCreateAssociationMixin, type BelongsToManyAddAssociationMixin, type BelongsToManyGetAssociationsMixin, type BelongsToManyAddAssociationsMixin, type BelongsToManySetAssociationsMixin } from 'sequelize';
+import {
+    DataTypes,
+    Sequelize,
+    Model,
+    type InferAttributes,
+    type InferCreationAttributes,
+    type CreationOptional,
+    type HasOneGetAssociationMixin,
+    type HasOneCreateAssociationMixin,
+    type BelongsToManyAddAssociationMixin,
+    type BelongsToManyGetAssociationsMixin,
+    type BelongsToManyAddAssociationsMixin,
+    type BelongsToManySetAssociationsMixin,
+    type ForeignKey,
+} from 'sequelize';
 import { RegularOpening, Event } from '.';
 import type { PlaceType } from '#types';
 import { listPlaceTypes } from '#scripts/utils.shared.ts';
 
-export default class Place extends Model<InferAttributes<Place>, InferCreationAttributes<Place>> {
+export default class Place extends Model<
+    InferAttributes<Place>,
+    InferCreationAttributes<Place>
+> {
     declare id: CreationOptional<number>;
     declare nom: string;
     declare slug: string;
@@ -11,7 +28,7 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
     declare type?: PlaceType;
     declare description: string;
     declare ouvert: boolean;
-    declare date_creation: CreationOptional<Date>;
+    declare dernier_editeur_id?: ForeignKey<number>;
 
     declare addRegularOpening: HasOneCreateAssociationMixin<RegularOpening>;
     declare getRegularOpening: HasOneGetAssociationMixin<RegularOpening>;
@@ -39,10 +56,12 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
                 adresse: DataTypes.TEXT,
                 description: {
                     type: DataTypes.TEXT,
-                    allowNull: true
+                    allowNull: true,
                 },
                 type: {
-                    type: DataTypes.ENUM(...listPlaceTypes.map((item) => item.value)),
+                    type: DataTypes.ENUM(
+                        ...listPlaceTypes.map((item) => item.value)
+                    ),
                     defaultValue: listPlaceTypes.map((item) => item.value)[0],
                     allowNull: false,
                 },
@@ -50,16 +69,23 @@ export default class Place extends Model<InferAttributes<Place>, InferCreationAt
                     type: DataTypes.BOOLEAN,
                     defaultValue: true,
                 },
-                date_creation: DataTypes.DATE,
+                dernier_editeur_id: {
+                    type: DataTypes.INTEGER,
+                    allowNull: true,
+                    unique: false,
+                    references: {
+                        model: 'user',
+                        key: 'id'
+                    }
+                },
             },
             {
                 sequelize,
-                updatedAt: false,
+                updatedAt: 'date_edition',
                 createdAt: 'date_creation',
                 modelName: 'place',
                 underscored: true,
             }
-        )
+        );
     }
 }
-

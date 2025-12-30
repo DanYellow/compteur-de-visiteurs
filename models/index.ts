@@ -79,6 +79,14 @@ sequelize.models.place.belongsToMany(sequelize.models.event, {
     onDelete: "CASCADE",
 });
 
+sequelize.models.place.belongsTo(sequelize.models.user, {
+    foreignKey: {
+        name: "dernier_editeur_id",
+        allowNull: true,
+    },
+    as: "dernier_editeur",
+});
+
 sequelize.models.event.belongsToMany(sequelize.models.place, {
     through: "place_event",
     foreignKey: "event_id",

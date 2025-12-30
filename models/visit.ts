@@ -6,7 +6,6 @@ import Place from '#models/place.ts';
 export default class Visit extends Model<InferAttributes<Visit>, InferCreationAttributes<Visit>> {
     declare id: CreationOptional<number>;
     declare place_id: ForeignKey<Place['id']>;
-    declare date_passage: CreationOptional<Date>;
     declare groupe?: string;
 
     declare getPlace: HasOneGetAssociationMixin<Place>;
@@ -29,7 +28,6 @@ export default class Visit extends Model<InferAttributes<Visit>, InferCreationAt
                     primaryKey: true,
                     autoIncrement: true,
                 },
-                date_passage: DataTypes.DATE,
                 ...listBusinessSectorKeys,
             },
             {

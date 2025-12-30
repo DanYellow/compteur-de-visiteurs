@@ -15,7 +15,7 @@ dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const router = express.Router();
 
-router.post("/utilisateur/approbation", requireRoleMiddleware("ADMIN"), async (req, res) => {
+router.post("/utilisateur/statut", requireRoleMiddleware("ADMIN"), async (req, res) => {
     const user = await UserModel.findByPk(Number(req.body.userId));
     if (user) {
         try {
