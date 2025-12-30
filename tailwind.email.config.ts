@@ -43,6 +43,9 @@ export default {
         fontSize: {
             base: "18px",
         },
+        fontWeight: {
+            bold: "bold",
+        },
 
         extend: {},
     },

@@ -55,13 +55,13 @@ router.get("/approbation", async (req, res) => {
 
     if ("text" in req.query) {
         return res.send(
-            nunjucks.render("emails/user-activation.txt.njk", {
+            nunjucks.render("emails/user-approved.txt.njk", {
                 date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
                 activation_link: activationLink,
             })
         );
     }
-    return res.send(renderEmail("emails/user-activation.njk", {
+    return res.send(renderEmail("emails/user-approved.njk", {
         date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
         activation_link: activationLink,
         nom: "Thomas",
