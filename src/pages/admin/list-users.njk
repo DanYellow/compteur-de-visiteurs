@@ -164,7 +164,9 @@ Liste utilisateurs
                 <span class="font-bold">Activer :</span> Permet à utilisateur de se connecter ou non
             </li>
         </ul>
-        <p>Un compte approuvé ne peut pas être désapprouvé. En revanche, un administrateur peut toujours le désactiver. Une désactivation bloque la connexion de l'utilisateur.</p>
+        <div class="mt-4">
+        {{ macros.warning_banner("Un compte approuvé ne peut pas être désapprouvé. En revanche, un administrateur peut toujours le désactiver. Une désactivation bloque la connexion de l'utilisateur et le déconnecte automatiquement.")}}
+        </div>
     </dialog>
 
     {% include "includes/detail-roles.njk" %}

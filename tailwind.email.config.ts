@@ -46,6 +46,9 @@ export default {
         fontWeight: {
             bold: "bold",
         },
+        borderRadius: {
+            'md': '6px',
+        },
 
         extend: {},
     },

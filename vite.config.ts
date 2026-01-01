@@ -36,7 +36,8 @@ export default defineConfig(({ mode }) => {
                 strict: true,
                 allow: [
                     'public',
-                    'src'
+                    'src',
+                    'node_modules',
                 ]
             },
         },
