@@ -1,5 +1,11 @@
 export default {
-    content: ['./src/emails/**/*.njk'],
+    content: [
+        './src/emails/**/*.njk',
+        '!./src/pages/**/*.njk',
+        '!./src/includes/**/*.njk',
+        // '!./src/layouts/**/*.njk',
+        // './src/layouts/email.njk',
+    ],
     theme: {
         spacing: {
             0: '0',
@@ -49,8 +55,18 @@ export default {
         borderRadius: {
             'md': '6px',
         },
+        screens: {
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+            xl: '1280px',
+        },
 
         extend: {},
+    },
+    corePlugins: {
+        preflight: false,
+        gridTemplateColumns: false,
     },
 };
 // https://tailwindcss.com/docs/upgrade-guide#using-a-javascript-config-file

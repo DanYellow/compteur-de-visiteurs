@@ -45,5 +45,6 @@ export const renderEmail = (template: string, data: Record<string, any> = {}) =>
         resolveCSSVariables: true,
         preserveMediaQueries: true,
         insertPreservedExtraCss: false,
-    }).replace(/<style[\s\S]*?<\/style>/gi, '');
+    })
+    // .replace(/<style[\s\S]*?<\/style>/gi, '');
 }
