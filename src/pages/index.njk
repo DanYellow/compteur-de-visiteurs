@@ -7,11 +7,11 @@
 Compteur de visiteurs
 {% endblock %}
 {% block scripts %}
-{% if NODE_ENV == "development" %}
-    <script type="module" src="/src/assets/scripts/register-form.ts" defer></script>
-{% else %}
-    <script type="module" src="/{{ manifest['src/assets/scripts/register-form.ts'].file }}" defer></script>
-{% endif %}
+    {% if NODE_ENV == "development" %}
+        <script type="module" src="/src/assets/scripts/register-form.ts" defer></script>
+    {% else %}
+        <script type="module" src="/{{ manifest['src/assets/scripts/register-form.ts'].file }}" defer></script>
+    {% endif %}
 {% endblock %}
 {% block content %}
     <div class="max-w-7xl mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 lg:grid-cols-[1fr_456px] justify-center gap-24 mx-auto">
@@ -20,41 +20,54 @@ Compteur de visiteurs
                 <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-20" alt="">
                 <p class="text-sm">{{ place.nom }}</p>
             </header>
+            <div class="overflow-y-hidden snap-y snap-mandatory">
+                <div data-step="1">
+                    {% include "includes/registration-steps/group-step.njk" %}
 
-            <div class="flex flex-col gap-3">
-                <div class="mb-11">
-                    <p class="title-font leading-none text-7xl uppercase">À quel(s) groupe(s)<br /><span class="text-green-numixs">appartenez-vous</span> ?</p>
-                    <p class="text-sm opacity-70 -mt-1">Vous devez choisir au moins un groupe</p>
+                    <div class="mt-7">
+                        <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                        Envoyer
+                        {% include "includes/icons/next-arrow.svg" %}
+                        </button>
+                    </div>
                 </div>
-                <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
+                <div data-step="2">
+                    {% include "includes/registration-steps/gender-step.njk" %}
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-7">
-                    {% for sector in list_business_sector %}
-                        {% set children = null %}
-                        {% if sector.value == "entreprise" %}
-                            {% set children %}
-                            <div data-input-switch-toggle-recipient="entreprise">
-                                <div class="ml-12 flex flex-col mt-2">
-                                    {{ forms.switch("Station Numixs", "station_numixs", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"label_classes": "text-xl" }) }}
-                                    {{ forms.switch("Externe", "entreprise_externe", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"label_classes": "text-xl" }) }}
-                                </div>
-                            </div>
-                            {% endset %}
-                        {% endif %}
-                        {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"children": children }) }}
-                    {% endfor %}
+                    <div class="mt-7">
+                        <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                        Envoyer
+                        {% include "includes/icons/next-arrow.svg" %}
+                        </button>
+                    </div>
                 </div>
-            </div>
+                <div data-step="3">
+                    {% include "includes/registration-steps/department-step.njk" %}
 
-            <div class="mt-7">
-                <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
-                    Envoyer
-                    {% include "includes/icons/next-arrow.svg" %}
-                </button>
+                    <div class="mt-7">
+                        <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                        Envoyer
+                        {% include "includes/icons/next-arrow.svg" %}
+                        </button>
+                    </div>
+                </div>
+                <div data-step="4">
+                    {% include "includes/registration-steps/age-step.njk" %}
+
+                    <div class="mt-7">
+                        <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                        Envoyer
+                        {% include "includes/icons/next-arrow.svg" %}
+                        </button>
+                    </div>
+                </div>
             </div>
         </form>
-        <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full" style="background-image: url('/images/compteur-deco-image.png')">
+        <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full">
+            <img src="/images/compteur-deco-image.png" alt="" srcset="">
         </div>
+        {# <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full" style="background-image: url('/images/compteur-deco-image.png')">
+        </div> #}
     </div>
 
     <footer class="max-w-7xl px-3 mx-auto text-center text-xs mt-4">
@@ -73,7 +86,9 @@ Compteur de visiteurs
         </div>
     </dialog>
     <template data-template-id="form-success">
-        <p class="title-font text-white text-7xl mb-4">Merci de votre retour, excellent passage au<br class="hidden lg:inline" /> <span class="text-green-numixs" data-place>FacLab numixs<sup>®</sup></span>.</p>
+        <p class="title-font text-white text-7xl mb-4">Merci de votre retour, excellent passage au<br class="hidden lg:inline"/>
+            <span class="text-green-numixs" data-place>FacLab numixs<sup>®</sup>
+            </span>.</p>
         <div class="overflow-hidden rounded-md h-52 lg:h-auto flex items-center lg:block">
             <img src="/images/register-complete.jpg" class="rounded-md" alt="">
         </div>
