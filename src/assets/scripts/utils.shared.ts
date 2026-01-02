@@ -130,7 +130,7 @@ export const getPivotTable = (
     const tableFooter = ['Total (visites)', ...tableValuesPlaceholder];
 
     listGroups
-        .filter((item) => (!("listInDb" in item) || item.listInDb))
+        .filter((item) => !('listInDb' in item) || item.listInDb)
         .forEach((business) => {
             let rowValues = [business.name];
 
@@ -166,11 +166,14 @@ export const getPivotTable = (
                     );
                 }, {});
                 if (options.simplified) {
-                    totalPerGroup = (listVisits as unknown as VisitRaw[]).reduce(
+                    totalPerGroup = (
+                        listVisits as unknown as VisitRaw[]
+                    ).reduce(
                         (acc: Record<string, number>, visit) => (
                             (acc[business.value] =
                                 (acc[business.value] || 0) +
-                                (visit[business.value as keyof VisitRaw] === 'oui'
+                                (visit[business.value as keyof VisitRaw] ===
+                                'oui'
                                     ? 1
                                     : 0)),
                             acc
@@ -194,31 +197,37 @@ export const getPivotTable = (
                     } else {
                         (tableFooter[indexArray + 1] as number) += (
                             totalPerGroup as Record<string, number[]>
-                        )[business.value].reduce((acc, value) => acc + value, 0);
+                        )[business.value].reduce(
+                            (acc, value) => acc + value,
+                            0
+                        );
                     }
                     visitsPerGroupAndPeriod[business.value][indexArray] =
                         totalPerGroup[business.value];
                 }
             });
 
-        rowValues = [...rowValues, ...visitsPerGroupAndPeriod[business.value]];
+            rowValues = [
+                ...rowValues,
+                ...visitsPerGroupAndPeriod[business.value],
+            ];
 
-        let totalBusiness = [];
-        if (options.simplified) {
-            totalBusiness = visitsPerGroupAndPeriod[business.value].reduce(
-                (acc, value) => acc + value,
-                0
-            );
-        } else {
-            totalBusiness = visitsPerGroupAndPeriod[business.value].reduce(
-                (acc, value) => [acc[0] + value[0], acc[1] + value[1]],
-                [0, 0]
-            );
-        }
+            let totalBusiness = [];
+            if (options.simplified) {
+                totalBusiness = visitsPerGroupAndPeriod[business.value].reduce(
+                    (acc, value) => acc + value,
+                    0
+                );
+            } else {
+                totalBusiness = visitsPerGroupAndPeriod[business.value].reduce(
+                    (acc, value) => [acc[0] + value[0], acc[1] + value[1]],
+                    [0, 0]
+                );
+            }
 
-        rowValues.push(totalBusiness);
-        tableValues.push(rowValues);
-    });
+            rowValues.push(totalBusiness);
+            tableValues.push(rowValues);
+        });
 
     tableFooter.push(totalVisits);
     tableValues.push(tableFooter);
@@ -428,26 +437,50 @@ export const listDepartments = [
     },
     {
         label: 'Autre / Hors Île-de-France',
-        value: '999',
+        value: '99',
     },
 ];
 
-export const ageRanges = [{
-    label: "17 ans et moins",
-    value: 0,
-}, {
-    label: "18/24 ans",
-    value: 1,
-}, {
-    label: "25/34 ans",
-    value: 2,
-}, {
-    label: "35/49 ans",
-    value: 3,
-}, {
-    label: "50/64 ans",
-    value: 4,
-}, {
-    label: "65 ans et plus",
-    value: 5,
-}]
+export const listAgeGroups = [
+    {
+        label: '17 ans et moins',
+        value: 0,
+    },
+    {
+        label: '18/24 ans',
+        value: 1,
+    },
+    {
+        label: '25/34 ans',
+        value: 2,
+    },
+    {
+        label: '35/49 ans',
+        value: 3,
+    },
+    {
+        label: '50/64 ans',
+        value: 4,
+    },
+    {
+        label: '65 ans et plus',
+        value: 5,
+    },
+];
+
+export const listSexes = [
+    {
+        label: 'Homme',
+        value: '0',
+    },
+    {
+        label: 'Femme',
+        value: '1',
+    },
+    {
+        label: 'Non-binaire',
+        value: '2',
+    },
+];
+
+export const REQUIRED_MESSAGE = 'Ce champ est obligatoire';

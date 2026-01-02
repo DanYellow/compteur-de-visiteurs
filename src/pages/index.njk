@@ -20,45 +20,49 @@ Compteur de visiteurs
                 <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-20" alt="">
                 <p class="text-sm">{{ place.nom }}</p>
             </header>
-            <div class="overflow-y-hidden snap-y snap-mandatory">
-                <div data-step="1">
-                    {% include "includes/registration-steps/group-step.njk" %}
+            <ul class="form-errors-list-container not-empty:mb-3" role="alert" data-form-errors id="error-container"></ul>
+            <div class="relative" id="wizard-steps">
 
-                    <div class="mt-7">
-                        <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                <div class="wrapper overflow-hidden snap-y snap-mandatory overscroll-contain inset-0" style="position: absolute;" id="steps-container">
+                    <div data-step="1" class="form-step">
+                        {% include "includes/registration-steps/group-step.njk" %}
+
+                        <div class="mt-7">
+                            <button type="button" data-button-step data-step-name="group" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
                         Envoyer
                         {% include "includes/icons/next-arrow.svg" %}
-                        </button>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div data-step="2">
-                    {% include "includes/registration-steps/gender-step.njk" %}
+                    <div data-step="2" class="form-step">
+                        {% include "includes/registration-steps/gender-step.njk" %}
 
-                    <div class="mt-7">
-                        <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                        <div class="mt-7">
+                            <button type="button" data-button-step data-step-name="gender" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
                         Envoyer
                         {% include "includes/icons/next-arrow.svg" %}
-                        </button>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div data-step="3">
-                    {% include "includes/registration-steps/department-step.njk" %}
+                    <div data-step="3" class="form-step">
+                        {% include "includes/registration-steps/department-step.njk" %}
 
-                    <div class="mt-7">
-                        <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                        <div class="mt-7">
+                            <button type="button" data-button-step data-step-name="department" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
                         Envoyer
                         {% include "includes/icons/next-arrow.svg" %}
-                        </button>
+                            </button>
+                        </div>
                     </div>
-                </div>
-                <div data-step="4">
-                    {% include "includes/registration-steps/age-step.njk" %}
+                    <div data-step="4" class="form-step">
+                        {% include "includes/registration-steps/age-step.njk" %}
 
-                    <div class="mt-7">
-                        <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                        <div class="mt-7">
+                            <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
                         Envoyer
                         {% include "includes/icons/next-arrow.svg" %}
-                        </button>
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

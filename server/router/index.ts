@@ -2,7 +2,7 @@ import express from "express";
 import { DateTime } from "luxon";
 import { Op } from 'sequelize';
 
-import { listGroups as listBusinessSector, listDepartments, ageRanges } from '#scripts/utils.shared.ts';
+import { listGroups as listBusinessSector, listDepartments, listAgeGroups } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
 import { VisitorSchema } from "#scripts/schemas.ts";
 import { flashMessageCookieOptions, wss } from "#server/index.ts";
@@ -51,7 +51,7 @@ router.get("/", async (req, res) => {
         "list_business_sector": listBusinessSector.filter((item) => (!("listInChoices" in item) || item.listInChoices)),
         place,
         list_departments: listDepartments,
-        list_age_ranges: ageRanges,
+        list_age_ranges: listAgeGroups,
     });
 }).post("/", async (req, res) => {
     const validator = VisitorSchema.safeParse(req.body);

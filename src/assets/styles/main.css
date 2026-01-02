@@ -419,3 +419,20 @@ button {
 .admin-wrapper {
     transition: grid-template-columns 300ms ease;
 }
+
+.form-step {
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+
+    min-height: 90%;
+    display: flex;
+    flex-direction: column;
+    /* justify-content: center; */
+    opacity: 0.3;
+    pointer-events: none;
+
+    &.active {
+        opacity: 1;
+        pointer-events: all;
+    }
+}
