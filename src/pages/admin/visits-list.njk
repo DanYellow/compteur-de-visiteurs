@@ -110,14 +110,29 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     {% endif %}
                     <p>{{ current_date|date("EEEE dd LLLL yyyy") }}</p>
                 </div>
-                <div class="bg-black-numixs p-3 rounded-md text-white-numixs hidden flex-1 md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
-                    <p class="col-span-full text-xl">Détails des visites par type de visiteur</p>
-                    {% for business in list_business_sector %}
-                        <div class="flex flex-col flex-auto">
-                            <p class="h-8">{{ business.name }}</p>
-                            <p class="text-xl place-content-end -mt-4">{{ visits_summary[business.value] }}</p>
-                        </div>
-                    {% endfor %}
+                <div class="bg-black-numixs p-3 rounded-md text-white-numixs flex-1">
+                    <p class="col-span-full text-2xl">Détails des visites par type de visiteur</p>
+                    <div class="md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                        <p class="col-span-full text-xl">Par groupe</p>
+                        {% for business in list_business_sector %}
+                            <div class="flex flex-col flex-auto">
+                                <p class="h-8">{{ business.name }}</p>
+                                <p class="text-xl place-content-end -mt-4">{{ visits_summary[business.value] }}</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <hr class="my-4">
+                    <div class="md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                        <p class="col-span-full text-xl">Par tranche d'âge</p>
+                    </div>
+                    <hr class="my-4">
+                    <div class="md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                        <p class="col-span-full text-xl">Par sexe</p>
+                    </div>
+                    <hr class="my-4">
+                    <div class="md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                        <p class="col-span-full text-xl">Par département</p>
+                    </div>
                 </div>
             </header>
             {% if place.nom %}

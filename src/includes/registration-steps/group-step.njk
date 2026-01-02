@@ -21,6 +21,16 @@
                 </div>
                 {% endset %}
             {% endif %}
+            {% if sector.value == "education" %}
+                {% set children %}
+                <div data-input-switch-toggle-recipient="education">
+                    <div class="ml-12 flex flex-col mt-2">
+                        {{ forms.switch("Enseignant", "enseignant", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"label_classes": "text-xl" }) }}
+                        {{ forms.switch("Élève", "eleve", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"label_classes": "text-xl" }) }}
+                    </div>
+                </div>
+                {% endset %}
+            {% endif %}
             {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"children": children }) }}
         {% endfor %}
     </div>

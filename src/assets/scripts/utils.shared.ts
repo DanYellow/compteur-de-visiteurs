@@ -23,13 +23,26 @@ export const listGroups = [
     {
         name: 'Entreprise',
         value: 'entreprise',
-        lineColor: 'rgb(15, 92, 192)',
+        lineColor: '',
         listInDb: false,
     },
     {
-        name: 'Éducation',
-        value: 'education',
+        name: 'Enseignant',
+        value: 'enseignant',
+        lineColor: 'rgb(15, 92, 192)',
+        listInChoices: false,
+    },
+    {
+        name: 'Élève',
+        value: 'eleve',
         lineColor: 'rgb(75, 192, 192)',
+        listInChoices: false,
+    },
+    {
+        name: 'Éducation / Scolaire',
+        value: 'education',
+        lineColor: '',
+        listInDb: false,
     },
     {
         name: 'Artisan',
@@ -116,75 +129,77 @@ export const getPivotTable = (
 
     const tableFooter = ['Total (visites)', ...tableValuesPlaceholder];
 
-    listGroups.forEach((business) => {
-        let rowValues = [business.name];
+    listGroups
+        .filter((item) => (!("listInDb" in item) || item.listInDb))
+        .forEach((business) => {
+            let rowValues = [business.name];
 
-        let visitsPerGroupAndPeriod = {
-            [business.value]: new Array(columns.length || 0).fill([0, 0]),
-        };
-
-        if (options.simplified) {
-            visitsPerGroupAndPeriod = {
-                [business.value]: new Array(columns.length || 0).fill(0),
+            let visitsPerGroupAndPeriod = {
+                [business.value]: new Array(columns.length || 0).fill([0, 0]),
             };
-        }
 
-        Object.entries(data).forEach(([group, listVisits]) => {
-            let totalPerGroup: Record<string, number[] | number> = (
-                listVisits as unknown as VisitRaw[]
-            ).reduce((acc: Record<string, number[]>, visit) => {
-                const isEventVisit = visit.liste_evenements !== '/';
-                return (
-                    (acc[business.value] = [
-                        (acc[business.value]?.[0] || 0) +
-                            (visit[business.value as keyof VisitRaw] ===
-                                'oui' && !isEventVisit
-                                ? 1
-                                : 0),
-                        (acc[business.value]?.[1] || 0) +
-                            (visit[business.value as keyof VisitRaw] ===
-                                'oui' && isEventVisit
-                                ? 1
-                                : 0),
-                    ]),
-                    acc
-                );
-            }, {});
             if (options.simplified) {
-                totalPerGroup = (listVisits as unknown as VisitRaw[]).reduce(
-                    (acc: Record<string, number>, visit) => (
-                        (acc[business.value] =
-                            (acc[business.value] || 0) +
-                            (visit[business.value as keyof VisitRaw] === 'oui'
-                                ? 1
-                                : 0)),
+                visitsPerGroupAndPeriod = {
+                    [business.value]: new Array(columns.length || 0).fill(0),
+                };
+            }
+
+            Object.entries(data).forEach(([group, listVisits]) => {
+                let totalPerGroup: Record<string, number[] | number> = (
+                    listVisits as unknown as VisitRaw[]
+                ).reduce((acc: Record<string, number[]>, visit) => {
+                    const isEventVisit = visit.liste_evenements !== '/';
+                    return (
+                        (acc[business.value] = [
+                            (acc[business.value]?.[0] || 0) +
+                                (visit[business.value as keyof VisitRaw] ===
+                                    'oui' && !isEventVisit
+                                    ? 1
+                                    : 0),
+                            (acc[business.value]?.[1] || 0) +
+                                (visit[business.value as keyof VisitRaw] ===
+                                    'oui' && isEventVisit
+                                    ? 1
+                                    : 0),
+                        ]),
                         acc
-                    ),
-                    {}
-                );
-            }
-
-            const indexArray = columns.findIndex((label) => {
-                if (typeof label === 'object') {
-                    return Number(label.id) === Number(group);
-                }
-                return Number(label) === Number(group);
-            });
-
-            if (indexArray >= 0) {
+                    );
+                }, {});
                 if (options.simplified) {
-                    (tableFooter[indexArray + 1] as number) += (
-                        totalPerGroup as Record<string, number>
-                    )[business.value];
-                } else {
-                    (tableFooter[indexArray + 1] as number) += (
-                        totalPerGroup as Record<string, number[]>
-                    )[business.value].reduce((acc, value) => acc + value, 0);
+                    totalPerGroup = (listVisits as unknown as VisitRaw[]).reduce(
+                        (acc: Record<string, number>, visit) => (
+                            (acc[business.value] =
+                                (acc[business.value] || 0) +
+                                (visit[business.value as keyof VisitRaw] === 'oui'
+                                    ? 1
+                                    : 0)),
+                            acc
+                        ),
+                        {}
+                    );
                 }
-                visitsPerGroupAndPeriod[business.value][indexArray] =
-                    totalPerGroup[business.value];
-            }
-        });
+
+                const indexArray = columns.findIndex((label) => {
+                    if (typeof label === 'object') {
+                        return Number(label.id) === Number(group);
+                    }
+                    return Number(label) === Number(group);
+                });
+
+                if (indexArray >= 0) {
+                    if (options.simplified) {
+                        (tableFooter[indexArray + 1] as number) += (
+                            totalPerGroup as Record<string, number>
+                        )[business.value];
+                    } else {
+                        (tableFooter[indexArray + 1] as number) += (
+                            totalPerGroup as Record<string, number[]>
+                        )[business.value].reduce((acc, value) => acc + value, 0);
+                    }
+                    visitsPerGroupAndPeriod[business.value][indexArray] =
+                        totalPerGroup[business.value];
+                }
+            });
 
         rowValues = [...rowValues, ...visitsPerGroupAndPeriod[business.value]];
 
@@ -412,7 +427,7 @@ export const listDepartments = [
         value: '95',
     },
     {
-        label: 'Autre',
+        label: 'Autre / Hors Île-de-France',
         value: '999',
     },
 ];
