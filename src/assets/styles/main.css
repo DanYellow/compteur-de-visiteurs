@@ -1,3 +1,5 @@
+@import "./properties.css" layer(base);
+
 @import 'tailwindcss';
 @plugin "@tailwindcss/forms";
 
@@ -148,7 +150,6 @@ dialog {
     }
 }
 
-/* :not([type="checkbox"], [type="radio"]) */
 input.error,
 textarea.error,
 select.error {
@@ -497,5 +498,41 @@ button {
         justify-content: center;
         flex-direction: column;
         gap: 0.55rem;
+    }
+}
+
+.ripple-effect {
+    --ripple-x: 0;
+    --ripple-y: 0;
+    --ripple-color: transparent;
+    --ripple-speed: 350;
+    --animation-tick: 0;
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background-color: transparent;
+        z-index: 10;
+        box-sizing: content-box;
+        overflow: hidden;
+        border-radius: inherit;
+        opacity: 0;
+        transition-property: opacity;
+        transition-duration: var(--duration-350);
+    }
+
+    &:hover,
+    &:focus-visible {
+        &::after {
+            opacity: 1;
+        }
+    }
+
+    &.animating {
+        &::after {
+            opacity: 1;
+            background-image: paint(ripple);
+        }
     }
 }

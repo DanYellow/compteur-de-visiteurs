@@ -8,9 +8,9 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-7">
         {% for department in list_departments %}
-        <div class="w-full text-black switch-container title-font font-bold bg-[#F5F5F5] rounded-md h-fit">
-            <label class="switch border-3 border-solid border-transparent rounded-md w-full p-3 justify-between inline-flex items-center cursor-pointer text-2xl">
-                <span>{{ department.label }}</span>
+        <div class="w-full text-black switch-container title-font font-bold bg-[#F5F5F5] rounded-md h-fit relative">
+            <label class="ripple-effect switch border-3 border-solid border-transparent rounded-md w-full p-3 justify-between inline-flex items-center cursor-pointer text-2xl">
+                <span class="relative z-50">{{ department.label }}</span>
                 <input type="radio" name="departement" class="sr-only" value="{{ department.value }}" id="{{ department.value }}">
             </label>
         </div>

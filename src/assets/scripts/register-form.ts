@@ -1,6 +1,8 @@
 import { GroupSchema, DepartmentSchema, AgeSchema, GenderSchema } from "#scripts/schemas/index.ts";
 import type { ZodObject } from "zod";
 
+import '#scripts/label-ripple-effect.ts';
+
 import { cancellableSleep } from "./utils";
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
@@ -207,3 +209,4 @@ listAllStepValidationButtons.forEach((item: HTMLButtonElement) => {
 window.addEventListener("pageshow", () => {
     resetSteps();
 });
+
