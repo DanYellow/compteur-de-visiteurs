@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 
-import { ChangePasswordSchema, PasswordRecoverySchema } from "#scripts/schemas.ts";
+import { ChangePasswordSchema, PasswordRecoverySchema } from "#scripts/schemas/index.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 import { User as UserModel } from "#models/index.ts";
 import { UserTokenData } from "#types";

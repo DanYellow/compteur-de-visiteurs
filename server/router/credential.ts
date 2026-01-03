@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 
-import { SignInSchema, SignInActivationSchema, LoginSchema } from "#scripts/schemas.ts";
+import { SignInSchema, SignInActivationSchema, LoginSchema } from "#scripts/schemas/index.ts";
 import { flashMessageCookieOptions, wss } from "#server/index.ts";
 import { User as UserModel } from "#models/index.ts";
 import { CustomSession, UserTokenData } from "#types";

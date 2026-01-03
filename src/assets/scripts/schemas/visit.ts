@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { listGroups as listBusinessSector, listAgeGroups, listDepartments } from '#scripts/utils.shared.ts';
+import { listGroups as listBusinessSector, listAgeGroups, listDepartments, listGenders } from '#scripts/utils.shared.ts';
 
 type BusinessSectorPayload = {
     entreprise?: string;
@@ -22,6 +22,8 @@ type BusinessSectorSchema = {
     station_numixs?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
     entreprise_externe?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
     education?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    enseignant?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
+    eleve?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
     artisan?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
     artiste?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
     agent_carpf?: z.ZodUnion<[z.ZodOptional<z.ZodString>, z.ZodLiteral<"">]>;
@@ -58,7 +60,15 @@ export const GroupSchema = z.object({
     return entrepriseIsNotSelected || entrepriseIsSelected;
 }, {
     message: "Vous devez choisir un type d'entreprise",
-    path: ['entreprise'] // Pointing out which field is invalid
+    path: ['entreprise']
+}).refine(data => {
+    const isEducationSelected = data.education === "oui" && (data.enseignant === "oui" || data.eleve === "oui");
+    const isEducationNotSelected = !data.education && !data.enseignant && !data.eleve
+
+    return isEducationNotSelected || isEducationSelected;
+}, {
+    message: "Vous devez choisir un type d'éducation",
+    path: ['education']
 })
 
 
@@ -75,7 +85,7 @@ export const DepartmentSchema = z.object({
 })
 
 export const GenderSchema = z.object({
-    genre: z.enum(["0", "1", "2"], {
+    genre: z.enum(listGenders.map(({ value }) => value), {
         error: "Vous devez sélectionner un genre",
     })
 })

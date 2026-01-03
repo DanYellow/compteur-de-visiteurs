@@ -13,11 +13,9 @@ const formSubmittingTplRaw = document.querySelector("[data-template-id='form-sub
 const listAllStepValidationButtons = document.querySelectorAll("[data-button-step]") as NodeListOf<HTMLButtonElement>;
 
 const wizard = document.getElementById('wizard-steps') as HTMLDivElement;
-const containerSteps = document.getElementById('steps-container') as HTMLDivElement;
 const listFormSteps = wizard.querySelectorAll('[data-step]');
 
 let sleepController = new AbortController();
-
 
 let currentStep = 0;
 let currentStepName = "";
@@ -71,7 +69,7 @@ const submitForm = async (e: SubmitEvent) => {
 
     if (res.success) {
         e.submitter?.blur();
-        resetSteps()
+        resetSteps();
         const tplSuccess = formSuccessTplRaw.content.cloneNode(true) as HTMLDivElement;
         const placeName = tplSuccess.querySelector("[data-place]")! as HTMLSpanElement;
 
@@ -89,7 +87,6 @@ const submitForm = async (e: SubmitEvent) => {
 };
 
 const validForm = (form: HTMLFormElement) => {
-    // const form = (e.currentTarget as HTMLFormElement)
     if (!("isDirty" in form.dataset)) {
         return
     }
@@ -111,11 +108,13 @@ const validForm = (form: HTMLFormElement) => {
             li.textContent = item.message;
 
             item.path.forEach((path) => {
-                const inputRelated = form.querySelector(`input[name="${String(path)}"]`);
+                const listInputRelated = form.querySelectorAll(`input[name="${String(path)}"]`);
 
-                if (inputRelated) {
-                    inputRelated.classList.add("error");
-                    inputRelated.ariaInvalid = "true";
+                if (listInputRelated.length) {
+                    listInputRelated.forEach((input) => {
+                        input.classList.add("error");
+                        input.ariaInvalid = "true";
+                    })
                 }
             })
 
@@ -147,11 +146,11 @@ dialog.addEventListener("toggle", (e: Event) => {
 form?.addEventListener("submit", submitForm);
 form?.addEventListener("input", () => validForm(form));
 
-function updateWizardHeight() {
+const updateWizardHeight = () => {
     let maxHeight = 0;
 
     listFormSteps.forEach(step => {
-        maxHeight = Math.max(maxHeight, step.offsetHeight);
+        maxHeight = Math.max(maxHeight, (step as HTMLDivElement).offsetHeight);
     });
 
     wizard.style.height = maxHeight + 'px';
@@ -159,8 +158,6 @@ function updateWizardHeight() {
 
 // Initial calculation
 updateWizardHeight();
-
-// window.addEventListener("resize", setWizardHeight);
 
 const resizeObserver = new ResizeObserver(() => {
     updateWizardHeight();
@@ -173,7 +170,7 @@ listFormSteps.forEach(step => {
 listFormSteps[0].classList.add("active");
 
 listAllStepValidationButtons.forEach((item: HTMLButtonElement) => {
-    item.addEventListener("click", (e: Event) => {
+    item.addEventListener("click", () => {
         const stepDirection = item.dataset.buttonStep as "prev" | "next";
 
         if (stepDirection === "prev") {

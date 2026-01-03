@@ -2,9 +2,9 @@ import express from "express";
 import { DateTime } from "luxon";
 import { Op } from 'sequelize';
 
-import { listGroups as listBusinessSector, listDepartments, listAgeGroups } from '#scripts/utils.shared.ts';
+import { listGroups as listBusinessSector, listDepartments, listAgeGroups, listGenders } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
-import { VisitorSchema } from "#scripts/schemas.ts";
+import { VisitSchema } from "#scripts/schemas/index.ts";
 import { flashMessageCookieOptions, wss } from "#server/index.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User as UserModel, Visit as VisitModel } from "#models/index.ts";
 import { parseManifest, requireRoleMiddleware } from "#server/middlewares.ts";
@@ -51,10 +51,11 @@ router.get("/", async (req, res) => {
         "list_business_sector": listBusinessSector.filter((item) => (!("listInChoices" in item) || item.listInChoices)),
         place,
         list_departments: listDepartments,
-        list_age_ranges: listAgeGroups,
+        list_age_groups: listAgeGroups,
+        list_genders: listGenders,
     });
 }).post("/", async (req, res) => {
-    const validator = VisitorSchema.safeParse(req.body);
+    const validator = VisitSchema.safeParse(req.body);
     if (!validator.success) {
         return res.status(500).json({ "success": false });
     }

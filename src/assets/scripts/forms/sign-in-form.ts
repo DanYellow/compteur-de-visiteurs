@@ -1,11 +1,11 @@
-import { SignInSchema } from "#scripts/schemas.ts";
+import { SignInSchema } from "#scripts/schemas/index.ts";
 
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
 
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
-    
+
     const form = (e.currentTarget as HTMLFormElement);
     form.dataset.isDirty = "";
 

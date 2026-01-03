@@ -1,4 +1,4 @@
-import { PasswordRecoverySchema } from "#scripts/schemas.ts";
+import { PasswordRecoverySchema } from "#scripts/schemas/index.ts";
 
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector(

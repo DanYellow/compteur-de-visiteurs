@@ -4,7 +4,7 @@ import { DateTime, Info } from "luxon";
 
 import sequelize, { Place as PlaceModel, Event as EventModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
 import { capitalizeFirstLetter } from '#scripts/utils.shared.ts';
-import { EventSchema } from "#scripts/schemas.ts";
+import { EventSchema } from "#scripts/schemas/index.ts";
 import { EventRaw, PlaceRaw } from "#types";
 import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
 

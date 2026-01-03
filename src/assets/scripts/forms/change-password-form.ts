@@ -1,4 +1,4 @@
-import { ChangePasswordSchema } from "#scripts/schemas.ts";
+import { ChangePasswordSchema } from "#scripts/schemas/index.ts";
 
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector(

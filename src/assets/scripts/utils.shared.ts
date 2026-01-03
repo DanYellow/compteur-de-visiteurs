@@ -415,7 +415,7 @@ export const listDepartments = [
         value: '78',
     },
     {
-        label: 'Essone (91)',
+        label: 'Essonne (91)',
         value: '91',
     },
     {
@@ -432,7 +432,7 @@ export const listDepartments = [
         value: '94',
     },
     {
-        label: "Val d'Oise (95)",
+        label: 'Val d\'Oise (95)',
         value: '95',
     },
     {
