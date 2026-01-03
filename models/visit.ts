@@ -1,11 +1,14 @@
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type ForeignKey, type HasOneGetAssociationMixin } from 'sequelize';
 
-import { listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
+import { listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '#scripts/utils.shared.ts';
 import Place from '#models/place.ts';
 
 export default class Visit extends Model<InferAttributes<Visit>, InferCreationAttributes<Visit>> {
     declare id: CreationOptional<number>;
     declare place_id: ForeignKey<Place['id']>;
+    declare genre: string;
+    declare departement: string;
+    declare tranche_age: number;
     declare groupe?: string;
 
     declare getPlace: HasOneGetAssociationMixin<Place>;
@@ -27,6 +30,24 @@ export default class Visit extends Model<InferAttributes<Visit>, InferCreationAt
                     type: DataTypes.INTEGER,
                     primaryKey: true,
                     autoIncrement: true,
+                },
+                tranche_age: {
+                    type: DataTypes.ENUM(
+                        ...listAgeGroups.map((item) => item.value)
+                    ),
+                    allowNull: false,
+                },
+                genre: {
+                    type: DataTypes.ENUM(
+                        ...listGenders.map((item) => item.value)
+                    ),
+                    allowNull: false,
+                },
+                departement: {
+                    type: DataTypes.ENUM(
+                        ...listDepartments.map((item) => item.value)
+                    ),
+                    allowNull: false,
                 },
                 ...listBusinessSectorKeys,
             },

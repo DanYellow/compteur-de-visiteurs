@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 @plugin "@tailwindcss/forms";
 
 @theme {
@@ -24,7 +24,7 @@
 }
 
 @utility title-font {
-    font-family: "Agency FB", sans-serif;
+    font-family: 'Agency FB', sans-serif;
 }
 
 @layer components {
@@ -90,7 +90,7 @@
 }
 
 :root {
-    font-family: "Calibri", sans-serif;
+    font-family: 'Calibri', sans-serif;
 
     /* --color-gray-numixs: #e0e0e0; */
 
@@ -110,10 +110,10 @@ html {
     position: relative;
 
     &.register {
-        background: url("/images/bottom-left-pattern.svg") no-repeat left bottom,
-            url("/images/top-right-pattern.svg") no-repeat right top, #272626;
+        background: url('/images/bottom-left-pattern.svg') no-repeat left bottom,
+            url('/images/top-right-pattern.svg') no-repeat right top, #272626;
         &::after {
-            content: "";
+            content: '';
             position: fixed;
             width: 700px;
             aspect-ratio: 1 / 1;
@@ -129,7 +129,7 @@ html {
     }
 
     &.admin {
-        background: url("/images/bottom-left-pattern.svg") no-repeat left bottom,
+        background: url('/images/bottom-left-pattern.svg') no-repeat left bottom,
             #272626;
     }
 }
@@ -315,14 +315,14 @@ button {
 }
 
 .result-form-modal::after {
-    content: "";
+    content: '';
     position: fixed;
     display: block;
     inset: 0;
     z-index: -1;
     opacity: 0.25;
-    background: url("/images/bottom-left-pattern.svg") no-repeat left bottom,
-        url("/images/top-right-pattern.svg") no-repeat right top, #312f2f;
+    background: url('/images/bottom-left-pattern.svg') no-repeat left bottom,
+        url('/images/top-right-pattern.svg') no-repeat right top, #312f2f;
     width: 100vw;
     height: 100vh;
 }
@@ -384,7 +384,8 @@ button {
     }
 }
 
-.pagination, .pagination-active {
+.pagination,
+.pagination-active {
     position: relative;
     &::after {
         display: block;
@@ -398,14 +399,14 @@ button {
     }
 
     &:is(:focus, :hover)::after {
-        content: "";
+        content: '';
     }
 }
 
 .pagination-active {
     color: var(--color-white-numixs);
     &::after {
-        content: "";
+        content: '';
         background-color: var(--color-gray-numixs);
     }
 }
@@ -428,11 +429,73 @@ button {
     display: flex;
     flex-direction: column;
     /* justify-content: center; */
-    opacity: 0.3;
+    opacity: 0.1;
     pointer-events: none;
+    transition: opacity 350ms ease-in-out;
 
     &.active {
         opacity: 1;
         pointer-events: all;
+    }
+
+    &::scroll-marker {
+        content: '';
+        width: 10px;
+        aspect-ratio: 1 / 1;
+        background-color: transparent;
+        border: 2px solid  rgb(from var(--color-green-numixs) r g b / 25%);
+        border-radius: 50%;
+    }
+
+    &::scroll-marker:target-current {
+        background-color: var(--color-green-numixs);
+    }
+}
+
+.wrapper {
+    anchor-name: --my-carousel;
+
+    &::scroll-button(*) {
+        border: 0;
+        font-size: 2rem;
+        background: none;
+        color: black;
+        opacity: 0.7;
+        cursor: pointer;
+    }
+
+    &::scroll-button(*):hover,
+    &::scroll-button(*):focus {
+        opacity: 1;
+    }
+
+    &::scroll-button(*):active {
+        translate: 1px 1px;
+    }
+
+    &::scroll-button(*):disabled {
+        opacity: 0.2;
+        cursor: unset;
+    }
+
+    &::scroll-button(*) {
+        position: absolute;
+        position-anchor: --my-carousel;
+    }
+
+    scroll-marker-group: after;
+
+    &::scroll-marker-group {
+        position: absolute;
+        position-anchor: --my-carousel;
+        right: calc(anchor(right) - 30px);
+        top: calc(anchor(top) + 50%);
+        /* top: calc(anchor(bottom) - 70px); */
+        /* justify-self: anchor-center; */
+
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        gap: 0.55rem;
     }
 }

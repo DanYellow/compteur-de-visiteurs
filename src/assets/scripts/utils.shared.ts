@@ -444,31 +444,31 @@ export const listDepartments = [
 export const listAgeGroups = [
     {
         label: '17 ans et moins',
-        value: 0,
+        value: '0',
     },
     {
         label: '18/24 ans',
-        value: 1,
+        value: '1',
     },
     {
         label: '25/34 ans',
-        value: 2,
+        value: '2',
     },
     {
         label: '35/49 ans',
-        value: 3,
+        value: '3',
     },
     {
         label: '50/64 ans',
-        value: 4,
+        value: '4',
     },
     {
         label: '65 ans et plus',
-        value: 5,
+        value: '5',
     },
 ];
 
-export const listSexes = [
+export const listGenders = [
     {
         label: 'Homme',
         value: '0',

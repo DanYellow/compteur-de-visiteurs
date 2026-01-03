@@ -42,23 +42,6 @@ const listBusinessSectorValidator: BusinessSectorSchema = listBusinessSector.map
     return { ...obj, ...item }
 }, {})
 
-export const VisitSchema = z.object({
-    // Secteur activité
-    ...listBusinessSectorValidator,
-}).refine((data) => {
-    return hasSelectedABusinessSector(data as BusinessSectorPayload);
-}, {
-    error: "Vous devez choisir au moins un groupe",
-    path: listBusinessSector.map((item) => item.value)
-}).refine(data => {
-    const entrepriseIsSelected = data.entreprise === "oui" && (data.entreprise_externe === "oui" || data.station_numixs === "oui");
-    const entrepriseIsNotSelected = !data.entreprise && !data.entreprise_externe && !data.station_numixs
-
-    return entrepriseIsNotSelected || entrepriseIsSelected;
-}, {
-    message: "Vous devez choisir un type d'entreprise",
-    path: ['entreprise'] // Pointing out which field is invalid
-})
 
 export const GroupSchema = z.object({
     // Secteur activité
@@ -80,21 +63,26 @@ export const GroupSchema = z.object({
 
 
 export const AgeSchema = z.object({
-    tranche_age: z.coerce.number()
-        .int()
-        .refine(v => listAgeGroups.map(({ value }) => value).includes(v), {
-            message: "Invalid level",
-        }),
+    tranche_age: z.enum(listAgeGroups.map(({ value }) => value), {
+        error: "Vous devez sélectionner une tranche d'âge",
+    })
 })
 
 export const DepartmentSchema = z.object({
     departement: z.enum(listDepartments.map(({ value }) => value), {
-        error: "Please select a status",
+        error: "Vous devez sélectionner un département",
     })
 })
 
 export const GenderSchema = z.object({
     genre: z.enum(["0", "1", "2"], {
-        error: "Please select a status",
+        error: "Vous devez sélectionner un genre",
     })
 })
+
+export const VisitSchema = z.object({
+    ...DepartmentSchema.shape,
+    ...GenderSchema.shape,
+    ...AgeSchema.shape,
+    ...GroupSchema.shape,
+});

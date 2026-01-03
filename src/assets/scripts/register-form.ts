@@ -1,5 +1,4 @@
-import { VisitorSchema } from "#scripts/schemas.ts";
-import { VisitSchema, DepartmentSchema, AgeSchema, GenderSchema } from "#scripts/schemas/index.ts";
+import { GroupSchema, DepartmentSchema, AgeSchema, GenderSchema } from "#scripts/schemas/index.ts";
 import type { ZodObject } from "zod";
 
 import { cancellableSleep } from "./utils";
@@ -24,58 +23,69 @@ let currentStep = 0;
 let currentStepName = "";
 
 const listStepsSchemas: Record<string, ZodObject> = {
-    group: VisitSchema,
+    group: GroupSchema,
     gender: GenderSchema,
     department: DepartmentSchema,
     age: AgeSchema,
 }
 
+const resetSteps = () => {
+    form.reset();
+    currentStep = 0;
+    listFormSteps[0].classList.add("active");
+
+    listFormSteps[0].scrollIntoView({
+        behavior: 'instant',
+        block: 'start'
+    });
+}
+
 const submitForm = async (e: SubmitEvent) => {
     e.preventDefault();
 
-    // const form = (e.currentTarget as HTMLFormElement);
-    // form.dataset.isDirty = "";
+    const form = (e.currentTarget as HTMLFormElement);
+    form.dataset.isDirty = "";
 
     // if (!validForm(e)) {
     //     return;
     // }
 
-    // dialog.showModal();
-    // const dialogSwapContainer = dialog.querySelector("[data-swap-content]") as HTMLDivElement;
-    // dialogSwapContainer.innerHTML = "";
-    // dialogSwapContainer.append(formSubmittingTplRaw.content.cloneNode(true));
+    dialog.showModal();
+    const dialogSwapContainer = dialog.querySelector("[data-swap-content]") as HTMLDivElement;
+    dialogSwapContainer.innerHTML = "";
+    dialogSwapContainer.append(formSubmittingTplRaw.content.cloneNode(true));
 
-    // const formData = new FormData(form);
+    const formData = new FormData(form);
 
-    // const req = await fetch("/", {
-    //     method: "POST",
-    //     headers: {
-    //         'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(Object.fromEntries(Array.from(formData.entries()))),
-    // });
+    const req = await fetch("/", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(Object.fromEntries(Array.from(formData.entries()))),
+    });
 
-    // const res = await req.json();
+    const res = await req.json();
 
-    // dialogSwapContainer.innerHTML = "";
+    dialogSwapContainer.innerHTML = "";
 
-    // if (res.success) {
-    //     e.submitter?.blur();
-    //     form.reset();
-    //     const tplSuccess = formSuccessTplRaw.content.cloneNode(true) as HTMLDivElement;
-    //     const placeName = tplSuccess.querySelector("[data-place]")! as HTMLSpanElement;
+    if (res.success) {
+        e.submitter?.blur();
+        resetSteps()
+        const tplSuccess = formSuccessTplRaw.content.cloneNode(true) as HTMLDivElement;
+        const placeName = tplSuccess.querySelector("[data-place]")! as HTMLSpanElement;
 
-    //     placeName.textContent = res.data.nom;
-    //     dialogSwapContainer.append(tplSuccess);
-    // } else {
-    //     dialogSwapContainer.append(formErrorTplRaw.content.cloneNode(true));
-    // }
+        placeName.textContent = res.data.nom;
+        dialogSwapContainer.append(tplSuccess);
+    } else {
+        dialogSwapContainer.append(formErrorTplRaw.content.cloneNode(true));
+    }
 
-    // try {
-    //     await cancellableSleep(Number(import.meta.env.FORM_RESULT_TIMEOUT), sleepController.signal);
-    //     dialog.close();
-    // } finally {
-    // }
+    try {
+        // await cancellableSleep(Number(import.meta.env.FORM_RESULT_TIMEOUT), sleepController.signal);
+        // dialog.close();
+    } finally {
+    }
 };
 
 const validForm = (form: HTMLFormElement) => {
@@ -150,27 +160,53 @@ function updateWizardHeight() {
 // Initial calculation
 updateWizardHeight();
 
+// window.addEventListener("resize", setWizardHeight);
+
+const resizeObserver = new ResizeObserver(() => {
+    updateWizardHeight();
+});
+
+listFormSteps.forEach(step => {
+    resizeObserver.observe(step);
+});
+
 listFormSteps[0].classList.add("active");
 
 listAllStepValidationButtons.forEach((item: HTMLButtonElement) => {
     item.addEventListener("click", (e: Event) => {
-        currentStepName = item.dataset.stepName!;
-        const form = (item.form as HTMLFormElement);
+        const stepDirection = item.dataset.buttonStep as "prev" | "next";
 
-        form.dataset.isDirty = "";
+        if (stepDirection === "prev") {
 
-        if (!validForm(form)) {
-            return;
+        } else {
+            currentStepName = item.dataset.stepName!;
+            const form = (item.form as HTMLFormElement);
+
+            form.dataset.isDirty = "";
+
+            if (!validForm(form)) {
+                return;
+            }
         }
+
         // const index = Array.from(containerSteps.children).indexOf(item.closest("[data-step]")!);
 
         listFormSteps[currentStep].classList.remove("active");
-        currentStep += 1;
-        listFormSteps[currentStep].classList.add("active");
+        currentStep += stepDirection === "prev" ? -1 : 1;
 
-        listFormSteps[currentStep].scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
+        if (listFormSteps[currentStep]) {
+            listFormSteps[currentStep].classList.add("active");
+
+            listFormSteps[currentStep].scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        } else {
+            form.requestSubmit();
+        }
     })
 })
+
+window.addEventListener("pageshow", () => {
+    resetSteps();
+});

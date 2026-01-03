@@ -27,51 +27,70 @@ Compteur de visiteurs
                     <div data-step="1" class="form-step">
                         {% include "includes/registration-steps/group-step.njk" %}
 
-                        <div class="mt-7">
-                            <button type="button" data-button-step data-step-name="group" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
-                        Envoyer
-                        {% include "includes/icons/next-arrow.svg" %}
+                        <div class="mt-7 flex flex-row justify-between">
+                            <div inert></div>
+                            <button type="button" data-button-step="next" data-step-name="group" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                            Continuer
+                            {% include "includes/icons/next-arrow.svg" %}
                             </button>
                         </div>
                     </div>
                     <div data-step="2" class="form-step">
                         {% include "includes/registration-steps/gender-step.njk" %}
 
-                        <div class="mt-7">
-                            <button type="button" data-button-step data-step-name="gender" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
-                        Envoyer
-                        {% include "includes/icons/next-arrow.svg" %}
+                        <div class="mt-7 flex flex-row justify-between">
+                            <button type="button" data-button-step="prev" data-step-name="group" class="text-white-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white/80 items-center">
+                                <span class="-scale-x-100">
+                                    {% include "includes/icons/next-arrow.svg" %}
+                                </span>
+                                Revenir
+                            </button>
+                            <button type="button" data-button-step="next" data-step-name="gender" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                                Continuer
+                                {% include "includes/icons/next-arrow.svg" %}
                             </button>
                         </div>
                     </div>
                     <div data-step="3" class="form-step">
                         {% include "includes/registration-steps/department-step.njk" %}
 
-                        <div class="mt-7">
-                            <button type="button" data-button-step data-step-name="department" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
-                        Envoyer
-                        {% include "includes/icons/next-arrow.svg" %}
+                        <div class="mt-7 flex flex-row justify-between">
+                            <button type="button" data-button-step="prev" class="text-white-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white/80 items-center">
+                                <span class="-scale-x-100">
+                                    {% include "includes/icons/next-arrow.svg" %}
+                                </span>
+                                Revenir
+                            </button>
+                            <button type="button" data-button-step="next" data-step-name="department" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                                Continuer
+                                {% include "includes/icons/next-arrow.svg" %}
                             </button>
                         </div>
                     </div>
                     <div data-step="4" class="form-step">
                         {% include "includes/registration-steps/age-step.njk" %}
 
-                        <div class="mt-7">
-                            <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
-                        Envoyer
-                        {% include "includes/icons/next-arrow.svg" %}
+                        <div class="mt-7 flex flex-row justify-between">
+                            <button type="button" data-button-step="prev" class="text-white-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white/80 items-center">
+                                <span class="-scale-x-100">
+                                    {% include "includes/icons/next-arrow.svg" %}
+                                </span>
+                                Revenir
+                            </button>
+                            <button type="button" data-button-step="next" data-step-name="age" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                                Envoyer
+                                {% include "includes/icons/next-arrow.svg" %}
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
         </form>
-        <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full">
+        {# <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full">
             <img src="/images/compteur-deco-image.png" alt="" srcset="">
-        </div>
-        {# <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full" style="background-image: url('/images/compteur-deco-image.png')">
         </div> #}
+        <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full" style="background-image: url('/images/compteur-deco-image.png')">
+        </div>
     </div>
 
     <footer class="max-w-7xl px-3 mx-auto text-center text-xs mt-4">

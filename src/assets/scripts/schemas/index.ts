@@ -2,7 +2,7 @@ import * as z from "zod";
 
 import { REQUIRED_MESSAGE } from '#scripts/utils.shared.ts';
 
-export { VisitSchema, DepartmentSchema, AgeSchema, GenderSchema } from "./visit.ts";
+export { VisitSchema, DepartmentSchema, AgeSchema, GenderSchema, GroupSchema } from "./visit.ts";
 export { PlaceSchema } from "./place.ts";
 export { EventSchema } from "./event.ts";
 
