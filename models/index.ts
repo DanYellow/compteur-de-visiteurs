@@ -20,7 +20,7 @@ const sequelize = new Sequelize({
     define: {
         freezeTableName: true,
     },
-    logging: false,
+    logging: process.env.NODE_ENV === "development",
 });
 
 try {

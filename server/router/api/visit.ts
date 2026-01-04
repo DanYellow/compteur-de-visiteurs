@@ -1,7 +1,7 @@
 
 import express from "express";
 import { DateTime } from "luxon";
-import { Op } from 'sequelize';
+import { Op, ProjectionAlias } from 'sequelize';
 
 import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel } from "#models/index.ts";
 import { PERIOD_PREDICATE } from "#server/router/api/index.ts";
@@ -28,7 +28,7 @@ router.get("/visites", async (req, res) => {
         place = await PlaceModel.findOne({ where: { slug: String(req.query.lieu) } })
     }
 
-    let groupQuery = [sequelize.fn("trim",
+    let groupQuery: ProjectionAlias | undefined = [sequelize.fn("trim",
         sequelize.fn("strftime", (PERIOD_PREDICATE as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime")
     ), "groupe"]
     if (req.query.filtre === "mois") {
@@ -45,8 +45,9 @@ router.get("/visites", async (req, res) => {
             raw: true,
             attributes: {
                 include: [
-                    [sequelize.literal("ROW_NUMBER() OVER (ORDER by date_passage ASC)"), "order"],
-                    [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"],
+                    [sequelize.literal("ROW_NUMBER() OVER (ORDER by date_passage ASC)"), "order"] as ProjectionAlias,
+                    // [sequelize.literal(`strftime('%u', ${visitTable}.date_passage, 'localtime')`), "ff"],
+                    [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"] as ProjectionAlias,
                     groupQuery,
                     [
                         sequelize.literal(`
@@ -65,52 +66,54 @@ router.get("/visites", async (req, res) => {
                         )`
                         ),
                         "liste_evenements"
-                    ]
+                    ] as ProjectionAlias
                 ],
                 exclude: ["lieu_id"]
             },
             where: {
                 [Op.and]: [
-                    sequelize.literal(`
-                        json_array_length("place->regularOpening"."jours_fermeture") = 0
-                        OR EXISTS (
-                            SELECT 1
-                            FROM json_each("place->regularOpening"."jours_fermeture")
-                            WHERE json_each.value != CAST( strftime('%u', visit.date_passage, 'localtime') AS text)
-                        )
-                    `),
-                    sequelize.where(
-                        sequelize.col("place.ouvert"), {
-                        [Op.eq]: 1
-                    })
-                    ,
                     {
                         date_passage: {
-                            [Op.and]: [
-                                {
-                                    [Op.between]: [startTime.toString(), endTime.toString()]
-                                }, {
-                                    [Op.or]: [
-                                        sequelize.literal(`(
-                                            SELECT 1
-                                            FROM regular_opening AS p
-                                            WHERE p.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
-                                            AND p.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
-                                        )`),
-                                        sequelize.literal(`(
-                                            SELECT 1
-                                            FROM ${eventTable} AS so
-                                            WHERE so.date = strftime("%Y-%m-%d", ${visitTable}.date_passage, 'localtime')
-                                            AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
-                                            AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
-                                        )`)
-                                    ]
-                                }
-                            ]
+                            [Op.between]: [startTime.toString(), endTime.toString()]
                         }
-                    }
-                ],
-                ...(place ? { lieu_id: place.id } : {}),
+                    },
+                    sequelize.literal(`
+                    (
+                        (
+                        -- REGULAR OPENING RULES
+                        (
+                            json_array_length("place->regularOpening"."jours_fermeture") = 0
+                            OR NOT EXISTS (
+                            SELECT 1
+                            FROM json_each("place->regularOpening"."jours_fermeture")
+                            WHERE json_each.value = CAST(strftime('%u', ${visitTable}.date_passage, 'localtime') AS text)
+                            )
+                        )
+                        AND EXISTS (
+                            SELECT 1
+                            FROM regular_opening AS p
+                            WHERE p.place_id = ${visitTable}.lieu_id
+                            AND p.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                            AND p.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                        )
+                        )
+                        OR
+                        (
+                        -- EVENT OVERRIDE
+                            EXISTS (
+                                SELECT 1
+                                FROM ${eventTable} AS so
+                                INNER JOIN place_event pe ON pe.event_id = so.id
+                                WHERE pe.place_id = ${visitTable}.lieu_id
+                                AND so.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
+                                AND so.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                                AND so.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                            )
+                        )
+                    )
+                `),
+                    ...(place ? [{ lieu_id: place.id }] : [])
+                ]
             },
             include: [{
                 model: PlaceModel,
@@ -138,6 +141,7 @@ router.get("/visites", async (req, res) => {
                 ['date_passage', 'DESC'],
             ]
         });
+
 
         res.status(200).json({
             data: listVisits

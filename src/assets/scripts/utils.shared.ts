@@ -152,15 +152,15 @@ export const getPivotTable = (
                     return (
                         (acc[business.value] = [
                             (acc[business.value]?.[0] || 0) +
-                                (visit[business.value as keyof VisitRaw] ===
-                                    'oui' && !isEventVisit
-                                    ? 1
-                                    : 0),
+                            (visit[business.value as keyof VisitRaw] ===
+                                'oui' && !isEventVisit
+                                ? 1
+                                : 0),
                             (acc[business.value]?.[1] || 0) +
-                                (visit[business.value as keyof VisitRaw] ===
-                                    'oui' && isEventVisit
-                                    ? 1
-                                    : 0),
+                            (visit[business.value as keyof VisitRaw] ===
+                                'oui' && isEventVisit
+                                ? 1
+                                : 0),
                         ]),
                         acc
                     );
@@ -173,7 +173,7 @@ export const getPivotTable = (
                             (acc[business.value] =
                                 (acc[business.value] || 0) +
                                 (visit[business.value as keyof VisitRaw] ===
-                                'oui'
+                                    'oui'
                                     ? 1
                                     : 0)),
                             acc
@@ -324,7 +324,7 @@ export const getWeeksRangeMonth = (daySelected: DateTime) => {
                 listWeeks.push({
                     id: item.start!.weekNumber,
                     name: `${item.start.toFormat('dd/LL')} ➜ ${(index ===
-                    array.length - 1
+                        array.length - 1
                         ? endMonth
                         : item.end!.minus({ day: 1 })
                     ).toFormat('dd/LL')}`,
@@ -484,3 +484,7 @@ export const listGenders = [
 ];
 
 export const REQUIRED_MESSAGE = 'Ce champ est obligatoire';
+
+export const uniqueByKey = (arr: any[], key: string) => {
+    return [...new Map(arr.map(item => [item[key], item])).values()];
+};

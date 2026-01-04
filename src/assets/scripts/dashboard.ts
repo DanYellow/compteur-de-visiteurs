@@ -4,7 +4,7 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { DateTime, Info } from "luxon";
 
 import type { ChartConfigData, CustomTitleOptions, EventRaw, LineChartEntry, VisitRaw } from "#types";
-import { capitalizeFirstLetter, baseConfigData, getPivotTable, listGroups as listBusinessSector, getWeeksRangeMonth } from './utils.shared';
+import { capitalizeFirstLetter, baseConfigData, getPivotTable, listGroups as listBusinessSector, getWeeksRangeMonth, uniqueByKey } from './utils.shared';
 import { TotalVisitors } from './utils';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
@@ -247,7 +247,7 @@ const listCharts = Object.values(configData);
                     ...resEvent.data.map((item: EventRaw) => item.jour)
                 ].sort((itemA, itemB) => itemA.id - itemB.id);
 
-                xLabels = Array.from(new Set(xLabels.map((item) => JSON.stringify(item)))).map((item) => JSON.parse(item))
+                xLabels = uniqueByKey(xLabels, "id");
 
                 eventData = new Array(xLabels.length).fill(0);
 
