@@ -1,7 +1,7 @@
 import express from "express";
 import { DateTime, Info } from "luxon";
 
-import { capitalizeFirstLetter, listGroups as listBusinessSector } from '#scripts/utils.shared.ts';
+import { capitalizeFirstLetter, listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '#scripts/utils.shared.ts';
 import PlaceRouter from "#server/router/admin/place.ts";
 import EventRouter from "#server/router/admin/event.ts";
 import UserRouter from "#server/router/admin/user.ts";
@@ -11,6 +11,7 @@ import { Op } from "sequelize";
 import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
 
 import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
+import { getVisitsSummaries } from "#server/utils.ts";
 
 const router = express.Router();
 
@@ -202,17 +203,6 @@ router.get(["/visiteurs", "/visites"], getUser, requireRoleMiddleware(), async (
     const listVisitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/visites?filtre=jour&jour=${daySelected.toFormat("yyyy-LL-dd")}&lieu=${placeSelected}`);
     const listVisits = (await listVisitsReq.json()).data || [];
 
-    const listBusinessSectorSelectable = listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb));
-    const listBusinessSectorKeys = listBusinessSectorSelectable.map((item) => item.value)
-
-    const visitsSummary = Object.fromEntries(listBusinessSectorKeys.map((item) => [item, 0]))
-
-    listVisits.forEach((visit: VisitRaw) => {
-        listBusinessSectorKeys.forEach((business) => {
-            visitsSummary[business] += visit[business] === "oui" ? 1 : 0
-        });
-    });
-
     const listPlaces = await PlaceModel.findAll({
         raw: true,
         include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
@@ -229,9 +219,12 @@ router.get(["/visiteurs", "/visites"], getUser, requireRoleMiddleware(), async (
     });
 
     res.render("pages/admin/visits-list.njk", {
-        visits_summary: visitsSummary,
+        visits_summary: getVisitsSummaries(listVisits),
         "visits_list": listVisits,
-        "list_business_sector": listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)),
+        "list_groups": listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)),
+        "list_genders": listGenders,
+        "list_departments": listDepartments,
+        "list_age_groups": listAgeGroups,
         "header_list": listVisits?.[0] ? Object.keys(listVisits[0]) : [],
         "current_date": daySelected,
         "today": DateTime.now(),

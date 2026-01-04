@@ -5,6 +5,8 @@ import nodemailer from "nodemailer";
 import juice from "juice";
 import nunjucks from "nunjucks";
 import dotenv from "dotenv";
+import { listGroups } from "#scripts/utils.shared.ts";
+import { VisitRaw } from "#types";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
@@ -47,4 +49,32 @@ export const renderEmail = (template: string, data: Record<string, any> = {}) =>
         insertPreservedExtraCss: false,
     })
     // .replace(/<style[\s\S]*?<\/style>/gi, '');
+}
+
+export const getVisitsSummaries = (listVisits: VisitRaw[]) => {
+    const result: Record<string, Record<string, number>> = {};
+
+    const listKeys = ["genre", "departement", "tranche_age",];
+
+    listKeys.forEach((key) => {
+        result[key] = listVisits.reduce((acc, visit: VisitRaw) => {
+            const value = visit[key];
+
+            if (value != null) {
+                acc[value] = (acc[value] || 0) + 1;
+            }
+
+            return acc;
+        }, {})
+    })
+
+    const listGroupsFiltered = listGroups.filter((item) => (!("listInDb" in item) || item.listInDb)).map((item) => item.value);
+
+    result.group = listGroupsFiltered.reduce((acc, key) => {
+        acc[key] = listVisits.reduce((count, item) => count + (item[key] === "oui" ? 1 : 0), 0);
+
+        return acc;
+    }, {});
+
+    return result;
 }

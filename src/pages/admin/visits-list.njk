@@ -80,22 +80,22 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
             </header>
             {% set todayLink = "/visites" %}
             {% include "includes/calendar.njk" %}
-            <header class="flex mb-3 gap-3">
+            <header class="flex flex-col mb-3 gap-3">
                 <div class="flex flex-col w-full md:w-auto bg-green-numixs p-3 pr-5 rounded-md text-black-numixs">
-                    {% if is_day_closed == false or list_day_events|length %}
+                    {% if is_day_closed == false or list_day_events | length %}
                         <p class="text-2xl title-font">
                             Nombre de visites uniques
                         </p>
                     {% endif %}
 
                     <p class="text-4xl title-font">
-                        {% if is_day_closed and list_day_events|length == 0 %}
+                        {% if is_day_closed and list_day_events | length == 0 %}
                         Fermé
                     {% else %}
                             {{ visits_list|length }}
                         {% endif %}
                     </p>
-                    {% if list_day_events|length %}
+                    {% if list_day_events | length %}
                         <p class='text-sm font-bold md:max-w-50'>Évènement(s) du jour :<br/>
                             {% for event in list_day_events %}
                                 <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-event" command="show-modal" data-event-data='{{ event | json }}'>
@@ -104,36 +104,60 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                                         <path d="M8.25 10.875a2.625 2.625 0 1 1 5.25 0 2.625 2.625 0 0 1-5.25 0Z"/>
                                         <path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25Zm-1.125 4.5a4.125 4.125 0 1 0 2.338 7.524l2.007 2.006a.75.75 0 1 0 1.06-1.06l-2.006-2.007a4.125 4.125 0 0 0-3.399-6.463Z" clip-rule="evenodd"/>
                                     </svg>
-                                </button>{% if loop.last == false and loop.length > 1 %}, {% endif %}
+                                </button>
+                                {% if loop.last == false and loop.length > 1 %}, {% endif %}
                             {% endfor %}
                         </p>
                     {% endif %}
                     <p>{{ current_date|date("EEEE dd LLLL yyyy") }}</p>
                 </div>
-                <div class="bg-black-numixs p-3 rounded-md text-white-numixs hidden md:block flex-1">
-                    <p class="col-span-full text-2xl">Détails des visites par type de visiteur</p>
-                    <div class="md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
-                        <p class="col-span-full text-xl">Par groupe</p>
-                        {% for business in list_business_sector %}
-                            <div class="flex flex-col flex-auto">
-                                <p class="h-8">{{ business.name }}</p>
-                                <p class="text-xl place-content-end -mt-4">{{ visits_summary[business.value] }}</p>
-                            </div>
-                        {% endfor %}
+                <details class="bg-black-numixs text-white-numixs rounded-md">
+                    <summary class="p-3 text-2xl">
+                        Détails des visites par type de visiteur
+                    </summary>
+                    <div class="bg-black-numixs rounded-b-md p-3">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                            <p class="col-span-full text-xl">Par groupe</p>
+                            {% for business in list_groups %}
+                                <div class="flex flex-col flex-auto">
+                                    <p class="h-8">{{ business.name }}</p>
+                                    <p class="text-xl place-content-end -mt-4">{{ visits_summary.group[business.value] }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <hr class="my-4">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                            <p class="col-span-full text-xl">Par tranche d'âge</p>
+                            {% for age_group in list_age_groups %}
+                                <div class="flex flex-col flex-auto">
+                                    <p class="h-8">{{ age_group.label }}</p>
+                                    <p class="text-xl place-content-end -mt-4">{{ visits_summary.tranche_age[age_group.value] or 0 }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <hr class="my-4">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                            <p class="col-span-full text-xl">Par genre</p>
+                            {% for gender in list_genders %}
+                                <div class="flex flex-col flex-auto">
+                                    <p class="h-8">{{ gender.label }}</p>
+                                    <p class="text-xl place-content-end -mt-4">{{ visits_summary.genre[gender.value] or 0 }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        <hr class="my-4">
+                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                            <p class="col-span-full text-xl">Par département</p>
+                            {% for department in list_departments %}
+                                <div class="flex flex-col flex-auto">
+                                    <p class="h-8">{{ department.label }}</p>
+                                    <p class="text-xl place-content-end -mt-4">{{ visits_summary.departement[department.value] or 0 }}</p>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                    <hr class="my-4">
-                    <div class="md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
-                        <p class="col-span-full text-xl">Par tranche d'âge</p>
-                    </div>
-                    <hr class="my-4">
-                    <div class="md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
-                        <p class="col-span-full text-xl">Par sexe</p>
-                    </div>
-                    <hr class="my-4">
-                    <div class="md:grid md:grid-cols-3 lg:grid-cols-4 gap-1.5">
-                        <p class="col-span-full text-xl">Par département</p>
-                    </div>
-                </div>
+                </details>
+
             </header>
             {% if place.nom %}
                 <div class="p-3 rounded-md border-solid border-black-numixs border mb-3">
@@ -164,7 +188,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             <td class="font-bold px-4 py-3 text-left">Date de visite</td>
                             <td class="font-bold px-4 py-3 text-left">Lieu</td>
                             <td class="font-bold px-4 py-3 text-left">Évènement</td>
-                            {% for business in list_business_sector %}
+                            {% for business in list_groups %}
                                 <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name | striptags(true) | escape | nl2br }}</td>
                             {% endfor %}
                             <td class="font-bold px-4 py-3 text-left"></td>
@@ -183,7 +207,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Date de passage" data-row-key="Date de passage">
                                     {{ visit["liste_evenements"]|split()|safe if visit["liste_evenements"] != "" else "/" }}
                                 </td>
-                                {% for business in list_business_sector %}
+                                {% for business in list_groups %}
                                     <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left {{ "font-bold" if visit[business.value] == "oui" else "" }}" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ visit[business.value] }}</td>
                                 {% endfor %}
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
@@ -197,8 +221,8 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             </tr>
                         {% else %}
                             <tr class="">
-                                <td colspan="{{ (list_business_sector | length) + 4 }}" class="px-4 py-3 text-center">
-                                    {% if is_day_closed and list_day_events|length == 0 %}
+                                <td colspan="{{ (list_groups | length) + 4 }}" class="px-4 py-3 text-center">
+                                    {% if is_day_closed and list_day_events | length == 0 %}
                                         {{ "Aucun lieu ouvert le" if place_selected == "tous" else "Fermé le " }}
                                         <time datetime="{{ current_date }}">{{ current_date|date("dd/LL/yyyy") }}</time>
                                     {% else %}
@@ -250,20 +274,20 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     <time datetime="">28/02/2024 à 10:00:00</time>
                 </p>
                 <p class="text-sm">
-                    <span class="inline-flex items-center gap-1">
+                    <span class="inline-flex items-center gap-1" title="Lieu">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 inline-block">
                             <path fill-rule="evenodd" d="m11.54 22.351.07.04.028.016a.76.76 0 0 0 .723 0l.028-.015.071-.041a16.975 16.975 0 0 0 1.144-.742 19.58 19.58 0 0 0 2.683-2.282c1.944-1.99 3.963-4.98 3.963-8.827a8.25 8.25 0 0 0-16.5 0c0 3.846 2.02 6.837 3.963 8.827a19.58 19.58 0 0 0 2.682 2.282 16.975 16.975 0 0 0 1.145.742ZM12 13.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" clip-rule="evenodd"/>
                         </svg>
-                    <span data-place-name></span> |
+                        <span data-place-name></span> |
                     </span>
-                    <span class="inline-flex items-center gap-1">
+                    <span class="inline-flex items-center gap-1" title="Évènement(s)">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-4 inline-block">
-                            <path d="M12.75 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM7.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM8.25 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM9.75 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM10.5 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM12.75 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM14.25 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 13.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" />
-                            <path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z" clip-rule="evenodd" />
+                            <path d="M12.75 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM7.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM8.25 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM9.75 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM10.5 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM12 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM12.75 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM14.25 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 17.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 15.75a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5ZM15 12.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM16.5 13.5a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"/>
+                            <path fill-rule="evenodd" d="M6.75 2.25A.75.75 0 0 1 7.5 3v1.5h9V3A.75.75 0 0 1 18 3v1.5h.75a3 3 0 0 1 3 3v11.25a3 3 0 0 1-3 3H5.25a3 3 0 0 1-3-3V7.5a3 3 0 0 1 3-3H6V3a.75.75 0 0 1 .75-.75Zm13.5 9a1.5 1.5 0 0 0-1.5-1.5H5.25a1.5 1.5 0 0 0-1.5 1.5v7.5a1.5 1.5 0 0 0 1.5 1.5h13.5a1.5 1.5 0 0 0 1.5-1.5v-7.5Z" clip-rule="evenodd"/>
                         </svg>
-                    <span data-visit-events></span>
+                        <span data-visit-events></span>
                     </span>
-                    </p>
+                </p>
             </div>
             <button type="button" command="close" commandfor="detail-visit" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -273,11 +297,23 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
         </header>
 
         <hr class="pb-1 mt-1 border-green-numixs">
-        <p class="text-xl">Groupe(s)</p>
-        <ul class="list-disc list-inside">
-            <li>En réinsertion pro</li>
-            <li>Entreprise Externe</li>
-        </ul>
+
+        <div class="grid grid-cols-[max-content_1fr] gap-x-5">
+            <p class="text-lg">Groupe(s)</p>
+            <ul class="list-disc list-inside mt-0.5" data-list-groups>
+                <li>En réinsertion pro</li>
+                <li>Entreprise Externe</li>
+            </ul>
+
+            <p class="text-lg">Genre</p>
+            <p class="mt-0.5" data-gender></p>
+
+            <p class="text-lg">Département</p>
+            <p class="mt-0.5" data-department></p>
+
+            <p class="text-lg">Tranche d'âge</p>
+            <p class="mt-0.5" data-age></p>
+        </div>
     </dialog>
 
     <dialog id="detail-event" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">

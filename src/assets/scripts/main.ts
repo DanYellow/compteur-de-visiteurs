@@ -1,4 +1,5 @@
 import "#styles/main.css";
+import "#styles/details.css";
 import "#styles/notification.css";
 import "#styles/calendar.css";
 
