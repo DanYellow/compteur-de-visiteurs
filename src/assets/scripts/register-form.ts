@@ -46,10 +46,6 @@ const submitForm = async (e: SubmitEvent) => {
     const form = (e.currentTarget as HTMLFormElement);
     form.dataset.isDirty = "";
 
-    // if (!validForm(e)) {
-    //     return;
-    // }
-
     dialog.showModal();
     const dialogSwapContainer = dialog.querySelector("[data-swap-content]") as HTMLDivElement;
     dialogSwapContainer.innerHTML = "";
@@ -210,3 +206,33 @@ window.addEventListener("pageshow", () => {
     resetSteps();
 });
 
+const req = await fetch("/api/visite/M74"); // QKC CHW
+const payload = await req.json();
+
+Object.entries(payload.contenu as Record<string, any>).forEach(([name, value]) => {
+    const field = form.elements.namedItem(name);
+    if (!field) return;
+
+    if (field instanceof HTMLInputElement) {
+        switch (field.type) {
+            case "checkbox":
+                field.checked = value === true || value === "oui" || value === "on";
+                break;
+
+            case "radio":
+                field.checked = field.value === value;
+                break;
+
+            default:
+                field.value = value;
+        }
+
+        return;
+    }
+
+    if (field instanceof RadioNodeList) {
+        field.value = value;
+
+        return;
+    }
+});

@@ -6,7 +6,7 @@ import { listGroups as listBusinessSector, listDepartments, listAgeGroups, listG
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
 import { VisitSchema } from "#scripts/schemas/index.ts";
 import { flashMessageCookieOptions, wss } from "#server/index.ts";
-import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User as UserModel, Visit as VisitModel } from "#models/index.ts";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel, VisitRegistered as VisitRegisteredModel, Visit as VisitModel } from "#models/index.ts";
 import { parseManifest, requireRoleMiddleware } from "#server/middlewares.ts";
 
 import ApiRouter from "./api/index.ts";
@@ -28,7 +28,8 @@ router.use(async (req, res, next) => {
 
     next();
 });
-// https://apidog.com/fr/blog/node-js-express-authentication-7/
+
+const generateFormCode = () => Math.random().toString(36).substring(2, 5).toUpperCase();
 
 router.get("/", async (req, res) => {
     const nbPlaces = await PlaceModel.count();
@@ -60,6 +61,8 @@ router.get("/", async (req, res) => {
         return res.status(500).json({ "success": false });
     }
 
+    console.log("req.body", req.body)
+
     try {
         const place = await PlaceModel.findOne({ where: { slug: req.cookies.lieu_numixs } })
         if (!place) {
@@ -70,25 +73,12 @@ router.get("/", async (req, res) => {
             lieu_id: place!.id,
         }
 
-        //         const [order, created] = await sequelize.query(`
-        //     INSERT INTO orders (customer_id, amount, created_at, updated_at)
-        //     SELECT :customerId, :amount, NOW(), NOW()
-        //     FROM customers
-        //     WHERE id = :customerId AND status = 'active'
-        //     RETURNING *;
-        //   `, {
-        //     replacements: {
-        //       customerId,
-        //       amount: orderData.amount
-        //     },
-        //     type: QueryTypes.INSERT
-        //   });
+        const newVisit = await VisitModel.create(payload);
 
-        // if (!created || order.length === 0) {
-        //     throw new Error('Cannot create order: Customer not active');
-        //   }
+        const code = generateFormCode();
 
-        const newVisit = await VisitModel.create(payload)
+        await VisitRegisteredModel.create({ code, contenu: req.body });
+
         await new Promise(r => setTimeout(r, 1500));
 
         wss.clients.forEach((client) => {
@@ -97,7 +87,13 @@ router.get("/", async (req, res) => {
             }
         });
 
-        res.status(200).json({ "success": true, data: (await newVisit.getPlace()).toJSON() })
+        res.status(200).json({
+            success: true,
+            data: {
+                ...(await newVisit.getPlace()).toJSON(),
+                code,
+            }
+        })
     } catch (err) {
         console.log(err)
         res.status(500).json({ "success": false })

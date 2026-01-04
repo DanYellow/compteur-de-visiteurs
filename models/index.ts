@@ -1,6 +1,7 @@
 import { Sequelize } from "sequelize";
 import Place from "./place";
 import Visit from "./visit";
+import VisitRegistered from "./visit-registered";
 import RegularOpening from "./regular-opening";
 import Event from "./event";
 import User from "./user";
@@ -20,7 +21,7 @@ const sequelize = new Sequelize({
     define: {
         freezeTableName: true,
     },
-    logging: process.env.NODE_ENV === "development",
+    logging: false, //process.env.NODE_ENV === "development",
 });
 
 try {
@@ -32,6 +33,7 @@ try {
 
 Place.initModel(sequelize);
 Visit.initModel(sequelize);
+VisitRegistered.initModel(sequelize);
 RegularOpening.initModel(sequelize);
 Event.initModel(sequelize);
 User.initModel(sequelize);
@@ -139,4 +141,4 @@ if (adminCount === 0) {
 
 export default sequelize;
 
-export { Place, Visit, RegularOpening, Event, User, UserPublicKeyCredentials };
+export { Place, Visit, RegularOpening, Event, User, UserPublicKeyCredentials, VisitRegistered };

@@ -19,6 +19,10 @@ Compteur de visiteurs
             <header class="mb-6">
                 <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-20" alt="">
                 <p class="text-sm">{{ place.nom }}</p>
+                <div class="flex gap-3 flex-col sm:flex-row">
+                    <button type="button" class="bg-green-numixs hocus:bg-dark-green-numixs text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="explaination" command="show-modal">J'ai un code de visite</button>
+                    <button type="button" class="bg-white-numixs hocus:bg-white-numixs/80 text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="explaination" command="show-modal">Pourquoi remplir ce formulaire ?</button>
+                </div>
             </header>
             <ul class="form-errors-list-container not-empty:mb-3" role="alert" data-form-errors id="error-container"></ul>
             <div class="relative" id="wizard-steps">
@@ -89,8 +93,7 @@ Compteur de visiteurs
         {# <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full">
             <img src="/images/compteur-deco-image.png" alt="" srcset="">
         </div> #}
-        <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full" style="background-image: url('/images/compteur-deco-image.png')">
-        </div>
+        <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full" style="background-image: url('/images/compteur-deco-image.png')"></div>
     </div>
 
     <footer class="max-w-7xl px-3 mx-auto text-center text-xs mt-4">
@@ -126,4 +129,18 @@ Compteur de visiteurs
 
         <button type="button" data-close-dialog command="close" commandfor="result-form-modal" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 active:bg-dark-green-numixs">Recommencer</button>
     </template>
+
+    <dialog id="explaination" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Pourquoi remplir ce formulaire ?</p>
+            </div>
+            <button type="button" command="close" commandfor="explaination" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+        <hr class="pb-1 mt-1 border-green-numixs">
+    </dialog>
 {% endblock %}

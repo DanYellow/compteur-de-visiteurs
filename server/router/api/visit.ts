@@ -3,7 +3,7 @@ import express from "express";
 import { DateTime } from "luxon";
 import { Op, ProjectionAlias } from 'sequelize';
 
-import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel } from "#models/index.ts";
+import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel, VisitRegistered as VisitRegisteredModel } from "#models/index.ts";
 import { PERIOD_PREDICATE } from "#server/router/api/index.ts";
 
 const router = express.Router();
@@ -153,5 +153,15 @@ router.get("/visites", async (req, res) => {
         });
     }
 });
+// "YZK
+router.get("/visite/:code", async (req, res) => {
+    const entry = await VisitRegisteredModel.findByPk(req.params.code);
+
+    if (!entry) {
+        return res.status(404).json({ error: "Invalid code" });
+    }
+
+    return res.json(entry.toJSON());
+})
 
 export default router;
