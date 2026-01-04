@@ -2,6 +2,7 @@ import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAt
 
 export default class VisitRegistered extends Model<InferAttributes<VisitRegistered>, InferCreationAttributes<VisitRegistered>> {
     declare code: string;
+    declare hash: string;
     declare contenu: Record<string, any>;
 
     static initModel(sequelize: Sequelize) {
@@ -12,8 +13,13 @@ export default class VisitRegistered extends Model<InferAttributes<VisitRegister
                     primaryKey: true,
                     allowNull: false,
                 },
+                hash: {
+                    type: DataTypes.STRING(64),
+                    allowNull: false,
+                    unique: true,
+                },
                 contenu: {
-                    type: DataTypes.JSON, // stored as TEXT in SQLite
+                    type: DataTypes.JSON,
                     allowNull: false,
                 },
             },

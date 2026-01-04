@@ -1,6 +1,7 @@
 import express from "express";
 import { DateTime } from "luxon";
 import { Op } from 'sequelize';
+import crypto from "crypto";
 
 import { listGroups as listBusinessSector, listDepartments, listAgeGroups, listGenders } from '#scripts/utils.shared.ts';
 import { SOCKET_EVENTS } from '#scripts/utils.ts';
@@ -30,6 +31,21 @@ router.use(async (req, res, next) => {
 });
 
 const generateFormCode = () => Math.random().toString(36).substring(2, 5).toUpperCase();
+const hashPayload = (normalized: string) => crypto.createHash("sha256").update(normalized).digest("hex");
+
+const normalizePayload = (payload: Record<string, any>) => {
+    const sorted = Object.keys(payload)
+        .sort()
+        .reduce((acc, key) => {
+            acc[key] =
+                payload[key] === "oui" ? true :
+                    payload[key] === "non" ? false :
+                        payload[key];
+            return acc;
+        }, {} as Record<string, any>);
+
+    return JSON.stringify(sorted);
+};
 
 router.get("/", async (req, res) => {
     const nbPlaces = await PlaceModel.count();
@@ -61,8 +77,6 @@ router.get("/", async (req, res) => {
         return res.status(500).json({ "success": false });
     }
 
-    console.log("req.body", req.body)
-
     try {
         const place = await PlaceModel.findOne({ where: { slug: req.cookies.lieu_numixs } })
         if (!place) {
@@ -77,7 +91,14 @@ router.get("/", async (req, res) => {
 
         const code = generateFormCode();
 
-        await VisitRegisteredModel.create({ code, contenu: req.body });
+        const normalized = normalizePayload(req.body);
+        console.log("normalized", normalized)
+        const hash = hashPayload(normalized);
+
+        const existingVisit = await VisitRegisteredModel.findOne({ where: { hash } });
+        if (!existingVisit) {
+            await VisitRegisteredModel.create({ code, contenu: req.body, hash });
+        }
 
         await new Promise(r => setTimeout(r, 1500));
 
@@ -91,7 +112,7 @@ router.get("/", async (req, res) => {
             success: true,
             data: {
                 ...(await newVisit.getPlace()).toJSON(),
-                code,
+                code: existingVisit ? existingVisit.code : code,
             }
         })
     } catch (err) {

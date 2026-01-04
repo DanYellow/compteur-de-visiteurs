@@ -206,7 +206,7 @@ window.addEventListener("pageshow", () => {
     resetSteps();
 });
 
-const req = await fetch("/api/visite/M74"); // QKC CHW
+const req = await fetch("/api/visite/WJB"); // QKC CHW
 const payload = await req.json();
 
 Object.entries(payload.contenu as Record<string, any>).forEach(([name, value]) => {

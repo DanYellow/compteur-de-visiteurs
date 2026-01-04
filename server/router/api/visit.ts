@@ -153,9 +153,9 @@ router.get("/visites", async (req, res) => {
         });
     }
 });
-// "YZK
+
 router.get("/visite/:code", async (req, res) => {
-    const entry = await VisitRegisteredModel.findByPk(req.params.code);
+    const entry = await VisitRegisteredModel.findByPk(req.params.code.toUpperCase());
 
     if (!entry) {
         return res.status(404).json({ error: "Invalid code" });
