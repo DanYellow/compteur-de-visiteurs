@@ -12,6 +12,9 @@ const formSuccessTplRaw = document.querySelector("[data-template-id='form-succes
 const formErrorTplRaw = document.querySelector("[data-template-id='form-error']") as HTMLTemplateElement;
 const formSubmittingTplRaw = document.querySelector("[data-template-id='form-submitting']") as HTMLTemplateElement;
 
+const dialogVisitCodeExplanation = document.getElementById("visit-code-explanation") as HTMLDialogElement;
+const dialogVisitCodeForm = document.getElementById("visit-code-form") as HTMLDialogElement;
+
 const listAllStepValidationButtons = document.querySelectorAll("[data-button-step]") as NodeListOf<HTMLButtonElement>;
 
 const wizard = document.getElementById('wizard-steps') as HTMLDivElement;
@@ -33,11 +36,6 @@ const resetSteps = () => {
     form.reset();
     currentStep = 0;
     listFormSteps[0].classList.add("active");
-
-    listFormSteps[0].scrollIntoView({
-        behavior: 'instant',
-        block: 'start'
-    });
 }
 
 const submitForm = async (e: SubmitEvent) => {
@@ -68,10 +66,20 @@ const submitForm = async (e: SubmitEvent) => {
     if (res.success) {
         e.submitter?.blur();
         resetSteps();
+
+        listFormSteps[0].scrollIntoView({
+            behavior: 'instant',
+            block: 'start'
+        });
         const tplSuccess = formSuccessTplRaw.content.cloneNode(true) as HTMLDivElement;
         const placeName = tplSuccess.querySelector("[data-place]")! as HTMLSpanElement;
+        const visitCode = tplSuccess.querySelector("[data-visit-code]")! as HTMLParagraphElement;
+        const visitCodeExplanationBtn = tplSuccess.querySelector("[data-visit-code-info]")! as HTMLButtonElement;
+
+        visitCodeExplanationBtn.dataset.visitCodeInfo = res.data.code;
 
         placeName.textContent = res.data.nom;
+        visitCode.textContent = res.data.code;
         dialogSwapContainer.append(tplSuccess);
     } else {
         dialogSwapContainer.append(formErrorTplRaw.content.cloneNode(true));
@@ -120,9 +128,6 @@ const validForm = (form: HTMLFormElement) => {
         })
 
         errorsContainer.scrollIntoView({ behavior: "auto" });
-        // if (e.type === "submit") {
-        //     errorsContainer.scrollIntoView({ behavior: "auto" });
-        // }
 
         return false;
     }
@@ -206,33 +211,63 @@ window.addEventListener("pageshow", () => {
     resetSteps();
 });
 
-const req = await fetch("/api/visite/WJB"); // QKC CHW
-const payload = await req.json();
 
-Object.entries(payload.contenu as Record<string, any>).forEach(([name, value]) => {
-    const field = form.elements.namedItem(name);
-    if (!field) return;
+dialogVisitCodeExplanation?.addEventListener("toggle", (e: Event) => {
+    const toggleEvent = e as ToggleEvent;
+    const isOpened = toggleEvent.newState === "open";
 
-    if (field instanceof HTMLInputElement) {
-        switch (field.type) {
-            case "checkbox":
-                field.checked = value === true || value === "oui" || value === "on";
-                break;
+    if (isOpened) {
+        const codeLabel = dialogVisitCodeExplanation.querySelector("[data-visit-code]");
+        if (codeLabel) {
+            codeLabel.textContent = (e.source as HTMLButtonElement).dataset.visitCodeInfo!;
+        }
+    }
+})
 
-            case "radio":
-                field.checked = field.value === value;
-                break;
+dialogVisitCodeForm?.querySelector("form")?.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-            default:
-                field.value = value;
+    const dialogForm = (e.currentTarget as HTMLFormElement);
+
+    const formData = new FormData(dialogForm);
+    const code = formData.get("code")
+
+    const req = await fetch(`/api/visite/${code}`); // QKC CHW WJB
+    const payload = await req.json();
+
+    if (req.status === 404) {
+
+        return;
+    }
+
+    dialogVisitCodeForm.close()
+    dialogForm.reset();
+
+    Object.entries(payload.contenu as Record<string, any>).forEach(([name, value]) => {
+        const field = form.elements.namedItem(name);
+        if (!field) return;
+
+        if (field instanceof HTMLInputElement) {
+            switch (field.type) {
+                case "checkbox":
+                    field.checked = value === true || value === "oui" || value === "on";
+                    break;
+
+                case "radio":
+                    field.checked = field.value === value;
+                    break;
+
+                default:
+                    field.value = value;
+            }
+
+            return;
         }
 
-        return;
-    }
+        if (field instanceof RadioNodeList) {
+            field.value = value;
 
-    if (field instanceof RadioNodeList) {
-        field.value = value;
-
-        return;
-    }
-});
+            return;
+        }
+    });
+})

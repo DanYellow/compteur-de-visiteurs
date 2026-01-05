@@ -1,5 +1,5 @@
 {% extends "layouts/page.njk" %}
-{% import "includes/macros.njk" as forms %}
+{% import "includes/macros.njk" as macros %}
 
 {% set root_class = "register" %}
 
@@ -20,13 +20,12 @@ Compteur de visiteurs
                 <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-20" alt="">
                 <p class="text-sm">{{ place.nom }}</p>
                 <div class="flex gap-3 flex-col sm:flex-row">
-                    <button type="button" class="bg-green-numixs hocus:bg-dark-green-numixs text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="explaination" command="show-modal">J'ai un code de visite</button>
-                    <button type="button" class="bg-white-numixs hocus:bg-white-numixs/80 text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="explaination" command="show-modal">Pourquoi remplir ce formulaire ?</button>
+                    <button type="button" class="bg-green-numixs hocus:bg-dark-green-numixs text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="visit-code-form" command="show-modal">J'ai un code de visite</button>
+                    <button type="button" class="bg-white-numixs hocus:bg-white-numixs/80 text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="explanation" command="show-modal">Pourquoi remplir ce formulaire ?</button>
                 </div>
             </header>
             <ul class="form-errors-list-container not-empty:mb-3" role="alert" data-form-errors id="error-container"></ul>
             <div class="relative" id="wizard-steps">
-
                 <div class="wrapper overflow-hidden snap-y snap-mandatory overscroll-contain inset-0" style="position: absolute;" id="steps-container">
                     <div data-step="1" class="form-step">
                         {% include "includes/registration-steps/group-step.njk" %}
@@ -112,6 +111,17 @@ Compteur de visiteurs
         </div>
     </dialog>
     <template data-template-id="form-success">
+        <div class="text-white text-center mb-4">
+            <p>Code de visite</p>
+            <p class="title-font text-7xl flex gap-2 justify-center">
+                <span data-visit-code></span>
+                <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="visit-code-explanation" command="show-modal" data-visit-code-info=''>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-14">
+                        <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
+                    </svg>
+                </button>
+            </p>
+        </div>
         <p class="title-font text-white text-7xl mb-4">Merci de votre retour, excellent passage au<br class="hidden lg:inline"/>
             <span class="text-green-numixs" data-place>FacLab numixs<sup>®</sup>
             </span>.</p>
@@ -119,7 +129,7 @@ Compteur de visiteurs
             <img src="/images/register-complete.jpg" class="rounded-md" alt="">
         </div>
 
-        <button type="button" data-close-dialog command="close" commandfor="result-form-modal" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 active:bg-dark-green-numixs">Revenir à l'accueil</button>
+        <button type="button" data-close-dialog command="close" commandfor="result-form-modal" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 hocus:bg-dark-green-numixs active:bg-dark-green-numixs">Revenir à l'accueil</button>
     </template>
     <template data-template-id="form-submitting">
         <img src="/images/loading.svg" class="animate-spin w-16" alt="Chargement">
@@ -127,20 +137,68 @@ Compteur de visiteurs
     <template data-template-id="form-error">
         <p class="title-font text-white text-7xl mb-4">Une erreur est survenue lors de votre enregistrement.</p>
 
-        <button type="button" data-close-dialog command="close" commandfor="result-form-modal" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 active:bg-dark-green-numixs">Recommencer</button>
+        <button type="button" data-close-dialog command="close" commandfor="result-form-modal" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 hocus:bg-dark-green-numixs active:bg-dark-green-numixs">Recommencer</button>
     </template>
 
-    <dialog id="explaination" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+    <dialog id="explanation" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
         <header class="flex flex-row justify-between items-start">
             <div>
                 <p class="title-font text-4xl">Pourquoi remplir ce formulaire ?</p>
             </div>
-            <button type="button" command="close" commandfor="explaination" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+            <button type="button" command="close" commandfor="explanation" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
                 </svg>
             </button>
         </header>
         <hr class="pb-1 mt-1 border-green-numixs">
+    </dialog>
+
+    <dialog id="visit-code-form" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Code de visite</p>
+            </div>
+            <button type="button" command="close" commandfor="visit-code-form" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <p class="mb-3">
+            Le code de visite est un moyen simple et rapide de remplir ce formulaire lors de votre prochain passage. Récolter ces données nous permet de témoigner de l'affluence de votre lieu et ainsi nous permettre d'obtenir des fonds pour financer nos machines et donc vos projets.
+        </p>
+        <form action="" class="flex flex-col gap-5">
+            <div class="flex flex-col">
+                <label for="code">Code</label>
+                <input type="text" id="code" name="code" maxlength="3" placeholder="Code à 3 caractères" class="text-gray-numixs uppercase">
+            </div>
+            <div>
+                <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:opacity-70 items-center">
+                    Envoyer
+                    <svg width="23" height="22" viewBox="0 0 23 22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M0.723633 11C0.723633 13.0767 1.37686 15.1068 2.60072 16.8335C3.82458 18.5602 5.56409 19.906 7.59929 20.7007C9.63449 21.4955 11.874 21.7034 14.0345 21.2982C16.1951 20.8931 18.1797 19.8931 19.7373 18.4246C21.295 16.9562 22.3558 15.0852 22.7856 13.0484C23.2153 11.0116 22.9948 8.90045 22.1518 6.98182C21.3088 5.0632 19.8812 3.42332 18.0495 2.26957C16.2179 1.11581 14.0645 0.5 11.8616 0.5C8.90763 0.5 6.07465 1.60625 3.98587 3.57538C1.89709 5.54451 0.723633 8.21523 0.723633 11ZM5.49705 10.25H15.1632L10.7239 6.04475L11.8616 5L18.2262 11L11.8616 17L10.7239 15.9298L15.1632 11.75H5.49705V10.25Z" fill="currentColor"></path>
+                    </svg>
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="visit-code-explanation" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Code de visite</p>
+            </div>
+            <button type="button" command="close" commandfor="visit-code-explanation" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <p class="text-lg">Vous revenez régulièrement ? Le code de visite est fait pour vous ! Quatre pages de formulaire, ça peut être fastidieux à remplir à chaque visite. Alors pour gagner du temps, vous pouvez utiliser le code ci-dessous pour remplir le formulaire (que vous pouvez toujours éditer) avec trois caractères et une validation pour votre prochain passage.</p>
+        <p class="title-font text-7xl text-center text-green-numixs" data-visit-code>_NO_CODE_</p>
+        <p class="text-lg">Remplir ce formulaire permet de récolter les données de fréquentation du lieu pour nous permettre de récolter des fonds.</p>
     </dialog>
 {% endblock %}

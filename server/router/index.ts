@@ -30,7 +30,12 @@ router.use(async (req, res, next) => {
     next();
 });
 
-const generateFormCode = () => Math.random().toString(36).substring(2, 5).toUpperCase();
+const chars = 'ABCDEFGHIJKLMNPQRSTUVWXYZ0123456789';
+const generateFormCode = () => {
+    return Array.from({ length: 3 }, () =>
+        chars[Math.floor(Math.random() * chars.length)]
+    ).join('');
+};
 const hashPayload = (normalized: string) => crypto.createHash("sha256").update(normalized).digest("hex");
 
 const normalizePayload = (payload: Record<string, any>) => {
@@ -92,7 +97,6 @@ router.get("/", async (req, res) => {
         const code = generateFormCode();
 
         const normalized = normalizePayload(req.body);
-        console.log("normalized", normalized)
         const hash = hashPayload(normalized);
 
         const existingVisit = await VisitRegisteredModel.findOne({ where: { hash } });

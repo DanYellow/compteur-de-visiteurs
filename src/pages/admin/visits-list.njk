@@ -24,7 +24,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
 {% block content %}
-    <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13" data-place='{{ place | json }}' data-list-events='{{ all_events | json }}'>
+    <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13 min-w-0" data-place='{{ place | json }}' data-list-events='{{ all_events | json }}'>
         <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
             <div class="text-black-numixs flex flex-col items-start">
                 <h1 class="text-black-numixs title-font font-bold text-6xl">Visites</h1>
@@ -116,7 +116,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                         Détails des visites par type de visiteur
                     </summary>
                     <div class="bg-black-numixs rounded-b-md p-3">
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1.5">
                             <p class="col-span-full text-xl">Par groupe</p>
                             {% for business in list_groups %}
                                 <div class="flex flex-col flex-auto">
@@ -126,7 +126,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             {% endfor %}
                         </div>
                         <hr class="my-4">
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1.5">
                             <p class="col-span-full text-xl">Par tranche d'âge</p>
                             {% for age_group in list_age_groups %}
                                 <div class="flex flex-col flex-auto">
@@ -136,7 +136,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             {% endfor %}
                         </div>
                         <hr class="my-4">
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1.5">
                             <p class="col-span-full text-xl">Par genre</p>
                             {% for gender in list_genders %}
                                 <div class="flex flex-col flex-auto">
@@ -146,7 +146,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             {% endfor %}
                         </div>
                         <hr class="my-4">
-                        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-1.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-1.5">
                             <p class="col-span-full text-xl">Par département</p>
                             {% for department in list_departments %}
                                 <div class="flex flex-col flex-auto">
@@ -157,7 +157,6 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                         </div>
                     </div>
                 </details>
-
             </header>
             {% if place.nom %}
                 <div class="p-3 rounded-md border-solid border-black-numixs border mb-3">
