@@ -120,8 +120,8 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             <p class="col-span-full text-xl">Par groupe</p>
                             {% for business in list_groups %}
                                 <div class="flex flex-col flex-auto">
-                                    <p class="h-8">{{ business.name }}</p>
-                                    <p class="text-xl place-content-end -mt-4">{{ visits_summary.group[business.value] }}</p>
+                                    <p class="h-8">{{ business.label }}</p>
+                                    <p class="text-xl place-content-end -mt-4 {{ "text-green-numixs" if visits_summary.group[business.value] else "" }}">{{ visits_summary.group[business.value] }}</p>
                                 </div>
                             {% endfor %}
                         </div>
@@ -131,7 +131,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             {% for age_group in list_age_groups %}
                                 <div class="flex flex-col flex-auto">
                                     <p class="h-8">{{ age_group.label }}</p>
-                                    <p class="text-xl place-content-end -mt-4">{{ visits_summary.tranche_age[age_group.value] or 0 }}</p>
+                                    <p class="text-xl place-content-end -mt-4 {{ "text-green-numixs" if visits_summary.tranche_age[age_group.value] else "" }}">{{ visits_summary.tranche_age[age_group.value] or 0 }}</p>
                                 </div>
                             {% endfor %}
                         </div>
@@ -141,7 +141,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             {% for gender in list_genders %}
                                 <div class="flex flex-col flex-auto">
                                     <p class="h-8">{{ gender.label }}</p>
-                                    <p class="text-xl place-content-end -mt-4">{{ visits_summary.genre[gender.value] or 0 }}</p>
+                                    <p class="text-xl place-content-end -mt-4 {{ "text-green-numixs" if visits_summary.genre[gender.value] else "" }}">{{ visits_summary.genre[gender.value] or 0 }}</p>
                                 </div>
                             {% endfor %}
                         </div>
@@ -151,7 +151,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             {% for department in list_departments %}
                                 <div class="flex flex-col flex-auto">
                                     <p class="h-8">{{ department.label }}</p>
-                                    <p class="text-xl place-content-end -mt-4">{{ visits_summary.departement[department.value] or 0 }}</p>
+                                    <p class="text-xl place-content-end -mt-4 {{ "text-green-numixs" if visits_summary.departement[department.value] else "" }}">{{ visits_summary.departement[department.value] or 0 }}</p>
                                 </div>
                             {% endfor %}
                         </div>
@@ -188,8 +188,11 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             <td class="font-bold px-4 py-3 text-left">Lieu</td>
                             <td class="font-bold px-4 py-3 text-left">Évènement</td>
                             {% for business in list_groups %}
-                                <td class="font-bold px-4 py-3 text-left border-solid">{{ business.name | striptags(true) | escape | nl2br }}</td>
+                                <td class="font-bold px-4 py-3 text-left border-solid">{{ business.label | striptags(true) | escape | nl2br }}</td>
                             {% endfor %}
+                            <td class="font-bold px-4 py-3 text-left">Genre</td>
+                            <td class="font-bold px-4 py-3 text-left">Département</td>
+                            <td class="font-bold px-4 py-3 text-left">Tranche d'âge</td>
                             <td class="font-bold px-4 py-3 text-left"></td>
                         </tr>
                     </thead>
@@ -207,8 +210,20 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                                     {{ visit["liste_evenements"]|split()|safe if visit["liste_evenements"] != "" else "/" }}
                                 </td>
                                 {% for business in list_groups %}
-                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left {{ "font-bold" if visit[business.value] == "oui" else "" }}" data-label="{{ business.name }}" data-row-key="{{ business.value }}">{{ visit[business.value] }}</td>
+                                    <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left {{ "font-bold" if visit[business.value] == "oui" else "" }}" data-label="{{ business.label }}" data-row-key="{{ business.value }}">{{ visit[business.value] }}</td>
                                 {% endfor %}
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left ">
+                                    {% set gender = list_genders|find({value: visit['genre']}) %}
+                                    {{ gender.label }}
+                                </td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left ">
+                                    {% set department = list_departments|find({value: visit['departement']}) %}
+                                    {{ department.label }}
+                                </td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left ">
+                                    {% set age = list_age_groups|find({value: visit['tranche_age']}) %}
+                                    {{ age.label }}
+                                </td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
                                     <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-visit" command="show-modal" data-visit-data='{{ visit | json }}'>
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">

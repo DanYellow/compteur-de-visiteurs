@@ -69,9 +69,7 @@ app.use(
 app.use((req, res, next) => {
     const context = {
         NODE_ENV: process.env.NODE_ENV,
-        admin_prefix: `/admin${
-            process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""
-        }`,
+        admin_prefix: `/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`,
         user_role: {},
     };
 
@@ -137,10 +135,13 @@ nunjucksConfig.addFilter("filter", (array, predicate) => {
     });
 });
 
-nunjucksConfig.addFilter("find", (array, predicate) => {
-    return array.find((item: Record<string, unknown>) => {
-        return item[predicate.key] === predicate.value;
-    });
+nunjucksConfig.addFilter("find", (array, criteria ) => {
+    const predicate = (item: Record<string, string | number>) =>
+        Object.entries(criteria).every(
+            ([k, v]) => item[k] === v
+        );
+
+    return array.find(predicate);
 });
 
 nunjucksConfig.addFilter("oxford_comma", (string) => {
@@ -180,7 +181,7 @@ nunjucksConfig.addGlobal(
 
 const listDomains: string[] =
     process.env.IS_DOCKER?.toLowerCase() === "true" &&
-    process.env.NODE_ENV === "production"
+        process.env.NODE_ENV === "production"
         ? ["faclab.localhost"]
         : ["localhost", "0.0.0.0"];
 const port = Number(process.env.VITE_PORT || 3900);

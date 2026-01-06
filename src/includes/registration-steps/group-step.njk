@@ -8,9 +8,9 @@
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-7">
-        {% for sector in list_business_sector %}
+        {% for business in list_business_sector %}
             {% set children = null %}
-            {% if sector.value == "entreprise" %}
+            {% if business.value == "entreprise" %}
                 {% set children %}
                 <div data-input-switch-toggle-recipient="entreprise">
                     <div class="ml-12 flex flex-col mt-2">
@@ -20,7 +20,7 @@
                 </div>
                 {% endset %}
             {% endif %}
-            {% if sector.value == "education" %}
+            {% if business.value == "education" %}
                 {% set children %}
                 <div data-input-switch-toggle-recipient="education">
                     <div class="ml-12 flex flex-col mt-2">
@@ -30,7 +30,7 @@
                 </div>
                 {% endset %}
             {% endif %}
-            {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"children": children }) }}
+            {{ forms.switch(business.label, business.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"children": children }) }}
         {% endfor %}
     </div>
 </div>

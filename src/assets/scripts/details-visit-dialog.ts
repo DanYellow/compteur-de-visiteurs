@@ -28,7 +28,7 @@ modal?.addEventListener("toggle", (e: Event) => {
         Object.entries(Object.fromEntries(listBusinessSectorSelected)).forEach(([key]) => {
             const li = document.createElement("li");
             const groupData = listBusinessSector.find((item) => item.value === key);
-            li.textContent = `${groupData?.name || ""} ${groupData?.fullName || ""}`;
+            li.textContent = `${groupData?.label || ""} ${groupData?.fullName || ""}`;
 
             visitGroupContainer.append(li);
         })
