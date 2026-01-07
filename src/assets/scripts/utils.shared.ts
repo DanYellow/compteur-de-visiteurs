@@ -132,7 +132,7 @@ export const getPivotTable = (
     listGroups
         .filter((item) => !('listInDb' in item) || item.listInDb)
         .forEach((business) => {
-            let rowValues = [business.name];
+            let rowValues = [business.label];
 
             let visitsPerGroupAndPeriod = {
                 [business.value]: new Array(columns.length || 0).fill([0, 0]),
@@ -238,72 +238,29 @@ export const getPivotTable = (
 type LinearCSVOptions = {
     periodLabel: string;
     lieu: string;
+    columns: string[];
 };
 
 // @TODO
 export const getLinearCSV = (
-    data: Record<string, unknown>[],
-    { periodLabel, lieu }: LinearCSVOptions
+    data: Record<string, unknown>[]
 ) => {
-    const listGroupsInForm = listGroups.filter(
-        (item) => !('listInDb' in item) || item.listInDb
-    );
-
-    const copyFirstEntry = data?.[0] || {};
-    delete copyFirstEntry.id;
-    delete copyFirstEntry.date_passage;
-
-    const firstRow = {
-        id: `Total : ${data.length}`,
-        date_passage: periodLabel,
-        ...copyFirstEntry,
-        ...Object.fromEntries(listGroupsInForm.map((item) => [item.value, 0])),
-        liste_evenements: '/',
-    } as unknown as CSVLinearHeader;
-
-    firstRow.lieu = firstRow['place.nom'];
-
-    if (lieu === 'tous' || !lieu) {
-        firstRow.lieu = 'Tous';
-    }
-
-    delete (firstRow as any).groupe;
-    delete firstRow.order;
-    delete firstRow['place.nom'];
-
-    const csvHeaderColumns = Object.keys(firstRow);
-
-    const csvPayload: (string[] | number[])[] = [csvHeaderColumns];
+    const csvPayload: (string|number)[][] = [];
 
     data.forEach((item, idx) => {
-        listGroupsInForm.forEach((group) => {
-            const key = group.value! as keyof CSVLinearHeader;
-            if (firstRow[key]) {
-                firstRow[key] += item[group.value] === 'oui' ? 1 : 0;
-            }
-        });
-
-        item.id = String(idx + 1);
-        item.lieu = item['place.nom'];
-
-        delete item.lieu_id;
-        delete item.groupe;
-        delete item.order;
-        delete item['place.nom'];
-
-        const rowData: string[] = Object.values(item) as string[];
-
-        csvPayload.push(rowData);
-    });
-
-    csvPayload.splice(1, 0, Object.values(firstRow) as string[] | number[]);
+        if (idx === 0) {
+            csvPayload.push(Object.keys(item))
+        } else {
+            csvPayload.push(Object.values(item))
+        }
+    })
 
     return csvPayload;
 };
 
 const listMonths = Info.months('long', { locale: 'fr' }).map((item, idx) => ({
     name: item.charAt(0).toUpperCase() + String(item).slice(1),
-    id: idx + 1,
+    id: String(idx + 1).padStart(2, '0'),
 }));
 
 export const getWeeksRangeMonth = (daySelected: DateTime) => {
