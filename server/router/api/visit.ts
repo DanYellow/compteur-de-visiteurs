@@ -125,8 +125,12 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
     const listGroupsFiltered = listGroups.filter((item) => (!("listInDb" in item) || item.listInDb));
 
     const totalAttributes: ProjectionAlias[] = [
-         [sequelize.literal(`'${period.startTime.toFormat("dd/LL/yyyy")} ➜ ${period.endTime.toFormat("dd/LL/yyyy")}'`), 'date_passage'],
+        [sequelize.literal(`'${period.startTime.toFormat("dd/LL/yyyy")} ➜ ${period.endTime.toFormat("dd/LL/yyyy")}'`), 'date_passage'],
         [sequelize.literal(place ? `${placeTable}.nom` : `'Tous'`), 'lieu'],
+        [
+            sequelize.literal(`'You'`),
+            "Évènement(s)"
+        ],
         ...listGroupsFiltered.map((item): ProjectionAlias => {
             return [
                 sequelize.fn(
@@ -244,6 +248,24 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
 
     const allAttributes: (string | [string, string] | ProjectionAlias)[] = [
         [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"] as ProjectionAlias,
+        [
+            sequelize.literal(`
+                COALESCE(
+                    (
+                        SELECT COALESCE(GROUP_CONCAT(DISTINCT so.nom), '')
+                        FROM ${eventTable} AS so
+                        INNER JOIN "place_event" f
+                            ON f.place_id = ${visitTable}.lieu_id
+                            AND f.event_id = so.id
+                        WHERE strftime("%Y-%m-%d", so.date, 'localtime') = strftime("%Y-%m-%d", ${visitTable}.date_passage, 'localtime')
+                        AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                        AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                    ),
+                    "/"
+                )`
+            ),
+            "Évènement(s)"
+        ],
         ...listGroupsFiltered.map((c) => c.value),
         ...listGenders.map(() => "genre"),
         ...listAgeGroups.map(() => "tranche_age"),
@@ -333,6 +355,7 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
 
         pivoted.date_passage = (row as any).date_passage;
         pivoted.lieu = (row as any).lieu;
+        pivoted["Évènement(s)"] = (row as any)["Évènement(s)"];
 
         listGroupsFiltered.forEach(item => {
             pivoted[item.label] = row[item.value] === 'oui' ? "oui" : "non";
@@ -375,9 +398,6 @@ router.get("/visites", async (req, res) => {
 
     const startTime = daySelected.startOf((PERIOD_PREDICATE as any)[filtreParam]?.luxon || "day");
     const endTime = daySelected.endOf((PERIOD_PREDICATE as any)[filtreParam]?.luxon || "day");
-
-        // const periodLabel = `${daySelected.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${daySelected.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
-
 
     let place: PlaceModel | null = null;
     if (req.query.lieu && req.query.lieu !== "tous") {
