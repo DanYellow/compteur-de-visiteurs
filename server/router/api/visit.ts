@@ -126,6 +126,7 @@ const getPivotVisits = async (place, period) => {
 
     const totalAttributes: ProjectionAlias[] = [
         [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"] as ProjectionAlias,
+        [sequelize.literal(`${placeTable}.nom`), 'lieu'],
         ...listGroupsFiltered.map((item): ProjectionAlias => {
             return [
                 sequelize.fn(
@@ -167,7 +168,7 @@ const getPivotVisits = async (place, period) => {
     const totalVisits = await VisitModel.findAll({
         attributes: [
             ...totalAttributes,
-            [sequelize.literal(`${placeTable}.nom`), 'lieu'],
+
             //  [literal(`'Anonymous'`), 'user_name']
         ],
         where: {
@@ -333,6 +334,7 @@ const getPivotVisits = async (place, period) => {
         const pivoted: Record<string, number | string> = {};
 
         pivoted.date_passage = (row as any).date_passage;
+        pivoted.lieu = (row as any).lieu;
 
         listGroupsFiltered.forEach(item => {
             pivoted[item.label] = row[item.value] === 'oui' ? "oui" : "non";
@@ -349,8 +351,6 @@ const getPivotVisits = async (place, period) => {
         listAgeGroups.forEach(item => {
             pivoted[`age_${item.label}`] = String(row.tranche_age) === String(item.value) ? "oui" : "non";
         });
-
-        pivoted.lieu = (row as any).lieu;
 
         return pivoted;
     });

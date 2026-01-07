@@ -144,7 +144,7 @@ const configData: ChartConfigData = {
         ...baseConfigData.jour,
         id: "dailyChart",
         chartTitle: `Visites uniques du ${daySelected.toFormat("dd/LL/yyyy")}`,
-        downloadLink: `/telecharger?jour=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        downloadLink: `/telecharger?jour=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}&pivot`,
         xTitle: 'Tranche horaire',
         xLabels: baseConfigData.jour.listColumns!,
     },
@@ -152,7 +152,7 @@ const configData: ChartConfigData = {
         ...baseConfigData.semaine,
         id: "weeklyChart",
         chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `/telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        downloadLink: `/telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}&pivot`,
         xTitle: 'Jours',
         xLabels: baseConfigData.semaine.listColumns!,
     },
@@ -160,7 +160,7 @@ const configData: ChartConfigData = {
         ...baseConfigData.mois,
         id: "monthlyChart",
         chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `/telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        downloadLink: `/telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}&pivot`,
         xTitle: 'Semaines',
         xLabels: baseConfigData.mois.listColumns!,
     },
@@ -168,7 +168,7 @@ const configData: ChartConfigData = {
         ...baseConfigData.annee,
         id: "yearlyChart",
         chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
-        downloadLink: `/telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}`,
+        downloadLink: `/telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}&pivot`,
         xTitle: 'Mois',
         xLabels: baseConfigData.annee.listColumns!,
     }
@@ -397,7 +397,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         const totalVisits = Object.values(chartData).flat().length;
 
         linkDownloadChartData.href = downloadLink || "";
-        linkDownloadDetailedChartData.href = `${downloadLink}&groupe&ouverture=${xLabels[0]}&fermeture=${xLabels.at(-1)}` || "";
+        // linkDownloadDetailedChartData.href = `${downloadLink}&groupe&ouverture=${xLabels[0]}&fermeture=${xLabels.at(-1)}` || "";
 
         const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr[data-tr-period]")! as HTMLTableRowElement;
         tableDetailsChartTableHeadRow.innerHTML = "";

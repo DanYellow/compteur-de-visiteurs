@@ -250,8 +250,9 @@ export const getLinearCSV = (
     data.forEach((item, idx) => {
         if (idx === 0) {
             csvPayload.push(Object.keys(item))
+            csvPayload.push(Object.values(item) as (string | number)[])
         } else {
-            csvPayload.push(Object.values(item))
+            csvPayload.push(Object.values(item) as (string | number)[])
         }
     })
 
