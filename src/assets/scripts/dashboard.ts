@@ -498,10 +498,11 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                 } else {
                     flatData = lineData;
                 }
+
                 lineChartDatasets.push({
                     label: row[0] as string,
                     data: flatData as number[],
-                    borderColor: listBusinessSector.find((item) => item.name === row[0] as string)!.lineColor,
+                    borderColor: listBusinessSector.find((item) => item.label === row[0] as string)!.lineColor,
                     tension: 0,
                     fill: true,
                 });
