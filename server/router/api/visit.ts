@@ -10,7 +10,7 @@ import { listAgeGroups, listDepartments, listGenders, listGroups } from "#script
 
 const router = express.Router();
 
-const getLinearVisits = async (query, place, period) => {
+const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null, period: { startTime: DateTime, endTime: DateTime }) => {
     const eventTable = EventModel.getTableName();
     const visitTable = VisitModel.getTableName();
 
@@ -118,15 +118,15 @@ const getLinearVisits = async (query, place, period) => {
     return listVisits;
 }
 
-const getPivotVisits = async (place, period) => {
+const getPivotVisits = async (place: PlaceModel | null, period: { startTime: DateTime, endTime: DateTime }) => {
     const eventTable = EventModel.getTableName();
     const visitTable = VisitModel.getTableName();
     const placeTable = PlaceModel.getTableName();
     const listGroupsFiltered = listGroups.filter((item) => (!("listInDb" in item) || item.listInDb));
 
     const totalAttributes: ProjectionAlias[] = [
-        [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"] as ProjectionAlias,
-        [sequelize.literal(`${placeTable}.nom`), 'lieu'],
+         [sequelize.literal(`'${period.startTime.toFormat("dd/LL/yyyy")} ➜ ${period.endTime.toFormat("dd/LL/yyyy")}'`), 'date_passage'],
+        [sequelize.literal(place ? `${placeTable}.nom` : `'Tous'`), 'lieu'],
         ...listGroupsFiltered.map((item): ProjectionAlias => {
             return [
                 sequelize.fn(
@@ -168,8 +168,6 @@ const getPivotVisits = async (place, period) => {
     const totalVisits = await VisitModel.findAll({
         attributes: [
             ...totalAttributes,
-
-            //  [literal(`'Anonymous'`), 'user_name']
         ],
         where: {
             [Op.and]: [
@@ -378,7 +376,10 @@ router.get("/visites", async (req, res) => {
     const startTime = daySelected.startOf((PERIOD_PREDICATE as any)[filtreParam]?.luxon || "day");
     const endTime = daySelected.endOf((PERIOD_PREDICATE as any)[filtreParam]?.luxon || "day");
 
-    let place = undefined;
+        // const periodLabel = `${daySelected.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${daySelected.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
+
+
+    let place: PlaceModel | null = null;
     if (req.query.lieu && req.query.lieu !== "tous") {
         place = await PlaceModel.findOne({ where: { slug: String(req.query.lieu) } })
     }
