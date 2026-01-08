@@ -101,7 +101,7 @@ router.get("/evenements", async (req, res) => {
                             ...item,
                             jour: {
                                 id: Number((item as unknown as EventRaw).groupe),
-                                name: capitalizeFirstLetter(listWeekDays[Number((item as unknown as EventRaw).groupe) - 1]),
+                                name: capitalizeFirstLetter(listWeekDays[Number((item as unknown as EventRaw).groupe) - 1] || ""),
                             }
                         }
                     })

@@ -158,6 +158,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                 backgroundColor: `rgb(from ${color} r g b / 50%)`,
                 borderColor: color,
                 borderWidth: 1.5,
+                maxBarThickness: 50,
             })
         });
 
