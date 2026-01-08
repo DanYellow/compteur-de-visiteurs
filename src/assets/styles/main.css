@@ -455,6 +455,7 @@ button {
 
 .wrapper {
     anchor-name: --my-carousel;
+    scroll-marker-group: after;
 
     &::scroll-button(*) {
         border: 0;
@@ -484,20 +485,22 @@ button {
         position-anchor: --my-carousel;
     }
 
-    scroll-marker-group: after;
-
     &::scroll-marker-group {
         position: absolute;
         position-anchor: --my-carousel;
-        right: calc(anchor(right) - 30px);
-        top: calc(anchor(top) + 50%);
-        /* top: calc(anchor(bottom) - 70px); */
-        /* justify-self: anchor-center; */
 
         display: flex;
         justify-content: center;
-        flex-direction: column;
         gap: 0.55rem;
+        top: calc(anchor(top) - 10%);
+        justify-self: anchor-center;
+
+        @media screen and (width >= 48rem) {
+            flex-direction: column;
+            top: calc(anchor(top) + 50%);
+            right: calc(anchor(right) - 30px);
+            justify-self: auto;
+        }
     }
 }
 
