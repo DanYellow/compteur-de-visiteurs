@@ -165,7 +165,10 @@ Liste utilisateurs
             </li>
         </ul>
         <div class="mt-4">
-        {{ macros.warning_banner("Un compte approuvé ne peut pas être désapprouvé. En revanche, un administrateur peut toujours le désactiver. Une désactivation bloque la connexion de l'utilisateur et le déconnecte automatiquement.")}}
+            {% set banner_text %}
+                Un compte approuvé ne peut pas être désapprouvé. En revanche, <span class="font-bold">un administrateur</span> peut toujours le désactiver. Une désactivation bloque la connexion de l'utilisateur et le déconnecte automatiquement.
+            {% endset %}
+            {{ macros.warning_banner(banner_text)}}
         </div>
     </dialog>
 

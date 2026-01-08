@@ -36,7 +36,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
             <div class="text-black-numixs">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
                     <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
-                        <menu class="absolute right-3 flex flex-row gap-3">
+                        <menu class="absolute right-3 flex flex-col gap-3">
                             <li>
                                 <button data-download-chart="dailyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                                     {% include "includes/icons/download-fill-icon.svg" %}
@@ -51,7 +51,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                         <canvas id="dailyChart" class="w-full h-full"></canvas>
                     </div>
                     <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
-                        <menu class="absolute right-3 flex flex-row gap-3">
+                        <menu class="absolute right-3 flex flex-col gap-3">
                             <li>
                                 <button data-download-chart="weeklyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                                     {% include "includes/icons/download-fill-icon.svg" %}
@@ -66,7 +66,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                         <canvas id="weeklyChart"></canvas>
                     </div>
                     <div class="bg-black-numixs p-3 rounded-2xl h-80 relative col-span-full lg:col-[initial]">
-                        <menu class="absolute right-3 flex flex-row gap-3">
+                        <menu class="absolute right-3 flex flex-col gap-3">
                             <li>
                                 <button data-download-chart="monthlyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                                     {% include "includes/icons/download-fill-icon.svg" %}
@@ -81,7 +81,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                         <canvas id="monthlyChart"></canvas>
                     </div>
                     <div class="col-span-full bg-black-numixs p-3 rounded-2xl h-96 relative">
-                        <menu class="absolute right-3 flex flex-row gap-3">
+                        <menu class="absolute right-3 flex flex-col gap-3">
                             <li>
                                 <button data-download-chart="yearlyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
                                     {% include "includes/icons/download-fill-icon.svg" %}

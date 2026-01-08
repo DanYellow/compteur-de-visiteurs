@@ -1,7 +1,7 @@
 
 import express from "express";
 import { DateTime } from "luxon";
-import { Op, ProjectionAlias } from 'sequelize';
+import { Op, ProjectionAlias, WhereOptions } from 'sequelize';
 
 import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel, VisitRegistered as VisitRegisteredModel, Place } from "#models/index.ts";
 import { PERIOD_PREDICATE } from "#server/router/api/index.ts";
@@ -13,6 +13,53 @@ const router = express.Router();
 const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null, period: { startTime: DateTime, endTime: DateTime }) => {
     const eventTable = EventModel.getTableName();
     const visitTable = VisitModel.getTableName();
+    const placeTable = PlaceModel.getTableName();
+
+    const whereConditions: WhereOptions<VisitModel>[] = [
+        {
+            date_passage: {
+                [Op.between]: [period.startTime.toString(), period.endTime.toString()]
+            }
+        },
+        sequelize.literal(`
+        (
+            (
+            -- REGULAR OPENING RULES
+            (
+                json_array_length("place->regularOpening"."jours_fermeture") = 0
+                OR NOT EXISTS (
+                SELECT 1
+                FROM json_each("place->regularOpening"."jours_fermeture")
+                WHERE json_each.value = CAST(strftime('%u', ${visitTable}.date_passage, 'localtime') AS text)
+                )
+            )
+            AND EXISTS (
+                SELECT 1
+                FROM regular_opening AS p
+                WHERE p.place_id = ${visitTable}.lieu_id
+                AND p.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                AND p.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+            )
+            )
+            OR
+            (
+            -- EVENT OVERRIDE
+                EXISTS (
+                    SELECT 1
+                    FROM ${eventTable} AS so
+                    INNER JOIN place_event pe ON pe.event_id = so.id
+                    WHERE pe.place_id = ${visitTable}.lieu_id
+                    AND so.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
+                    AND so.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                    AND so.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                )
+            )
+        )
+    `)
+    ];
+    if (place) {
+        whereConditions.push({ lieu_id: place.id });
+    }
 
     const listVisits = await VisitModel.findAll({
         raw: true,
@@ -39,60 +86,19 @@ const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null,
                         )`
                     ),
                     "liste_evenements"
-                ] as ProjectionAlias
+                ] as ProjectionAlias,
+                [sequelize.literal(`${placeTable}.nom`), 'lieu'],
             ],
             exclude: ["lieu_id"]
         },
         where: {
-            [Op.and]: [
-                {
-                    date_passage: {
-                        [Op.between]: [period.startTime.toString(), period.endTime.toString()]
-                    }
-                },
-                sequelize.literal(`
-                    (
-                        (
-                        -- REGULAR OPENING RULES
-                        (
-                            json_array_length("place->regularOpening"."jours_fermeture") = 0
-                            OR NOT EXISTS (
-                            SELECT 1
-                            FROM json_each("place->regularOpening"."jours_fermeture")
-                            WHERE json_each.value = CAST(strftime('%u', ${visitTable}.date_passage, 'localtime') AS text)
-                            )
-                        )
-                        AND EXISTS (
-                            SELECT 1
-                            FROM regular_opening AS p
-                            WHERE p.place_id = ${visitTable}.lieu_id
-                            AND p.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                            AND p.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                        )
-                        )
-                        OR
-                        (
-                        -- EVENT OVERRIDE
-                            EXISTS (
-                                SELECT 1
-                                FROM ${eventTable} AS so
-                                INNER JOIN place_event pe ON pe.event_id = so.id
-                                WHERE pe.place_id = ${visitTable}.lieu_id
-                                AND so.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
-                                AND so.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                                AND so.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                            )
-                        )
-                    )
-                `),
-                ...(place ? [{ lieu_id: place.id }] : [])
-            ]
+            [Op.and]: whereConditions,
         },
         include: [{
             model: PlaceModel,
             as: "place",
             required: true,
-            attributes: ["nom"],
+            attributes: [],
             include: [
                 {
                     model: RegularOpeningModel,
@@ -125,10 +131,14 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
     const listGroupsFiltered = listGroups.filter((item) => (!("listInDb" in item) || item.listInDb));
 
     const totalAttributes: ProjectionAlias[] = [
+        [
+            sequelize.literal(`'Total: ' || COUNT(*)`),
+            "id"
+        ],
         [sequelize.literal(`'${period.startTime.toFormat("dd/LL/yyyy")} ➜ ${period.endTime.toFormat("dd/LL/yyyy")}'`), 'date_passage'],
         [sequelize.literal(place ? `${placeTable}.nom` : `'Tous'`), 'lieu'],
         [
-            sequelize.literal(`'Tous'`),
+            sequelize.literal(eventId ? `(SELECT nom FROM ${eventTable} LIMIT 1)` : `'Tous'`),
             "Évènement(s)"
         ],
         ...listGroupsFiltered.map((item): ProjectionAlias => {
@@ -224,14 +234,30 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
     if (eventId) {
         subQuery = ` (
             SELECT 1
-                    FROM ${eventTable} AS event
-                    INNER JOIN place_event pe ON pe.event_id = ${eventId}
-                    WHERE pe.place_id = ${visitTable}.lieu_id
-                    AND event.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
-                    AND event.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                    AND event.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                FROM ${eventTable} AS event
+                INNER JOIN place_event pe ON pe.event_id = ${eventId}
+                WHERE pe.place_id = ${visitTable}.lieu_id
+                AND event.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
+                AND event.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                AND event.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
         )
     `
+    }
+
+    const whereConditions: WhereOptions<VisitModel>[] = [sequelize.literal(subQuery)];
+    if (place) {
+        whereConditions.push({ lieu_id: place.id });
+    }
+
+    if (!eventId) {
+        whereConditions.push({
+            date_passage: {
+                [Op.between]: [
+                    period.startTime.toString(),
+                    period.endTime.toString(),
+                ],
+            },
+        });
     }
 
     const totalVisits = await VisitModel.findAll({
@@ -239,15 +265,7 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
             ...totalAttributes,
         ],
         where: {
-            [Op.and]: [
-                {
-                    date_passage: {
-                        [Op.between]: [period.startTime.toString(), period.endTime.toString()]
-                    }
-                },
-                sequelize.literal(subQuery),
-                ...(place ? [{ lieu_id: place.id }] : []),
-            ]
+            [Op.and]: whereConditions
         },
         include: [{
             model: PlaceModel,
@@ -309,15 +327,7 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
             [sequelize.literal(`${placeTable}.nom`), 'lieu'],
         ],
         where: {
-            [Op.and]: [
-                {
-                    date_passage: {
-                        [Op.between]: [period.startTime.toString(), period.endTime.toString()]
-                    }
-                },
-                sequelize.literal(subQuery),
-                ...(place ? [{ lieu_id: place.id }] : [])
-            ]
+            [Op.and]: whereConditions
         },
         include: [{
             model: PlaceModel,
@@ -347,9 +357,10 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
         raw: true
     });
 
-    const pivotedRows = allVisits.map(row => {
+    const pivotedRows = allVisits.map((row, idx) => {
         const pivoted: Record<string, number | string> = {};
 
+        pivoted.id = idx + 1;
         pivoted.date_passage = (row as any).date_passage;
         pivoted.lieu = (row as any).lieu;
         pivoted["Évènement(s)"] = (row as any)["Évènement(s)"];
@@ -385,7 +396,13 @@ router.get("/visites", async (req, res) => {
     let daySelected = DateTime.now();
 
     if (req.query.jour) {
-        const tmpDate = DateTime.fromISO(req.query.jour as string);
+        const tmpDate = DateTime.fromISO(String(req.query.jour));
+        if (tmpDate.isValid) {
+            daySelected = tmpDate;
+        }
+    } else if (!("jour" in req.query) && "evenement" in req.query) {
+        const event = await EventModel.findByPk(String(req.query.evenement));
+        const tmpDate = DateTime.fromISO(String(event?.date));
         if (tmpDate.isValid) {
             daySelected = tmpDate;
         }

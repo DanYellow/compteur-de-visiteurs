@@ -205,7 +205,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                                         {{ visit["date_passage"]|date("dd/LL/yyyy à HH:mm") }}
                                     </time>
                                 </td>
-                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">{{ visit['place.nom'] }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">{{ visit.lieu }}</td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Date de passage" data-row-key="Date de passage">
                                     {{ visit["liste_evenements"]|split()|safe if visit["liste_evenements"] != "" else "/" }}
                                 </td>

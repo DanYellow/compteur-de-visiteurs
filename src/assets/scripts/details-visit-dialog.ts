@@ -40,9 +40,9 @@ modal?.addEventListener("toggle", (e: Event) => {
         visitDepartment.textContent = listDepartments.find((item) => item.value === visitData.departement)?.label || "";
         visitAge.textContent = listAgeGroups.find((item) => item.value === visitData.tranche_age)?.label || "";
 
-        placeName.textContent = visitData["place.nom"];
-        visitEvents.textContent = "";
-        if (visitData["liste_evenements"] !== "/") {
+        placeName.textContent = visitData.lieu;
+        visitEvents.textContent = "Visite régulière";
+        if (visitData["liste_evenements"] !== "") {
             visitEvents.textContent = visitData["liste_evenements"];
         }
     }

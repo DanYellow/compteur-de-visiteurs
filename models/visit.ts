@@ -5,11 +5,12 @@ import Place from '#models/place.ts';
 
 export default class Visit extends Model<InferAttributes<Visit>, InferCreationAttributes<Visit>> {
     declare id: CreationOptional<number>;
-    declare place_id: ForeignKey<Place['id']>;
+    declare lieu_id: ForeignKey<Place['id']>;
     declare genre: string;
     declare departement: string;
     declare tranche_age: number;
     declare groupe?: string;
+    declare date_passage: CreationOptional<Date>;
 
     declare getPlace: HasOneGetAssociationMixin<Place>;
 
@@ -50,6 +51,10 @@ export default class Visit extends Model<InferAttributes<Visit>, InferCreationAt
                     allowNull: false,
                 },
                 ...listBusinessSectorKeys,
+                date_passage: {
+                    type: DataTypes.DATE,
+                    allowNull: false,
+                },
             },
             {
                 modelName: 'visit',

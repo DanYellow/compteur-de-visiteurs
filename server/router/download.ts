@@ -1,10 +1,9 @@
 import express from "express";
 import fs from "fs";
 import path from "path";
-import { ProjectionAlias } from 'sequelize';
 import { fileURLToPath, URLSearchParams } from "url";
 import { stringify } from "csv-stringify/sync";
-import { DateTime, DateTimeUnit } from "luxon";
+import { DateTime } from "luxon";
 import sequelize, { RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
 import { baseConfigData, DEFAULT_CLOSE_HOURS, DEFAULT_OPEN_HOURS, getLinearCSV, getPivotTable, getWeeksRangeMonth, listAgeGroups, listDepartments, listGenders, listGroups } from "#scripts/utils.shared.ts";
 import { slugify } from "#scripts/utils.ts";
@@ -30,7 +29,12 @@ router.get('/', async (req, res) => {
     let csvPayload = [];
 
     const extraParams = new URLSearchParams(Object.entries(
-        { jour: req.query[configKey], lieu: req.query.lieu, evenement: req.query.evenement } as Record<string, string>).filter(([_, value]) => value !== undefined && value !== null)
+        {
+            jour: req.query[configKey],
+            lieu: req.query.lieu,
+            evenement: encodeURI(req.query.evenement as string),
+            ...("evenement" in req.query ? { } : { pivot: "" }),
+        } as Record<string, string>).filter(([_, value]) => value !== undefined && value !== null)
     );
 
     const request = await fetch(`http://${req.get('host')}/api/visites?filtre=${configKey}&${extraParams.toString()}`); //  pivot
