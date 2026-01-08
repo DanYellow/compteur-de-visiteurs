@@ -1,4 +1,4 @@
-@import "./properties.css" layer(base);
+@import './properties.css' layer(base);
 
 @import 'tailwindcss';
 @plugin "@tailwindcss/forms";
@@ -444,7 +444,7 @@ button {
         width: 10px;
         aspect-ratio: 1 / 1;
         background-color: transparent;
-        border: 2px solid  rgb(from var(--color-green-numixs) r g b / 25%);
+        border: 2px solid rgb(from var(--color-green-numixs) r g b / 25%);
         border-radius: 50%;
     }
 
@@ -509,7 +509,7 @@ button {
     --animation-tick: 0;
 
     &::after {
-        content: "";
+        content: '';
         position: absolute;
         inset: 0;
         background-color: transparent;
@@ -533,6 +533,27 @@ button {
         &::after {
             opacity: 1;
             background-image: paint(ripple);
+        }
+    }
+}
+
+.extensible-button {
+    overflow-x: clip;
+    width: calc(var(--spacing) * 6);
+    transition: width 0.35s ease;
+    white-space: nowrap;
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: 1.05rem auto;
+    justify-content: flex-start;
+    align-content: center;
+    pointer-events: auto;
+
+    &:has(span) {
+        &:hover,
+        &:focus-visible {
+            aspect-ratio: auto;
+            width: max-content;
         }
     }
 }

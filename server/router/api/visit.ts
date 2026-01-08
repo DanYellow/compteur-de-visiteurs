@@ -118,7 +118,7 @@ const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null,
     return listVisits;
 }
 
-const getPivotVisits = async (place: PlaceModel | null, period: { startTime: DateTime, endTime: DateTime }) => {
+const getPivotVisits = async (place: PlaceModel | null, period: { startTime: DateTime, endTime: DateTime }, eventId?: string) => {
     const eventTable = EventModel.getTableName();
     const visitTable = VisitModel.getTableName();
     const placeTable = PlaceModel.getTableName();
@@ -128,14 +128,18 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
         [sequelize.literal(`'${period.startTime.toFormat("dd/LL/yyyy")} ➜ ${period.endTime.toFormat("dd/LL/yyyy")}'`), 'date_passage'],
         [sequelize.literal(place ? `${placeTable}.nom` : `'Tous'`), 'lieu'],
         [
-            sequelize.literal(`'You'`),
+            sequelize.literal(`'Tous'`),
             "Évènement(s)"
         ],
         ...listGroupsFiltered.map((item): ProjectionAlias => {
             return [
                 sequelize.fn(
-                    'SUM',
-                    sequelize.literal(`CASE WHEN ${String(item.value)} = 'oui' THEN 1 ELSE 0 END`)
+                    'COALESCE',
+                    sequelize.fn(
+                        'SUM',
+                        sequelize.literal(`CASE WHEN ${String(item.value)} = 'oui' THEN 1 ELSE 0 END`)
+                    ),
+                    0
                 ),
                 item.label
             ]
@@ -143,8 +147,12 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
         ...listGenders.map((item): ProjectionAlias => {
             return [
                 sequelize.fn(
-                    'SUM',
-                    sequelize.literal(`CASE WHEN genre = '${String(item.value)}' THEN 1 ELSE 0 END`)
+                    'COALESCE',
+                    sequelize.fn(
+                        'SUM',
+                        sequelize.literal(`CASE WHEN genre = '${String(item.value)}' THEN 1 ELSE 0 END`)
+                    ),
+                    0
                 ),
                 `genre_${item.label}`
             ]
@@ -152,8 +160,12 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
         ...listDepartments.map((item): ProjectionAlias => {
             return [
                 sequelize.fn(
-                    'SUM',
-                    sequelize.literal(`CASE WHEN departement = '${String(item.value)}' THEN 1 ELSE 0 END`)
+                    'COALESCE',
+                    sequelize.fn(
+                        'SUM',
+                        sequelize.literal(`CASE WHEN departement = '${String(item.value)}' THEN 1 ELSE 0 END`)
+                    ),
+                    0
                 ),
                 `departement_${item.label}`
             ]
@@ -161,13 +173,66 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
         ...listAgeGroups.map((item): ProjectionAlias => {
             return [
                 sequelize.fn(
-                    'SUM',
-                    sequelize.literal(`CASE WHEN tranche_age = '${String(item.value)}' THEN 1 ELSE 0 END`)
+                    'COALESCE',
+                    sequelize.fn(
+                        'SUM',
+                        sequelize.literal(`CASE WHEN tranche_age = '${String(item.value)}' THEN 1 ELSE 0 END`)
+                    ),
+                    0
                 ),
                 `age_${item.label}`
             ]
         }),
     ];
+
+    let subQuery = `
+        (
+            (
+            -- REGULAR OPENING RULES
+            (
+                json_array_length("place->regularOpening"."jours_fermeture") = 0
+                OR NOT EXISTS (
+                SELECT 1
+                FROM json_each("place->regularOpening"."jours_fermeture")
+                WHERE json_each.value = CAST(strftime('%u', ${visitTable}.date_passage, 'localtime') AS text)
+                )
+            )
+            AND EXISTS (
+                SELECT 1
+                FROM regular_opening AS p
+                WHERE p.place_id = ${visitTable}.lieu_id
+                AND p.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                AND p.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+            )
+            )
+            OR
+            (
+            -- EVENT OVERRIDE
+                EXISTS (
+                    SELECT 1
+                    FROM ${eventTable} AS so
+                    INNER JOIN place_event pe ON pe.event_id = so.id
+                    WHERE pe.place_id = ${visitTable}.lieu_id
+                    AND so.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
+                    AND so.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                    AND so.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                )
+            )
+        )
+    `
+
+    if (eventId) {
+        subQuery = ` (
+            SELECT 1
+                    FROM ${eventTable} AS event
+                    INNER JOIN place_event pe ON pe.event_id = ${eventId}
+                    WHERE pe.place_id = ${visitTable}.lieu_id
+                    AND event.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
+                    AND event.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                    AND event.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+        )
+    `
+    }
 
     const totalVisits = await VisitModel.findAll({
         attributes: [
@@ -180,42 +245,8 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
                         [Op.between]: [period.startTime.toString(), period.endTime.toString()]
                     }
                 },
-                sequelize.literal(`
-                    (
-                        (
-                        -- REGULAR OPENING RULES
-                        (
-                            json_array_length("place->regularOpening"."jours_fermeture") = 0
-                            OR NOT EXISTS (
-                            SELECT 1
-                            FROM json_each("place->regularOpening"."jours_fermeture")
-                            WHERE json_each.value = CAST(strftime('%u', ${visitTable}.date_passage, 'localtime') AS text)
-                            )
-                        )
-                        AND EXISTS (
-                            SELECT 1
-                            FROM regular_opening AS p
-                            WHERE p.place_id = ${visitTable}.lieu_id
-                            AND p.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                            AND p.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                        )
-                        )
-                        OR
-                        (
-                        -- EVENT OVERRIDE
-                            EXISTS (
-                                SELECT 1
-                                FROM ${eventTable} AS so
-                                INNER JOIN place_event pe ON pe.event_id = so.id
-                                WHERE pe.place_id = ${visitTable}.lieu_id
-                                AND so.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
-                                AND so.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                                AND so.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                            )
-                        )
-                    )
-                `),
-                ...(place ? [{ lieu_id: place.id }] : [])
+                sequelize.literal(subQuery),
+                ...(place ? [{ lieu_id: place.id }] : []),
             ]
         },
         include: [{
@@ -284,41 +315,7 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
                         [Op.between]: [period.startTime.toString(), period.endTime.toString()]
                     }
                 },
-                sequelize.literal(`
-                    (
-                        (
-                        -- REGULAR OPENING RULES
-                        (
-                            json_array_length("place->regularOpening"."jours_fermeture") = 0
-                            OR NOT EXISTS (
-                            SELECT 1
-                            FROM json_each("place->regularOpening"."jours_fermeture")
-                            WHERE json_each.value = CAST(strftime('%u', ${visitTable}.date_passage, 'localtime') AS text)
-                            )
-                        )
-                        AND EXISTS (
-                            SELECT 1
-                            FROM regular_opening AS p
-                            WHERE p.place_id = ${visitTable}.lieu_id
-                            AND p.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                            AND p.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                        )
-                        )
-                        OR
-                        (
-                        -- EVENT OVERRIDE
-                            EXISTS (
-                                SELECT 1
-                                FROM ${eventTable} AS so
-                                INNER JOIN place_event pe ON pe.event_id = so.id
-                                WHERE pe.place_id = ${visitTable}.lieu_id
-                                AND so.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
-                                AND so.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                                AND so.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                            )
-                        )
-                    )
-                `),
+                sequelize.literal(subQuery),
                 ...(place ? [{ lieu_id: place.id }] : [])
             ]
         },
@@ -417,10 +414,11 @@ router.get("/visites", async (req, res) => {
         let listVisits = []
         if ("pivot" in req.query) {
             listVisits = await getPivotVisits(place, { startTime, endTime })
+        } else if ("evenement" in req.query) {
+            listVisits = await getPivotVisits(place, { startTime, endTime }, String(req.query.evenement))
         } else {
             listVisits = await getLinearVisits(groupQuery, place, { startTime, endTime })
         }
-
 
         res.status(200).json({
             data: listVisits

@@ -58,6 +58,7 @@ const description = modal.querySelector(
     "[data-description]"
 ) as HTMLParagraphElement;
 const globalChart = modal.querySelector("#global-chart") as HTMLCanvasElement;
+const downloadLinkCsv = modal.querySelector("#data-download-csv-data") as HTMLAnchorElement;
 
 modal?.addEventListener("toggle", async (e: Event) => {
     const toggleEvent = e as ToggleEvent;
@@ -163,6 +164,8 @@ modal?.addEventListener("toggle", async (e: Event) => {
         ; (modal.querySelector("[data-download-chart]") as HTMLButtonElement)!.dataset.chartData = JSON.stringify({
             nom: `Lieu(x) : ${eventData.listPlaces.map((item: PlaceRaw) => item.nom).join(", ") || "Aucun"}`
         });
+
+        downloadLinkCsv.href = `/telecharger?jour=${eventData.date}&evenement=${eventData.id}&nom_evenement=${eventData.nom}`
 
         new Chart(globalChart, {
             type: "bar",
