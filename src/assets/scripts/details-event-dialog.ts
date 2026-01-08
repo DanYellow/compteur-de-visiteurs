@@ -178,7 +178,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                 maintainAspectRatio: false,
                 plugins: {
                     title: {
-                        text: `Visites uniques "${eventData.nom}"`,
+                        text: ['Visites uniques', eventData.nom],
                         display: true,
                         color: greenNumixs,
                         font: {
@@ -186,6 +186,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                             style: "normal",
                             weight: "normal",
                             family: "Agency FB",
+                            lineHeight: 0.85
                         },
                         padding: {
                             bottom: 0

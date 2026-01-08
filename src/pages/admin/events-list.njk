@@ -37,11 +37,10 @@ Liste des évènements
         <div class="flex flex-col gap-3 mb-4">
             {% include "includes/hello-banner.njk" %}
             {{ macros.info_banner("Les évènements associés à un lieu s'afficheront dans le calendrier.")}}
+            {% include "includes/form-banner-success.njk" %}
         </div>
 
         <div class="text-black-numixs">
-            {% include "includes/form-banner-success.njk" %}
-
             <ul class="flex flex-row gap-2 text-xl mb-1.5">
                 <li>
                     <a href="?" class="mr-3 hocus:text-dark-green-numixs {{ "border-b-2" if (current_year == year) else "" }}">Tous</a>
@@ -61,6 +60,7 @@ Liste des évènements
                             <td class="font-bold px-4 py-3 text-left">Jour</td>
                             <td class="font-bold px-4 py-3 text-left">Heures d'ouverture</td>
                             <td class="font-bold px-4 py-3 text-left">Lieux concernés</td>
+                            <td class="font-bold px-4 py-3 text-left">Nombre de visites<br>(tous lieux confondus)</td>
                             <td class="font-bold px-4 py-3 text-left"></td>
                             <td class="font-bold px-4 py-3 text-left"></td>
                         </tr>
@@ -96,6 +96,10 @@ Liste des évènements
                                     Aucun
                                     {% endif %}
                                 </td>
+                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                    {{ event.nombre_de_visites }}
+                                </td>
+
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                     <a href="{{ admin_prefix }}/evenement/{{ event.id }}" class="font-bold hocus:opacity-75">Éditer</a>
                                 </td>

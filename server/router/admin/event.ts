@@ -2,7 +2,7 @@ import { Op } from "sequelize";
 import express from "express";
 import { DateTime, Info } from "luxon";
 
-import sequelize, { Place as PlaceModel, Event as EventModel, RegularOpening as RegularOpeningModel } from "#models/index.ts";
+import sequelize, { Place as PlaceModel, Event as EventModel, RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
 import { capitalizeFirstLetter } from '#scripts/utils.shared.ts';
 import { EventSchema } from "#scripts/schemas/index.ts";
 import { EventRaw, PlaceRaw } from "#types";
@@ -13,12 +13,32 @@ const router = express.Router();
 router.get(['/evenements'], getUser, requireRoleMiddleware(), async (req, res) => {
     const today = DateTime.now();
 
+    const eventTable = EventModel.getTableName();
+    const visitTable = VisitModel.getTableName();
+
     const yearSelected = Number(req.query?.annee || today.get("year"));
     const startDate = new Date(`${yearSelected}-01-01T00:00:00.000Z`);
     const endDate = new Date(`${yearSelected + 1}-01-01T00:00:00.000Z`);
 
     const listEvents = await EventModel.findAll({
         order: [["date", "DESC"], ["heure_ouverture", "DESC"], ["nom", "ASC"], [{ model: PlaceModel, as: 'listPlaces' }, "nom", "ASC"]],
+        attributes: {
+            include: [
+                [
+                    sequelize.literal(`(
+                        SELECT COUNT(*)
+                        FROM ${visitTable} AS v
+                        JOIN "place_event" AS pe ON pe."place_id" = v."lieu_id"
+                        WHERE pe."event_id" = ${eventTable}."id"
+                            AND strftime("%Y-%m-%d", ${eventTable}.date, 'localtime') = strftime("%Y-%m-%d", v.date_passage, 'localtime')
+                            AND ${eventTable}."heure_ouverture" <= strftime("%H:%M", v.date_passage, 'localtime')
+                            AND ${eventTable}."heure_fermeture" >= strftime("%H:%M", v.date_passage, 'localtime')
+                        )`
+                    ),
+                    'nombre_de_visites',
+                ],
+            ],
+        },
         where: {
             ...((req.query?.periode || req.query?.annee) && {
                 date: {
@@ -56,7 +76,7 @@ router.get(['/evenements'], getUser, requireRoleMiddleware(), async (req, res) =
         flash_message: req.cookies.flash_message,
         periode: req.query.periode,
         current_year: req.query?.annee,
-        list_years: (listYears as unknown as {annee: number}[]).map(item => Number(item.annee)),
+        list_years: (listYears as unknown as { annee: number }[]).map(item => Number(item.annee)),
     });
 })
 
@@ -113,7 +133,7 @@ router.get(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware
         list_places: listPlaces,
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
-}).post(['/evenement', '/evenement/:eventId'], getUser,requireRoleMiddleware(), async (req, res) => {
+}).post(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware(), async (req, res) => {
     const payloadValidation = {
         ...req.body,
         lieux: JSON.stringify(req.body.lieux || [])
