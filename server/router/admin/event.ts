@@ -28,7 +28,7 @@ router.get(['/evenements'], getUser, requireRoleMiddleware(), async (req, res) =
                     sequelize.literal(`(
                         SELECT COUNT(*)
                         FROM ${visitTable} AS v
-                        JOIN "place_event" AS pe ON pe."place_id" = v."lieu_id"
+                        JOIN place_event AS pe ON pe.place_id = v."lieu_id"
                         WHERE pe."event_id" = ${eventTable}."id"
                             AND strftime("%Y-%m-%d", ${eventTable}.date, 'localtime') = strftime("%Y-%m-%d", v.date_passage, 'localtime')
                             AND ${eventTable}."heure_ouverture" <= strftime("%H:%M", v.date_passage, 'localtime')

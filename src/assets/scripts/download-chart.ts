@@ -77,7 +77,7 @@ listDownloadButtons.forEach((item) => {
                 animation: false as const,
             },
             plugins: baseConfig.plugins,
-        } 
+        }
 
         // Update font sizes for export
         exportedChartConfig.options.plugins.totalVisitors.fontSize = "18px";
@@ -194,7 +194,11 @@ listDownloadButtons.forEach((item) => {
         ctx.fillRect(0, 0, exportWidth, exportHeight);
 
         // Export
-        const filename = slugify(chartInstance.config!.options!.plugins!.title!.text as string);
+        let title = chartInstance.config!.options!.plugins!.title!.text;
+        if (Array.isArray(title)) {
+            title = title.join(" ")
+        }
+        const filename = slugify(title as string);
         link.download = `${filename}_${String(Date.now()).slice(-6)}.jpg`;
         link.href = exportCanvas.toDataURL("image/jpeg", 1);
         link.click();

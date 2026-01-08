@@ -158,7 +158,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                 backgroundColor: `rgb(from ${color} r g b / 50%)`,
                 borderColor: color,
                 borderWidth: 1.5,
-                maxBarThickness: 50,
+                maxBarThickness: 120,
             })
         });
 
@@ -166,7 +166,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
             nom: `Lieu(x) : ${eventData.listPlaces.map((item: PlaceRaw) => item.nom).join(", ") || "Aucun"}`
         });
 
-        downloadLinkCsv.href = `/telecharger?jour=${eventData.date}&evenement=${eventData.id}&nom_evenement=${eventData.nom}`
+        downloadLinkCsv.href = `/telecharger?jour=${eventData.date}&evenement=${eventData.id}&nom_evenement=${encodeURIComponent(eventData.nom)}`
 
         new Chart(globalChart, {
             type: "bar",

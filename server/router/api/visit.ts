@@ -234,12 +234,13 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
     if (eventId) {
         subQuery = ` (
             SELECT 1
-                FROM ${eventTable} AS event
-                INNER JOIN place_event pe ON pe.event_id = ${eventId}
-                WHERE pe.place_id = ${visitTable}.lieu_id
-                AND event.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
-                AND event.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                AND event.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                FROM ${eventTable} AS evt
+                JOIN place_event pe
+                    ON pe.event_id = evt.id
+                WHERE evt.id = ${eventId}
+                    AND evt.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
+                    AND evt.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                    AND evt.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
         )
     `
     }
@@ -366,7 +367,7 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
         pivoted["Évènement(s)"] = (row as any)["Évènement(s)"];
 
         listGroupsFiltered.forEach(item => {
-            pivoted[item.label] = row[item.value] === 'oui' ? "oui" : "non";
+            pivoted[item.label] = (row as any)[item.value] === 'oui' ? "oui" : "non";
         });
 
         listGenders.forEach(item => {

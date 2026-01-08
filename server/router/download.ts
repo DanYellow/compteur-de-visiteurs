@@ -32,7 +32,7 @@ router.get('/', async (req, res) => {
         {
             jour: req.query[configKey],
             lieu: req.query.lieu,
-            evenement: encodeURI(req.query.evenement as string),
+            evenement: encodeURIComponent(req.query.evenement as string),
             ...("evenement" in req.query ? { } : { pivot: "" }),
         } as Record<string, string>).filter(([_, value]) => value !== undefined && value !== null)
     );
