@@ -88,7 +88,7 @@ export interface BaseConfigData {
     [key: string]: {
         apiKey: string;
         xValuesSuffix?: string;
-        listColumns?: string[] | { id: number; name: string; }[];
+        listColumns?: string[] | { id: number | string; name: string; }[];
     }
 }
 
@@ -98,7 +98,7 @@ export type ChartConfigData = BaseConfigData & {
         chartTitle: string;
         downloadLink: string;
         xTitle: string;
-        xLabels: string[] | { id: number; name: string; }[];
+        xLabels: string[] | { id: number | string; name: string; }[];
     }
 }
 

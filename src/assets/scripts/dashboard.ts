@@ -9,7 +9,7 @@ import { TotalVisitors } from './utils';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const linkDownloadChartData = document.querySelector("[data-download-chart-data='simple']") as HTMLLinkElement;
-const linkDownloadDetailedChartData = document.querySelector("[data-download-chart-data='detailed']") as HTMLLinkElement;
+// const linkDownloadDetailedChartData = document.querySelector("[data-download-chart-data='detailed']") as HTMLLinkElement;
 const tableDetailsChart = document.getElementById("table-details-chart") as HTMLTableElement;
 
 const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")
@@ -242,6 +242,7 @@ const listCharts = Object.values(configData);
                     xLabels,
                 }
             } else if (apiKey === "semaine") {
+                console.log("resEvent.data", resEvent.data)
                 xLabels = [
                     ...xLabels,
                     ...resEvent.data.map((item: EventRaw) => item.jour)
