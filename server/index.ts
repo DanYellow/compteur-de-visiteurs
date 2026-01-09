@@ -129,13 +129,16 @@ nunjucksConfig.addFilter("split", (value, char = ",") => {
         .join("");
 });
 
-nunjucksConfig.addFilter("filter", (array, predicate) => {
-    return array.filter((item: Record<string, unknown>) => {
-        return item[predicate.key] === predicate.value;
-    });
+nunjucksConfig.addFilter("filter", (array, criteria) => {
+    const predicate = (item: Record<string, string | number>) =>
+        Object.entries(criteria).every(
+            ([k, v]) => item[k] === v
+        );
+
+    return array.filter(predicate);
 });
 
-nunjucksConfig.addFilter("find", (array, criteria ) => {
+nunjucksConfig.addFilter("find", (array, criteria) => {
     const predicate = (item: Record<string, string | number>) =>
         Object.entries(criteria).every(
             ([k, v]) => item[k] === v

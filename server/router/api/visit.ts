@@ -5,12 +5,12 @@ import { Op, ProjectionAlias, WhereOptions } from 'sequelize';
 
 import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel, VisitRegistered as VisitRegisteredModel, Place } from "#models/index.ts";
 import { PERIOD_PREDICATE } from "#server/router/api/index.ts";
-import { listAgeGroups, listDepartments, listGenders, listGroups } from "#scripts/utils.shared.ts";
+import { listAgeGroups, listDepartments, listGenders, listGroups, NB_ITEMS_PER_PAGE } from "#scripts/utils.shared.ts";
 import { VisitCodeSchema } from "#scripts/schemas/index.ts";
 
 const router = express.Router();
 
-const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null, period: { startTime: DateTime, endTime: DateTime }) => {
+const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null, period: { startTime: DateTime, endTime: DateTime }, page?: number) => {
     const eventTable = EventModel.getTableName();
     const visitTable = VisitModel.getTableName();
     const placeTable = PlaceModel.getTableName();
@@ -61,7 +61,7 @@ const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null,
         whereConditions.push({ lieu_id: place.id });
     }
 
-    const listVisits = await VisitModel.findAll({
+    const listVisits = await VisitModel.findAndCountAll({
         raw: true,
         attributes: {
             include: [
@@ -91,6 +91,10 @@ const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null,
             ],
             exclude: ["lieu_id"]
         },
+        ...(page ? {
+            offset: NB_ITEMS_PER_PAGE * Math.max(0, page - 1),
+            limit: NB_ITEMS_PER_PAGE
+        }: {}),
         where: {
             [Op.and]: whereConditions,
         },
@@ -429,17 +433,37 @@ router.get("/visites", async (req, res) => {
     }
 
     try {
-        let listVisits = []
+        let listVisits = [];
+        type PaginationType = {
+            total?: number;
+            total_pages?: number;
+            current_page?: number;
+            has_prev?: boolean;
+            has_next?: boolean;
+        }
+        const pagination: PaginationType = {};
+
         if ("pivot" in req.query) {
             listVisits = await getPivotVisits(place, { startTime, endTime })
         } else if ("evenement" in req.query) {
             listVisits = await getPivotVisits(place, { startTime, endTime }, String(req.query.evenement))
         } else {
-            listVisits = await getLinearVisits(groupQuery, place, { startTime, endTime })
+            const currentPage = req.query?.page ? Number(req.query.page) : undefined;
+            const {rows, count} = await getLinearVisits(groupQuery, place, { startTime, endTime }, currentPage)
+            listVisits = rows;
+
+            pagination.total = count;
+            pagination.total_pages = Math.ceil(count / NB_ITEMS_PER_PAGE);
+            if (currentPage) {
+                pagination.current_page = currentPage;
+                pagination.has_prev = currentPage > 1;
+                pagination.has_next = currentPage * NB_ITEMS_PER_PAGE < count;
+            }
         }
 
         res.status(200).json({
-            data: listVisits
+            data: listVisits,
+            pagination,
         });
     } catch (e) {
         console.log("error", e)

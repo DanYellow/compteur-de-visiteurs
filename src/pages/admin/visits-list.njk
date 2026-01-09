@@ -18,13 +18,15 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
 {% endblock %}
 
 {% set all_events = (place.listEvents or list_events) %}
-{% set list_day_events = all_events|filter({key: "date", value: current_date|date("yyyy-LL-dd")}) %}
+{% set list_day_events = all_events|filter({ date: current_date|date("yyyy-LL-dd")}) %}
 {% set active_menu_item = "visiteurs" %}
 {% set place_selected = place.slug or "tous" %}
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
+
 {% block content %}
     <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13 min-w-0" data-place='{{ place | json }}' data-list-events='{{ all_events | json }}'>
+{{ list_day_events | dump }}
         <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
             <div class="text-black-numixs flex flex-col items-start">
                 <h1 class="text-black-numixs title-font font-bold text-6xl">Visites</h1>
@@ -90,9 +92,9 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
 
                     <p class="text-4xl title-font">
                         {% if is_day_closed and list_day_events | length == 0 %}
-                        Fermé
-                    {% else %}
-                            {{ visits_list|length }}
+                            Fermé
+                        {% else %}
+                            {{ pagination.total }}
                         {% endif %}
                     </p>
                     {% if list_day_events | length %}
@@ -163,14 +165,14 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     <h2 class="title-font font-bold text-2xl">{{ place.nom }}</h2>
                     <p>Horaires réguliers : {{ place.heure_ouverture|date("HH'h'mm") }}-{{ place.heure_fermeture|date("HH'h'mm") }}</p>
 
-                    {% if list_day_events | length %}
+                    {# {% if list_day_events | length %}
                         <p>Évènement(s) du jour :
                             {% for event in place.listEvents %}
                                 {{ event.nom }} • {{ event.heure_ouverture|date("HH'h'mm") }}-{{ event.heure_fermeture|date("HH'h'mm") }}
                                 {% if loop.last == false %}, {% endif %}
                             {% endfor %}
                         </p>
-                    {% endif %}
+                    {% endif %} #}
                     {% if place.jours_fermeture_litteral | length %}
                         <p>Fermé le {{ place.jours_fermeture_litteral | oxford_comma }}</p>
                     {% else %}
@@ -248,6 +250,9 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     </tbody>
                 </table>
             </div>
+            {% if pagination.total_pages > 1 %}
+                {% include "includes/pagination.njk" %}
+            {% endif %}
         </div>
     </div>
 

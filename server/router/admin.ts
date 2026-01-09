@@ -200,8 +200,8 @@ router.get(["/visiteurs", "/visites"], getUser, requireRoleMiddleware(), async (
 
     const isClosedDay = closedDays.includes(String(daySelected.weekday));
 
-    const listVisitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/visites?filtre=jour&jour=${daySelected.toFormat("yyyy-LL-dd")}&lieu=${placeSelected}`);
-    const listVisits = (await listVisitsReq.json()).data || [];
+    const listVisitsReq = await fetch(`${req.protocol}://${req.get('host')}/api/visites?filtre=jour&jour=${daySelected.toFormat("yyyy-LL-dd")}&lieu=${placeSelected}&page=${req.query.page || 1}`);
+    const { data: listVisits, pagination } = (await listVisitsReq.json()) || { data: [], pagination: {}};
 
     const listPlaces = await PlaceModel.findAll({
         raw: true,
@@ -221,12 +221,14 @@ router.get(["/visiteurs", "/visites"], getUser, requireRoleMiddleware(), async (
     res.render("pages/admin/visits-list.njk", {
         visits_summary: getVisitsSummaries(listVisits),
         "visits_list": listVisits,
+        "pagination": pagination,
         "list_groups": listBusinessSector.filter((item) => (!("listInDb" in item) || item.listInDb)),
         "list_genders": listGenders,
         "list_departments": listDepartments,
         "list_age_groups": listAgeGroups,
         "header_list": listVisits?.[0] ? Object.keys(listVisits[0]) : [],
         "current_date": daySelected,
+        "current_page": req.query.page || 1,
         "today": DateTime.now(),
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
         "is_day_closed": isClosedDay,
