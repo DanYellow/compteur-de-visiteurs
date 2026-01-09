@@ -26,7 +26,6 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
 
 {% block content %}
     <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13 min-w-0" data-place='{{ place | json }}' data-list-events='{{ all_events | json }}'>
-{{ list_day_events | dump }}
         <header class="flex flex-row justify-between md:items-center mb-10 -mt-1.5">
             <div class="text-black-numixs flex flex-col items-start">
                 <h1 class="text-black-numixs title-font font-bold text-6xl">Visites</h1>
@@ -201,7 +200,9 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     <tbody>
                         {% for visit in visits_list %}
                             <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
-                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">{{ loop.index }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Numéro" data-row-key="{{ business.value }}">
+                                    {{ pagination.total - ((pagination.current_page - 1) * pagination.per_page) - loop.index0 }}
+                                </td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left" data-label="Date de passage" data-row-key="Date de passage">
                                     <time datetime="{{ visit['date_passage'] }}">
                                         {{ visit["date_passage"]|date("dd/LL/yyyy à HH:mm") }}

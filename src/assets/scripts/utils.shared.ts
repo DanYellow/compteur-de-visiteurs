@@ -447,4 +447,4 @@ export const uniqueByKey = (arr: any[], key: string) => {
     return [...new Map(arr.map(item => [item[key], item])).values()];
 };
 
-export const NB_ITEMS_PER_PAGE = 5;
+export const NB_ITEMS_PER_PAGE = 25;

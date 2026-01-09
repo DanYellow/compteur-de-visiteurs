@@ -200,10 +200,6 @@ select.error {
     }
 }
 
-.current-day {
-    anchor-name: --calendar-anchor;
-}
-
 .result-form-modal::after {
     content: '';
     position: fixed;
@@ -261,7 +257,6 @@ select.error {
     min-height: 90%;
     display: flex;
     flex-direction: column;
-    /* justify-content: center; */
     opacity: 0.1;
     pointer-events: none;
     transition: opacity 350ms ease-in-out;

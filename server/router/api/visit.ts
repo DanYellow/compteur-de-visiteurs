@@ -438,6 +438,7 @@ router.get("/visites", async (req, res) => {
             total?: number;
             total_pages?: number;
             current_page?: number;
+            per_page?: number;
             has_prev?: boolean;
             has_next?: boolean;
         }
@@ -456,6 +457,7 @@ router.get("/visites", async (req, res) => {
             pagination.total_pages = Math.ceil(count / NB_ITEMS_PER_PAGE);
             if (currentPage) {
                 pagination.current_page = currentPage;
+                pagination.per_page = NB_ITEMS_PER_PAGE;
                 pagination.has_prev = currentPage > 1;
                 pagination.has_next = currentPage * NB_ITEMS_PER_PAGE < count;
             }

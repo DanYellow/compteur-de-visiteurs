@@ -119,6 +119,7 @@
                     &::after {
                         content: 'Évènement(s)';
                         display: block;
+                        pointer-events: none;
                         /* inset-inline: 0.5rem; */
                         left: 50%;
                         translate: -50% 0%;
@@ -182,4 +183,8 @@
             opacity: 1;
         }
     }
+}
+
+.current-day {
+    anchor-name: --calendar-anchor;
 }

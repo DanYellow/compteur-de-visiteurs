@@ -27,7 +27,7 @@ let sleepController = new AbortController();
 let currentStep = 0;
 let currentStepName = "";
 
-const FORM_RESULT_TIMEOUT = 8000;
+const FORM_RESULT_TIMEOUT = 10000;
 
 const listStepsSchemas: Record<string, ZodObject> = {
     group: GroupSchema,
