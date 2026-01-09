@@ -1,4 +1,4 @@
-import { GroupSchema, DepartmentSchema, AgeSchema, GenderSchema } from "#scripts/schemas/index.ts";
+import { GroupSchema, DepartmentSchema, AgeSchema, GenderSchema, VisitCodeSchema } from "#scripts/schemas/index.ts";
 import type { ZodObject } from "zod";
 
 import '#scripts/label-ripple-effect.ts';
@@ -6,14 +6,16 @@ import '#scripts/label-ripple-effect.ts';
 import { cancellableSleep } from "./utils";
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
-const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;
+const mainErrorsContainer = document.getElementById("error-container") as HTMLUListElement;
+const visiteCodeErrorsContainer = document.getElementById("error-visit-code-container") as HTMLUListElement;
 const dialog = document.querySelector("[data-dialog='form-submitted']") as HTMLDialogElement;
 const formSuccessTplRaw = document.querySelector("[data-template-id='form-success']") as HTMLTemplateElement;
 const formErrorTplRaw = document.querySelector("[data-template-id='form-error']") as HTMLTemplateElement;
 const formSubmittingTplRaw = document.querySelector("[data-template-id='form-submitting']") as HTMLTemplateElement;
 
 const dialogVisitCodeExplanation = document.getElementById("visit-code-explanation") as HTMLDialogElement;
-const dialogVisitCodeForm = document.getElementById("visit-code-form") as HTMLDialogElement;
+const dialogVisitCode = document.getElementById("visit-code") as HTMLDialogElement;
+const dialogVisitCodeForm = dialogVisitCode?.querySelector("form") as HTMLFormElement;
 
 const listAllStepValidationButtons = document.querySelectorAll("[data-button-step]") as NodeListOf<HTMLButtonElement>;
 
@@ -24,6 +26,8 @@ let sleepController = new AbortController();
 
 let currentStep = 0;
 let currentStepName = "";
+
+const FORM_RESULT_TIMEOUT = 8000;
 
 const listStepsSchemas: Record<string, ZodObject> = {
     group: GroupSchema,
@@ -86,19 +90,19 @@ const submitForm = async (e: SubmitEvent) => {
     }
 
     try {
-        // await cancellableSleep(Number(import.meta.env.FORM_RESULT_TIMEOUT), sleepController.signal);
-        // dialog.close();
+        await cancellableSleep(FORM_RESULT_TIMEOUT, sleepController.signal);
+        dialog.close();
     } finally {
     }
 };
 
-const validForm = (form: HTMLFormElement) => {
+const validForm = (form: HTMLFormElement, schema: ZodObject, errorsContainer: HTMLUListElement) => {
     if (!("isDirty" in form.dataset)) {
         return
     }
 
     const formData = new FormData(form);
-    const validator = listStepsSchemas[currentStepName].safeParse(Object.fromEntries(formData));
+    const validator = schema.safeParse(Object.fromEntries(formData));
 
     form.querySelectorAll("input.error").forEach((item) => {
         item.classList.remove("error");
@@ -147,7 +151,7 @@ dialog.addEventListener("toggle", (e: Event) => {
 })
 
 form?.addEventListener("submit", submitForm);
-form?.addEventListener("input", () => validForm(form));
+form?.addEventListener("input", () => validForm(form, listStepsSchemas[currentStepName], mainErrorsContainer));
 
 const updateWizardHeight = () => {
     let maxHeight = 0;
@@ -184,7 +188,7 @@ listAllStepValidationButtons.forEach((item: HTMLButtonElement) => {
 
             form.dataset.isDirty = "";
 
-            if (!validForm(form)) {
+            if (!validForm(form, listStepsSchemas[currentStepName], mainErrorsContainer)) {
                 return;
             }
         }
@@ -224,24 +228,41 @@ dialogVisitCodeExplanation?.addEventListener("toggle", (e: Event) => {
     }
 })
 
-dialogVisitCodeForm?.querySelector("form")?.addEventListener("submit", async (e) => {
+dialogVisitCodeForm?.addEventListener("input", (e: Event) => validForm(
+    (e.currentTarget as HTMLFormElement),
+    VisitCodeSchema,
+    visiteCodeErrorsContainer
+));
+dialogVisitCodeForm?.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    const dialogForm = (e.currentTarget as HTMLFormElement);
+    dialogVisitCodeForm.dataset.isDirty = "";
 
-    const formData = new FormData(dialogForm);
-    const code = formData.get("code")
+    const formData = new FormData(dialogVisitCodeForm);
 
-    const req = await fetch(`/api/visite/${code}`); // QKC CHW WJB
+    const isFormValid = validForm(dialogVisitCodeForm, VisitCodeSchema, visiteCodeErrorsContainer);
+    if (!isFormValid) {
+        return;
+    }
+
+    const code = formData.get("code");
+
+    const req = await fetch(`/api/visite/${code}`);
     const payload = await req.json();
 
     if (req.status === 404) {
+        const li = document.createElement('li');
+        li.textContent = `Le code "${code}" n'est associé à aucune visite`;
+
+        visiteCodeErrorsContainer.appendChild(li);
 
         return;
     }
 
-    dialogVisitCodeForm.close()
-    dialogForm.reset();
+    dialogVisitCodeForm.removeAttribute('data-is-dirty');
+    dialogVisitCode.close()
+    dialogVisitCodeForm.reset();
+    form.reset();
 
     Object.entries(payload.contenu as Record<string, any>).forEach(([name, value]) => {
         const field = form.elements.namedItem(name);

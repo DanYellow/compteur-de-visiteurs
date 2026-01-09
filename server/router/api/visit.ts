@@ -6,7 +6,7 @@ import { Op, ProjectionAlias, WhereOptions } from 'sequelize';
 import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel, VisitRegistered as VisitRegisteredModel, Place } from "#models/index.ts";
 import { PERIOD_PREDICATE } from "#server/router/api/index.ts";
 import { listAgeGroups, listDepartments, listGenders, listGroups } from "#scripts/utils.shared.ts";
-
+import { VisitCodeSchema } from "#scripts/schemas/index.ts";
 
 const router = express.Router();
 
@@ -449,9 +449,13 @@ router.get("/visites", async (req, res) => {
     }
 });
 
-router.get("/visite/:code", async (req, res) => {
-    const entry = await VisitRegisteredModel.findByPk(req.params.code.toUpperCase());
+router.get("/visite{/:code}", async (req, res) => {
+    const validator = VisitCodeSchema.safeParse(req.params);
+    if (!validator.success) {
+        return res.status(500).json({ error: "Invalid code" });
+    }
 
+    const entry = await VisitRegisteredModel.findByPk(req.params.code!.toUpperCase());
     if (!entry) {
         return res.status(404).json({ error: "Invalid code" });
     }

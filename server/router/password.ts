@@ -52,7 +52,7 @@ router.get('/mot-de-passe-oublie', async (req, res) => {
     return res.redirect("/mot-de-passe-oublie");
 });
 
-router.get(['/recuperation-mot-de-passe/{:token}'], async (req, res) => {
+router.get(['/recuperation-mot-de-passe{/:token}'], async (req, res) => {
     let user = null;
     let errorKey = "";
     const { token } = req.params;
@@ -83,7 +83,7 @@ router.get(['/recuperation-mot-de-passe/{:token}'], async (req, res) => {
         flash_message: errorKey,
         user_email: user?.email,
     });
-}).post('/recuperation-mot-de-passe/{:token}', async (req, res) => {
+}).post('/recuperation-mot-de-passe{/:token}', async (req, res) => {
     const validator = ChangePasswordSchema.safeParse(req.body);
     const { token } = req.params;
 

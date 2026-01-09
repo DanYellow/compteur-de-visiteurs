@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { listGroups as listBusinessSector, listAgeGroups, listDepartments, listGenders } from '#scripts/utils.shared.ts';
+import { listGroups as listBusinessSector, listAgeGroups, listDepartments, listGenders, REQUIRED_MESSAGE } from '#scripts/utils.shared.ts';
 
 type BusinessSectorPayload = {
     entreprise?: string;
@@ -71,7 +71,6 @@ export const GroupSchema = z.object({
     path: ['education']
 })
 
-
 export const AgeSchema = z.object({
     tranche_age: z.enum(listAgeGroups.map(({ value }) => value), {
         error: "Vous devez sélectionner une tranche d'âge",
@@ -96,3 +95,9 @@ export const VisitSchema = z.object({
     ...AgeSchema.shape,
     ...GroupSchema.shape,
 });
+
+const VISIT_CODE_REGEX = /^(\d|[A-z]){3}$/;
+
+export const VisitCodeSchema = z.object({
+    code: z.string().refine((value) => VISIT_CODE_REGEX.test(value ?? ""), 'Le code de visite doit faire exactement 3 caractères'),
+})

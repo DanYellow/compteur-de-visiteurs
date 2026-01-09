@@ -20,11 +20,11 @@ Compteur de visiteurs
                 <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-20" alt="">
                 <p class="text-sm">{{ place.nom }}</p>
                 <div class="flex gap-3 flex-col sm:flex-row">
-                    <button type="button" class="bg-green-numixs hocus:bg-dark-green-numixs text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="visit-code-form" command="show-modal">J'ai un code de visite</button>
+                    <button type="button" class="bg-green-numixs hocus:bg-dark-green-numixs text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="visit-code" command="show-modal">J'ai un code de visite</button>
                     <button type="button" class="bg-white-numixs hocus:bg-white-numixs/80 text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="explanation" command="show-modal">Pourquoi remplir ce formulaire ?</button>
                 </div>
             </header>
-            <ul class="form-errors-list-container not-empty:mb-3" role="alert" data-form-errors id="error-container"></ul>
+            <ul class="form-errors-list-container not-empty:mb-3" role="alert" id="error-container"></ul>
             <div class="relative" id="wizard-steps">
                 <div class="wrapper overflow-hidden snap-y snap-mandatory overscroll-contain inset-0" style="position: absolute;" id="steps-container">
                     <div data-step="1" class="form-step">
@@ -151,7 +151,7 @@ Compteur de visiteurs
         <hr class="pb-1 mt-1 border-green-numixs">
     </dialog>
 
-    <dialog id="visit-code-form" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+    <dialog id="visit-code" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
         <header class="flex flex-row justify-between items-start">
             <p class="title-font text-4xl">Code de visite</p>
         </header>
@@ -159,8 +159,9 @@ Compteur de visiteurs
         <p class="mb-2">
             Le code de visite est un moyen simple et rapide de remplir ce formulaire. Récolter ces données nous permet de témoigner de l'affluence de votre lieu et ainsi nous permettre d'obtenir des fonds pour financer nos machines et donc vos projets.
         </p>
-        <div class="mb-3">
-        {{ macros.warning_banner("Un code de visite ne peut pas contenir la lettre \"O\"") }}
+        <div class="mb-4 flex flex-col gap-3">
+            {{ macros.warning_banner("Un code de visite ne peut pas contenir la lettre \"O\"") }}
+            <ul class="form-errors-list-container" role="alert" data-form-errors id="error-visit-code-container"></ul>
         </div>
         <form action="" class="flex flex-col gap-5" autocomplete="off">
             <div class="flex flex-col">
@@ -171,7 +172,7 @@ Compteur de visiteurs
                 <button type="submit" class="text-green-numixs w-fit title-font rounded-md text-2xl py-3.5 font-bold hocus:text-dark-green-numixs">
                     Envoyer
                 </button>
-                <button type="button" command="close" commandfor="visit-code-form" class="title-font text-2xl py-1.5 rounded-md text-white-numixs hocus:opacity-70">Annuler</button>
+                <button type="button" command="close" commandfor="visit-code" class="title-font text-2xl py-1.5 rounded-md text-white-numixs hocus:opacity-70">Annuler</button>
             </div>
         </form>
     </dialog>
