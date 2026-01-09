@@ -335,35 +335,5 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
         </div>
     </dialog>
 
-    <dialog id="detail-event" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
-        <header class="flex flex-row justify-between items-start">
-            <div>
-                <p class="title-font text-4xl" data-name></p>
-                <p class="text-sm">
-                    Le <time datetime="">14/11/2025 de 10:47:56 à 12:47:56</time>
-                </p>
-                <p class="text-sm" data-place-name></p>
-            </div>
-            <button type="button" command="close" commandfor="detail-event" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
-                </svg>
-            </button>
-        </header>
-
-        <hr class="pb-1 mt-1 border-green-numixs">
-        <p data-description=""></p>
-        <div class="p-3 rounded-2xl h-100 relative">
-            <menu class="absolute right-3 flex flex-row gap-3">
-                <li>
-                    <button data-download-chart="global-chart" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer" title="Télécharger graphique">
-                        {% include "includes/icons/download-fill-icon.svg" %}
-                    </button>
-                </li>
-            </menu>
-            <canvas id="global-chart" class="w-full h-full"></canvas>
-        </div>
-        <p class="text-xl">Lieu(x) concerné(s)</p>
-        <ul class="list-disc list-inside columns-2"></ul>
-    </dialog>
+    {% include "includes/dialogs/detail-event.njk" %}
 {% endblock %}

@@ -32,13 +32,11 @@ router.get('/', async (req, res) => {
         {
             jour: req.query[configKey],
             lieu: req.query.lieu,
-            evenement: encodeURIComponent(req.query.evenement as string),
-            ...("evenement" in req.query ? { } : { pivot: "" }),
+            ...("evenement" in req.query ? { evenement: encodeURIComponent(req.query.evenement as string) } : { pivot: "" }),
         } as Record<string, string>).filter(([_, value]) => value !== undefined && value !== null)
     );
 
-    const request = await fetch(`http://${req.get('host')}/api/visites?filtre=${configKey}&${extraParams.toString()}`); //  pivot
-
+    const request = await fetch(`http://${req.get('host')}/api/visites?filtre=${configKey}&${extraParams.toString()}`);
     const requestRes = await request.json();
 
     let placeName = "tous";
