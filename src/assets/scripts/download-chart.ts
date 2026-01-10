@@ -23,7 +23,6 @@ const CHART_TABLE_GAP = 20;
 const BOTTOM_MARGIN = 40;
 const SIDE_PADDING = 12;
 
-
 const today = DateTime.now();
 
 listDownloadButtons.forEach((item) => {
@@ -65,7 +64,7 @@ listDownloadButtons.forEach((item) => {
         const baseConfig = chartInstance.config;
 
         const exportedChartConfig: any = {
-            ...("type" in baseConfig ? {type: baseConfig.type} : {}),
+            ...("type" in baseConfig ? { type: baseConfig.type } : {}),
             data: {
                 ...baseConfig.data,
                 datasets: baseConfig.data.datasets.map(ds => ({ ...ds })),
@@ -109,6 +108,10 @@ listDownloadButtons.forEach((item) => {
 
         // Create offscreen chart
         const exportChart = new Chart(offscreenCtx, exportedChartConfig);
+
+        chartInstance.data.datasets.forEach((_, i) => {
+            exportChart.setDatasetVisibility(i, chartInstance.isDatasetVisible(i));
+        });
 
         // Force synchronous render
         exportChart.update();
