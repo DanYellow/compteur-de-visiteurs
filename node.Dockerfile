@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-RUN node env-to-json.js
+RUN npm run email
 
 RUN npm run build
 
