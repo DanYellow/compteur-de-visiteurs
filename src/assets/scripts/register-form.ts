@@ -216,15 +216,20 @@ window.addEventListener("pageshow", () => {
 });
 
 
-dialogVisitCodeExplanation?.addEventListener("toggle", (e: Event) => {
+dialogVisitCodeExplanation?.addEventListener("toggle", async (e: Event) => {
     const toggleEvent = e as ToggleEvent;
     const isOpened = toggleEvent.newState === "open";
 
     if (isOpened) {
         const codeLabel = dialogVisitCodeExplanation.querySelector("[data-visit-code]");
+        sleepController.abort();
+        sleepController = new AbortController();
         if (codeLabel) {
             codeLabel.textContent = (e.source as HTMLButtonElement).dataset.visitCodeInfo!;
         }
+    } else {
+        await cancellableSleep(FORM_RESULT_TIMEOUT, sleepController.signal);
+        dialog.close();
     }
 })
 

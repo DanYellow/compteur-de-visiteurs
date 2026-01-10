@@ -19,7 +19,12 @@
                 {{ macros.warning_banner("Le lieu définit n'existe pas, vous devez choisir un lieu existant.") }}
             {% endif %}
             {% if flash_message.closed_place %}
-                {{ macros.warning_banner("Le lieu définit n'est pas ouvert aujourd'hui. Les visites ne seront pas enregistrées.") }}
+                {% set banner_content %}
+                    <span class="font-bold">
+                        Le lieu définit n'est pas ouvert aujourd'hui. Les visites ne seront pas enregistrées.
+                    </span>
+                {% endset %}
+                {{ macros.warning_banner(banner_content) }}
             {% endif %}
             {% if flash_message.set_place %}
                 {% set banner_content %}
