@@ -183,18 +183,18 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                 {% include "includes/form-banner-success.njk" %}
                 <table class="w-full bg-white border-collapse whitespace-nowrap">
                     <thead>
-                        <tr class="bg-gray-200">
-                            <td class="font-bold px-4 py-3 text-left">#</td>
-                            <td class="font-bold px-4 py-3 text-left">Date de visite</td>
-                            <td class="font-bold px-4 py-3 text-left">Lieu</td>
-                            <td class="font-bold px-4 py-3 text-left">Évènement</td>
+                        <tr class="bg-gray-200 fixed-table-header">
+                            <th class="font-bold px-4 py-3 text-left">#</th>
+                            <th class="font-bold px-4 py-3 text-left">Date de visite</th>
+                            <th class="font-bold px-4 py-3 text-left">Lieu</th>
+                            <th class="font-bold px-4 py-3 text-left">Évènement</th>
                             {% for business in list_groups %}
-                                <td class="font-bold px-4 py-3 text-left border-solid">{{ business.label | striptags(true) | escape | nl2br }}</td>
+                                <th class="font-bold px-4 py-3 text-left border-solid">{{ business.label | striptags(true) | escape | nl2br }}</th>
                             {% endfor %}
-                            <td class="font-bold px-4 py-3 text-left">Genre</td>
-                            <td class="font-bold px-4 py-3 text-left">Département</td>
-                            <td class="font-bold px-4 py-3 text-left">Tranche d'âge</td>
-                            <td class="font-bold px-4 py-3 text-left"></td>
+                            <th class="font-bold px-4 py-3 text-left">Genre</th>
+                            <th class="font-bold px-4 py-3 text-left">Département</th>
+                            <th class="font-bold px-4 py-3 text-left">Tranche d'âge</th>
+                            <th class="font-bold px-4 py-3 text-left"></th>
                         </tr>
                     </thead>
                     <tbody>

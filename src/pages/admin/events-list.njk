@@ -31,7 +31,7 @@ Liste des évènements
                     <option {{ "selected" if periode == "a-venir" else "" }} value="a-venir">A venir</option>
                 </select>
             </div>
-            <a href="{{ admin_prefix }}/evenement" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-md text-white self-start md:self-auto">Créer un évènement</a>
+            <a href="{{ admin_prefix }}/evenement" class="{{ primary_button_classes_filled }}">Créer un évènement</a>
         </header>
 
         <div class="flex flex-col gap-3 mb-4">
@@ -52,17 +52,17 @@ Liste des évènements
                 {% endfor %}
             </ul>
             <div class="overflow-x-auto">
-                <table class="w-full bg-white border-collapse whitespace-nowrap">
+                <table class="w-full bg-white border-collapse whitespace-nowrap fixed-table-header">
                     <thead>
-                        <tr class="bg-gray-200">
-                            <td class="font-bold px-4 py-3 text-left">#</td>
-                            <td class="font-bold px-4 py-3 text-left">Nom</td>
-                            <td class="font-bold px-4 py-3 text-left">Jour</td>
-                            <td class="font-bold px-4 py-3 text-left">Heures d'ouverture</td>
-                            <td class="font-bold px-4 py-3 text-left">Lieux concernés</td>
-                            <td class="font-bold px-4 py-3 text-left">Nombre de visites<br>(tous lieux confondus)</td>
-                            <td class="font-bold px-4 py-3 text-left"></td>
-                            <td class="font-bold px-4 py-3 text-left"></td>
+                        <tr class="bg-gray-200 fixed-table-header">
+                            <th class="font-bold px-4 py-3 text-left">#</th>
+                            <th class="font-bold px-4 py-3 text-left">Nom</th>
+                            <th class="font-bold px-4 py-3 text-left">Jour</th>
+                            <th class="font-bold px-4 py-3 text-left">Heures d'ouverture</th>
+                            <th class="font-bold px-4 py-3 text-left">Lieux concernés</th>
+                            <th class="font-bold px-4 py-3 text-left">Nombre de visites<br>(tous lieux confondus)</th>
+                            <th class="font-bold px-4 py-3 text-left"></th>
+                            <th class="font-bold px-4 py-3 text-left"></th>
                         </tr>
                     </thead>
                     <tbody>

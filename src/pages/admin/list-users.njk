@@ -34,13 +34,13 @@ Liste utilisateurs
         <div class="text-black-numixs">
             <div class="overflow-x-auto">
                 {% include "includes/form-banner-success.njk" %}
-                <table class="w-full bg-white border-collapse whitespace-nowrap">
+                <table class="w-full bg-white border-collapse whitespace-nowrap fixed-table-header">
                     <thead>
                         <tr class="bg-gray-200">
-                            <td class="font-bold px-4 py-3 text-left">#</td>
-                            <td class="font-bold px-4 py-3 text-left">Prénom / Nom</td>
-                            <td class="font-bold px-4 py-3 text-left">Adresse e-mail</td>
-                            <td class="font-bold px-4 py-3 text-left">
+                            <th class="font-bold px-4 py-3 text-left">#</th>
+                            <th class="font-bold px-4 py-3 text-left">Prénom / Nom</th>
+                            <th class="font-bold px-4 py-3 text-left">Adresse e-mail</th>
+                            <th class="font-bold px-4 py-3 text-left">
                                 <span class="inline-flex items-center gap-2">
                                     Rôle
                                     <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-roles" command="show-modal" data-event-data='{{ event | json }}'>
@@ -49,9 +49,9 @@ Liste utilisateurs
                                         </svg>
                                     </button>
                                 </span>
-                            </td>
-                            <td class="font-bold px-4 py-3 text-left">Activer</td>
-                            <td class="font-bold px-4 py-3 text-left">
+                            </th>
+                            <th class="font-bold px-4 py-3 text-left">Activer</th>
+                            <th class="font-bold px-4 py-3 text-left">
                                 <span class="inline-flex items-center gap-2">
                                     Approuver
                                     <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="approved-status" command="show-modal" data-event-data='{{ event | json }}'>
@@ -60,10 +60,10 @@ Liste utilisateurs
                                         </svg>
                                     </button>
                                 </span>
-                            </td>
-                            <td class="font-bold px-4 py-3 text-left">Date inscription</td>
-                            <td class="font-bold px-4 py-3 text-left">Dernière connexion</td>
-                            <td class="font-bold px-4 py-3 text-left"></td>
+                            </th>
+                            <th class="font-bold px-4 py-3 text-left">Date inscription</th>
+                            <th class="font-bold px-4 py-3 text-left">Dernière connexion</th>
+                            <th class="font-bold px-4 py-3 text-left"></th>
                         </tr>
                     </thead>
                     <tbody>

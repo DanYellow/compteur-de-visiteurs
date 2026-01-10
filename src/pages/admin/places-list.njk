@@ -20,7 +20,7 @@ Liste lieux numixs
         <header class="flex flex-col md:flex-row gap-y-3 justify-between md:items-center mb-10 -mt-1.5">
             <h1 class="text-black-numixs title-font font-bold text-6xl">Lieux numixs</h1>
             {% if user_role.weight >= 100 %}
-            <a href="{{ admin_prefix }}/lieu" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-md text-white self-start md:self-auto">Créer un nouvel lieu</a>
+            <a href="{{ admin_prefix }}/lieu" class="{{ primary_button_classes_filled }}">Créer un nouveau lieu</a>
             {% endif %}
         </header>
 
@@ -30,15 +30,15 @@ Liste lieux numixs
         <div class="text-black-numixs">
             <div class="overflow-x-auto">
                 {% include "includes/form-banner-success.njk" %}
-                <table class="w-full bg-white border-collapse whitespace-nowrap">
+                <table class="w-full bg-white border-collapse whitespace-nowrap fixed-table-header">
                     <thead>
                         <tr class="bg-gray-200">
-                            <td class="font-bold px-4 py-3 text-left">#</td>
-                            <td class="font-bold px-4 py-3 text-left">Nom</td>
-                            <td class="font-bold px-4 py-3 text-left">Heures d'ouverture</td>
-                            <td class="font-bold px-4 py-3 text-left">Jours fermés</td>
-                            <td class="font-bold px-4 py-3 text-left">Ouvert</td>
-                            <td class="font-bold px-4 py-3 text-left"></td>
+                            <th class="font-bold px-4 py-3 text-left">#</th>
+                            <th class="font-bold px-4 py-3 text-left">Nom</th>
+                            <th class="font-bold px-4 py-3 text-left">Heures d'ouverture</th>
+                            <th class="font-bold px-4 py-3 text-left">Jours fermés</th>
+                            <th class="font-bold px-4 py-3 text-left">Ouvert</th>
+                            <th class="font-bold px-4 py-3 text-left"></th>
                         </tr>
                     </thead>
                     <tbody>

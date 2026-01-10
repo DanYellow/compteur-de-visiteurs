@@ -32,6 +32,12 @@
     font-family: 'Agency FB', sans-serif;
 }
 
+@utility fixed-table-header {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
 @layer components {
     .input {
         border: solid 1px var(--color-gray-input-border-numixs);
