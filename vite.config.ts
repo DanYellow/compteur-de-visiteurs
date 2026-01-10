@@ -48,12 +48,12 @@ export default defineConfig(({ mode }) => {
             lib: {
                 entry: [
                     path.resolve(__dirname, "src/assets/scripts/main.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/register-form.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/place-form.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/event-form.ts"),
+                    path.resolve(__dirname, "src/assets/scripts/forms/register-form.ts"),
+                    path.resolve(__dirname, "src/assets/scripts/forms/place-form.ts"),
+                    path.resolve(__dirname, "src/assets/scripts/forms/event-form.ts"),
                     path.resolve(__dirname, "src/assets/scripts/dashboard.ts"),
                     path.resolve(__dirname, "src/assets/scripts/download-chart.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/details-event-dialog.ts"),
+                    path.resolve(__dirname, "src/assets/scripts/dialogs/details-event-dialog.ts"),
                     path.resolve(__dirname, "src/assets/scripts/forms/sign-in-form.ts"),
                 ],
                 formats: ["es"],

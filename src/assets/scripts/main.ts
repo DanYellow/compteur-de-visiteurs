@@ -6,7 +6,7 @@ import "#styles/calendar.css";
 import "#scripts/dropdown-redirect.ts";
 import "#scripts/calendar.ts";
 import "#scripts/socket-client.ts";
-import "#scripts/delete-list-item-dialog.ts";
+import "#scripts/dialogs/delete-list-item-dialog.ts";
 
 document.querySelectorAll("dialog").forEach((item) => {
     item.addEventListener("click", (e) => {

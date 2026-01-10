@@ -8,9 +8,9 @@ Compteur de visiteurs
 {% endblock %}
 {% block scripts %}
     {% if NODE_ENV == "development" %}
-        <script type="module" src="/src/assets/scripts/register-form.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/forms/register-form.ts" defer></script>
     {% else %}
-        <script type="module" src="/{{ manifest['src/assets/scripts/register-form.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/forms/register-form.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}
 {% block content %}
@@ -20,8 +20,8 @@ Compteur de visiteurs
                 <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-20" alt="">
                 <p class="text-sm">{{ place.nom }}</p>
                 <div class="flex gap-3 flex-col sm:flex-row">
-                    <button type="button" class="bg-green-numixs hocus:bg-dark-green-numixs text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="visit-code" command="show-modal">J'ai un code de visite</button>
                     <button type="button" class="bg-white-numixs hocus:bg-white-numixs/80 text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="explanation" command="show-modal">Pourquoi remplir ce formulaire ?</button>
+                    <button type="button" class="bg-green-numixs hocus:bg-dark-green-numixs text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="visit-code" command="show-modal">J'ai un code de visite</button>
                 </div>
             </header>
             <ul class="form-errors-list-container not-empty:mb-3" role="alert" id="error-container"></ul>

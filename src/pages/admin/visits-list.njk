@@ -7,12 +7,12 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
 {% import "includes/macros.njk" as macros %}
 {% block scripts %}
     {% if NODE_ENV == "development" %}
-        <script type="module" src="/src/assets/scripts/details-event-dialog.ts" defer></script>
-        <script type="module" src="/src/assets/scripts/details-visit-dialog.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/dialogs/details-event-dialog.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/dialogs/details-visit-dialog.ts" defer></script>
         <script type="module" src="/src/assets/scripts/download-chart.ts" defer></script>
     {% else %}
-        <script type="module" src="/{{ manifest['src/assets/scripts/details-event-dialog.ts'].file }}" defer></script>
-        <script type="module" src="/{{ manifest['src/assets/scripts/details-visit-dialog.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/dialogs/details-event-dialog.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/dialogs/details-visit-dialog.ts'].file }}" defer></script>
         <script type="module" src="/{{ manifest['src/assets/scripts/download-chart.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}

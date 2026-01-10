@@ -3,7 +3,7 @@ import type { ZodObject } from "zod";
 
 import '#scripts/label-ripple-effect.ts';
 
-import { cancellableSleep } from "./utils";
+import { cancellableSleep } from "#scripts/utils.ts";
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
 const mainErrorsContainer = document.getElementById("error-container") as HTMLUListElement;

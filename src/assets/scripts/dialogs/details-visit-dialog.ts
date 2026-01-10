@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from './utils.shared';
+import { listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '../utils.shared';
 
 const modal = document.getElementById("detail-visit") as HTMLDialogElement;
 

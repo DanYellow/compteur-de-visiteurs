@@ -12,9 +12,9 @@ Créer nouveau lieu Numixs
 
 {% block scripts %}
     {% if NODE_ENV == "development" %}
-        <script type="module" src="/src/assets/scripts/place-form.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/forms/place-form.ts" defer></script>
     {% else %}
-        <script type="module" src="/{{ manifest['src/assets/scripts/place-form.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/forms/place-form.ts'].file }}" defer></script>
     {% endif %}
 {% endblock %}
 
