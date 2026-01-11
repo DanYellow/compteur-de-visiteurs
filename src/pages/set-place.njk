@@ -45,9 +45,10 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="mt-7">
-                <button type="submit" class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
-                    Envoyer
+            <div class="flex flex-col md:flex-row justify-between mt-5">
+                <div inert></div>
+                <button type="submit" class="{{ primary_green_button_classes }}">
+                    Sélectionner
                     {% include "includes/icons/next-arrow.svg" %}
                 </button>
             </div>

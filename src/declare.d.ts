@@ -22,7 +22,7 @@ declare global {
     }
 
     namespace NodeJS {
-        interface ProcessEnv {
+        export interface ProcessEnv {
             NODE_ENV: 'development' | 'production';
             FORM_RESULT_TIMEOUT: number;
 
@@ -43,5 +43,4 @@ declare global {
         }
     }
 }
-
 export { }

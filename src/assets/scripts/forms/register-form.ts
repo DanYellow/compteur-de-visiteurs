@@ -39,7 +39,11 @@ const listStepsSchemas: Record<string, ZodObject> = {
 const resetSteps = () => {
     form.reset();
     currentStep = 0;
-    listFormSteps[0].classList.add("active");
+    listFormSteps[currentStep].classList.add("active");
+    listFormSteps[currentStep].scrollIntoView({
+        behavior: 'instant',
+        block: 'start'
+    });
 }
 
 const submitForm = async (e: SubmitEvent) => {
@@ -295,5 +299,12 @@ dialogVisitCodeForm?.addEventListener("submit", async (e) => {
 
             return;
         }
+    });
+
+    currentStep = 0;
+    listFormSteps[0].classList.add("active");
+    listFormSteps[currentStep].scrollIntoView({
+        behavior: 'instant',
+        block: 'start'
     });
 })

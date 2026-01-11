@@ -52,8 +52,9 @@ Inscription
                     <input type="email" name="email" class="text-black" id="email">
                 </div>
 
-                <div>
-                    <button type="submit" class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                <div class="flex flex-row justify-between mt-5">
+                    <div inert></div>
+                    <button type="submit" class="{{ primary_green_button_classes }}">
                     S'inscrire
                     {% include "includes/icons/next-arrow.svg" %}
                     </button>

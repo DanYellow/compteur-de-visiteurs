@@ -87,8 +87,9 @@ Finalisation de compte
                     </div>
                 </div>
 
-                <div>
-                    <button type="submit" {{ "" if is_token_valid else "inert" }} class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center inert:!cursor-not-allowed inert:opacity-60">
+                <div class="flex flex-row justify-between mt-5">
+                    <div inert></div>
+                    <button type="submit" {{ "" if is_token_valid else "inert" }} class="{{ primary_green_button_classes }}">
                     Créer compte
                     {% include "includes/icons/next-arrow.svg" %}
                     </button>

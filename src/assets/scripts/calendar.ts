@@ -292,7 +292,7 @@ import type { EventRaw } from "#types";
             const weekday = DateTime.fromISO(
                 `${yearAndMonth}-${dayNumber}`
             ).weekday;
-            const calendarDayTplLink = calendarDayTpl.querySelector("a")!;
+            const calendarDayTplLink = calendarDayTpl.querySelector("a") as HTMLAnchorElement;
             calendarDayTplLink.classList.toggle(
                 "open",
                 !listClosedDaysIndex.includes(String(weekday))
