@@ -78,11 +78,11 @@ Connexion
                         <input type="password" name="mot_de_passe" id="mot_de_passe" class="text-black w-full" autocomplete="current-password webauthn" data-input-toggle-visibility>
                     </div>
                     <div class="flex flex-col md:flex-row justify-between">
-                        <button type="submit" class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
+                        <a href="/mot-de-passe-oublie" class="text-white-numixs hocus:text-white-numixs/80 w-fit title-font text-2xl py-3.5 font-bold">Mot de passe oublié ?</a>
+                        <button type="submit" class="text-green-numixs inline-flex w-fit title-font text-2xl gap-2.5 py-3.5 font-bold hocus:text-dark-green-numixs items-center">
                             Se connecter
                             {% include "includes/icons/next-arrow.svg" %}
                         </button>
-                        <a href="/mot-de-passe-oublie" class="text-white-numixs hocus:text-white-numixs/80 w-fit title-font text-2xl py-3.5 font-bold">Mot de passe oublié ?</a>
                     </div>
                 </div>
                 <p class="text-lg text-center" data-passkey-toggle>ou</p>

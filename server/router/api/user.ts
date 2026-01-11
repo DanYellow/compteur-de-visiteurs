@@ -107,14 +107,14 @@ router.post("/utilisateur/generer-nouveau-mdp", async (req, res) => {
     });
 
     if (!user) {
-        return res.status(200).json({});
+        return res.status(500).json({});
     }
 
     const token = jwt.sign(
         { userId: user.id },
-        String(process.env.JWT_ACTIVATION_SECRET),
+        String(process.env.JWT_PASSWORD_RECOVERY_SECRET),
         {
-            expiresIn: (process.env.JWT_ACTIVATION_EXPIRES ?? '1d') as jwt.SignOptions['expiresIn'],
+            expiresIn: (process.env.JWT_PASSWORD_RECOVERY_EXPIRE_TIME ?? '1d') as jwt.SignOptions['expiresIn'],
         }
     );
 
