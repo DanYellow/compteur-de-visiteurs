@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import { DateTime } from 'luxon';
 import nunjucks from 'nunjucks';
 
-import { renderEmail } from '#server/utils.ts';
+import { renderEmail } from '#server/utils.server.ts';
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 

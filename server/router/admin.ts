@@ -11,7 +11,7 @@ import { Op } from "sequelize";
 import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
 
 import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
-import { getVisitsSummaries } from "#server/utils.ts";
+import { getVisitsSummaries } from "#server/utils.server.ts";
 
 const router = express.Router();
 

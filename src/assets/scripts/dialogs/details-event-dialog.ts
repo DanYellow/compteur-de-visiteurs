@@ -18,7 +18,7 @@ import {
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import type { EventRaw, Place_Visits, PlaceRaw, VisitRaw } from "#types";
-import { TotalVisitors } from "../utils";
+import { TotalVisitors } from "#scripts/utils.client.ts";
 
 Chart.register(
     BarElement,

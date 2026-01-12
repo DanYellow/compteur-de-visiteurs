@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { Chart } from 'chart.js';
-import { loadImage } from "#scripts/utils.ts";
+import { loadImage } from "#scripts/utils.client.ts";
 import { slugify } from "#scripts/utils.shared.ts";
 
 const listDownloadButtons = document.querySelectorAll("[data-download-chart]");

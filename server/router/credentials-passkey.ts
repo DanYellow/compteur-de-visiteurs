@@ -18,7 +18,7 @@ import {
 } from "#models/index.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 import { CustomSession, PasskeyTokenData, UserTokenData } from "#types";
-import { mailTransporter, renderEmail } from "#server/utils.ts";
+import { mailTransporter, renderEmail } from "#server/utils.server.ts";
 import { DateTime } from "luxon";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });

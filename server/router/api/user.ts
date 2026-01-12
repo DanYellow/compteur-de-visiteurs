@@ -7,9 +7,8 @@ import {
     User as UserModel,
     UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
 } from "#models/index.ts";
-import { mailTransporter } from "#server/utils.ts";
+import { mailTransporter, renderEmail } from "#server/utils.server.ts";
 import { requireRoleMiddleware } from "#server/middlewares.ts";
-import { renderEmail } from "#server/utils.ts";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
