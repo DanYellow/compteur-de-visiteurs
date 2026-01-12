@@ -34,10 +34,10 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
         {% set todayLink = "/dashboard" %}
         {% include "includes/calendar.njk" %}
         <div class="text-black-numixs">
-            <div class="flex flex-row justify-between mb-2">
+            <div class="flex flex-col md:flex-row gap-y-5 justify-between mb-2">
                 <nav class="flex flex-row text-lg">
-                    <p class="mr-1.5 font-bold">Filter par</p>
-                    <ul class="flex flex-row gap-0.5">
+                    <p class="mr-1.5 font-bold whitespace-nowrap">Filter par</p>
+                    <ul class="flex flex-row gap-0.5 overflow-auto whitespace-nowrap">
                         <li>
                             <a class="underline hocus:no-underline rounded-md px-2 py-0.5 {{ "bg-green-numixs" if query_params.filtre == "visite" or query_params.filtre is not defined else ""}}" href="{{ formatQueryParams({ filtre: "visite", lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}">Type de visites</a>
                         </li>
@@ -52,8 +52,8 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                         </li>
                     </ul>
                 </nav>
-                <label class="gap-3 inline-flex items-center cursor-pointer rounded-md {{ options.label_classes if options.label_classes else default_options.label_classes }}">
-                    <input type="checkbox"  checked class="sr-only peer" data-switch-toggle-charts-sync="{{ name }}">
+                <label class="gap-3 w-fit inline-flex items-center cursor-pointer rounded-md {{ options.label_classes if options.label_classes else default_options.label_classes }}">
+                    <input type="checkbox" checked class="sr-only peer" data-switch-toggle-charts-sync="{{ name }}">
                     <span class="relative z-50">Synchroniser les graphiques</span>
                     <div class="relative z-50 switch border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-dark-green-numixs/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-numixs"></div>
                 </label>

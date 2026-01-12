@@ -244,7 +244,7 @@ type LinearCSVOptions = {
 export const getLinearCSV = (
     data: Record<string, unknown>[]
 ) => {
-    const csvPayload: (string|number)[][] = [];
+    const csvPayload: (string | number)[][] = [];
 
     data.forEach((item, idx) => {
         if (idx === 0) {
@@ -264,35 +264,29 @@ const listMonths = Info.months('long', { locale: 'fr' }).map((item, idx) => ({
 }));
 
 export const getWeeksRangeMonth = (daySelected: DateTime) => {
-    const startMonth = daySelected.startOf('month');
-    const endMonth = daySelected.endOf('month');
-    const intervalMonth = startMonth.until(endMonth);
+    const startOfMonth = daySelected.startOf('month');
+    const endOfMonth = daySelected.endOf('month');
 
-    if (intervalMonth.isValid) {
-        const intervalWeeks = intervalMonth.splitBy({ weeks: 1 });
-        const listWeeks: WeekMonth[] = [];
+    let cursor = startOfMonth.startOf('week');
 
-        intervalWeeks.forEach(
-            (
-                item: Interval<true>,
-                index: number,
-                array: Interval<boolean>[]
-            ) => {
-                listWeeks.push({
-                    id: item.start!.weekNumber,
-                    name: `${item.start.toFormat('dd/LL')} ➜ ${(index ===
-                        array.length - 1
-                        ? endMonth
-                        : item.end!.minus({ day: 1 })
-                    ).toFormat('dd/LL')}`,
-                });
-            }
-        );
+    const listWeeks: WeekMonth[] = [];
 
-        return listWeeks;
+    while (cursor <= endOfMonth) {
+        const weekStart = cursor;
+        const weekEnd = cursor.plus({ days: 6 });
+
+        const from = weekStart < startOfMonth ? startOfMonth : weekStart;
+        const to = weekEnd > endOfMonth ? endOfMonth : weekEnd;
+
+        listWeeks.push({
+            id: weekStart.weekNumber,
+            name: `${from.toFormat('dd/LL')} ➜ ${to.toFormat('dd/LL')}`,
+        });
+
+        cursor = cursor.plus({ weeks: 1 });
     }
 
-    return [];
+    return listWeeks;
 };
 
 export const baseConfigData: BaseConfigData = {

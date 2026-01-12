@@ -304,8 +304,7 @@ const listChartsInstance: Chart[] = []
                                 onClick: (e: ChartEvent, legendItem: LegendItem, _legend: { chart: Chart }) => {
                                     syncLegend(e, legendItem, _legend, listChartsInstance, areChartsSync);
                                 },
-                            }
-                            ,
+                            },
                             totalVisitors: {
                                 text: 'Visites : ' + res.data.length,
                                 totalColor: greenNumixs,
@@ -329,7 +328,6 @@ const listChartsInstance: Chart[] = []
         );
     })
 })();
-
 
 const detailsChartCtx = document.getElementById("detailsChart")! as HTMLCanvasElement;
 detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
@@ -359,7 +357,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
         const visitsHasEvents = Object.values(chartData).flat().some((item) => (item as VisitRaw).liste_evenements !== "")
         const chartDataPivotTable = getPivotTable(chartData, xLabels as [], { columnSuffix: xValuesSuffix, simplified: !visitsHasEvents })
-
+        console.log(xLabels)
         Object.values(chartDataPivotTable).forEach((row, index, table) => {
             const trBody = document.createElement("tr");
             trBody.classList.add("hover:!bg-green-numixs/15");
