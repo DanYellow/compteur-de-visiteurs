@@ -75,7 +75,7 @@ const ageGroupsColors: {[key: string]: string} = {
     2: window.getComputedStyle(document.body).getPropertyValue(`--color-amber-300`),
     3: window.getComputedStyle(document.body).getPropertyValue(`--color-green-300`),
     4: window.getComputedStyle(document.body).getPropertyValue(`--color-gray-300`),
-    5: window.getComputedStyle(document.body).getPropertyValue(`--color-orange-300`),
+    5: window.getComputedStyle(document.body).getPropertyValue(`--color-teal-300`),
 }
 
 export const listAgeGroups = _listAgeGroups.map((item) => {

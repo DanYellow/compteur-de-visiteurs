@@ -238,12 +238,14 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             </tr>
                         {% else %}
                             <tr class="">
-                                <td colspan="{{ (list_groups | length) + 4 }}" class="px-4 py-3 text-center">
+                                <td colspan="{{ (list_groups | length) + 7 }}" class="px-4 py-3 text-center">
                                     {% if is_day_closed and list_day_events | length == 0 %}
                                         {{ "Aucun lieu ouvert le" if place_selected == "tous" else "Fermé le " }}
-                                        <time datetime="{{ current_date }}">{{ current_date|date("dd/LL/yyyy") }}</time>
+                                        <time datetime="{{ current_date }}">
+                                            {{ current_date|date("dd/LL/yyyy") }}
+                                        </time>
                                     {% else %}
-                                    Pas de visites le <time datetime="{{ current_date }}">{{ current_date|date("dd/LL/yyyy") }}</time>
+                                        Pas de visites le <time datetime="{{ current_date }}">{{ current_date|date("dd/LL/yyyy") }}</time>
                                     {% endif %}
                                 </td>
                             </tr>

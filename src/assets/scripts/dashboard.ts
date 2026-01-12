@@ -1,16 +1,17 @@
-import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend, SubTitle, type ScriptableScaleContext } from 'chart.js';
+import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend, SubTitle, type ScriptableScaleContext, type LegendItem, type ChartEvent, } from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime, Info } from "luxon";
 
-import type { ChartConfigData, CustomTitleOptions, EventRaw, LineChartEntry, VisitRaw } from "#types";
+import type { ChartConfigData, EventRaw, LineChartEntry, VisitRaw } from "#types";
 import { capitalizeFirstLetter, baseConfigData, getPivotTable, listGroups as listBusinessSector, getWeeksRangeMonth, uniqueByKey } from '#scripts/utils.shared.ts';
 import { TotalVisitors, listGenders, listVisits as _listVisits, listAgeGroups, listDepartments } from '#scripts/utils.client.ts';
+import { chartScales, chartTitleStyle, syncLegend } from '#scripts/utils.chart.ts';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const linkDownloadChartData = document.querySelector("[data-download-chart-data='simple']") as HTMLLinkElement;
-// const linkDownloadDetailedChartData = document.querySelector("[data-download-chart-data='detailed']") as HTMLLinkElement;
 const tableDetailsChart = document.getElementById("table-details-chart") as HTMLTableElement;
+const inputSyncCharts = document.querySelector('[data-switch-toggle-charts-sync]') as HTMLInputElement;
 
 const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")
 
@@ -18,17 +19,7 @@ Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Too
 
 const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs');
 
-const chartTitleStyle: CustomTitleOptions = {
-    display: true,
-    color: greenNumixs,
-    font: {
-        size: 22,
-        style: 'normal',
-        weight: 'normal',
-        family: "Agency FB"
-    }
-};
-
+let areChartsSync = true;
 
 const [heure_ouverture_heure] = placeData.regularOpening.heure_ouverture.split(":");
 const [heure_fermeture_heure, heure_fermeture_minutes] = placeData.regularOpening.heure_fermeture.split(":");
@@ -58,64 +49,9 @@ baseConfigData.semaine = {
         }).filter((item) => item !== null)
 }
 
-export const chartScales = (xTitle: string, titleSize: number = 12, stacked = false) => {
-    return {
-        y: {
-            ticks: {
-                color: "white",
-                stepSize: 1,
-                font: {
-                    size: 12
-                }
-            },
-            grid: {
-                color: (ctx: ScriptableScaleContext) => {
-                    if (ctx.index === 0) {
-                        return "rgba(255, 255, 255, 1)";
-                    }
-                },
-                drawOnChartArea: true,
-                lineWidth: 1,
-            },
-            title: {
-                display: true,
-                text: "Visites uniques",
-                color: "white",
-                font: {
-                    size: titleSize
-                }
-            },
-            beginAtZero: true,
-            stacked,
-        },
-        x: {
-            stacked,
-            ticks: {
-                color: "white",
-                font: {
-                    size: 12
-                }
-            },
-            grid: {
-                color: (ctx: ScriptableScaleContext) => {
-                    if (ctx.index === 0) {
-                        return "rgba(255, 255, 255, 1)";
-                    }
-                },
-                drawOnChartArea: true,
-                lineWidth: 1,
-            },
-            title: {
-                display: true,
-                text: xTitle,
-                color: "white",
-                font: {
-                    size: titleSize
-                },
-            }
-        },
-    }
-}
+inputSyncCharts.addEventListener("change", () => {
+    areChartsSync = inputSyncCharts.checked
+})
 
 let daySelected = DateTime.now();
 const queryParams = new URLSearchParams(window.location.search);
@@ -202,10 +138,11 @@ const configData: ChartConfigData = {
 }
 
 const listCharts = Object.values(configData);
+const listChartsInstance: Chart[] = []
 
 ; (() => {
     listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
-        const ctx = document.getElementById(id)! as HTMLCanvasElement;
+        const ctx = document.getElementById(id) as HTMLCanvasElement;
 
         const apiQueryParams = new URLSearchParams({
             filtre: apiKey,
@@ -215,9 +152,7 @@ const listCharts = Object.values(configData);
 
         const req = await fetch(`/api/visites?${apiQueryParams.toString()}`);
         const res = await req.json();
-        const listVisitsGrouped = Object.groupBy(res.data as VisitRaw[], (item) => {
-            return item.groupe;
-        });
+        const listVisitsGrouped = Object.groupBy(res.data as VisitRaw[], (item) => item.groupe);
 
         let listEventsHours = [] as { date: string, groupe: string, heure_fermeture: number, heure_ouverture: number, is_close_hour_exactly: boolean }[];
 
@@ -315,83 +250,86 @@ const listCharts = Object.values(configData);
             return `${item}${xValuesSuffix || ""}`;
         })
 
-        new Chart(
-            ctx,
-            {
-                type: 'bar',
-                data: {
-                    labels: chartLabels,
-                    datasets: filters[filterParam].group.map((item) => {
-                        return {
-                            label: item.label,
-                            data: chartDataNumber[item.value],
-                            backgroundColor: item.color,
-                            borderColor: item.borderColor,
-                            borderWidth: 1.5
-                        }
-                    })
-                },
-                options: {
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: {
-                            text: chartTitle,
-                            ...chartTitleStyle,
-                            padding: {
-                                bottom: 0
+        listChartsInstance.push(
+            new Chart(
+                ctx,
+                {
+                    type: 'bar',
+                    data: {
+                        labels: chartLabels,
+                        datasets: filters[filterParam].group.map((item) => {
+                            return {
+                                label: item.label,
+                                data: chartDataNumber[item.value],
+                                backgroundColor: item.color,
+                                borderColor: item.borderColor,
+                                borderWidth: 1.5
+                            }
+                        })
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        plugins: {
+                            title: {
+                                text: chartTitle,
+                                ...chartTitleStyle,
+                                padding: {
+                                    bottom: 0
+                                }
+                            },
+                            subtitle: {
+                                display: true,
+                                text: `(${placeData.nom ?? "Tous"})`,
+                                color: "white",
+                                font: {
+                                    size: 0,
+                                    style: 'normal',
+                                    weight: 'normal',
+                                    family: 'Calibri',
+                                },
+                            },
+                            tooltip: {
+                                enabled: true,
+                            },
+                            legend: {
+                                display: true,
+                                labels: {
+                                    color: '#FFF',
+                                },
+                                title: {
+                                    display: true,
+                                    text: filters[filterParam].legendTitle,
+                                    color: '#FFF',
+                                },
+                                onClick: (e: ChartEvent, legendItem: LegendItem, _legend: { chart: Chart }) => {
+                                    syncLegend(e, legendItem, _legend, listChartsInstance, areChartsSync);
+                                },
+                            }
+                            ,
+                            totalVisitors: {
+                                text: 'Visites : ' + res.data.length,
+                                totalColor: greenNumixs,
+                            },
+                            datalabels: {
+                                color: "white",
+                                font: {
+                                    size: 0
+                                },
+                                anchor: "end",
+                                align: "end",
+                                offset: 3,
+                                formatter: v => v ? v : ''
                             }
                         },
-                        subtitle: {
-                            display: true,
-                            text: `(${placeData.nom ?? "Tous"})`,
-                            color: "white",
-                            font: {
-                                size: 0,
-                                style: 'normal',
-                                weight: 'normal',
-                                family: "Calibri"
-                            },
-                            padding: {
-                                // bottom: eventData.filter(Boolean).some((item) => item !== 0) ? 0 : 20
-                            },
-                        },
-                        tooltip: {
-                            enabled: true,
-                        },
-                        legend: {
-                            display: true,
-                            labels: {
-                                color: '#FFF',
-                            },
-                            title: {
-                                display: true,
-                                text: filters[filterParam].legendTitle,
-                                color: '#FFF',
-                            },
-                        }
-                        ,
-                        totalVisitors: {
-                            text: 'Visites : ' + res.data.length,
-                            totalColor: greenNumixs,
-                        },
-                        datalabels: {
-                            color: "white",
-                            font: {
-                                size: 0
-                            },
-                            anchor: "end",
-                            align: "end",
-                            offset: 3,
-                            formatter: v => v ? v : ''
-                        }
+                        scales: chartScales(xTitle, undefined, true),
                     },
-                    scales: chartScales(xTitle, undefined, true),
-                },
-                plugins: [TotalVisitors],
-            }
+                    plugins: [TotalVisitors],
+                }
+            )
         );
     })
 })();
+
 
 const detailsChartCtx = document.getElementById("detailsChart")! as HTMLCanvasElement;
 detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
@@ -407,7 +345,6 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         const totalVisits = Object.values(chartData).flat().length;
 
         linkDownloadChartData.href = downloadLink || "";
-        // linkDownloadDetailedChartData.href = `${downloadLink}&groupe&ouverture=${xLabels[0]}&fermeture=${xLabels.at(-1)}` || "";
 
         const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr[data-tr-period]")! as HTMLTableRowElement;
         tableDetailsChartTableHeadRow.innerHTML = "";
@@ -523,7 +460,6 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
             }
         });
 
-
         const data = {
             labels: chartDataPivotTable[0].slice(1, chartDataPivotTable[0].length - 1),
             datasets: lineChartDatasets,
@@ -548,7 +484,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                                 display: true,
                                 text: "Groupes",
                                 color: '#FFF',
-                            }
+                            },
                         },
                         title: {
                             text: `${(chartTitle || "").replace("uniques", "détaillées")}`,
@@ -583,9 +519,6 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                         datalabels: {
                             color: "white",
                             align: "end",
-                            // borderColor: "white",
-                            // borderRadius: 10,
-                            // borderWidth: 1,
                             font: {
                                 size: 0
                             },
@@ -598,11 +531,9 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         )
     } else {
         try {
-            const modalChart = Chart.getChart('detailsChart')
+            const modalChart = Chart.getChart('detailsChart');
             modalChart?.destroy();
         } catch (e) {
         }
     }
 })
-
-
