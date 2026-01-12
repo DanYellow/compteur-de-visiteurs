@@ -1,6 +1,5 @@
 import type {
     BaseConfigData,
-    CSVLinearHeader,
     PivotTableOptions,
     VisitRaw,
     WeekMonth,
@@ -448,3 +447,27 @@ export const uniqueByKey = (arr: any[], key: string) => {
 };
 
 export const NB_ITEMS_PER_PAGE = 25;
+
+export const SOCKET_EVENTS = {
+    VISITOR_REGISTERED: "VISITOR_REGISTERED",
+    NEW_USER: "NEW_USER",
+}
+
+export const slugify = (input: string): string => {
+    if (!input)
+        return '';
+
+    // make lower case and trim
+    let slug = input.toLowerCase().trim();
+
+    // remove accents from charaters
+    slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
+    // replace invalid chars with spaces
+    slug = slug.replace(/[^a-z0-9\s-]/g, ' ').trim();
+
+    // replace multiple spaces or hyphens with a single hyphen
+    slug = slug.replace(/[\s-]+/g, '-');
+
+    return slug;
+}

@@ -1,30 +1,12 @@
 import type { TotalVisitorsPluginOptions } from "#types";
 import type { Chart } from "chart.js";
+import { listGenders as _listGenders, listAgeGroups as _listAgeGroups, listDepartments as _listDepartments } from "./utils.shared";
 
 export const loadImage = (obj: HTMLImageElement) => {
     return new Promise((resolve, reject) => {
         obj.onload = () => resolve(obj);
         obj.onerror = reject;
     });
-}
-
-export const slugify = (input: string): string => {
-    if (!input)
-        return '';
-
-    // make lower case and trim
-    let slug = input.toLowerCase().trim();
-
-    // remove accents from charaters
-    slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-
-    // replace invalid chars with spaces
-    slug = slug.replace(/[^a-z0-9\s-]/g, ' ').trim();
-
-    // replace multiple spaces or hyphens with a single hyphen
-    slug = slug.replace(/[\s-]+/g, '-');
-
-    return slug;
 }
 
 export const cancellableSleep = (duration: number, signal: AbortSignal) => {
@@ -43,11 +25,6 @@ export const cancellableSleep = (duration: number, signal: AbortSignal) => {
 
         signal.addEventListener('abort', abort);
     });
-}
-
-export const SOCKET_EVENTS = {
-    VISITOR_REGISTERED: "VISITOR_REGISTERED",
-    NEW_USER: "NEW_USER",
 }
 
 export const TotalVisitors = {
@@ -75,3 +52,71 @@ export const TotalVisitors = {
         ctx.restore();
     }
 };
+
+const barOpacity = 40;
+
+const genderColors: {[key: string]: string} = {
+    0: window.getComputedStyle(document.body).getPropertyValue(`--color-sky-300`),
+    1: window.getComputedStyle(document.body).getPropertyValue(`--color-pink-300`),
+    2: window.getComputedStyle(document.body).getPropertyValue(`--color-gray-300`),
+}
+
+export const listGenders = _listGenders.map((item) => {
+    return {
+        ...item,
+        color: `rgb(from ${genderColors[item.value]} r g b / ${barOpacity}%)`,
+        borderColor: genderColors[item.value],
+    }
+})
+
+const ageGroupsColors: {[key: string]: string} = {
+    0: window.getComputedStyle(document.body).getPropertyValue(`--color-blue-300`),
+    1: window.getComputedStyle(document.body).getPropertyValue(`--color-red-300`),
+    2: window.getComputedStyle(document.body).getPropertyValue(`--color-amber-300`),
+    3: window.getComputedStyle(document.body).getPropertyValue(`--color-green-300`),
+    4: window.getComputedStyle(document.body).getPropertyValue(`--color-gray-300`),
+    5: window.getComputedStyle(document.body).getPropertyValue(`--color-orange-300`),
+}
+
+export const listAgeGroups = _listAgeGroups.map((item) => {
+    return {
+        ...item,
+        color: `rgb(from ${ageGroupsColors[item.value]} r g b / ${barOpacity}%)`,
+        borderColor: ageGroupsColors[item.value],
+    }
+})
+
+const departmentColors: {[key: string]: string} = {
+    75: window.getComputedStyle(document.body).getPropertyValue(`--color-blue-300`),
+    77: window.getComputedStyle(document.body).getPropertyValue(`--color-red-300`),
+    78: window.getComputedStyle(document.body).getPropertyValue(`--color-indigo-300`),
+    91: window.getComputedStyle(document.body).getPropertyValue(`--color-pink-300`),
+    92: window.getComputedStyle(document.body).getPropertyValue(`--color-amber-300`),
+    93: window.getComputedStyle(document.body).getPropertyValue(`--color-green-300`),
+    94: window.getComputedStyle(document.body).getPropertyValue(`--color-gray-300`),
+    95: window.getComputedStyle(document.body).getPropertyValue(`--color-orange-300`),
+    99: window.getComputedStyle(document.body).getPropertyValue(`--color-teal-300`),
+}
+
+export const listDepartments = _listDepartments.map((item) => {
+    return {
+        ...item,
+        color: `rgb(from ${departmentColors[item.value]} r g b / ${barOpacity}%)`,
+        borderColor: departmentColors[item.value],
+    }
+})
+
+const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs');
+const whiteNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-white-numixs');
+
+export const listVisits = [{
+    label: "Visites régulières",
+    value: 0,
+    color: `rgb(from ${greenNumixs} r g b / ${barOpacity}%)`,
+    borderColor: greenNumixs,
+}, {
+    label: "Visites évènements",
+    value: 1,
+    color: `rgb(from ${whiteNumixs} r g b / ${barOpacity}%)`,
+    borderColor: whiteNumixs,
+}]

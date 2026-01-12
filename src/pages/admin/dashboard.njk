@@ -34,8 +34,25 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
             {% set todayLink = "/dashboard" %}
             {% include "includes/calendar.njk" %}
             <div class="text-black-numixs">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                    <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
+                <nav class="flex flex-row mb-2 text-lg">
+                    <p class="mr-1.5 font-bold">Filter par</p>
+                    <ul class="flex flex-row gap-0.5">
+                        <li>
+                            <a class="underline hocus:no-underline rounded-md px-2 py-0.5 {{ "bg-green-numixs" if query_params.filtre == "visite" or query_params.filtre is not defined else ""}}" href="{{ formatQueryParams({ filtre: "visite", lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}">Type de visites</a>
+                        </li>
+                        <li>
+                            <a class="underline hocus:no-underline rounded-md px-2 py-0.5 {{ "bg-green-numixs" if query_params.filtre == "genre" else ""}}" href="{{ formatQueryParams({ filtre: "genre", lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}">Genre</a>
+                        </li>
+                        <li>
+                            <a class="underline hocus:no-underline rounded-md px-2 py-0.5 {{ "bg-green-numixs" if query_params.filtre == "age" else ""}}" href="{{ formatQueryParams({ filtre: "age", lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}">Tranche d'âge</a>
+                        </li>
+                        <li>
+                            <a class="underline hocus:no-underline rounded-md px-2 py-0.5 {{ "bg-green-numixs" if query_params.filtre == "departement" else ""}}" href="{{ formatQueryParams({ filtre: "departement", lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}">Département</a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-2">
+                    <div class="bg-black-numixs p-3 rounded-2xl h-120 relative">
                         <menu class="absolute right-3 flex flex-col gap-1.5">
                             <li>
                                 <button data-download-chart="dailyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
@@ -50,7 +67,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                         </menu>
                         <canvas id="dailyChart" class="w-full h-full"></canvas>
                     </div>
-                    <div class="bg-black-numixs p-3 rounded-2xl h-80 relative">
+                    <div class="bg-black-numixs p-3 rounded-2xl h-120 relative">
                         <menu class="absolute right-3 flex flex-col gap-1.5">
                             <li>
                                 <button data-download-chart="weeklyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
@@ -65,7 +82,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                         </menu>
                         <canvas id="weeklyChart"></canvas>
                     </div>
-                    <div class="bg-black-numixs p-3 rounded-2xl h-80 relative col-span-full lg:col-[initial]">
+                    <div class="bg-black-numixs p-3 rounded-2xl h-120 relative col-span-full 2xl:col-[initial]">
                         <menu class="absolute right-3 flex flex-col gap-1.5">
                             <li>
                                 <button data-download-chart="monthlyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
@@ -80,7 +97,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                         </menu>
                         <canvas id="monthlyChart"></canvas>
                     </div>
-                    <div class="col-span-full bg-black-numixs p-3 rounded-2xl h-96 relative">
+                    <div class="col-span-full bg-black-numixs p-3 rounded-2xl h-150 relative">
                         <menu class="absolute right-3 flex flex-col gap-1.5">
                             <li>
                                 <button data-download-chart="yearlyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">

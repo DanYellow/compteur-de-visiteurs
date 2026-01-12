@@ -1,6 +1,7 @@
 import { DateTime } from "luxon";
 import { Chart } from 'chart.js';
-import { loadImage, slugify } from "./utils";
+import { loadImage } from "#scripts/utils.ts";
+import { slugify } from "#scripts/utils.shared.ts";
 
 const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
 const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")

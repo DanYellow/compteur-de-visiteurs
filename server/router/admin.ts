@@ -102,6 +102,7 @@ router.get(["/", "/dashboard", "/tableau-de-bord"], getUser, requireRoleMiddlewa
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
         "list_places": listPlaces,
         "list_events": listEventsComputed,
+        "query_params": req.query,
         "place": {
             ...(place ? {
                 ...place,

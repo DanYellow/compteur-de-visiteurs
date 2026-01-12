@@ -21,11 +21,15 @@
     --color-lime-*: initial;
     --color-fuchsia-*: initial;
     --color-cyan-*: initial;
-    --color-orange-*: initial;
-    --color-pink-*: initial;
-    --color-teal-*: initial;
+    /* --color-orange-*: initial; */
+    /* --color-pink-*: initial; */
+    /* --color-teal-*: initial; */
     --color-emerald-*: initial;
     --color-purple-*: initial;
+    --color-neutral-*: initial;
+    --color-zinc-*: initial;
+    --color-violet-*: initial;
+    --color-stone-*: initial;
 }
 
 @utility title-font {

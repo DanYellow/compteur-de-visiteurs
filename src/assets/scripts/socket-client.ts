@@ -1,4 +1,4 @@
-import { SOCKET_EVENTS } from '#scripts/utils.ts';
+import { SOCKET_EVENTS } from "#scripts/utils.shared.ts";
 import { createNotification } from '#scripts/notifications-manager.ts';
 
 const ws = new WebSocket(`ws://${window.location.host}`);

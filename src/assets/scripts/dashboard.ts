@@ -5,7 +5,7 @@ import { DateTime, Info } from "luxon";
 
 import type { ChartConfigData, CustomTitleOptions, EventRaw, LineChartEntry, VisitRaw } from "#types";
 import { capitalizeFirstLetter, baseConfigData, getPivotTable, listGroups as listBusinessSector, getWeeksRangeMonth, uniqueByKey } from './utils.shared';
-import { TotalVisitors } from './utils';
+import { TotalVisitors, listGenders, listVisits as _listVisits, listAgeGroups, listDepartments } from './utils';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const linkDownloadChartData = document.querySelector("[data-download-chart-data='simple']") as HTMLLinkElement;
@@ -28,6 +28,7 @@ const chartTitleStyle: CustomTitleOptions = {
         family: "Agency FB"
     }
 };
+
 
 const [heure_ouverture_heure] = placeData.regularOpening.heure_ouverture.split(":");
 const [heure_fermeture_heure, heure_fermeture_minutes] = placeData.regularOpening.heure_fermeture.split(":");
@@ -67,7 +68,6 @@ export const chartScales = (xTitle: string, titleSize: number = 12, stacked = fa
                     size: 12
                 }
             },
-
             grid: {
                 color: (ctx: ScriptableScaleContext) => {
                     if (ctx.index === 0) {
@@ -139,6 +139,33 @@ const placeQueryParams = new URLSearchParams({
 });
 const downloadLinkSuffix = placeQueryParams.toString().length ? `&${placeQueryParams.toString()}` : '';
 
+const filters = {
+    age: {
+        key: "tranche_age",
+        group: listAgeGroups,
+        legendTitle: "Tranches d'âge",
+    },
+    genre: {
+        key: "genre",
+        group: listGenders,
+        legendTitle: "Genres",
+    },
+    departement: {
+        key: "departement",
+        group: listDepartments,
+        legendTitle: "Départements",
+    },
+    visite: {
+        key: "liste_evenements",
+        group: _listVisits,
+        legendTitle: "Visites",
+    },
+} as const;
+
+type FilterKey = keyof typeof filters;
+
+const filterParam = queryParams.get('filtre') as FilterKey || "visite";
+
 const configData: ChartConfigData = {
     "jour": {
         ...baseConfigData.jour,
@@ -188,13 +215,11 @@ const listCharts = Object.values(configData);
 
         const req = await fetch(`/api/visites?${apiQueryParams.toString()}`);
         const res = await req.json();
-
         const listVisitsGrouped = Object.groupBy(res.data as VisitRaw[], (item) => {
             return item.groupe;
         });
 
-        let eventData: number[] = [];
-        let listEventsHours = [] as {date: string, groupe: string, heure_fermeture: number, heure_ouverture: number, is_close_hour_exactly: boolean}[];
+        let listEventsHours = [] as { date: string, groupe: string, heure_fermeture: number, heure_ouverture: number, is_close_hour_exactly: boolean }[];
 
         const reqEvent = await fetch(`/api/evenements?${apiQueryParams.toString()}`);
         const resEvent = await reqEvent.json();
@@ -216,8 +241,6 @@ const listCharts = Object.values(configData);
                 })
             });
 
-            eventData = new Array(xLabels.length).fill(0);
-
             if (apiKey === "jour") {
                 const {
                     heure_fermeture = Number(heure_fermeture_heure),
@@ -235,22 +258,17 @@ const listCharts = Object.values(configData);
                 const rangeOpeningHours = Math.abs(heure_fermeture - heure_ouverture - (isCloseHourExactly ? 1 : 0) + 1);
                 xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + heure_ouverture).map((item) => String(item));
 
-                eventData = new Array(xLabels.length).fill(0);
-
                 configData.jour = {
                     ...configData.jour,
                     xLabels,
                 }
             } else if (apiKey === "semaine") {
-                console.log("resEvent.data", resEvent.data)
                 xLabels = [
                     ...xLabels,
                     ...resEvent.data.map((item: EventRaw) => item.jour)
                 ].sort((itemA, itemB) => itemA.id - itemB.id);
 
                 xLabels = uniqueByKey(xLabels, "id");
-
-                eventData = new Array(xLabels.length).fill(0);
 
                 configData.semaine = {
                     ...configData.semaine,
@@ -260,7 +278,11 @@ const listCharts = Object.values(configData);
         }
 
         ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
-        const regularData: number[] = new Array(xLabels.length).fill(0);
+
+        const chartDataNumber: { [key: string]: number[] } = {}
+        filters[filterParam].group.forEach((item) => {
+            chartDataNumber[item.value] = new Array(xLabels.length).fill(0);
+        })
 
         const getIndexForKey = (value: string): number => {
             return xLabels.findIndex((item) => {
@@ -277,10 +299,10 @@ const listCharts = Object.values(configData);
             const idx = getIndexForKey(key);
 
             listVisits?.forEach((visit) => {
-                if (visit.liste_evenements === "") {
-                    regularData[idx] += 1;
+                if (filterParam === "visite") {
+                    chartDataNumber[visit.liste_evenements === "" ? 0 : 1][idx] += 1;
                 } else {
-                    eventData[idx] += 1;
+                    chartDataNumber[visit[filters[filterParam].key]][idx] += 1;
                 }
             })
         })
@@ -299,22 +321,15 @@ const listCharts = Object.values(configData);
                 type: 'bar',
                 data: {
                     labels: chartLabels,
-                    datasets: [
-                        {
-                            label: "Visites régulières",
-                            data: regularData,
-                            backgroundColor: `rgba(213, 217, 22, 0.5)`,
-                            borderColor: greenNumixs,
+                    datasets: filters[filterParam].group.map((item) => {
+                        return {
+                            label: item.label,
+                            data: chartDataNumber[item.value],
+                            backgroundColor: item.color,
+                            borderColor: item.borderColor,
                             borderWidth: 1.5
-                        },
-                        {
-                            label: "Visites évènement",
-                            data: eventData,
-                            backgroundColor: `rgba(255, 255, 255, 0.5)`,
-                            borderColor: "white",
-                            borderWidth: 1.5,
                         }
-                    ]
+                    })
                 },
                 options: {
                     maintainAspectRatio: false,
@@ -337,29 +352,23 @@ const listCharts = Object.values(configData);
                                 family: "Calibri"
                             },
                             padding: {
-                                bottom: eventData.filter(Boolean).some((item) => item !== 0) ? 0 : 20
+                                // bottom: eventData.filter(Boolean).some((item) => item !== 0) ? 0 : 20
                             },
                         },
                         tooltip: {
                             enabled: true,
                         },
-                        ...(eventData.filter(Boolean).some((item) => item !== 0) ? {
-                            legend: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#FFF',
+                            },
+                            title: {
                                 display: true,
-                                labels: {
-                                    color: '#FFF',
-                                },
-                                title: {
-                                    display: false,
-                                    text: "Visites",
-                                    color: '#FFF',
-                                }
-                            }
-                        } : {
-                            legend: {
-                                display: false,
-                            }
-                        })
+                                text: filters[filterParam].legendTitle,
+                                color: '#FFF',
+                            },
+                        }
                         ,
                         totalVisitors: {
                             text: 'Visites : ' + res.data.length,
@@ -440,51 +449,51 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                         }
                     }
                 } else {
-                        const td = document.createElement("td");
+                    const td = document.createElement("td");
 
-                        if (Array.isArray(cell)) {
-                            cell.forEach((val, idx) => {
-                                if(idx === 0) {
-                                    const tdReg = document.createElement("td");
-                                    tdReg.textContent = String(val);
-                                    tdReg.style.textAlign = "center";
-                                    tdReg.style.color = Number(val) > 0 ? greenNumixs : "";
+                    if (Array.isArray(cell)) {
+                        cell.forEach((val, idx) => {
+                            if (idx === 0) {
+                                const tdReg = document.createElement("td");
+                                tdReg.textContent = String(val);
+                                tdReg.style.textAlign = "center";
+                                tdReg.style.color = Number(val) > 0 ? greenNumixs : "";
 
-                                    if (cellIndex === listRows.length - 1) {
-                                        tdReg.style.borderLeft = "2px solid white";
-                                    }
-                                    trBody.append(tdReg);
-                                } else {
-                                    td.style.color = Number(val) > 0 ? greenNumixs : "";
-                                    td.textContent = String(val);
+                                if (cellIndex === listRows.length - 1) {
+                                    tdReg.style.borderLeft = "2px solid white";
                                 }
-                            })
-                        } else {
-                            td.textContent = String(cell);
-                            td.style.color = Number(cell) > 0 ? greenNumixs : "";
-                            td.colSpan = 2;
-                        }
-                        if (cellIndex === 0) {
-                            td.style.paddingLeft = "0.2rem";
-                            td.colSpan = 2;
-                        }
-                        if (cellIndex > 0) {
-                            td.style.textAlign = "center";
-                        }
+                                trBody.append(tdReg);
+                            } else {
+                                td.style.color = Number(val) > 0 ? greenNumixs : "";
+                                td.textContent = String(val);
+                            }
+                        })
+                    } else {
+                        td.textContent = String(cell);
+                        td.style.color = Number(cell) > 0 ? greenNumixs : "";
+                        td.colSpan = 2;
+                    }
+                    if (cellIndex === 0) {
+                        td.style.paddingLeft = "0.2rem";
+                        td.colSpan = 2;
+                    }
+                    if (cellIndex > 0) {
+                        td.style.textAlign = "center";
+                    }
 
-                        // Last column
-                        if (cellIndex === listRows.length - 1 && !Array.isArray(cell)) {
-                            td.style.borderLeft = "2px solid white";
-                        }
+                    // Last column
+                    if (cellIndex === listRows.length - 1 && !Array.isArray(cell)) {
+                        td.style.borderLeft = "2px solid white";
+                    }
 
-                        // Last row
-                        if (index === table.length - 1) {
-                            td.style.borderTop = "2px solid white";
-                            td.style.fontSize = "1.25rem";
-                            td.style.paddingTop = "0.35rem";
-                        }
+                    // Last row
+                    if (index === table.length - 1) {
+                        td.style.borderTop = "2px solid white";
+                        td.style.fontSize = "1.25rem";
+                        td.style.paddingTop = "0.35rem";
+                    }
 
-                        trBody.append(td);
+                    trBody.append(td);
                 }
             });
 

@@ -4,7 +4,7 @@ import { Op } from 'sequelize';
 import crypto from "crypto";
 
 import { listGroups as listBusinessSector, listDepartments, listAgeGroups, listGenders } from '#scripts/utils.shared.ts';
-import { SOCKET_EVENTS } from '#scripts/utils.ts';
+import { SOCKET_EVENTS } from "#scripts/utils.shared.ts";
 import { VisitSchema } from "#scripts/schemas/index.ts";
 import { flashMessageCookieOptions, wss } from "#server/index.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, VisitRegistered as VisitRegisteredModel, Visit as VisitModel } from "#models/index.ts";

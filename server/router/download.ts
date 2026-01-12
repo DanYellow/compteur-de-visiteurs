@@ -6,7 +6,7 @@ import { stringify } from "csv-stringify/sync";
 import { DateTime } from "luxon";
 import sequelize, { RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
 import { baseConfigData, DEFAULT_CLOSE_HOURS, DEFAULT_OPEN_HOURS, getLinearCSV, getPivotTable, getWeeksRangeMonth, listAgeGroups, listDepartments, listGenders, listGroups } from "#scripts/utils.shared.ts";
-import { slugify } from "#scripts/utils.ts";
+import { slugify } from "#scripts/utils.shared.ts";
 import { PlaceRaw, VisitRaw } from "#types";
 
 const { place: PlaceModel } = sequelize.models;

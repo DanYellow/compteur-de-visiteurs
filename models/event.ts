@@ -1,5 +1,4 @@
-import { slugify } from '#scripts/utils.ts';
-import { DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
+import { DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS, slugify } from "#scripts/utils.shared.ts";
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin, type BelongsToManyGetAssociationsMixin } from 'sequelize';
 import Place from './place';
 
