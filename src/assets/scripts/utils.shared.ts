@@ -151,22 +151,21 @@ export const getPivotTable = (
         )
     );
 
-    res.push({
+    const total: { label: string, total: number[][] }[] = []
+
+    total.push({
         label: "Total par type",
         total: columnTotals
     })
 
-    res.push({
+    total.push({
         label: "Total",
         total: columnTotals.map(([totalReg, totalEvent]) => [totalReg + totalEvent])
     })
 
-    console.log("res", res)
-
-    return res;
+    return {body: res, footer: total};
 };
 
-// @TODO
 export const getLinearCSV = (
     data: Record<string, unknown>[]
 ) => {

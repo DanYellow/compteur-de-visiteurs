@@ -141,194 +141,225 @@ const configData: ChartConfigData = {
 const listCharts = Object.values(configData);
 const listChartsInstance: Chart[] = []
 
-    ; (() => {
-        listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
-            const ctx = document.getElementById(id) as HTMLCanvasElement;
+listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
+    const ctx = document.getElementById(id) as HTMLCanvasElement;
 
-            const apiQueryParams = new URLSearchParams({
-                filtre: apiKey,
-                jour: daySelected.toFormat("yyyy-LL-dd"),
-                ...((placeParam === "tous" || !placeParam) ? {} : { lieu: placeParam }),
-            });
+    const apiQueryParams = new URLSearchParams({
+        filtre: apiKey,
+        jour: daySelected.toFormat("yyyy-LL-dd"),
+        ...((placeParam === "tous" || !placeParam) ? {} : { lieu: placeParam }),
+    });
 
-            const req = await fetch(`/api/visites?${apiQueryParams.toString()}`);
-            const res = await req.json();
-            const listVisitsGrouped = Object.groupBy(res.data as VisitRaw[], (item) => item.groupe);
+    const req = await fetch(`/api/visites?${apiQueryParams.toString()}`);
+    const res = await req.json();
+    const listVisitsGrouped = Object.groupBy(res.data as VisitRaw[], (item) => item.groupe);
 
-            let listEventsHours = [] as { date: string, groupe: string, heure_fermeture: number, heure_ouverture: number, is_close_hour_exactly: boolean }[];
+    let listEventsHours = [] as { date: string, groupe: string, heure_fermeture: number, heure_ouverture: number, is_close_hour_exactly: boolean }[];
 
-            const reqEvent = await fetch(`/api/evenements?${apiQueryParams.toString()}`);
-            const resEvent = await reqEvent.json();
+    const reqEvent = await fetch(`/api/evenements?${apiQueryParams.toString()}`);
+    const resEvent = await reqEvent.json();
 
-            if (resEvent.data) {
-                resEvent.data.forEach((item: EventRaw) => {
-                    const [event_heure_ouverture_heure] = item.heure_ouverture.split(":");
-                    const [event_heure_fermeture_heure, event_heure_fermeture_minutes] = item.heure_fermeture.split(":");
+    if (resEvent.data) {
+        resEvent.data.forEach((item: EventRaw) => {
+            const [event_heure_ouverture_heure] = item.heure_ouverture.split(":");
+            const [event_heure_fermeture_heure, event_heure_fermeture_minutes] = item.heure_fermeture.split(":");
 
-                    const isEventClosedAfterRegularHours = heure_fermeture_heure > parseInt(heure_fermeture_heure);
-                    const minutesToUse = isEventClosedAfterRegularHours ? heure_fermeture_minutes : event_heure_fermeture_minutes;
+            const isEventClosedAfterRegularHours = heure_fermeture_heure > parseInt(heure_fermeture_heure);
+            const minutesToUse = isEventClosedAfterRegularHours ? heure_fermeture_minutes : event_heure_fermeture_minutes;
 
-                    listEventsHours.push({
-                        date: String(item.date),
-                        groupe: item.groupe,
-                        heure_fermeture: Math.max(Number(event_heure_fermeture_heure), Number(heure_fermeture_heure)),
-                        heure_ouverture: Math.min(Number(event_heure_ouverture_heure), Number(heure_ouverture_heure)),
-                        is_close_hour_exactly: minutesToUse === "00",
-                    })
-                });
+            listEventsHours.push({
+                date: String(item.date),
+                groupe: item.groupe,
+                heure_fermeture: Math.max(Number(event_heure_fermeture_heure), Number(heure_fermeture_heure)),
+                heure_ouverture: Math.min(Number(event_heure_ouverture_heure), Number(heure_ouverture_heure)),
+                is_close_hour_exactly: minutesToUse === "00",
+            })
+        });
 
-                if (apiKey === "jour") {
-                    const {
-                        heure_fermeture = Number(heure_fermeture_heure),
-                        heure_ouverture = Number(heure_ouverture_heure),
-                    } = listEventsHours?.[0] || {}
+        if (apiKey === "jour") {
+            const {
+                heure_fermeture = Number(heure_fermeture_heure),
+                heure_ouverture = Number(heure_ouverture_heure),
+            } = listEventsHours?.[0] || {}
 
-                    let {
-                        is_close_hour_exactly: isCloseHourExactly = false,
-                    } = listEventsHours?.[0] || {}
+            let {
+                is_close_hour_exactly: isCloseHourExactly = false,
+            } = listEventsHours?.[0] || {}
 
-                    if (!resEvent.data.length && placeData.regularOpening) {
-                        isCloseHourExactly = placeData.regularOpening.heure_fermeture.split(":")[1] === "00"
-                    }
-
-                    const rangeOpeningHours = Math.abs(heure_fermeture - heure_ouverture - (isCloseHourExactly ? 1 : 0) + 1);
-                    xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + heure_ouverture).map((item) => String(item));
-
-                    configData.jour = {
-                        ...configData.jour,
-                        xLabels,
-                    }
-                } else if (apiKey === "semaine") {
-                    xLabels = [
-                        ...xLabels,
-                        ...resEvent.data.map((item: EventRaw) => item.jour)
-                    ].sort((itemA, itemB) => itemA.id - itemB.id);
-
-                    xLabels = uniqueByKey(xLabels, "id");
-
-                    configData.semaine = {
-                        ...configData.semaine,
-                        xLabels,
-                    }
-                }
+            if (!resEvent.data.length && placeData.regularOpening) {
+                isCloseHourExactly = placeData.regularOpening.heure_fermeture.split(":")[1] === "00"
             }
 
-            ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
+            const rangeOpeningHours = Math.abs(heure_fermeture - heure_ouverture - (isCloseHourExactly ? 1 : 0) + 1);
+            xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + heure_ouverture).map((item) => String(item));
 
-            const chartDataNumber: { [key: string]: number[] } = {}
-            filters[filterParam].group.forEach((item) => {
-                chartDataNumber[item.value] = new Array(xLabels.length).fill(0);
-            })
+            configData.jour = {
+                ...configData.jour,
+                xLabels,
+            }
+        } else if (apiKey === "semaine") {
+            xLabels = [
+                ...xLabels,
+                ...resEvent.data.map((item: EventRaw) => item.jour)
+            ].sort((itemA, itemB) => itemA.id - itemB.id);
 
-            const getIndexForKey = (value: string): number => {
-                return xLabels.findIndex((item) => {
-                    let labelKey = item;
-                    if (typeof item === 'object') {
-                        labelKey = String((item as { name: string; id: number; }).id);
-                    }
+            xLabels = uniqueByKey(xLabels, "id");
 
-                    return labelKey === value;
-                })
+            configData.semaine = {
+                ...configData.semaine,
+                xLabels,
+            }
+        }
+    }
+
+    ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
+
+    const chartDataNumber: { [key: string]: number[] } = {}
+    filters[filterParam].group.forEach((item) => {
+        chartDataNumber[item.value] = new Array(xLabels.length).fill(0);
+    })
+
+    const getIndexForKey = (value: string): number => {
+        return xLabels.findIndex((item) => {
+            let labelKey = item;
+            if (typeof item === 'object') {
+                labelKey = String((item as { name: string; id: number; }).id);
             }
 
-            Object.entries(listVisitsGrouped).forEach(([key, listVisits]) => {
-                const idx = getIndexForKey(key);
-
-                listVisits?.forEach((visit) => {
-                    if (filterParam === "visite") {
-                        chartDataNumber[visit.liste_evenements === "" ? 0 : 1][idx] += 1;
-                    } else {
-                        chartDataNumber[visit[filters[filterParam].key]][idx] += 1;
-                    }
-                })
-            })
-
-            const chartLabels = xLabels.map((item) => {
-                if (typeof item === 'object') {
-                    return `${item.name}${xValuesSuffix || ""}`;
-                }
-
-                return `${item}${xValuesSuffix || ""}`;
-            })
-
-            listChartsInstance.push(
-                new Chart(
-                    ctx,
-                    {
-                        type: 'bar',
-                        data: {
-                            labels: chartLabels,
-                            datasets: filters[filterParam].group.map((item) => {
-                                return {
-                                    label: item.label,
-                                    data: chartDataNumber[item.value],
-                                    backgroundColor: item.color,
-                                    borderColor: item.borderColor,
-                                    borderWidth: 1.5
-                                }
-                            })
-                        },
-                        options: {
-                            maintainAspectRatio: false,
-                            plugins: {
-                                title: {
-                                    text: chartTitle,
-                                    ...chartTitleStyle,
-                                    padding: {
-                                        bottom: 0
-                                    }
-                                },
-                                subtitle: {
-                                    display: true,
-                                    text: `(${placeData.nom ?? "Tous"})`,
-                                    color: "white",
-                                    font: {
-                                        size: 0,
-                                        style: 'normal',
-                                        weight: 'normal',
-                                        family: 'Calibri',
-                                    },
-                                },
-                                tooltip: {
-                                    enabled: true,
-                                },
-                                legend: {
-                                    display: true,
-                                    labels: {
-                                        color: '#FFF',
-                                    },
-                                    title: {
-                                        display: true,
-                                        text: filters[filterParam].legendTitle,
-                                        color: '#FFF',
-                                    },
-                                    onClick: (e: ChartEvent, legendItem: LegendItem, _legend: { chart: Chart }) => {
-                                        syncLegend(e, legendItem, _legend, listChartsInstance, areChartsSync);
-                                    },
-                                },
-                                totalVisitors: {
-                                    text: 'Visites : ' + res.data.length,
-                                    totalColor: greenNumixs,
-                                },
-                                datalabels: {
-                                    color: "white",
-                                    font: {
-                                        size: 0
-                                    },
-                                    anchor: "end",
-                                    align: "end",
-                                    offset: 3,
-                                    formatter: v => v ? v : ''
-                                }
-                            },
-                            scales: chartScales(xTitle, undefined, true),
-                        },
-                        plugins: [TotalVisitors],
-                    }
-                )
-            );
+            return labelKey === value;
         })
-    })();
+    }
+
+    Object.entries(listVisitsGrouped).forEach(([key, listVisits]) => {
+        const idx = getIndexForKey(key);
+
+        listVisits?.forEach((visit) => {
+            if (filterParam === "visite") {
+                chartDataNumber[visit.liste_evenements === "" ? 0 : 1][idx] += 1;
+            } else {
+                chartDataNumber[visit[filters[filterParam].key]][idx] += 1;
+            }
+        })
+    })
+
+    const chartLabels = xLabels.map((item) => {
+        if (typeof item === 'object') {
+            return `${item.name}${xValuesSuffix || ""}`;
+        }
+
+        return `${item}${xValuesSuffix || ""}`;
+    })
+
+    listChartsInstance.push(
+        new Chart(
+            ctx,
+            {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: filters[filterParam].group.map((item) => {
+                        return {
+                            label: item.label,
+                            data: chartDataNumber[item.value],
+                            backgroundColor: item.color,
+                            borderColor: item.borderColor,
+                            borderWidth: 1.5
+                        }
+                    })
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            text: chartTitle,
+                            ...chartTitleStyle,
+                            padding: {
+                                bottom: 0
+                            }
+                        },
+                        subtitle: {
+                            display: true,
+                            text: `(${placeData.nom ?? "Tous"})`,
+                            color: "white",
+                            font: {
+                                size: 0,
+                                style: 'normal',
+                                weight: 'normal',
+                                family: 'Calibri',
+                            },
+                        },
+                        tooltip: {
+                            enabled: true,
+                        },
+                        legend: {
+                            display: true,
+                            labels: {
+                                color: '#FFF',
+                            },
+                            title: {
+                                display: true,
+                                text: filters[filterParam].legendTitle,
+                                color: '#FFF',
+                            },
+                            onClick: (e: ChartEvent, legendItem: LegendItem, _legend: { chart: Chart }) => {
+                                syncLegend(e, legendItem, _legend, listChartsInstance, areChartsSync);
+                            },
+                        },
+                        totalVisitors: {
+                            text: 'Visites : ' + res.data.length,
+                            totalColor: greenNumixs,
+                        },
+                        datalabels: {
+                            color: "white",
+                            font: {
+                                size: 0
+                            },
+                            anchor: "end",
+                            align: "end",
+                            offset: 3,
+                            formatter: v => v ? v : ''
+                        }
+                    },
+                    scales: chartScales(xTitle, undefined, true),
+                },
+                plugins: [TotalVisitors],
+            }
+        )
+    );
+});
+
+const generateTotalCells = (tr: HTMLTableRowElement, data: number[][], rootArray?:unknown[], rootIndex?: number) => {
+    const hasExtraParams = typeof rootIndex !== "undefined" && Array.isArray(rootArray);
+
+    data.forEach((totalVisits, idxTotalVisits, totalVisitsArray) => {
+        totalVisits.forEach((visit, idxVisit) => {
+            const td = document.createElement("td");
+            td.textContent = String(visit);
+            td.style.textAlign = "center";
+            td.style.color = Number(visit) > 0 ? greenNumixs : "";
+
+            if (idxTotalVisits === totalVisitsArray.length - 1) {
+                td.style.fontSize = "1.25rem";
+                if (idxVisit === 0) {
+                    td.style.borderLeft = "2px solid white";
+                }
+            }
+
+            if (hasExtraParams && rootIndex >= rootArray.length - 2) {
+                td.style.fontSize = '1.25rem';
+                if (rootIndex === rootArray.length - 2) {
+                    td.style.borderTop = "2px solid white";
+                }
+            }
+
+            if (totalVisits.length === 1) {
+                td.colSpan = 2;
+            }
+
+            tr.append(td);
+        });
+    })
+}
 
 const detailsChartCtx = document.getElementById("detailsChart")! as HTMLCanvasElement;
 detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
@@ -345,11 +376,14 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
         linkDownloadChartData.href = downloadLink || "";
 
-        const tableDetailsChartTableHead = tableDetailsChart.querySelector("thead")! as HTMLTableSectionElement;
+        const tableDetailsChartTableHead = tableDetailsChart.querySelector("thead") as HTMLTableSectionElement;
         tableDetailsChartTableHead.innerHTML = "";
 
-        const tableDetailsChartTableBody = tableDetailsChart.querySelector("tbody")! as HTMLTableSectionElement;
+        const tableDetailsChartTableBody = tableDetailsChart.querySelector("tbody") as HTMLTableSectionElement;
         tableDetailsChartTableBody.innerHTML = "";
+
+        const tableDetailsChartTableFooter = tableDetailsChart.querySelector("tfoot") as HTMLTableSectionElement;
+        tableDetailsChartTableFooter.innerHTML = "";
 
         const lineChartDatasets: LineChartEntry[] = [];
 
@@ -402,8 +436,8 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
             }
         })
 
-        // Table body + footer
-        tableData.forEach((item, cellIndex, array) => {
+        // Table body
+        tableData.body.forEach((item, cellIndex) => {
             const trBody = document.createElement("tr");
             tableDetailsChartTableBody.append(trBody);
 
@@ -422,52 +456,42 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                 trBody.style.backgroundColor = "#00000075";
             }
 
-            if (cellIndex === array.length - 2) {
+            trBody.append(td);
+
+            generateTotalCells(trBody, item.total)
+
+            lineChartDatasets.push({
+                label: item.label,
+                data: item.total.map((item: unknown) => {
+                    return (item as number[]).reduce((acc: number, value: number) => acc + value, 0)
+                }),
+                borderColor: listBusinessSector.find((group) => group.label === item.label)!.lineColor,
+                tension: 0,
+                fill: true,
+            });
+        })
+
+        tableData.footer.forEach((item, cellIndex, array) => {
+            const trFooter = document.createElement("tr");
+            tableDetailsChartTableFooter.append(trFooter);
+
+            trFooter.classList.add("hover:!bg-green-numixs/15");
+
+            const td = document.createElement("th");
+            td.textContent = item.label;
+            td.colSpan = 2;
+            td.style.backgroundColor = grayNumixs;
+            td.style.paddingInline = "0.5rem";
+            td.style.textAlign = "left";
+            td.classList.add(...["sticky", "left-0"]);
+
+            trFooter.append(td);
+
+            if (cellIndex === 0) {
                 td.style.borderTop = "2px solid white";
             }
 
-            trBody.append(td);
-
-            item.total.forEach((totalVisits, idxTotalVisits, totalVisitsArray) => {
-                totalVisits.forEach((visit, idxVisit) => {
-                    const td = document.createElement("td");
-                    td.textContent = String(visit);
-                    td.style.textAlign = "center";
-                    td.style.color = Number(visit) > 0 ? greenNumixs : "";
-
-                    if (idxTotalVisits === totalVisitsArray.length - 1) {
-                        td.style.fontSize = "1.25rem";
-                        if (idxVisit === 0) {
-                            td.style.borderLeft = "2px solid white";
-                        }
-                    }
-
-                    if (cellIndex >= array.length - 2) {
-                        td.style.fontSize = "1.25rem";
-                        if (cellIndex === array.length - 2) {
-                            td.style.borderTop = "2px solid white";
-                        }
-                    }
-
-                    if (totalVisits.length === 1) {
-                        td.colSpan = 2;
-                    }
-
-                    trBody.append(td)
-                });
-            })
-
-            if (cellIndex < array.length - 2) {
-                lineChartDatasets.push({
-                    label: item.label,
-                    data: item.total.map((item: unknown) => {
-                        return (item as number[]).reduce((acc: number, value: number) => acc + value, 0)
-                    }),
-                    borderColor: listBusinessSector.find((group) => group.label === item.label)!.lineColor,
-                    tension: 0,
-                    fill: true,
-                });
-            }
+            generateTotalCells(trFooter, item.total, array, cellIndex)
         })
 
         const data = {

@@ -46,59 +46,10 @@ router.get('/', async (req, res) => {
         placeName = (req.query.nom_evenement || "evenement").toString();
     }
 
-    const fileTimestamp = `_${slugify(placeName)}_${String(Date.now()).slice(-6)}.csv`;
-    let csvFilename = "";
+    const fileTimestamp = `${slugify(placeName)}_${String(Date.now()).slice(-6)}.csv`;
+    const csvFilename = `liste-visites_${configKey}_${fileTimestamp}`;
 
-    if (isGrouped) {
-        const config = baseConfigData[configKey];
-        if (req.query.lieu && req.query.lieu !== "tous" && configKey === "jour") {
-            const place = await PlaceModel.findOne({
-                where: { slug: req.query.lieu },
-                include: [
-                    {
-                        model: RegularOpeningModel,
-                        as: "regularOpening",
-                        required: true,
-                    }
-                ],
-                raw: true,
-                nest: true,
-            }) as unknown as PlaceRaw | null;
-
-            if (place) {
-                const closedHour = parseInt(place.regularOpening!.heure_fermeture.split(":")[0]);
-
-                const openHour = parseInt(place.regularOpening!.heure_ouverture.split(":")[0]);
-
-                const rangeOpeningHours = Math.abs(Number(closedHour) - Number(openHour) + 1);
-                const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + openHour).map((item) => String(item));
-
-                config.listColumns = listTimeSlots;
-            }
-        }
-
-        csvFilename = `liste-visites-detaillee_${configKey}`;
-        const pivotPayload = Object.groupBy(requestRes.data, (item: VisitRaw) => {
-            return item.groupe;
-        }) as Record<string, VisitRaw[]>;
-
-        if ("mois" in req.query) {
-            config.listColumns = getWeeksRangeMonth(DateTime.fromISO(req.query.mois as string));
-        } else if ("jour" in req.query) {
-            const closedHours = Number(req.query?.fermeture || DEFAULT_CLOSE_HOURS.split(":")[0]);
-            const openHours = Number(req.query?.ouverture || DEFAULT_OPEN_HOURS.split(":")[0]);
-            const rangeOpeningHours = Math.abs(closedHours - openHours + 1);
-
-            config.listColumns = Array.from(new Array(rangeOpeningHours), (_, i) => i + openHours).map((item) => String(item));
-        }
-        csvPayload = getPivotTable(pivotPayload, config.listColumns, { columnSuffix: config?.xValuesSuffix || "", simplified: true });
-    } else {
-        csvFilename = `liste-visites_${configKey}`;
-
-        csvPayload = getLinearCSV(requestRes.data)
-    }
-
-    csvFilename += fileTimestamp;
+    csvPayload = getLinearCSV(requestRes.data)
 
     const tempCsvFile = path.join(__dirname, "..", "liste-visites.tmp.csv");
 
