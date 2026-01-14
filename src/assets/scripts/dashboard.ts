@@ -1,11 +1,15 @@
-import { Chart, BarElement, BarController, CategoryScale, LinearScale, Title, LineController, LineElement, PointElement, Tooltip, Legend, SubTitle, type ScriptableScaleContext, type LegendItem, type ChartEvent, } from 'chart.js';
+import {
+    Chart, BarElement, BarController, CategoryScale,
+    LinearScale, Title, LineController, LineElement, PointElement,
+    Tooltip, Legend, SubTitle, type LegendItem, type ChartEvent,
+} from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 import { DateTime, Info } from "luxon";
 
 import type { ChartConfigData, EventRaw, LineChartEntry, VisitRaw } from "#types";
-import { capitalizeFirstLetter, baseConfigData, getPivotTable, listGroups as listBusinessSector, getWeeksRangeMonth, uniqueByKey } from '#scripts/utils.shared.ts';
-import { TotalVisitors, listGenders, listVisits as _listVisits, listAgeGroups, listDepartments } from '#scripts/utils.client.ts';
+import { capitalizeFirstLetter, baseConfigData, getPivotTable, getWeeksRangeMonth, uniqueByKey } from '#scripts/utils.shared.ts';
+import { TotalVisitors, listGenders, listVisits as _listVisits, listAgeGroups, listDepartments, listGroups as listBusinessSector, greenNumixs, grayNumixs } from '#scripts/utils.client.ts';
 import { chartScales, chartTitleStyle, syncLegend } from '#scripts/utils.chart.ts';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
@@ -16,9 +20,6 @@ const inputSyncCharts = document.querySelector('[data-switch-toggle-charts-sync]
 const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")
 
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels, SubTitle);
-
-const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs');
-const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-gray-numixs');
 
 let areChartsSync = true;
 
@@ -361,7 +362,7 @@ const generateTotalCells = (tr: HTMLTableRowElement, data: number[][], rootArray
     })
 }
 
-const generateFirstRowCell = (data: {label: string}, colSpan: number = 1) => {
+const generateFirstRowCell = (data: { label: string }, colSpan: number = 1) => {
     const th = document.createElement("th");
     th.textContent = data.label;
     th.colSpan = colSpan;
@@ -419,7 +420,8 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                 const label = typeof item === 'object' ? item.name : item;
                 th.textContent = `${label}${cellIndex === array.length - 1 ? "" : xValuesSuffix}`;
             } else {
-                th.textContent = "";
+                th.classList.add(...["sticky", "left-0"]);
+                th.style.backgroundColor = grayNumixs;
             }
             th.colSpan = cellIndex === 0 ? 1 : nb;
             if (cellIndex === array.length - 1) {
@@ -457,7 +459,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
             trBody.classList.add(...["hover:!bg-green-numixs/15", "tr-details-table"]);
 
-            const td = generateFirstRowCell(data, 1) // data.total[0].length;
+            const td = generateFirstRowCell(data, 1);
             trBody.append(td);
 
             if (cellIndex % 2 === 0) {
@@ -472,7 +474,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                 data: data.total.map((item: unknown) => {
                     return (item as number[]).reduce((acc: number, value: number) => acc + value, 0)
                 }),
-                borderColor: listBusinessSector.find((group) => group.label === data.label)!.lineColor,
+                borderColor: listBusinessSector.find((group) => group.label === data.label)!.borderColor,
                 tension: 0,
                 fill: true,
             });
@@ -485,7 +487,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
             trFooter.classList.add(...["hover:!bg-green-numixs/15", "tr-details-table"]);
 
-            const td = generateFirstRowCell(data, 1); // data
+            const td = generateFirstRowCell(data, 1);
             trFooter.append(td);
 
             if (cellIndex === 0) {

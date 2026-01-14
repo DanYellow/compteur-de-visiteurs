@@ -20,7 +20,7 @@ Liste des évènements
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
 {% block content %}
-    <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13" data-place='{{ place | json }}'>
+    <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13 min-w-0" data-place='{{ place | json }}'>
         <header class="flex flex-col md:flex-row justify-between md:items-center mb-10 -mt-1.5 gap-3">
             <div class="text-black-numixs flex flex-col items-start">
                 <h1 class="title-font font-bold text-6xl">Évènements</h1>

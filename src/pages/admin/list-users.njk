@@ -18,7 +18,7 @@ Liste utilisateurs
     {% endif %}
 {% endblock %}
 {% block content %}
-    <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13">
+    <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13 min-w-0">
         <header class="flex flex-col md:flex-row gap-y-3 justify-between md:items-center mb-10 -mt-1.5">
             <div class="text-black-numixs">
                 <h1 class="title-font font-bold text-6xl">Utilisateurs</h1>
@@ -50,10 +50,10 @@ Liste utilisateurs
                                     </button>
                                 </span>
                             </th>
-                            <th class="font-bold px-4 py-3 text-left">Activer</th>
+                            <th class="font-bold px-4 py-3 text-left">Approuver</th>
                             <th class="font-bold px-4 py-3 text-left">
                                 <span class="inline-flex items-center gap-2">
-                                    Approuver
+                                    Activer
                                     <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="approved-status" command="show-modal" data-event-data='{{ event | json }}'>
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5">
                                             <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
@@ -79,13 +79,13 @@ Liste utilisateurs
                                 </td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                     <label class="cursor-pointer has-disabled:opacity-80 has-disabled:cursor-not-allowed">
-                                        <input type="checkbox" value="{{ user.actif }}" {{ "checked" if user.actif == 1 else "" }} {{ "disabled" if user.actif == 1 else "" }} data-change-user-status='{"id": {{ user.id }}, "key": "actif"}' class="sr-only peer">
+                                        <input type="checkbox" value="{{ user.approuve }}" {{ "checked" if user.approuve == 1 else "" }} {{ "disabled" if user.role.weight >= 100  or user.approuve == 1 else "" }} data-change-user-status='{"id": {{ user.id }}, "key": "approuve"}' class="sr-only peer">
                                         <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-checked:bg-green-numixs rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-focus:ring-dark-green-numixs/30"></div>
                                     </label>
                                 </td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
                                     <label class="cursor-pointer has-disabled:opacity-80 has-disabled:cursor-not-allowed">
-                                        <input type="checkbox" value="{{ user.approuve }}" {{ "checked" if user.approuve == 1 else "" }} {{ "disabled" if user.role.weight >= 100 else "" }} data-change-user-status='{"id": {{ user.id }}, "key": "approuve"}' class="sr-only peer">
+                                        <input type="checkbox" value="{{ user.actif }}" {{ "checked" if user.actif == 1 else "" }} {{ "disabled" if user.role.weight >= 100 else "" }} data-change-user-status='{"id": {{ user.id }}, "key": "actif"}' class="sr-only peer">
                                         <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-checked:bg-green-numixs rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-focus:ring-dark-green-numixs/30"></div>
                                     </label>
                                 </td>

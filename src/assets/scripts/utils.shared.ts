@@ -1,10 +1,9 @@
 import type {
     BaseConfigData,
-    PivotTableOptions,
     VisitRaw,
     WeekMonth,
 } from '#types';
-import { DateTime, Info, Interval } from 'luxon';
+import { DateTime, Info } from 'luxon';
 
 export const listGroups = [
     {

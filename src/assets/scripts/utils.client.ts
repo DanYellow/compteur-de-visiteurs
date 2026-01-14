@@ -1,6 +1,6 @@
 import type { TotalVisitorsPluginOptions } from "#types";
 import type { Chart } from "chart.js";
-import { listGenders as _listGenders, listAgeGroups as _listAgeGroups, listDepartments as _listDepartments } from "./utils.shared";
+import { listGenders as _listGenders, listAgeGroups as _listAgeGroups, listDepartments as _listDepartments, listGroups as _listGroups } from "./utils.shared";
 
 export const loadImage = (obj: HTMLImageElement) => {
     return new Promise((resolve, reject) => {
@@ -55,7 +55,7 @@ export const TotalVisitors = {
 
 const barOpacity = 40;
 
-const genderColors: {[key: string]: string} = {
+const genderColors: { [key: string]: string } = {
     0: window.getComputedStyle(document.body).getPropertyValue(`--color-sky-300`),
     1: window.getComputedStyle(document.body).getPropertyValue(`--color-pink-300`),
     2: window.getComputedStyle(document.body).getPropertyValue(`--color-gray-300`),
@@ -69,7 +69,7 @@ export const listGenders = _listGenders.map((item) => {
     }
 })
 
-const ageGroupsColors: {[key: string]: string} = {
+const ageGroupsColors: { [key: string]: string } = {
     0: window.getComputedStyle(document.body).getPropertyValue(`--color-blue-300`),
     1: window.getComputedStyle(document.body).getPropertyValue(`--color-red-300`),
     2: window.getComputedStyle(document.body).getPropertyValue(`--color-amber-300`),
@@ -86,7 +86,7 @@ export const listAgeGroups = _listAgeGroups.map((item) => {
     }
 })
 
-const departmentColors: {[key: string]: string} = {
+const departmentColors: { [key: string]: string } = {
     75: window.getComputedStyle(document.body).getPropertyValue(`--color-blue-300`),
     77: window.getComputedStyle(document.body).getPropertyValue(`--color-red-300`),
     78: window.getComputedStyle(document.body).getPropertyValue(`--color-indigo-300`),
@@ -106,8 +106,9 @@ export const listDepartments = _listDepartments.map((item) => {
     }
 })
 
-const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs');
-const whiteNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-white-numixs');
+export const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs');
+export const whiteNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-white-numixs');
+export const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-gray-numixs');
 
 export const listVisits = [{
     label: "Visites régulières",
@@ -120,3 +121,14 @@ export const listVisits = [{
     color: `rgb(from ${whiteNumixs} r g b / ${barOpacity}%)`,
     borderColor: whiteNumixs,
 }]
+
+export const listGroups = _listGroups.map((item) => {
+    const baseColor = item.lineColor;
+    return {
+        ...item,
+        ...(baseColor ? {
+            color: `rgb(from ${baseColor} r g b / ${barOpacity}%)`,
+            borderColor: baseColor,
+        } : {})
+    }
+})
