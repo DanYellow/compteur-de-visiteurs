@@ -101,143 +101,69 @@ export const getPivotTable = (
     columns: string[] | { id: number; name: string }[] = [],
     options: PivotTableOptions = { columnSuffix: '', simplified: false }
 ) => {
-    const tableValues = [];
-    const totalVisits = Object.values(data)
-        .flat()
-        .map((item) =>
-            Object.values(item).reduce(
-                (total: number, x) => (x === 'oui' ? total + 1 : total),
-                0
-            )
+    const listGroupsFiltered = listGroups.filter((item) => !('listInDb' in item) || item.listInDb)
+
+    const res: { label: string, total: number[][] }[] = []
+
+    listGroupsFiltered.forEach((item) => {
+        const valuesForGroup: number[][] = columns.map((col) => {
+            const visitGroupKey = typeof col === 'object' ? col.id : col;
+            const visitsForGroup = data[visitGroupKey];
+            if (visitsForGroup) {
+                return visitsForGroup.reduce(
+                    (accumulator, currentVisit) => {
+                        const isEventVisit = currentVisit.liste_evenements !== '';
+
+                        return [
+                            accumulator[0] + (!isEventVisit && currentVisit[item.value as keyof VisitRaw] === "oui" ? 1 : 0),
+                            accumulator[1] + (isEventVisit && currentVisit[item.value as keyof VisitRaw] === "oui" ? 1 : 0)
+                        ]
+                    }, [0, 0]
+                );
+            }
+            return [0, 0];
+        })
+
+        const totalForGroup = valuesForGroup.reduce((acc, totalVisits) => {
+            return [
+                acc[0] + totalVisits[0],
+                acc[1] + totalVisits[1]
+            ]
+        }, [0, 0])
+
+        valuesForGroup.push(totalForGroup);
+
+        res.push({
+            label: item.label,
+            total: valuesForGroup
+        })
+    })
+
+    const columnCount = res[0].total.length;
+
+    const columnTotals = Array.from({ length: columnCount }, (_, colIndex) =>
+        res.reduce(
+            ([sumA, sumB], item) => [
+                sumA + (item.total[colIndex] as number[])[0],
+                sumB + (item.total[colIndex] as number[])[1]
+            ],
+            [0, 0]
         )
-        .reduce((total: number, val: number) => total + val, 0);
+    );
 
-    const tableHeaderColumns = ['Groupe'];
-    const tableValuesPlaceholder: number[] = [];
+    res.push({
+        label: "Total par type",
+        total: columnTotals
+    })
 
-    [...columns].forEach((label: string | Record<string, string | number>) => {
-        if (typeof label === 'object') {
-            tableHeaderColumns.push(`${label.name}${options.columnSuffix}`);
-        } else {
-            tableHeaderColumns.push(`${label}${options.columnSuffix}`);
-        }
-        tableValuesPlaceholder.push(0);
-    });
-    tableHeaderColumns.push('Total par groupe');
-    tableValues.push(tableHeaderColumns);
+    res.push({
+        label: "Total",
+        total: columnTotals.map(([totalReg, totalEvent]) => [totalReg + totalEvent])
+    })
 
-    const tableFooter = ['Total (visites)', ...tableValuesPlaceholder];
+    console.log("res", res)
 
-    listGroups
-        .filter((item) => !('listInDb' in item) || item.listInDb)
-        .forEach((business) => {
-            let rowValues = [business.label];
-
-            let visitsPerGroupAndPeriod = {
-                [business.value]: new Array(columns.length || 0).fill([0, 0]),
-            };
-
-            if (options.simplified) {
-                visitsPerGroupAndPeriod = {
-                    [business.value]: new Array(columns.length || 0).fill(0),
-                };
-            }
-
-            Object.entries(data).forEach(([group, listVisits]) => {
-                let totalPerGroup: Record<string, number[] | number> = (
-                    listVisits as unknown as VisitRaw[]
-                ).reduce((acc: Record<string, number[]>, visit) => {
-                    const isEventVisit = visit.liste_evenements !== '/';
-                    return (
-                        (acc[business.value] = [
-                            (acc[business.value]?.[0] || 0) +
-                            (visit[business.value as keyof VisitRaw] ===
-                                'oui' && !isEventVisit
-                                ? 1
-                                : 0),
-                            (acc[business.value]?.[1] || 0) +
-                            (visit[business.value as keyof VisitRaw] ===
-                                'oui' && isEventVisit
-                                ? 1
-                                : 0),
-                        ]),
-                        acc
-                    );
-                }, {});
-                if (options.simplified) {
-                    totalPerGroup = (
-                        listVisits as unknown as VisitRaw[]
-                    ).reduce(
-                        (acc: Record<string, number>, visit) => (
-                            (acc[business.value] =
-                                (acc[business.value] || 0) +
-                                (visit[business.value as keyof VisitRaw] ===
-                                    'oui'
-                                    ? 1
-                                    : 0)),
-                            acc
-                        ),
-                        {}
-                    );
-                }
-
-                const indexArray = columns.findIndex((label) => {
-                    if (typeof label === 'object') {
-                        return Number(label.id) === Number(group);
-                    }
-                    return Number(label) === Number(group);
-                });
-
-                if (indexArray >= 0) {
-                    if (options.simplified) {
-                        (tableFooter[indexArray + 1] as number) += (
-                            totalPerGroup as Record<string, number>
-                        )[business.value];
-                    } else {
-                        (tableFooter[indexArray + 1] as number) += (
-                            totalPerGroup as Record<string, number[]>
-                        )[business.value].reduce(
-                            (acc, value) => acc + value,
-                            0
-                        );
-                    }
-                    visitsPerGroupAndPeriod[business.value][indexArray] =
-                        totalPerGroup[business.value];
-                }
-            });
-
-            rowValues = [
-                ...rowValues,
-                ...visitsPerGroupAndPeriod[business.value],
-            ];
-
-            let totalBusiness = [];
-            if (options.simplified) {
-                totalBusiness = visitsPerGroupAndPeriod[business.value].reduce(
-                    (acc, value) => acc + value,
-                    0
-                );
-            } else {
-                totalBusiness = visitsPerGroupAndPeriod[business.value].reduce(
-                    (acc, value) => [acc[0] + value[0], acc[1] + value[1]],
-                    [0, 0]
-                );
-            }
-
-            rowValues.push(totalBusiness);
-            tableValues.push(rowValues);
-        });
-
-    tableFooter.push(totalVisits);
-    tableValues.push(tableFooter);
-
-    return tableValues;
-};
-
-type LinearCSVOptions = {
-    periodLabel: string;
-    lieu: string;
-    columns: string[];
+    return res;
 };
 
 // @TODO

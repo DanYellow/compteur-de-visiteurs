@@ -18,6 +18,7 @@ const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivE
 Chart.register(BarElement, BarController, CategoryScale, LinearScale, Title, Tooltip, LineController, LineElement, PointElement, Legend, ChartDataLabels, SubTitle);
 
 const greenNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-green-numixs');
+const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-gray-numixs');
 
 let areChartsSync = true;
 
@@ -140,194 +141,194 @@ const configData: ChartConfigData = {
 const listCharts = Object.values(configData);
 const listChartsInstance: Chart[] = []
 
-; (() => {
-    listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
-        const ctx = document.getElementById(id) as HTMLCanvasElement;
+    ; (() => {
+        listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuffix }) => {
+            const ctx = document.getElementById(id) as HTMLCanvasElement;
 
-        const apiQueryParams = new URLSearchParams({
-            filtre: apiKey,
-            jour: daySelected.toFormat("yyyy-LL-dd"),
-            ...((placeParam === "tous" || !placeParam) ? {} : { lieu: placeParam }),
-        });
-
-        const req = await fetch(`/api/visites?${apiQueryParams.toString()}`);
-        const res = await req.json();
-        const listVisitsGrouped = Object.groupBy(res.data as VisitRaw[], (item) => item.groupe);
-
-        let listEventsHours = [] as { date: string, groupe: string, heure_fermeture: number, heure_ouverture: number, is_close_hour_exactly: boolean }[];
-
-        const reqEvent = await fetch(`/api/evenements?${apiQueryParams.toString()}`);
-        const resEvent = await reqEvent.json();
-
-        if (resEvent.data) {
-            resEvent.data.forEach((item: EventRaw) => {
-                const [event_heure_ouverture_heure] = item.heure_ouverture.split(":");
-                const [event_heure_fermeture_heure, event_heure_fermeture_minutes] = item.heure_fermeture.split(":");
-
-                const isEventClosedAfterRegularHours = heure_fermeture_heure > parseInt(heure_fermeture_heure);
-                const minutesToUse = isEventClosedAfterRegularHours ? heure_fermeture_minutes : event_heure_fermeture_minutes;
-
-                listEventsHours.push({
-                    date: String(item.date),
-                    groupe: item.groupe,
-                    heure_fermeture: Math.max(Number(event_heure_fermeture_heure), Number(heure_fermeture_heure)),
-                    heure_ouverture: Math.min(Number(event_heure_ouverture_heure), Number(heure_ouverture_heure)),
-                    is_close_hour_exactly: minutesToUse === "00",
-                })
+            const apiQueryParams = new URLSearchParams({
+                filtre: apiKey,
+                jour: daySelected.toFormat("yyyy-LL-dd"),
+                ...((placeParam === "tous" || !placeParam) ? {} : { lieu: placeParam }),
             });
 
-            if (apiKey === "jour") {
-                const {
-                    heure_fermeture = Number(heure_fermeture_heure),
-                    heure_ouverture = Number(heure_ouverture_heure),
-                } = listEventsHours?.[0] || {}
+            const req = await fetch(`/api/visites?${apiQueryParams.toString()}`);
+            const res = await req.json();
+            const listVisitsGrouped = Object.groupBy(res.data as VisitRaw[], (item) => item.groupe);
 
-                let {
-                    is_close_hour_exactly: isCloseHourExactly = false,
-                } = listEventsHours?.[0] || {}
+            let listEventsHours = [] as { date: string, groupe: string, heure_fermeture: number, heure_ouverture: number, is_close_hour_exactly: boolean }[];
 
-                if (!resEvent.data.length && placeData.regularOpening) {
-                    isCloseHourExactly = placeData.regularOpening.heure_fermeture.split(":")[1] === "00"
-                }
+            const reqEvent = await fetch(`/api/evenements?${apiQueryParams.toString()}`);
+            const resEvent = await reqEvent.json();
 
-                const rangeOpeningHours = Math.abs(heure_fermeture - heure_ouverture - (isCloseHourExactly ? 1 : 0) + 1);
-                xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + heure_ouverture).map((item) => String(item));
+            if (resEvent.data) {
+                resEvent.data.forEach((item: EventRaw) => {
+                    const [event_heure_ouverture_heure] = item.heure_ouverture.split(":");
+                    const [event_heure_fermeture_heure, event_heure_fermeture_minutes] = item.heure_fermeture.split(":");
 
-                configData.jour = {
-                    ...configData.jour,
-                    xLabels,
-                }
-            } else if (apiKey === "semaine") {
-                xLabels = [
-                    ...xLabels,
-                    ...resEvent.data.map((item: EventRaw) => item.jour)
-                ].sort((itemA, itemB) => itemA.id - itemB.id);
+                    const isEventClosedAfterRegularHours = heure_fermeture_heure > parseInt(heure_fermeture_heure);
+                    const minutesToUse = isEventClosedAfterRegularHours ? heure_fermeture_minutes : event_heure_fermeture_minutes;
 
-                xLabels = uniqueByKey(xLabels, "id");
+                    listEventsHours.push({
+                        date: String(item.date),
+                        groupe: item.groupe,
+                        heure_fermeture: Math.max(Number(event_heure_fermeture_heure), Number(heure_fermeture_heure)),
+                        heure_ouverture: Math.min(Number(event_heure_ouverture_heure), Number(heure_ouverture_heure)),
+                        is_close_hour_exactly: minutesToUse === "00",
+                    })
+                });
 
-                configData.semaine = {
-                    ...configData.semaine,
-                    xLabels,
+                if (apiKey === "jour") {
+                    const {
+                        heure_fermeture = Number(heure_fermeture_heure),
+                        heure_ouverture = Number(heure_ouverture_heure),
+                    } = listEventsHours?.[0] || {}
+
+                    let {
+                        is_close_hour_exactly: isCloseHourExactly = false,
+                    } = listEventsHours?.[0] || {}
+
+                    if (!resEvent.data.length && placeData.regularOpening) {
+                        isCloseHourExactly = placeData.regularOpening.heure_fermeture.split(":")[1] === "00"
+                    }
+
+                    const rangeOpeningHours = Math.abs(heure_fermeture - heure_ouverture - (isCloseHourExactly ? 1 : 0) + 1);
+                    xLabels = Array.from(new Array(rangeOpeningHours), (_, i) => i + heure_ouverture).map((item) => String(item));
+
+                    configData.jour = {
+                        ...configData.jour,
+                        xLabels,
+                    }
+                } else if (apiKey === "semaine") {
+                    xLabels = [
+                        ...xLabels,
+                        ...resEvent.data.map((item: EventRaw) => item.jour)
+                    ].sort((itemA, itemB) => itemA.id - itemB.id);
+
+                    xLabels = uniqueByKey(xLabels, "id");
+
+                    configData.semaine = {
+                        ...configData.semaine,
+                        xLabels,
+                    }
                 }
             }
-        }
 
-        ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
+            ctx.dataset.chartData = JSON.stringify(listVisitsGrouped);
 
-        const chartDataNumber: { [key: string]: number[] } = {}
-        filters[filterParam].group.forEach((item) => {
-            chartDataNumber[item.value] = new Array(xLabels.length).fill(0);
-        })
+            const chartDataNumber: { [key: string]: number[] } = {}
+            filters[filterParam].group.forEach((item) => {
+                chartDataNumber[item.value] = new Array(xLabels.length).fill(0);
+            })
 
-        const getIndexForKey = (value: string): number => {
-            return xLabels.findIndex((item) => {
-                let labelKey = item;
+            const getIndexForKey = (value: string): number => {
+                return xLabels.findIndex((item) => {
+                    let labelKey = item;
+                    if (typeof item === 'object') {
+                        labelKey = String((item as { name: string; id: number; }).id);
+                    }
+
+                    return labelKey === value;
+                })
+            }
+
+            Object.entries(listVisitsGrouped).forEach(([key, listVisits]) => {
+                const idx = getIndexForKey(key);
+
+                listVisits?.forEach((visit) => {
+                    if (filterParam === "visite") {
+                        chartDataNumber[visit.liste_evenements === "" ? 0 : 1][idx] += 1;
+                    } else {
+                        chartDataNumber[visit[filters[filterParam].key]][idx] += 1;
+                    }
+                })
+            })
+
+            const chartLabels = xLabels.map((item) => {
                 if (typeof item === 'object') {
-                    labelKey = String((item as { name: string; id: number; }).id);
+                    return `${item.name}${xValuesSuffix || ""}`;
                 }
 
-                return labelKey === value;
+                return `${item}${xValuesSuffix || ""}`;
             })
-        }
 
-        Object.entries(listVisitsGrouped).forEach(([key, listVisits]) => {
-            const idx = getIndexForKey(key);
-
-            listVisits?.forEach((visit) => {
-                if (filterParam === "visite") {
-                    chartDataNumber[visit.liste_evenements === "" ? 0 : 1][idx] += 1;
-                } else {
-                    chartDataNumber[visit[filters[filterParam].key]][idx] += 1;
-                }
-            })
-        })
-
-        const chartLabels = xLabels.map((item) => {
-            if (typeof item === 'object') {
-                return `${item.name}${xValuesSuffix || ""}`;
-            }
-
-            return `${item}${xValuesSuffix || ""}`;
-        })
-
-        listChartsInstance.push(
-            new Chart(
-                ctx,
-                {
-                    type: 'bar',
-                    data: {
-                        labels: chartLabels,
-                        datasets: filters[filterParam].group.map((item) => {
-                            return {
-                                label: item.label,
-                                data: chartDataNumber[item.value],
-                                backgroundColor: item.color,
-                                borderColor: item.borderColor,
-                                borderWidth: 1.5
-                            }
-                        })
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        plugins: {
-                            title: {
-                                text: chartTitle,
-                                ...chartTitleStyle,
-                                padding: {
-                                    bottom: 0
+            listChartsInstance.push(
+                new Chart(
+                    ctx,
+                    {
+                        type: 'bar',
+                        data: {
+                            labels: chartLabels,
+                            datasets: filters[filterParam].group.map((item) => {
+                                return {
+                                    label: item.label,
+                                    data: chartDataNumber[item.value],
+                                    backgroundColor: item.color,
+                                    borderColor: item.borderColor,
+                                    borderWidth: 1.5
+                                }
+                            })
+                        },
+                        options: {
+                            maintainAspectRatio: false,
+                            plugins: {
+                                title: {
+                                    text: chartTitle,
+                                    ...chartTitleStyle,
+                                    padding: {
+                                        bottom: 0
+                                    }
+                                },
+                                subtitle: {
+                                    display: true,
+                                    text: `(${placeData.nom ?? "Tous"})`,
+                                    color: "white",
+                                    font: {
+                                        size: 0,
+                                        style: 'normal',
+                                        weight: 'normal',
+                                        family: 'Calibri',
+                                    },
+                                },
+                                tooltip: {
+                                    enabled: true,
+                                },
+                                legend: {
+                                    display: true,
+                                    labels: {
+                                        color: '#FFF',
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: filters[filterParam].legendTitle,
+                                        color: '#FFF',
+                                    },
+                                    onClick: (e: ChartEvent, legendItem: LegendItem, _legend: { chart: Chart }) => {
+                                        syncLegend(e, legendItem, _legend, listChartsInstance, areChartsSync);
+                                    },
+                                },
+                                totalVisitors: {
+                                    text: 'Visites : ' + res.data.length,
+                                    totalColor: greenNumixs,
+                                },
+                                datalabels: {
+                                    color: "white",
+                                    font: {
+                                        size: 0
+                                    },
+                                    anchor: "end",
+                                    align: "end",
+                                    offset: 3,
+                                    formatter: v => v ? v : ''
                                 }
                             },
-                            subtitle: {
-                                display: true,
-                                text: `(${placeData.nom ?? "Tous"})`,
-                                color: "white",
-                                font: {
-                                    size: 0,
-                                    style: 'normal',
-                                    weight: 'normal',
-                                    family: 'Calibri',
-                                },
-                            },
-                            tooltip: {
-                                enabled: true,
-                            },
-                            legend: {
-                                display: true,
-                                labels: {
-                                    color: '#FFF',
-                                },
-                                title: {
-                                    display: true,
-                                    text: filters[filterParam].legendTitle,
-                                    color: '#FFF',
-                                },
-                                onClick: (e: ChartEvent, legendItem: LegendItem, _legend: { chart: Chart }) => {
-                                    syncLegend(e, legendItem, _legend, listChartsInstance, areChartsSync);
-                                },
-                            },
-                            totalVisitors: {
-                                text: 'Visites : ' + res.data.length,
-                                totalColor: greenNumixs,
-                            },
-                            datalabels: {
-                                color: "white",
-                                font: {
-                                    size: 0
-                                },
-                                anchor: "end",
-                                align: "end",
-                                offset: 3,
-                                formatter: v => v ? v : ''
-                            }
+                            scales: chartScales(xTitle, undefined, true),
                         },
-                        scales: chartScales(xTitle, undefined, true),
-                    },
-                    plugins: [TotalVisitors],
-                }
-            )
-        );
-    })
-})();
+                        plugins: [TotalVisitors],
+                    }
+                )
+            );
+        })
+    })();
 
 const detailsChartCtx = document.getElementById("detailsChart")! as HTMLCanvasElement;
 detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
@@ -344,11 +345,8 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
         linkDownloadChartData.href = downloadLink || "";
 
-        const tableDetailsChartTableHeadRow = tableDetailsChart.querySelector("thead tr[data-tr-period]")! as HTMLTableRowElement;
-        tableDetailsChartTableHeadRow.innerHTML = "";
-
-        const tableDetailsChartTableHeadVisitTypeRow = tableDetailsChart.querySelector("thead tr[data-tr-visit-type]")! as HTMLTableRowElement;
-        tableDetailsChartTableHeadVisitTypeRow.innerHTML = "";
+        const tableDetailsChartTableHead = tableDetailsChart.querySelector("thead")! as HTMLTableSectionElement;
+        tableDetailsChartTableHead.innerHTML = "";
 
         const tableDetailsChartTableBody = tableDetailsChart.querySelector("tbody")! as HTMLTableSectionElement;
         tableDetailsChartTableBody.innerHTML = "";
@@ -356,110 +354,127 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         const lineChartDatasets: LineChartEntry[] = [];
 
         const visitsHasEvents = Object.values(chartData).flat().some((item) => (item as VisitRaw).liste_evenements !== "")
-        const chartDataPivotTable = getPivotTable(chartData, xLabels as [], { columnSuffix: xValuesSuffix, simplified: !visitsHasEvents })
-        console.log(xLabels)
-        Object.values(chartDataPivotTable).forEach((row, index, table) => {
+        const tableData = getPivotTable(chartData, xLabels as [], { columnSuffix: xValuesSuffix, simplified: !visitsHasEvents })
+
+        const periodTableRow = document.createElement("tr");
+        tableDetailsChartTableHead.append(periodTableRow);
+
+        const visitTypeTableRow = document.createElement("tr");
+        visitTypeTableRow.style.borderBottom = "2px solid white";
+        tableDetailsChartTableHead.append(visitTypeTableRow);
+
+        // Table header
+        ;[null, ...xLabels, "Total"].forEach((item, cellIndex, array) => {
+            const th = document.createElement("th");
+            th.classList.add(...['px-2']);
+            if (item !== null) {
+                const label = typeof item === 'object' ? item.name : item;
+                th.textContent = `${label}${cellIndex === array.length - 1 ? "" : xValuesSuffix}`;
+            } else {
+                th.textContent = "";
+            }
+            th.colSpan = 2;
+            if (cellIndex === array.length - 1) {
+                th.style.borderLeft = "2px solid white";
+            }
+            periodTableRow.append(th);
+
+            for (let indexHead = 0; indexHead < 2; indexHead++) {
+                const th = document.createElement("th");
+                th.classList.add(...['px-2'])
+                th.style.paddingBottom = "0.25rem";
+                if (cellIndex === array.length - 1 && indexHead === 0) {
+                    th.style.borderLeft = "2px solid white";
+                }
+
+                if (cellIndex === 0) {
+                    if (indexHead === 0) {
+                        th.colSpan = 2;
+                        th.textContent = "Groupe / Type de visite";
+                        th.style.backgroundColor = grayNumixs;
+                        th.classList.add(...["sticky", "left-0"]);
+                        visitTypeTableRow.append(th);
+                    }
+                } else {
+                    th.textContent = indexHead % 2 ? "Evènement" : "Régulière";
+                    visitTypeTableRow.append(th);
+                }
+            }
+        })
+
+        // Table body + footer
+        tableData.forEach((item, cellIndex, array) => {
             const trBody = document.createElement("tr");
+            tableDetailsChartTableBody.append(trBody);
+
             trBody.classList.add("hover:!bg-green-numixs/15");
-            if (index % 2 === 0) {
+
+            const td = document.createElement("th");
+            td.textContent = item.label;
+            td.colSpan = 2;
+            td.style.backgroundColor = grayNumixs;
+            td.style.paddingInline = "0.5rem";
+            td.style.textAlign = "left";
+            td.classList.add(...["sticky", "left-0"]);
+
+            if (cellIndex % 2 === 0) {
+                td.style.backgroundColor = "#000000";
                 trBody.style.backgroundColor = "#00000075";
             }
 
-            row.forEach((cell, cellIndex, listRows) => {
-                if (index === 0) {
-                    const th = document.createElement("th");
-                    th.classList.add("px-2")
-                    th.textContent = String(cell);
-                    th.colSpan = 2;
-                    tableDetailsChartTableHeadRow.append(th);
+            if (cellIndex === array.length - 2) {
+                td.style.borderTop = "2px solid white";
+            }
 
-                    if (visitsHasEvents) {
-                        for (let indexHead = 0; indexHead < 2; indexHead++) {
-                            const th = document.createElement("th");
-                            th.classList.add("px-2")
-                            if (cellIndex !== 0) {
-                                th.textContent = indexHead % 2 ? "Evènement" : "Régulière";
-                            }
-                            tableDetailsChartTableHeadVisitTypeRow.append(th);
+            trBody.append(td);
+
+            item.total.forEach((totalVisits, idxTotalVisits, totalVisitsArray) => {
+                totalVisits.forEach((visit, idxVisit) => {
+                    const td = document.createElement("td");
+                    td.textContent = String(visit);
+                    td.style.textAlign = "center";
+                    td.style.color = Number(visit) > 0 ? greenNumixs : "";
+
+                    if (idxTotalVisits === totalVisitsArray.length - 1) {
+                        td.style.fontSize = "1.25rem";
+                        if (idxVisit === 0) {
+                            td.style.borderLeft = "2px solid white";
                         }
                     }
-                } else {
-                    const td = document.createElement("td");
 
-                    if (Array.isArray(cell)) {
-                        cell.forEach((val, idx) => {
-                            if (idx === 0) {
-                                const tdReg = document.createElement("td");
-                                tdReg.textContent = String(val);
-                                tdReg.style.textAlign = "center";
-                                tdReg.style.color = Number(val) > 0 ? greenNumixs : "";
-
-                                if (cellIndex === listRows.length - 1) {
-                                    tdReg.style.borderLeft = "2px solid white";
-                                }
-                                trBody.append(tdReg);
-                            } else {
-                                td.style.color = Number(val) > 0 ? greenNumixs : "";
-                                td.textContent = String(val);
-                            }
-                        })
-                    } else {
-                        td.textContent = String(cell);
-                        td.style.color = Number(cell) > 0 ? greenNumixs : "";
-                        td.colSpan = 2;
-                    }
-                    if (cellIndex === 0) {
-                        td.style.paddingLeft = "0.2rem";
-                        td.colSpan = 2;
-                    }
-                    if (cellIndex > 0) {
-                        td.style.textAlign = "center";
-                    }
-
-                    // Last column
-                    if (cellIndex === listRows.length - 1 && !Array.isArray(cell)) {
-                        td.style.borderLeft = "2px solid white";
-                    }
-
-                    // Last row
-                    if (index === table.length - 1) {
-                        td.style.borderTop = "2px solid white";
+                    if (cellIndex >= array.length - 2) {
                         td.style.fontSize = "1.25rem";
-                        td.style.paddingTop = "0.35rem";
+                        if (cellIndex === array.length - 2) {
+                            td.style.borderTop = "2px solid white";
+                        }
                     }
 
-                    trBody.append(td);
-                }
-            });
+                    if (totalVisits.length === 1) {
+                        td.colSpan = 2;
+                    }
 
-            if (index > 0 && index < table.length - 1) {
-                const lineData = row.slice(1, row.length - 1);
+                    trBody.append(td)
+                });
+            })
 
-                let flatData = []
-                if (visitsHasEvents) {
-                    flatData = lineData.map((item: unknown) => {
-                        return (item as number[]).reduce((acc: number, value: number) => acc + value, 0)
-                    })
-                } else {
-                    flatData = lineData;
-                }
-
+            if (cellIndex < array.length - 2) {
                 lineChartDatasets.push({
-                    label: row[0] as string,
-                    data: flatData as number[],
-                    borderColor: listBusinessSector.find((item) => item.label === row[0] as string)!.lineColor,
+                    label: item.label,
+                    data: item.total.map((item: unknown) => {
+                        return (item as number[]).reduce((acc: number, value: number) => acc + value, 0)
+                    }),
+                    borderColor: listBusinessSector.find((group) => group.label === item.label)!.lineColor,
                     tension: 0,
                     fill: true,
                 });
             }
-
-            if (index > 0) {
-                tableDetailsChartTableBody.append(trBody);
-            }
-        });
+        })
 
         const data = {
-            labels: chartDataPivotTable[0].slice(1, chartDataPivotTable[0].length - 1),
+            labels: xLabels.map((item) => {
+                const label = typeof item === 'object' ? item.name : item
+                return `${label}${xValuesSuffix}`;
+            }),
             datasets: lineChartDatasets,
         };
 
