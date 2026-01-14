@@ -120,6 +120,7 @@ html {
 
     background: #312f2f;
     position: relative;
+    scrollbar-gutter: stable;
 
     &.register {
         background: url('/images/bottom-left-pattern.svg') no-repeat left bottom,
@@ -143,6 +144,12 @@ html {
     &.admin {
         background: url('/images/bottom-left-pattern.svg') no-repeat left bottom,
             #272626;
+    }
+}
+
+body {
+    &:has(dialog[open]) {
+        overflow: hidden;
     }
 }
 
@@ -290,7 +297,7 @@ select.error {
     }
 }
 
-.wrapper {
+.form-step-wrapper {
     anchor-name: --my-carousel;
     scroll-marker-group: after;
 
@@ -396,4 +403,10 @@ select.error {
             width: max-content;
         }
     }
+}
+
+.tr-details-table:hover th {
+    background-color: oklch(
+        from var(--color-dark-green-numixs) calc(l * 0.65) c h
+    ) !important;
 }

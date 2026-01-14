@@ -99,11 +99,11 @@ export const listGroups = [
 export const getPivotTable = (
     data: Record<string, VisitRaw[]>,
     columns: string[] | { id: number; name: string }[] = [],
-    options: PivotTableOptions = { columnSuffix: '', simplified: false }
+    hasEvents: boolean
 ) => {
     const listGroupsFiltered = listGroups.filter((item) => !('listInDb' in item) || item.listInDb)
 
-    const res: { label: string, total: number[][] }[] = []
+    const res: { label: string, total: number[][] }[] = [];
 
     listGroupsFiltered.forEach((item) => {
         const valuesForGroup: number[][] = columns.map((col) => {
@@ -116,20 +116,20 @@ export const getPivotTable = (
 
                         return [
                             accumulator[0] + (!isEventVisit && currentVisit[item.value as keyof VisitRaw] === "oui" ? 1 : 0),
-                            accumulator[1] + (isEventVisit && currentVisit[item.value as keyof VisitRaw] === "oui" ? 1 : 0)
+                            ...(hasEvents ? [accumulator[1] + (isEventVisit && currentVisit[item.value as keyof VisitRaw] === "oui" ? 1 : 0)] : [])
                         ]
-                    }, [0, 0]
+                    }, [0, ...(hasEvents ? [0] : [])]
                 );
             }
-            return [0, 0];
+            return [0, ...(hasEvents ? [0] : [])];
         })
 
         const totalForGroup = valuesForGroup.reduce((acc, totalVisits) => {
             return [
                 acc[0] + totalVisits[0],
-                acc[1] + totalVisits[1]
+                ...(hasEvents ? [acc[1] + totalVisits[1]] : [])
             ]
-        }, [0, 0])
+        }, [0, ...(hasEvents ? [0] : [])]);
 
         valuesForGroup.push(totalForGroup);
 
@@ -145,25 +145,27 @@ export const getPivotTable = (
         res.reduce(
             ([sumA, sumB], item) => [
                 sumA + (item.total[colIndex] as number[])[0],
-                sumB + (item.total[colIndex] as number[])[1]
+                ...(hasEvents ? [sumB + (item.total[colIndex] as number[])[1]] : [])
             ],
-            [0, 0]
+            [0, ...(hasEvents ? [0] : [])]
         )
     );
 
     const total: { label: string, total: number[][] }[] = []
 
-    total.push({
-        label: "Total par type",
-        total: columnTotals
-    })
+    if (hasEvents) {
+        total.push({
+            label: "Total par type",
+            total: columnTotals
+        })
+    }
 
     total.push({
         label: "Total",
-        total: columnTotals.map(([totalReg, totalEvent]) => [totalReg + totalEvent])
-    })
+        total: columnTotals.map(([totalReg, totalEvent]) => [totalReg + (hasEvents ? totalEvent : 0)])
+    });
 
-    return {body: res, footer: total};
+    return { body: res, footer: total };
 };
 
 export const getLinearCSV = (

@@ -328,11 +328,11 @@ listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuff
     );
 });
 
-const generateTotalCells = (tr: HTMLTableRowElement, data: number[][], rootArray?:unknown[], rootIndex?: number) => {
+const generateTotalCells = (tr: HTMLTableRowElement, data: number[][], rootArray?: unknown[], rootIndex?: number, hasEvents: boolean = false) => {
     const hasExtraParams = typeof rootIndex !== "undefined" && Array.isArray(rootArray);
 
     data.forEach((totalVisits, idxTotalVisits, totalVisitsArray) => {
-        totalVisits.forEach((visit, idxVisit) => {
+        totalVisits.forEach((visit, idxVisit, array) => {
             const td = document.createElement("td");
             td.textContent = String(visit);
             td.style.textAlign = "center";
@@ -347,18 +347,30 @@ const generateTotalCells = (tr: HTMLTableRowElement, data: number[][], rootArray
 
             if (hasExtraParams && rootIndex >= rootArray.length - 2) {
                 td.style.fontSize = '1.25rem';
-                if (rootIndex === rootArray.length - 2) {
+                if (rootIndex === rootArray.length - (hasEvents ? 2 : 1)) {
                     td.style.borderTop = "2px solid white";
                 }
             }
 
             if (totalVisits.length === 1) {
-                td.colSpan = 2;
+                td.colSpan = array.length;
             }
 
             tr.append(td);
         });
     })
+}
+
+const generateFirstRowCell = (data: {label: string}, colSpan: number = 1) => {
+    const th = document.createElement("th");
+    th.textContent = data.label;
+    th.colSpan = colSpan;
+    th.style.backgroundColor = grayNumixs;
+    th.style.paddingInline = "0.5rem";
+    th.style.textAlign = "left";
+    th.classList.add(...["sticky", "left-0"]);
+
+    return th;
 }
 
 const detailsChartCtx = document.getElementById("detailsChart")! as HTMLCanvasElement;
@@ -388,7 +400,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         const lineChartDatasets: LineChartEntry[] = [];
 
         const visitsHasEvents = Object.values(chartData).flat().some((item) => (item as VisitRaw).liste_evenements !== "")
-        const tableData = getPivotTable(chartData, xLabels as [], { columnSuffix: xValuesSuffix, simplified: !visitsHasEvents })
+        const tableData = getPivotTable(chartData, xLabels as [], visitsHasEvents)
 
         const periodTableRow = document.createElement("tr");
         tableDetailsChartTableHead.append(periodTableRow);
@@ -396,6 +408,8 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         const visitTypeTableRow = document.createElement("tr");
         visitTypeTableRow.style.borderBottom = "2px solid white";
         tableDetailsChartTableHead.append(visitTypeTableRow);
+
+        const nb = tableData.body[0].total[0].length;
 
         // Table header
         ;[null, ...xLabels, "Total"].forEach((item, cellIndex, array) => {
@@ -407,13 +421,13 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
             } else {
                 th.textContent = "";
             }
-            th.colSpan = 2;
+            th.colSpan = cellIndex === 0 ? 1 : nb;
             if (cellIndex === array.length - 1) {
                 th.style.borderLeft = "2px solid white";
             }
             periodTableRow.append(th);
 
-            for (let indexHead = 0; indexHead < 2; indexHead++) {
+            for (let indexHead = 0; indexHead < nb; indexHead++) {
                 const th = document.createElement("th");
                 th.classList.add(...['px-2'])
                 th.style.paddingBottom = "0.25rem";
@@ -423,7 +437,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
 
                 if (cellIndex === 0) {
                     if (indexHead === 0) {
-                        th.colSpan = 2;
+                        th.colSpan = 1;
                         th.textContent = "Groupe / Type de visite";
                         th.style.backgroundColor = grayNumixs;
                         th.classList.add(...["sticky", "left-0"]);
@@ -437,62 +451,58 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         })
 
         // Table body
-        tableData.body.forEach((item, cellIndex) => {
+        tableData.body.forEach((data, cellIndex) => {
             const trBody = document.createElement("tr");
             tableDetailsChartTableBody.append(trBody);
 
-            trBody.classList.add("hover:!bg-green-numixs/15");
+            trBody.classList.add(...["hover:!bg-green-numixs/15", "tr-details-table"]);
 
-            const td = document.createElement("th");
-            td.textContent = item.label;
-            td.colSpan = 2;
-            td.style.backgroundColor = grayNumixs;
-            td.style.paddingInline = "0.5rem";
-            td.style.textAlign = "left";
-            td.classList.add(...["sticky", "left-0"]);
+            const td = generateFirstRowCell(data, 1) // data.total[0].length;
+            trBody.append(td);
 
             if (cellIndex % 2 === 0) {
                 td.style.backgroundColor = "#000000";
                 trBody.style.backgroundColor = "#00000075";
             }
 
-            trBody.append(td);
-
-            generateTotalCells(trBody, item.total)
+            generateTotalCells(trBody, data.total);
 
             lineChartDatasets.push({
-                label: item.label,
-                data: item.total.map((item: unknown) => {
+                label: data.label,
+                data: data.total.map((item: unknown) => {
                     return (item as number[]).reduce((acc: number, value: number) => acc + value, 0)
                 }),
-                borderColor: listBusinessSector.find((group) => group.label === item.label)!.lineColor,
+                borderColor: listBusinessSector.find((group) => group.label === data.label)!.lineColor,
                 tension: 0,
                 fill: true,
             });
         })
 
-        tableData.footer.forEach((item, cellIndex, array) => {
+        // Table footer
+        tableData.footer.forEach((data, cellIndex, array) => {
             const trFooter = document.createElement("tr");
             tableDetailsChartTableFooter.append(trFooter);
 
-            trFooter.classList.add("hover:!bg-green-numixs/15");
+            trFooter.classList.add(...["hover:!bg-green-numixs/15", "tr-details-table"]);
 
-            const td = document.createElement("th");
-            td.textContent = item.label;
-            td.colSpan = 2;
-            td.style.backgroundColor = grayNumixs;
-            td.style.paddingInline = "0.5rem";
-            td.style.textAlign = "left";
-            td.classList.add(...["sticky", "left-0"]);
-
+            const td = generateFirstRowCell(data, 1); // data
             trFooter.append(td);
 
             if (cellIndex === 0) {
                 td.style.borderTop = "2px solid white";
             }
 
-            generateTotalCells(trFooter, item.total, array, cellIndex)
-        })
+            generateTotalCells(trFooter, data.total, array, cellIndex, visitsHasEvents)
+        });
+
+        if (visitsHasEvents) {
+            Array.from(Array.from(tableDetailsChartTableFooter.childNodes).at(-1)!.childNodes).forEach((cell, idx) => {
+                if (idx === 0) {
+                    return;
+                }
+                (cell as HTMLTableCellElement).colSpan = 2;
+            });
+        }
 
         const data = {
             labels: xLabels.map((item) => {
@@ -542,7 +552,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                                 size: 16,
                                 style: 'normal',
                                 weight: 'normal',
-                                family: "Calibri"
+                                family: 'Calibri'
                             },
                             padding: {
                                 bottom: 10
