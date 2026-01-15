@@ -1,4 +1,4 @@
-import { Chart, type ChartEvent, type LegendElement, type LegendItem, type ScriptableScaleContext } from 'chart.js';
+import { Chart, type ChartEvent, type LegendItem, type ScriptableScaleContext } from 'chart.js';
 import type { CustomTitleOptions } from "#types";
 
 export const chartScales = (xTitle: string, titleSize: number = 12, stacked = false) => {

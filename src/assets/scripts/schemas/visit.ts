@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { listGroups as listBusinessSector, listAgeGroups, listDepartments, listGenders, REQUIRED_MESSAGE } from '#scripts/utils.shared.ts';
+import { listGroups as listBusinessSector, listAgeGroups, listDepartments, listGenders } from '#scripts/utils.shared.ts';
 
 type BusinessSectorPayload = {
     entreprise?: string;

@@ -21,6 +21,16 @@ declare global {
         createNotification: (message: string) => void;
     }
 
+    type PaintWorkletConstructor = {
+        new(): {
+            paint(
+                ctx: CanvasRenderingContext2D,
+                size: { width: number; height: number },
+                properties: Map<string, any>
+            ): void;
+        };
+    };
+
     namespace NodeJS {
         export interface ProcessEnv {
             NODE_ENV: 'development' | 'production';
@@ -40,6 +50,7 @@ declare global {
 
             HOSTNAME: string;
             DEFAULT_ADMIN_PASSWORD: string;
+            ALLOWED_IPS: string;
         }
     }
 }

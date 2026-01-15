@@ -14,6 +14,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+declare const registerPaint: (
+    name: string,
+    painter: PaintWorkletConstructor
+) => void;
+
+interface PaintSize {
+    width: number;
+    height: number;
+}
+
+
 // Example : https://houdini.glitch.me/paint
 if (typeof registerPaint !== "undefined") {
     registerPaint(
@@ -30,7 +41,7 @@ if (typeof registerPaint !== "undefined") {
                     "--ripple-stroke-width",
                 ];
             }
-            paint(ctx, geom, properties) {
+            paint(ctx: CanvasRenderingContext2D, size: PaintSize, properties: Map<string, any>) {
                 const defaultSpeed = 1000;
                 const speed = parseInt(
                     properties.get("--ripple-speed")?.toString() || defaultSpeed
@@ -60,7 +71,7 @@ if (typeof registerPaint !== "undefined") {
                 ctx.arc(
                     x,
                     y,
-                    (geom.width * tick) / speed, // radius
+                    (size.width * tick) / speed, // radius
                     0, // startAngle
                     2 * Math.PI // endAngle
                 );
