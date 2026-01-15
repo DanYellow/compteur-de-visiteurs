@@ -35,15 +35,18 @@ async function reloadWhitelist() {
 })()
 
 export const checkIpAdress = (req: Request, res: Response, next: NextFunction) => {
-    return res.status(403).render("pages/not-allowed.njk");
+    const userIp = normalizeIp(req.ip!);
+
     if (process.env.NODE_ENV === "development") {
         return next();
     }
 
     const listAllowedIPs = new Set((whitelistIp || "").split(/[,\n]/).map((item) => item.trim()));
 
-    if (!listAllowedIPs.has(normalizeIp(req.ip!))) {
-        return res.status(403).render("pages/not-allowed.njk");
+    if (!listAllowedIPs.has(userIp)) {
+        return res.status(403).render("pages/not-allowed.njk", {
+            ip: userIp
+        });
     }
 
     next();

@@ -1,6 +1,7 @@
 {% extends "layouts/page.njk" %}
 
 {% set root_class = "register" %}
+{% import "includes/macros.njk" as macros %}
 
 {% block title %}
 Accès interdit
@@ -10,5 +11,13 @@ Accès interdit
     <div class="max-w-7xl mt-8 px-3 mx-auto">
         <h1 class="text-6xl title-font">Accès interdit</h1>
         <p>Vous n'avez pas accès à cette page. <a href="/" class="underline text-green-numixs hocus:no-underline">Retourner à la page d'accueil</a>.</p>
+        {% if ip %}
+            {% set message %}
+                Votre adresse ip <span class="font-bold">{{ ip }}</span> n'est pas autorisée, si vous pensez que c'est une erreur, veuillez contacter l'administrateur.
+            {% endset %}
+            <div class="mt-4">
+                {{ macros.warning_banner(message) }}
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
