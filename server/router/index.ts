@@ -169,11 +169,11 @@ router.get(["/choix-lieu"], async (req, res) => {
     res.redirect("/choix-lieu");
 });
 
-router.get("/interdit", async (req, res) => {
+router.get("/interdit", async (_, res) => {
     res.status(403).render("pages/not-allowed.njk");
 });
 
-router.post('/deconnexion', (req, res) => {
+router.post('/deconnexion', (_, res) => {
     res.cookie('flash_message', "success_logout", flashMessageCookieOptions)
     res.clearCookie("token");
     res.redirect('/connexion');

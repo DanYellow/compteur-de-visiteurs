@@ -6,7 +6,7 @@ import { PlaceSchema } from "#scripts/schemas/index.ts";
 import { slugify } from "#scripts/utils.shared.ts";
 import { DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User } from "#models/index.ts";
-import { PlaceRaw } from "#types";
+import type { PlaceRaw } from "#types";
 import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 

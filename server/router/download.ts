@@ -3,13 +3,9 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath, URLSearchParams } from "url";
 import { stringify } from "csv-stringify/sync";
-import { DateTime } from "luxon";
-import sequelize, { RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
-import { baseConfigData, DEFAULT_CLOSE_HOURS, DEFAULT_OPEN_HOURS, getLinearCSV, getPivotTable, getWeeksRangeMonth, listAgeGroups, listDepartments, listGenders, listGroups } from "#scripts/utils.shared.ts";
+import { getLinearCSV } from "#scripts/utils.shared.ts";
 import { slugify } from "#scripts/utils.shared.ts";
-import { PlaceRaw, VisitRaw } from "#types";
 
-const { place: PlaceModel } = sequelize.models;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -24,7 +20,6 @@ router.get('/', async (req, res) => {
     }
 
     const [configKey] = Object.entries(predicatesDict).filter(([key]) => Object.keys(req.query).includes(key)).at(0) || "jour"
-    const isGrouped = "groupe" in req.query;
 
     let csvPayload = [];
 

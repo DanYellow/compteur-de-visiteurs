@@ -7,7 +7,7 @@ import dotenv from 'dotenv';
 import { SignInSchema, SignInActivationSchema, LoginSchema } from "#scripts/schemas/index.ts";
 import { flashMessageCookieOptions, wss } from "#server/index.ts";
 import { User as UserModel } from "#models/index.ts";
-import { CustomSession, UserTokenData } from "#types";
+import type { CustomSession, UserTokenData } from "#types";
 import { SOCKET_EVENTS } from "#scripts/utils.shared.ts";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` })

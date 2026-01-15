@@ -7,6 +7,7 @@
         "dev": "cross-env NODE_ENV=development cross-env NODE_ENV=development tsx watch --include \"./server/*\" --include \"./src/*\" server/index.ts",
         "dev:docker": "tsx watch --include \"./server/*\" --include \"./src/*\" server/index.ts",
         "build": "npm run email && cross-env NODE_ENV=production tsc && vite build",
+        "build:server": "tsc --project tsconfig.server.json",
         "email": "npx @tailwindcss/cli -i ./src/assets/styles/email.css -o ./dist/tailwind-email.tmp.css --minify && npx postcss ./dist/tailwind-email.tmp.css -o ./dist/tailwind-email.css",
         "prod": "cross-env NODE_ENV=production node --import=tsx server/index.ts"
     },

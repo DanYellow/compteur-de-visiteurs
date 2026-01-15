@@ -1,7 +1,7 @@
 import express from "express";
 
 import sequelize from "#models/index.ts";
-import { CommonRegularOpening } from "#types";
+import type { CommonRegularOpening } from "#types";
 import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
 
 const router = express.Router();

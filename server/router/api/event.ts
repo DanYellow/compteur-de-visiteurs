@@ -4,7 +4,7 @@ import { DateTime, Info } from "luxon";
 import { Op } from 'sequelize';
 
 import { PERIOD_PREDICATE } from "#server/router/api/index.ts";
-import { EventRaw } from "#types";
+import type { EventRaw } from "#types";
 import { capitalizeFirstLetter } from "#scripts/utils.shared.ts";
 
 const router = express.Router();

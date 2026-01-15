@@ -60,7 +60,6 @@ export type Place_Visits = InferAttributes<PlaceModel> & {
     listVisits: VisitRaw[];
 };
 
-
 export type CommonRegularOpening = {
     jours_fermeture: string[] | string;
     heure_ouverture: string;

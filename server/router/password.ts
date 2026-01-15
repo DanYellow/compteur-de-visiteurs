@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import { ChangePasswordSchema, PasswordRecoverySchema } from "#scripts/schemas/index.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
 import { User as UserModel } from "#models/index.ts";
-import { UserTokenData } from "#types";
+import type { UserTokenData } from "#types";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` })
 

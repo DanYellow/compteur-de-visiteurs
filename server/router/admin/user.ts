@@ -5,7 +5,7 @@ import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
 import { User as UserModel, UserPublicKeyCredentials as UserPublicKeyCredentialsModel } from "#models/index.ts";
 import { LIST_ROLES } from "#scripts/utils.shared.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
-import { UserTokenData } from "#types";
+import type { UserTokenData } from "#types";
 import { Op } from "sequelize";
 
 const NUMBER_REGEX = /^\d+$/;

@@ -1,15 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
-import { fileURLToPath } from "url";
 import fs from "fs/promises";
 import path from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const normalizeIp = (ip: string) =>
     ip.startsWith("::ffff:") ? ip.replace("::ffff:", "") : ip;
 
-const filePath = path.join(__dirname, '..', '..', './whitelist-ip.tmp.txt');
+const filePath = path.join(process.cwd(), 'whitelist-ip.tmp.txt');
 
 let whitelistIp = await fs.readFile(filePath, 'utf-8');
 let reloadTimeout: NodeJS.Timeout | null = null;

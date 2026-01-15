@@ -9,7 +9,7 @@ dotenv.config({ path: `${process.cwd()}/.env.local` });
 
 const router = express.Router();
 
-router.get('/', async (req, res) => {
+router.get('/', async (_, res) => {
     const listRoutes = router.stack.map((item) => {
         return item.route!.path;
     })
