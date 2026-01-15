@@ -50,7 +50,6 @@ declare global {
 
             HOSTNAME: string;
             DEFAULT_ADMIN_PASSWORD: string;
-            ALLOWED_IPS: string;
         }
     }
 }

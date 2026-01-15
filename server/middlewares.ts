@@ -78,19 +78,4 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     next();
 }
 
-const normalizeIp = (ip: string) =>
-    ip.startsWith("::ffff:") ? ip.replace("::ffff:", "") : ip;
-
-export const checkIpAdress = (req: Request, res: Response, next: NextFunction) => {
-    if (process.env.NODE_ENV === "development") {
-        return next();
-    }
-
-    const listAllowedIPs = new Set((process.env.ALLOWED_IPS || "").split(",").map((item) => item.trim()));
-
-    if (!listAllowedIPs.has(normalizeIp(req.ip!))) {
-        return res.status(403).render("pages/not-allowed.njk");
-    }
-
-    next();
-}
+export { checkIpAdress } from "./middlewares/check-ip.ts";
