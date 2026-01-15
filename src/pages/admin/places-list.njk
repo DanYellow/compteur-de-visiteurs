@@ -24,26 +24,28 @@ Liste lieux numixs
             {% endif %}
         </header>
 
-        {% include "includes/hello-banner.njk" %}
+        <div class="flex flex-col gap-3 mb-4">
+            {% include "includes/hello-banner.njk" %}
+            {% include "includes/form-banner-success.njk" %}
+        </div>
         {# <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 mb-4">Les lieux avec des heures d'ouverture non définis ne peuvent pas être définis pour un évènement ou comme lieu de receuil de visites</p> #}
 
         <div class="text-black-numixs">
             <div class="overflow-x-auto">
-                {% include "includes/form-banner-success.njk" %}
                 <table class="w-full bg-white border-collapse whitespace-nowrap fixed-table-header">
                     <thead>
                         <tr class="bg-gray-200">
                             <th class="font-bold px-4 py-3 text-left">#</th>
                             <th class="font-bold px-4 py-3 text-left">Nom</th>
-                            <th class="font-bold px-4 py-3 text-left">Heures d'ouverture</th>
-                            <th class="font-bold px-4 py-3 text-left">Jours fermés</th>
+                            <th class="font-bold px-4 py-3 text-left">Horaires d'ouverture</th>
+                            <th class="font-bold px-4 py-3 text-left">Jours de fermeture</th>
                             <th class="font-bold px-4 py-3 text-left">Ouvert</th>
                             <th class="font-bold px-4 py-3 text-left"></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for place in places_list %}
-                            <tr class="even:bg-green-numixs/50 group hover:bg-slate-200" data-member-row>
+                            <tr class="even:bg-green-numixs/50 group hover:bg-slate-200">
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.nom }}</td>
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
