@@ -1,28 +1,27 @@
 services:
-  traefik:
-    image: traefik:v3
-    container_name: traefik
-    command: --api.insecure=true --providers.docker
-    ports:
-      - 80:80
-      - 8081:8081
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  # traefik:
+  #   image: traefik:v3
+  #   container_name: traefik
+  #   command: --api.insecure=true --providers.docker
+  #   ports:
+  #     - 80:80
+  #     - 8081:8081
+  #   volumes:
+  #     - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
   compteur-de-visiteurs:
     container_name: compteur-social-production
     build:
       context: .
       dockerfile: node.Dockerfile
-    depends_on:
-      - traefik
+    # depends_on:
+    #   - traefik
     stdin_open: true
     tty: true
     ports:
       - 3900:3900
     environment:
       - NODE_ENV=production
-      - NODE_OPTIONS=--max_old_space_size=8192
       - IS_DOCKER=true
     env_file:
       - .env.local
