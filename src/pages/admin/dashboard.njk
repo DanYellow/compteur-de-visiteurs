@@ -58,67 +58,51 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     <div class="relative z-50 switch border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-dark-green-numixs/30 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-numixs"></div>
                 </label>
             </div>
-
+            {% set menu_chart_classes = "absolute right-3 flex flex-col items-end gap-3" %}
             <div class="grid grid-cols-1 xl:grid-cols-2 2xl:grid-cols-3 gap-2">
                 <div class="bg-black-numixs p-3 rounded-2xl h-120 relative">
-                    <menu class="absolute right-3 flex flex-col gap-1.5">
+                    <menu class="{{ menu_chart_classes }}">
                         <li>
-                            <button data-download-chart="dailyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
-                                {% include "includes/icons/download-fill-icon.svg" %}
-                            </button>
+                            {{ macros.download_chart_extensible_button("daily-chart") }}
                         </li>
                         <li>
-                            <button data-details-chart="jour" type="button" command="show-modal" commandfor="detailsChartModal" title="Afficher la vue détaillée" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
-                                {% include "includes/icons/zoom-icon.svg" %}
-                            </button>
+                            {{ macros.zoom_chart_extensible_button("jour", "detailsChartModal") }}
                         </li>
                     </menu>
-                    <canvas id="dailyChart" class="w-full h-full"></canvas>
+                    <canvas id="daily-chart" class="w-full h-full"></canvas>
                 </div>
                 <div class="bg-black-numixs p-3 rounded-2xl h-120 relative">
-                    <menu class="absolute right-3 flex flex-col gap-1.5">
+                    <menu class="{{ menu_chart_classes }}">
                         <li>
-                            <button data-download-chart="weeklyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
-                                {% include "includes/icons/download-fill-icon.svg" %}
-                            </button>
+                            {{ macros.download_chart_extensible_button("weekly-chart") }}
                         </li>
                         <li>
-                            <button data-details-chart="semaine" type="button" command="show-modal" commandfor="detailsChartModal" title="Afficher la vue détaillée" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
-                                {% include "includes/icons/zoom-icon.svg" %}
-                            </button>
+                            {{ macros.zoom_chart_extensible_button("semaine", "detailsChartModal") }}
                         </li>
                     </menu>
-                    <canvas id="weeklyChart"></canvas>
+                    <canvas id="weekly-chart"></canvas>
                 </div>
                 <div class="bg-black-numixs p-3 rounded-2xl h-120 relative col-span-full 2xl:col-[initial]">
-                    <menu class="absolute right-3 flex flex-col gap-1.5">
+                    <menu class="{{ menu_chart_classes }}">
                         <li>
-                            <button data-download-chart="monthlyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
-                                {% include "includes/icons/download-fill-icon.svg" %}
-                            </button>
+                            {{ macros.download_chart_extensible_button("monthly-chart") }}
                         </li>
                         <li>
-                            <button data-details-chart="mois" type="button" command="show-modal" commandfor="detailsChartModal" title="Afficher la vue détaillée" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
-                                {% include "includes/icons/zoom-icon.svg" %}
-                            </button>
+                            {{ macros.zoom_chart_extensible_button("mois", "detailsChartModal") }}
                         </li>
                     </menu>
-                    <canvas id="monthlyChart"></canvas>
+                    <canvas id="monthly-chart"></canvas>
                 </div>
                 <div class="col-span-full bg-black-numixs p-3 rounded-2xl h-150 relative">
-                    <menu class="absolute right-3 flex flex-col gap-1.5">
+                    <menu class="{{ menu_chart_classes }}">
                         <li>
-                            <button data-download-chart="yearlyChart" type="button" title="Télécharger le graphique" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
-                                {% include "includes/icons/download-fill-icon.svg" %}
-                            </button>
+                            {{ macros.download_chart_extensible_button("yearly-chart") }}
                         </li>
                         <li>
-                            <button data-details-chart="annee" type="button" command="show-modal" commandfor="detailsChartModal" title="Afficher la vue détaillée" class="text-white-numixs hocus:text-green-numixs cursor-pointer size-6">
-                                {% include "includes/icons/zoom-icon.svg" %}
-                            </button>
+                            {{ macros.zoom_chart_extensible_button("annee", "detailsChartModal") }}
                         </li>
                     </menu>
-                    <canvas id="yearlyChart"></canvas>
+                    <canvas id="yearly-chart"></canvas>
                 </div>
             </div>
         </div>
@@ -135,8 +119,10 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             {% endset %}
 
                             {% set split_button_sub_action_1 %}
-                            <a href="" data-download-chart-data="simple" download class="w-full align-center inline-flex whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-md text-black hocus:bg-slate-300">
-                                {% include "includes/icons/download-fill-icon.svg" %}
+                            <a href="" data-download-chart-data="simple" download class="w-full items-center inline-flex justify-center whitespace-nowrap flex-row gap-2 px-3.5 py-2.5 rounded-md text-black hocus:bg-slate-300">
+                                <span class="size-6">
+                                    {% include "includes/icons/download-fill-icon.svg" %}
+                                </span>
                                 Télécharger les données visite par visite (.csv)
                             </a>
                             {% endset %}

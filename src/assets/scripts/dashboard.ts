@@ -107,7 +107,7 @@ const filterParam = queryParams.get('filtre') as FilterKey || "visite";
 const configData: ChartConfigData = {
     "jour": {
         ...baseConfigData.jour,
-        id: "dailyChart",
+        id: "daily-chart",
         chartTitle: `Visites uniques du ${daySelected.toFormat("dd/LL/yyyy")}`,
         downloadLink: `/telecharger?jour=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}&pivot`,
         xTitle: 'Tranche horaire',
@@ -115,7 +115,7 @@ const configData: ChartConfigData = {
     },
     "semaine": {
         ...baseConfigData.semaine,
-        id: "weeklyChart",
+        id: "weekly-chart",
         chartTitle: `Visites uniques du ${daySelected.startOf("week").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("week").toFormat("dd/LL/yyyy")}`,
         downloadLink: `/telecharger?semaine=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}&pivot`,
         xTitle: 'Jours',
@@ -123,7 +123,7 @@ const configData: ChartConfigData = {
     },
     "mois": {
         ...baseConfigData.mois,
-        id: "monthlyChart",
+        id: "monthly-chart",
         chartTitle: `Visites uniques du ${daySelected.startOf("month").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("month").toFormat("dd/LL/yyyy")}`,
         downloadLink: `/telecharger?mois=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}&pivot`,
         xTitle: 'Semaines',
@@ -131,7 +131,7 @@ const configData: ChartConfigData = {
     },
     "annee": {
         ...baseConfigData.annee,
-        id: "yearlyChart",
+        id: "yearly-chart",
         chartTitle: `Visites uniques du ${daySelected.startOf("year").toFormat("dd/LL/yyyy")} au ${daySelected.endOf("year").toFormat("dd/LL/yyyy")}`,
         downloadLink: `/telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}&pivot`,
         xTitle: 'Mois',

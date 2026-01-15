@@ -198,7 +198,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                     },
                     subtitle: {
                         display: true,
-                        text: `(${DateTime.fromISO(String(eventData.date)).toFormat("dd/LL/yyyy")})`,
+                        text: `(${DateTime.fromISO(String(eventData.date)).toFormat("dd/LL/yyyy")} • ${heure_ouverture_heure}h${heure_ouverture_minutes} ➜ ${heure_fermeture_heure}h${heure_fermeture_minutes})`,
                         color: "white",
                         font: {
                             size: 14,

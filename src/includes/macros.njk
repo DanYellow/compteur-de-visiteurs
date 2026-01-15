@@ -69,3 +69,27 @@
         {{ text | safe }}
     </p>
 {% endmacro %}
+
+{% macro download_chart_extensible_button(name) %}
+    <button data-download-chart="{{ name }}" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer extensible-button bg-gray-numixs" title="Télécharger graphique">
+        <span class="size-6">
+            {% include "includes/icons/download-fill-icon.svg" %}
+        </span>
+        <span class="inline-flex items-center">Télécharger graphique (.jpg)</span>
+    </button>
+{% endmacro %}
+
+{% macro zoom_chart_extensible_button(name, dialogId) %}
+    <button
+        data-details-chart="{{ name }}"
+        type="button"
+        command="show-modal"
+        commandfor="{{ dialogId }}"
+        title="Afficher la vue détaillée"
+        class="text-white-numixs hocus:text-green-numixs cursor-pointer extensible-button bg-gray-numixs" title="Télécharger graphique">
+        <span class="size-6">
+            {% include "includes/icons/zoom-icon.svg" %}
+        </span>
+        <span class="inline-flex items-center">Afficher la vue détaillée</span>
+    </button>
+{% endmacro %}
