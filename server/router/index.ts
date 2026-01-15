@@ -8,7 +8,7 @@ import { SOCKET_EVENTS } from "#scripts/utils.shared.ts";
 import { VisitSchema } from "#scripts/schemas/index.ts";
 import { flashMessageCookieOptions, wss } from "#server/index.ts";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, VisitRegistered as VisitRegisteredModel, Visit as VisitModel } from "#models/index.ts";
-import { parseManifest, requireRoleMiddleware } from "#server/middlewares.ts";
+import { checkIpAdress, parseManifest, requireRoleMiddleware } from "#server/middlewares.ts";
 
 import ApiRouter from "./api/index.ts";
 import DownloadRouter from "./download.ts";
@@ -52,7 +52,7 @@ const normalizePayload = (payload: Record<string, any>) => {
     return JSON.stringify(sorted);
 };
 
-router.get("/", async (req, res) => {
+router.get("/", checkIpAdress, async (req, res) => {
     const nbPlaces = await PlaceModel.count();
 
     if (nbPlaces === 0) {
@@ -76,7 +76,7 @@ router.get("/", async (req, res) => {
         list_age_groups: listAgeGroups,
         list_genders: listGenders,
     });
-}).post("/", async (req, res) => {
+}).post("/", checkIpAdress, async (req, res) => {
     const validator = VisitSchema.safeParse(req.body);
     if (!validator.success) {
         return res.status(500).json({ "success": false });
@@ -170,7 +170,7 @@ router.get(["/choix-lieu"], async (req, res) => {
 });
 
 router.get("/interdit", async (req, res) => {
-    res.render("pages/not-allowed.njk");
+    res.status(403).render("pages/not-allowed.njk");
 });
 
 router.post('/deconnexion', (req, res) => {
