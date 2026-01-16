@@ -1,9 +1,9 @@
-import { SignInActivationSchema } from "#scripts/schemas/index.ts";
+import { SignInActivationSchema } from "#scripts/schemas/index";
 import {
     getPasskeyOptions,
     createPasskey,
     togglePasskeysVisibility,
-} from "#scripts/passkey-manager.ts";
+} from "#scripts/passkey-manager";
 
 togglePasskeysVisibility();
 

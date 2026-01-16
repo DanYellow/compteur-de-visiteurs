@@ -1,7 +1,7 @@
 import "choices.js/public/assets/styles/choices.css";
 import Choices from "choices.js";
 
-import { PlaceSchema } from "#scripts/schemas/index.ts";
+import { PlaceSchema } from "#scripts/schemas/index";
 
 const form = document.querySelector("[data-place-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;

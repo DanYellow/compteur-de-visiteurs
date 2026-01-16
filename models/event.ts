@@ -1,5 +1,5 @@
-import { DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS, slugify } from "#scripts/utils.shared.ts";
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin, type BelongsToManyGetAssociationsMixin } from 'sequelize';
+import { DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS, slugify } from "#scripts/utils.shared";
 import Place from './place';
 
 export default class Event extends Model<InferAttributes<Event>, InferCreationAttributes<Event>> {

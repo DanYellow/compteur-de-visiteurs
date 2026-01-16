@@ -1,5 +1,5 @@
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type ForeignKey } from 'sequelize';
-import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
+import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared";
 
 export default class RegularOpening extends Model<InferAttributes<RegularOpening>, InferCreationAttributes<RegularOpening>> {
     declare id: CreationOptional<number>;

@@ -3,8 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath, URLSearchParams } from "url";
 import { stringify } from "csv-stringify/sync";
-import { getLinearCSV } from "#scripts/utils.shared.ts";
-import { slugify } from "#scripts/utils.shared.ts";
+import { getLinearCSV, slugify } from "#scripts/utils.shared";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

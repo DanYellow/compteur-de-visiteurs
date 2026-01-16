@@ -1,11 +1,11 @@
 import express from "express";
-import sequelize, { Place as PlaceModel, Visit as VisitModel, Event as EventModel } from "#models/index.ts";
+import sequelize, { Place as PlaceModel, Visit as VisitModel, Event as EventModel } from "#models/index";
 import { DateTime, Info } from "luxon";
 import { Op } from 'sequelize';
 
-import { PERIOD_PREDICATE } from "#server/router/api/index.ts";
+import { PERIOD_PREDICATE } from "#server/router/api/index";
 import type { EventRaw } from "#types";
-import { capitalizeFirstLetter } from "#scripts/utils.shared.ts";
+import { capitalizeFirstLetter } from "#scripts/utils.shared";
 
 const router = express.Router();
 

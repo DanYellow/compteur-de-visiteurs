@@ -23,10 +23,10 @@ export const PERIOD_PREDICATE = {
     },
 }
 
-import UserApiRouter from "#server/router/api/user.ts";
-import EventApiRouter from "#server/router/api/event.ts";
-import PlaceApiRouter from "#server/router/api/place.ts";
-import VisitApiRouter from "#server/router/api/visit.ts";
+import UserApiRouter from "#server/router/api/user";
+import EventApiRouter from "#server/router/api/event";
+import PlaceApiRouter from "#server/router/api/place";
+import VisitApiRouter from "#server/router/api/visit";
 
 const router = express.Router();
 

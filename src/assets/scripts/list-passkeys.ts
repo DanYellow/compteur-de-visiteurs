@@ -2,8 +2,8 @@ import {
     getPasskeyOptions,
     createPasskey,
     togglePasskeysVisibility,
-} from "#scripts/passkey-manager.ts";
-import { createNotification } from '#scripts/notifications-manager.ts';
+} from "#scripts/passkey-manager";
+import { createNotification } from '#scripts/notifications-manager';
 
 togglePasskeysVisibility();
 

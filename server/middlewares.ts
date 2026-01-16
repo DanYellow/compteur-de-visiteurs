@@ -3,10 +3,10 @@ import path from "path";
 import fs from "fs/promises";
 import jwt from "jsonwebtoken";
 
-import { LIST_ROLES } from "#scripts/utils.shared.ts";
+import { LIST_ROLES } from "#scripts/utils.shared";
 import type { CustomSession, UserTokenData } from "#types";
 import { flashMessageCookieOptions } from ".";
-import { User as UserModel } from "#models/index.ts";
+import { User as UserModel } from "#models/index";
 
 export const requireRoleMiddleware = (role: string = "") => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -78,4 +78,4 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     next();
 }
 
-export { checkIpAdress } from "#server/middlewares/check-ip.ts";
+export { checkIpAdress } from "#server/middlewares/check-ip";

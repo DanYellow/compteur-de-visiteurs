@@ -1,7 +1,6 @@
 import { defineConfig, loadEnv, type UserConfig } from "vite";
 
 import tailwindcss from "@tailwindcss/vite";
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 import path from "path";
 
@@ -13,7 +12,6 @@ export default defineConfig(({ mode }) => {
     return {
         plugins: [
             tailwindcss(),
-            tsconfigPaths(),
         ],
         appType: "custom",
         define: {
@@ -47,25 +45,22 @@ export default defineConfig(({ mode }) => {
         base: '/assets/',
         build: {
             emptyOutDir: false,
-            outDir: "dist/assets",
+            outDir: "dist",
             manifest: "manifest.json",
             target: 'esnext',
-            lib: {
-                entry: [
-                    path.resolve(__dirname, "src/assets/scripts/main.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/forms/register-form.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/forms/place-form.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/forms/event-form.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/forms/login-form.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/dashboard.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/download-chart.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/dialogs/details-event-dialog.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/forms/sign-in-form.ts"),
-                    path.resolve(__dirname, "src/assets/scripts/toggle-input-visibility.ts"),
-                ],
-                formats: ["es"],
-            },
             rollupOptions: {
+                input: {
+                    main: path.resolve(__dirname, "src/assets/scripts/main.ts"),
+                    "register-form": path.resolve(__dirname, "src/assets/scripts/forms/register-form.ts"),
+                    "place-form": path.resolve(__dirname, "src/assets/scripts/forms/place-form.ts"),
+                    "event-form": path.resolve(__dirname, "src/assets/scripts/forms/event-form.ts"),
+                    "login-form": path.resolve(__dirname, "src/assets/scripts/forms/login-form.ts"),
+                    "dashboard": path.resolve(__dirname, "src/assets/scripts/dashboard.ts"),
+                    "download-char": path.resolve(__dirname, "src/assets/scripts/download-chart.ts"),
+                    "details-event-dialog": path.resolve(__dirname, "src/assets/scripts/dialogs/details-event-dialog.ts"),
+                    "sign-in-form": path.resolve(__dirname, "src/assets/scripts/forms/sign-in-form.ts"),
+                    "toggle-input-visibility": path.resolve(__dirname, "src/assets/scripts/toggle-input-visibility.ts"),
+                },
                 output: {
                     assetFileNames: "[name].[ext]",
                 },

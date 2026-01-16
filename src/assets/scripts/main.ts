@@ -3,10 +3,10 @@ import "#styles/details.css";
 import "#styles/notification.css";
 import "#styles/calendar.css";
 
-import "#scripts/dropdown-redirect.ts";
-import "#scripts/calendar.ts";
-import "#scripts/socket-client.ts";
-import "#scripts/dialogs/delete-list-item-dialog.ts";
+import "#scripts/dropdown-redirect";
+import "#scripts/calendar";
+import "#scripts/socket-client";
+import "#scripts/dialogs/delete-list-item-dialog";
 
 document.querySelectorAll("dialog").forEach((item) => {
     item.addEventListener("click", (e) => {

@@ -1,5 +1,5 @@
-import { LoginSchema } from "#scripts/schemas/index.ts";
-import { togglePasskeysVisibility } from "#scripts/passkey-manager.ts";
+import { LoginSchema } from "#scripts/schemas/index";
+import { togglePasskeysVisibility } from "#scripts/passkey-manager";
 
 togglePasskeysVisibility();
 

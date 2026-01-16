@@ -1,37 +1,40 @@
 {
-  "compilerOptions": {
-    "target": "ES2023",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable", "es2024"],
-    "skipLibCheck": true,
+    "compilerOptions": {
+        "target": "ES2023",
+        "useDefineForClassFields": true,
+        "module": "ESNext",
+        "lib": [
+            "ES2022",
+            "DOM",
+            "DOM.Iterable",
+            "es2024"
+        ],
+        "skipLibCheck": true,
+        "rootDirs": [
+            "src",
+            "server",
+            "models"
+        ],
+        "types": [
+            "node"
+        ],
+        /* Bundler mode */
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": false,
+        "verbatimModuleSyntax": true,
+        "moduleDetection": "force",
+        "noEmit": true,
 
-    "types": ["node"],
-
-    /* Bundler mode */
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": false,
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-
-    /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
-    "baseUrl": ".",
-    "paths": {
-        "#server/utils/*": ["server/utils/*"],
-        "#server/*": ["server/*"],
-        "#models/*": ["models/*"],
-        "#schemas/*": ["src/assets/scripts/schemas/*"],
-        "#scripts/*": ["src/assets/scripts/*"],
-        "#types": ["types"],
-        "#styles/*.css": ["src/assets/styles/*.css"]
-    }
-  },
-  "exclude": ["node_modules", "vite.config.ts", "**/*.test.ts"]
+        /* Linting */
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "erasableSyntaxOnly": true,
+        "noFallthroughCasesInSwitch": true,
+        "noUncheckedSideEffectImports": true
+    },
+    "exclude": [
+        "node_modules",
+        "**/*.test.ts"
+    ]
 }

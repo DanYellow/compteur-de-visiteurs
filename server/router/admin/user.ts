@@ -1,12 +1,12 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-
-import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
-import { User as UserModel, UserPublicKeyCredentials as UserPublicKeyCredentialsModel } from "#models/index.ts";
-import { LIST_ROLES } from "#scripts/utils.shared.ts";
-import { flashMessageCookieOptions } from "#server/index.ts";
-import type { UserTokenData } from "#types";
 import { Op } from "sequelize";
+
+import { getUser, requireRoleMiddleware } from "#server/middlewares";
+import { User as UserModel, UserPublicKeyCredentials as UserPublicKeyCredentialsModel } from "#models/index";
+import { LIST_ROLES } from "#scripts/utils.shared";
+import { flashMessageCookieOptions } from "#server/index";
+import type { UserTokenData } from "#types";
 
 const NUMBER_REGEX = /^\d+$/;
 

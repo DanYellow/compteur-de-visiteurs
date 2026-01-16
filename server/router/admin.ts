@@ -1,17 +1,17 @@
 import express from "express";
 import { DateTime, Info } from "luxon";
 
-import { capitalizeFirstLetter, listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '#scripts/utils.shared.ts';
-import PlaceRouter from "#server/router/admin/place.ts";
-import EventRouter from "#server/router/admin/event.ts";
-import UserRouter from "#server/router/admin/user.ts";
+import { capitalizeFirstLetter, listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '#scripts/utils.shared';
+import PlaceRouter from "#server/router/admin/place";
+import EventRouter from "#server/router/admin/event";
+import UserRouter from "#server/router/admin/user";
 import type { CommonRegularOpening, EventRaw, PlaceRaw } from "#types";
-import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index.ts";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index";
 import { Op } from "sequelize";
-import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
+import { getUser, requireRoleMiddleware } from "#server/middlewares";
 
-import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared.ts";
-import { getVisitsSummaries } from "#server/utils.server.ts";
+import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared";
+import { getVisitsSummaries } from "#server/utils.server";
 
 const router = express.Router();
 

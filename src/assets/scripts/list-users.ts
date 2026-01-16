@@ -1,4 +1,4 @@
-import { createNotification } from '#scripts/notifications-manager.ts';
+import { createNotification } from '#scripts/notifications-manager';
 
 const listSwitches = document.querySelectorAll(
     "[data-change-user-status]"

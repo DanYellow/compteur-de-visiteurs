@@ -9,13 +9,13 @@ import { VisitSchema } from "#scripts/schemas/index";
 import { flashMessageCookieOptions, wss } from "#server/index";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, VisitRegistered as VisitRegisteredModel, Visit as VisitModel } from "#models/index";
 import { checkIpAdress, parseManifest, requireRoleMiddleware } from "#server/middlewares";
-console.log(SOCKET_EVENTS)
-// import ApiRouter from "#server/router/api/index.ts";
-// import DownloadRouter from "#server/router/download.ts";
-// import AdminRouter from "#server/router/admin.ts";
-// import CredentialRouter from "#server/router/credential.ts";
-// import CredentialsPasskeyRouter from "#server/router/credentials-passkey.ts";
-// import PasswordRouter from "#server/router/password.ts";
+
+import ApiRouter from "#server/router/api/index";
+import DownloadRouter from "#server/router/download";
+import AdminRouter from "#server/router/admin";
+import CredentialRouter from "#server/router/credential";
+import CredentialsPasskeyRouter from "#server/router/credentials-passkey";
+import PasswordRouter from "#server/router/password";
 
 const router = express.Router();
 
@@ -180,12 +180,12 @@ router.post('/deconnexion', (_, res) => {
 });
 
 
-// router.use(CredentialRouter);
-// router.use(CredentialsPasskeyRouter);
-// router.use(PasswordRouter);
-// router.use("/api", ApiRouter);
-// router.use("/telecharger", requireRoleMiddleware("READ_ONLY"), DownloadRouter);
-// router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, requireRoleMiddleware("READ_ONLY"), AdminRouter);
+router.use(CredentialRouter);
+router.use(CredentialsPasskeyRouter);
+router.use(PasswordRouter);
+router.use("/api", ApiRouter);
+router.use("/telecharger", requireRoleMiddleware("READ_ONLY"), DownloadRouter);
+router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, requireRoleMiddleware("READ_ONLY"), AdminRouter);
 
 if (process.env.NODE_ENV === "development") {
     const DebugRouter = await import("./debug");

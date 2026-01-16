@@ -1,6 +1,6 @@
 import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type ForeignKey, type HasOneGetAssociationMixin } from 'sequelize';
 
-import { listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '#scripts/utils.shared.ts';
+import { listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '#scripts/utils.shared';
 import Place from '#models/place';
 // import type { VisitGroupFields } from '#types';
 

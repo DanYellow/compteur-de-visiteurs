@@ -11,7 +11,7 @@ import { loadEnvFile } from 'node:process';
 import fs from "fs";
 import { rateLimit } from 'express-rate-limit';
 
-import router from "#server/router";
+import router from "#server/router/index";
 
 const serverip = ip.address();
 
@@ -19,7 +19,7 @@ loadEnvFile(`${process.cwd()}/.env.local`);
 
 const app = express();
 if (process.env.NODE_ENV === "development") {
-    const viteConfig = await import("../vite.config");
+    const viteConfig = await import("../vite.config.ts");
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
         ...viteConfig.default,

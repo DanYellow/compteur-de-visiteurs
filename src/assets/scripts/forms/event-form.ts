@@ -1,7 +1,7 @@
 import "choices.js/public/assets/styles/choices.css";
 import Choices from "choices.js";
 
-import { EventSchema } from "#scripts/schemas/index.ts";
+import { EventSchema } from "#scripts/schemas/index";
 
 const form = document.querySelector("[data-special-opening-form]") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;

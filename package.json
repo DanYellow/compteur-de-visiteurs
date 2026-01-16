@@ -7,7 +7,7 @@
         "dev": "cross-env NODE_ENV=development cross-env NODE_ENV=development tsx watch --tsconfig ./tsconfig.server.json server/index.ts",
         "dev:docker": "tsx watch --include \"./server/*\" --include \"./src/*\" server/index.ts",
         "build": "cross-env NODE_ENV=production tsc && vite build",
-        "build:server": "cross-env NODE_ENV=development npx tsc --project tsconfig.server.json && npx tsc-alias -p tsconfig.server.json",
+        "build:server": "vite build --config vite.config.server.ts",
         "email": "npx @tailwindcss/cli -i ./src/assets/styles/email.css -o ./dist/tailwind-email.tmp.css --minify && npx postcss ./dist/tailwind-email.tmp.css -o ./dist/tailwind-email.css",
         "prod": "cross-env NODE_ENV=production node ./dist/server/index.js"
     },
@@ -27,12 +27,10 @@
         "@types/nunjucks": "^3.2.6",
         "@types/ws": "^8.18.1",
         "autoprefixer": "^10.4.23",
-        "nunjucks": "^3.2.4",
         "postcss": "^8.5.6",
         "postcss-cli": "^11.0.1",
         "postcss-logical": "^8.1.0",
         "tailwindcss": "^4.1.13",
-        "tsc-alias": "^1.8.16",
         "tsconfig-paths": "^4.2.0",
         "tsx": "^4.20.6",
         "typescript": "~5.8.3",
@@ -61,9 +59,18 @@
         "juice": "^11.0.3",
         "luxon": "^3.7.2",
         "nodemailer": "^7.0.11",
+        "nunjucks": "^3.2.4",
         "sequelize": "^6.37.7",
         "sqlite3": "^5.1.7",
         "ws": "^8.18.3",
         "zod": "^4.1.9"
+    },
+    "imports": {
+        "#server/utils/*": "./server/utils/*.ts",
+        "#server/*": "./server/*.ts",
+        "#models/*": "./models/*.ts",
+        "#scripts/*": "./src/assets/scripts/*.ts",
+        "#types": "./types.ts",
+        "#styles/*.css": "./src/assets/styles/*.css"
     }
 }

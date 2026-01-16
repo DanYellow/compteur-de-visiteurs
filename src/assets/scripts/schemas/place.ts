@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { listPlaceTypes, REQUIRED_MESSAGE } from '#scripts/utils.shared.ts';
+import { listPlaceTypes, REQUIRED_MESSAGE } from '#scripts/utils.shared';
 
 export const PlaceSchema = z.object({
     nom: z.string().min(1, {

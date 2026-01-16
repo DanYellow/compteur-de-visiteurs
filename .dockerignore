@@ -23,3 +23,5 @@ LICENSE
 .idea
 *.swp
 *.swo
+
+!.env.local

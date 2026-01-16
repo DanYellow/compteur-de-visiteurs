@@ -6,9 +6,9 @@ import jwt from "jsonwebtoken";
 import {
     User as UserModel,
     UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
-} from "#models/index.ts";
-import { mailTransporter, renderEmail } from "#server/utils.server.ts";
-import { requireRoleMiddleware } from "#server/middlewares.ts";
+} from "#models/index";
+import { mailTransporter, renderEmail } from "#server/utils.server";
+import { requireRoleMiddleware } from "#server/middlewares";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 

@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 
 import { SignInSchema, SignInActivationSchema, LoginSchema } from "#scripts/schemas/index";
 import { flashMessageCookieOptions, wss } from "#server/index";
-import { User as UserModel } from "#models";
+import { User as UserModel } from "#models/index";
 import type { CustomSession, UserTokenData } from "#types";
 import { SOCKET_EVENTS } from "#scripts/utils.shared";
 

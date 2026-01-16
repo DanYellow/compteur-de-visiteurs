@@ -1,7 +1,7 @@
 const listLabels = document.querySelectorAll("label") as NodeListOf<HTMLLabelElement>;
 
 if ('paintWorklet' in CSS) {
-    const ripple = await import('#scripts/worklets/ripple.ts?url');
+    const ripple = await import('#scripts/worklets/ripple?url');
     (CSS as any).paintWorklet.addModule(ripple.default);
 }
 

@@ -2,11 +2,11 @@ import { Op } from "sequelize";
 import express from "express";
 import { DateTime, Info } from "luxon";
 
-import sequelize, { Place as PlaceModel, Event as EventModel, RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index.ts";
-import { capitalizeFirstLetter } from '#scripts/utils.shared.ts';
-import { EventSchema } from "#scripts/schemas/index.ts";
+import sequelize, { Place as PlaceModel, Event as EventModel, RegularOpening as RegularOpeningModel, Visit as VisitModel } from "#models/index";
+import { capitalizeFirstLetter } from '#scripts/utils.shared';
+import { EventSchema } from "#scripts/schemas/index";
 import type { EventRaw, PlaceRaw } from "#types";
-import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
+import { getUser, requireRoleMiddleware } from "#server/middlewares";
 
 const router = express.Router();
 

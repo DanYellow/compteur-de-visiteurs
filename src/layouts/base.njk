@@ -13,7 +13,8 @@
             <script type="module" src="/src/assets/scripts/main.ts" defer></script>
         {% else %}
             <script type="module" src="/{{ manifest['src/assets/scripts/main.ts'].file }}" defer></script>
-            <link rel="stylesheet" href="/{{ manifest['style.css'].file }}">
+            <link rel="stylesheet" href="/main.css">
+            {% block styles %}{% endblock %}
         {% endif %}
         <link rel="shortcut icon" href="/images/faclab-logo.svg" type="image/x-icon">
         {% block scripts %}{% endblock %}

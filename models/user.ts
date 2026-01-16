@@ -9,7 +9,7 @@ import {
     type BelongsToManyGetAssociationsMixin,
     Op,
 } from "sequelize";
-import { LIST_ROLES } from "#scripts/utils.shared.ts";
+import { LIST_ROLES } from "#scripts/utils.shared";
 import type UserPublicKeyCredentials from "./user-public-key-credentials";
 
 import dotenv from "dotenv";

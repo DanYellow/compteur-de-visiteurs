@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from "express";
-import fs from "fs/promises";
+import fs from "fs";
+import fsp from "fs/promises";
 import path from "path";
 
 const normalizeIp = (ip: string) =>
@@ -7,28 +8,13 @@ const normalizeIp = (ip: string) =>
 
 const filePath = path.join(process.cwd(), 'whitelist-ip.tmp.txt');
 
-let whitelistIp = await fs.readFile(filePath, 'utf-8');
-let reloadTimeout: NodeJS.Timeout | null = null;
+let whitelistIp = await fsp.readFile(filePath, 'utf-8');
 
-async function reloadWhitelist() {
-    try {
-        whitelistIp = await fs.readFile(filePath, 'utf-8');
-    } catch (err) {
-        console.error('Error reading file:', err);
+fs.watchFile(filePath, { interval: 500 }, async (curr, prev) => {
+    if (curr.mtime !== prev.mtime) {
+        whitelistIp = await fsp.readFile(filePath, 'utf-8');
     }
-}
-
-(async () => {
-    const watcher = fs.watch(filePath)
-    for await (const event of watcher) {
-        if (event.eventType !== 'change') continue;
-        if (reloadTimeout) clearTimeout(reloadTimeout);
-
-        reloadTimeout = setTimeout(() => {
-            reloadWhitelist();
-        }, 300)
-    }
-})()
+});
 
 export const checkIpAdress = (req: Request, res: Response, next: NextFunction) => {
     const userIp = normalizeIp(req.ip!);

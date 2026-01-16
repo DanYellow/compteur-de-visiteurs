@@ -1,4 +1,4 @@
-import { SignInSchema } from "#scripts/schemas/index.ts";
+import { SignInSchema } from "#scripts/schemas/index";
 
 const form = document.querySelector("form") as HTMLFormElement;
 const errorsContainer = document.querySelector("[data-form-errors]") as HTMLUListElement;

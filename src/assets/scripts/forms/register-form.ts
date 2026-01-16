@@ -1,9 +1,9 @@
-import { GroupSchema, DepartmentSchema, AgeSchema, GenderSchema, VisitCodeSchema } from "#scripts/schemas/index.ts";
+import { GroupSchema, DepartmentSchema, AgeSchema, GenderSchema, VisitCodeSchema } from "#scripts/schemas/index";
 import type { ZodObject } from "zod";
 
-import '#scripts/label-ripple-effect.ts';
+import '#scripts/label-ripple-effect';
 
-import { cancellableSleep } from "#scripts/utils.client.ts";
+import { cancellableSleep } from "#scripts/utils.client";
 
 const form = document.querySelector("[data-sign-in-form]") as HTMLFormElement;
 const mainErrorsContainer = document.getElementById("error-container") as HTMLUListElement;

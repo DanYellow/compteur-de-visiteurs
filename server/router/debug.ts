@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 
-import { User as UserModel } from "#models/index.ts";
+import { User as UserModel } from "#models/index";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 

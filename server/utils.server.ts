@@ -5,7 +5,7 @@ import nodemailer from "nodemailer";
 import juice from "juice";
 import nunjucks from "nunjucks";
 import dotenv from "dotenv";
-import { listGroups } from "#scripts/utils.shared.ts";
+import { listGroups } from "#scripts/utils.shared";
 import type { VisitRaw, VisitValue } from "#types";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });

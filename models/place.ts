@@ -15,7 +15,7 @@ import {
 } from 'sequelize';
 import { RegularOpening, Event } from '.';
 import type { PlaceType } from '#types';
-import { listPlaceTypes } from '#scripts/utils.shared.ts';
+import { listPlaceTypes } from '#scripts/utils.shared';
 
 export default class Place extends Model<
     InferAttributes<Place>,

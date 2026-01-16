@@ -15,8 +15,8 @@ import jwt from "jsonwebtoken";
 import {
     User as UserModel,
     UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
-} from "#models/index.ts";
-import { flashMessageCookieOptions } from "#server/index.ts";
+} from "#models/index";
+import { flashMessageCookieOptions } from "#server/index";
 import type { CustomSession } from "#types";
 // import { mailTransporter, renderEmail } from "#server/utils.server.ts";
 // import { DateTime } from "luxon";

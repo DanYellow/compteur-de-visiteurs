@@ -8,16 +8,17 @@ import User from "./user";
 import UserPublicKeyCredentials from "./user-public-key-credentials";
 
 import bcrypt from "bcryptjs";
+import path from "path";
 
-let databaseFileName = "./database.tmp.sqlite";
+let databaseFileName = "database.tmp.sqlite";
 
 if (process.env.NODE_ENV === "production") {
-    databaseFileName = "./database-prod.tmp.sqlite";
+    databaseFileName = "database-prod.tmp.sqlite";
 }
 
 const sequelize = new Sequelize({
     dialect: "sqlite",
-    storage: databaseFileName,
+    storage: path.resolve(path.resolve(), databaseFileName),
     define: {
         freezeTableName: true,
     },

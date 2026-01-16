@@ -1,14 +1,13 @@
 import express from "express";
 import { Info } from "luxon";
 
-import { capitalizeFirstLetter, DEFAULT_CLOSE_HOURS, DEFAULT_OPEN_HOURS, listPlaceTypes } from '#scripts/utils.shared.ts';
-import { PlaceSchema } from "#scripts/schemas/index.ts";
-import { slugify } from "#scripts/utils.shared.ts";
-import { DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared.ts";
-import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User } from "#models/index.ts";
+import { capitalizeFirstLetter, DEFAULT_CLOSE_HOURS, DEFAULT_OPEN_HOURS, listPlaceTypes } from '#scripts/utils.shared';
+import { PlaceSchema } from "#scripts/schemas/index";
+import { slugify, DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User } from "#models/index";
 import type { PlaceRaw } from "#types";
-import { getUser, requireRoleMiddleware } from "#server/middlewares.ts";
-import { flashMessageCookieOptions } from "#server/index.ts";
+import { getUser, requireRoleMiddleware } from "#server/middlewares";
+import { flashMessageCookieOptions } from "#server/index";
 
 const router = express.Router();
 

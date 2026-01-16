@@ -3,9 +3,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 
-import { ChangePasswordSchema, PasswordRecoverySchema } from "#scripts/schemas/index.ts";
-import { flashMessageCookieOptions } from "#server/index.ts";
-import { User as UserModel } from "#models/index.ts";
+import { ChangePasswordSchema, PasswordRecoverySchema } from "#scripts/schemas/index";
+import { flashMessageCookieOptions } from "#server/index";
+import { User as UserModel } from "#models/index";
 import type { UserTokenData } from "#types";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` })
