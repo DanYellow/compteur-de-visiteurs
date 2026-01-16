@@ -1,5 +1,6 @@
 import type {
     BaseConfigData,
+    GroupItem,
     VisitRaw,
     WeekMonth,
 } from '#types';
@@ -93,7 +94,7 @@ export const listGroups = [
         value: 'autre',
         lineColor: 'rgb(252, 26, 3)',
     },
-];
+] as const satisfies readonly GroupItem[];
 
 export const getPivotTable = (
     data: Record<string, VisitRaw[]>,
@@ -276,7 +277,7 @@ export const LIST_ROLES = [
         value: 'READ_ONLY',
         weight: 1,
     },
-];
+] as const;
 
 export const listDepartments = [
     {
@@ -299,7 +300,6 @@ export const listDepartments = [
         label: 'Hauts-de-Seine (92)',
         value: '92',
     },
-
     {
         label: 'Seine-Saint-Denis (93)',
         value: '93',
@@ -316,7 +316,7 @@ export const listDepartments = [
         label: 'Autre / Hors Île-de-France',
         value: '99',
     },
-];
+] as const;
 
 export const listAgeGroups = [
     {
@@ -343,7 +343,7 @@ export const listAgeGroups = [
         label: '65 ans et plus',
         value: '5',
     },
-];
+] as const;
 
 export const listGenders = [
     {
@@ -358,7 +358,7 @@ export const listGenders = [
         label: 'Non-binaire',
         value: '2',
     },
-];
+] as const;
 
 export const REQUIRED_MESSAGE = 'Ce champ est obligatoire';
 

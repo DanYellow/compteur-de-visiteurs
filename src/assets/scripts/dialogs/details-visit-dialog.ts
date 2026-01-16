@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import { listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '../utils.shared';
+import type { GroupItem } from "#types";
 
 const modal = document.getElementById("detail-visit") as HTMLDialogElement;
 
@@ -23,11 +24,11 @@ modal?.addEventListener("toggle", (e: Event) => {
         const visitData = JSON.parse(sourceItem.dataset.visitData!);
 
         const listKeysBusiness = listBusinessSector.map((item) => item.value)
-        const listBusinessSectorSelected = Object.entries(visitData).filter(([key, value]) => value === "oui" && listKeysBusiness.includes(key));
+        const listBusinessSectorSelected = Object.entries(visitData).filter(([key, value]) => value === "oui" && listKeysBusiness.includes(key as (typeof listBusinessSector)[number]['value']));
 
         Object.entries(Object.fromEntries(listBusinessSectorSelected)).forEach(([key]) => {
             const li = document.createElement("li");
-            const groupData = listBusinessSector.find((item) => item.value === key);
+            const groupData = listBusinessSector.find((item) => item.value === key) as GroupItem;
             li.textContent = `${groupData?.label || ""} ${groupData?.fullName || ""}`;
 
             visitGroupContainer.append(li);

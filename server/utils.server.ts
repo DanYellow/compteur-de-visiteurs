@@ -6,7 +6,7 @@ import juice from "juice";
 import nunjucks from "nunjucks";
 import dotenv from "dotenv";
 import { listGroups } from "#scripts/utils.shared.ts";
-import { VisitRaw } from "#types";
+import type { VisitRaw, VisitValue } from "#types";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
@@ -48,33 +48,32 @@ export const renderEmail = (template: string, data: Record<string, any> = {}) =>
         preserveMediaQueries: true,
         insertPreservedExtraCss: false,
     })
-    // .replace(/<style[\s\S]*?<\/style>/gi, '');
 }
 
 export const getVisitsSummaries = (listVisits: VisitRaw[]) => {
-    const result: Record<string, Record<string, number>> = {};
+    const result: Record<string, Record<VisitValue, number>> = {};
 
     const listKeys = ["genre", "departement", "tranche_age",];
 
     listKeys.forEach((key) => {
-        result[key] = listVisits.reduce((acc, visit: VisitRaw) => {
-            const value = visit[key];
+        result[key] = listVisits.reduce((category: Record<VisitValue, number>, visit: VisitRaw) => {
+            const value = visit[key as keyof VisitRaw] as VisitValue;
 
             if (value != null) {
-                acc[value] = (acc[value] || 0) + 1;
+                category[value] = (category[value] || 0) + 1;
             }
 
-            return acc;
-        }, {})
+            return category;
+        }, {} as Record<VisitValue, number>)
     })
 
     const listGroupsFiltered = listGroups.filter((item) => (!("listInDb" in item) || item.listInDb)).map((item) => item.value);
 
     result.group = listGroupsFiltered.reduce((acc, key) => {
-        acc[key] = listVisits.reduce((count, item) => count + (item[key] === "oui" ? 1 : 0), 0);
+        acc[key] = listVisits.reduce((count, item: VisitRaw) => count + (item[key] === "oui" ? 1 : 0), 0);
 
         return acc;
-    }, {});
+    }, {} as Record<VisitValue, number>);
 
     return result;
 }
