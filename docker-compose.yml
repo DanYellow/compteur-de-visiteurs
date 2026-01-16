@@ -1,13 +1,28 @@
+version: "3.9"
+
 services:
-  # traefik:
-  #   image: traefik:v3
-  #   container_name: traefik
-  #   command: --api.insecure=true --providers.docker
-  #   ports:
-  #     - 80:80
-  #     - 8081:8081
-  #   volumes:
-  #     - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  init-tmp:
+    image: busybox
+    container_name: init-tmp
+    command: ["sh", "-c", "mkdir -p /host/tmp && chmod 777 /host/tmp"]
+    volumes:
+      - ./tmp:/host/tmp
+    # This service exits immediately after creating the folder
+    restart: "no"
+
+  traefik:
+    image: traefik:v3
+    container_name: traefik
+    command:
+      - --api.insecure=true                   # enable dashboard
+      - --providers.docker=true               # use Docker as provider
+      - --entrypoints.web.address=:80         # HTTP entrypoint
+    ports:
+      - "80:80"                               # HTTP
+      - "8080:8080"                           # Dashboard
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    restart: unless-stopped
 
   compteur-de-visiteurs:
     container_name: compteur-social-production
@@ -16,8 +31,9 @@ services:
       dockerfile: node.Dockerfile
     volumes:
       - ./whitelist-ip.tmp.txt:/app/whitelist-ip.tmp.txt
-    # depends_on:
-    #   - traefik
+      - ./database-docker.tmp.sqlite:/app/database-prod.tmp.sqlite
+    depends_on:
+      - init-tmp
     stdin_open: true
     tty: true
     ports:
@@ -31,4 +47,6 @@ services:
       - .env.local
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.compteur-de-visiteurs.rule=Host(`faclab.localhost`)"
+      - 'traefik.http.routers.compteur.rule=Host("faclab.localhost")'
+      - "traefik.http.routers.compteur.entrypoints=web"
+    restart: unless-stopped
