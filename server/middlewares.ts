@@ -78,4 +78,4 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     next();
 }
 
-export { checkIpAdress } from "./middlewares/check-ip.ts";
+export { checkIpAdress } from "#server/middlewares/check-ip.ts";

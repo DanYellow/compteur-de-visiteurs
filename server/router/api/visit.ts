@@ -1,10 +1,10 @@
 
 import express from "express";
 import { DateTime } from "luxon";
-import { Op, ProjectionAlias, WhereOptions } from 'sequelize';
+import { Op, type ProjectionAlias, type WhereOptions } from 'sequelize';
 
-import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel, VisitRegistered as VisitRegisteredModel, Place } from "#models/index.ts";
-import { PERIOD_PREDICATE } from "#server/router/api/index.ts";
+import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel, VisitRegistered as VisitRegisteredModel } from "#models/index.ts";
+import { PERIOD_PREDICATE } from "#server/router/api/index";
 import { listAgeGroups, listDepartments, listGenders, listGroups, NB_ITEMS_PER_PAGE } from "#scripts/utils.shared.ts";
 import { VisitCodeSchema } from "#scripts/schemas/index.ts";
 
@@ -360,7 +360,7 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
             ['date_passage', 'DESC'],
         ],
         raw: true
-    });
+    }) as VisitModel[];
 
     const pivotedRows = allVisits.map((row, idx) => {
         const pivoted: Record<string, number | string> = {};
@@ -370,7 +370,7 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
         pivoted.lieu = (row as any).lieu;
         pivoted["Évènement(s)"] = (row as any)["Évènement(s)"];
 
-        listGroupsFiltered.forEach(item => {
+        listGroupsFiltered.forEach((item: VisitValue) => {
             pivoted[item.label] = (row as any)[item.value] === 'oui' ? "oui" : "non";
         });
 

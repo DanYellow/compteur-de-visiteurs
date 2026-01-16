@@ -1,6 +1,6 @@
 import * as z from "zod";
 
-import { REQUIRED_MESSAGE } from '#scripts/utils.shared.ts';
+import { REQUIRED_MESSAGE } from '#scripts/utils.shared';
 
 export const EventSchema = z.object({
     nom: z.string().min(1, {

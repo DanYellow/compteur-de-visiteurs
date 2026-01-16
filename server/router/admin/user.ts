@@ -99,7 +99,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
     res.redirect(`${res.locals.admin_prefix}/utilisateurs`);
 })
 
-router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res, next) => {
+router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res) => {
     if (req.params.userId !== "moi" && String(req.params.userId) !== String(res.locals.current_user!.id)) {
         return res.redirect("/interdit");
     }

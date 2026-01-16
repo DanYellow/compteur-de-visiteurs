@@ -3,19 +3,19 @@ import { DateTime } from "luxon";
 import { Op } from 'sequelize';
 import crypto from "crypto";
 
-import { listGroups as listBusinessSector, listDepartments, listAgeGroups, listGenders } from '#scripts/utils.shared.ts';
-import { SOCKET_EVENTS } from "#scripts/utils.shared.ts";
-import { VisitSchema } from "#scripts/schemas/index.ts";
-import { flashMessageCookieOptions, wss } from "#server/index.ts";
-import { Place as PlaceModel, RegularOpening as RegularOpeningModel, VisitRegistered as VisitRegisteredModel, Visit as VisitModel } from "#models/index.ts";
-import { checkIpAdress, parseManifest, requireRoleMiddleware } from "#server/middlewares.ts";
-
-import ApiRouter from "./api/index.ts";
-import DownloadRouter from "./download.ts";
-import AdminRouter from "./admin.ts";
-import CredentialRouter from "./credential.ts";
-import CredentialsPasskeyRouter from "./credentials-passkey.ts";
-import PasswordRouter from "./password.ts";
+import { listGroups as listBusinessSector, listDepartments, listAgeGroups, listGenders } from '#scripts/utils.shared';
+import { SOCKET_EVENTS } from "#scripts/utils.shared";
+import { VisitSchema } from "#scripts/schemas/index";
+import { flashMessageCookieOptions, wss } from "#server/index";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel, VisitRegistered as VisitRegisteredModel, Visit as VisitModel } from "#models/index";
+import { checkIpAdress, parseManifest, requireRoleMiddleware } from "#server/middlewares";
+console.log(SOCKET_EVENTS)
+// import ApiRouter from "#server/router/api/index.ts";
+// import DownloadRouter from "#server/router/download.ts";
+// import AdminRouter from "#server/router/admin.ts";
+// import CredentialRouter from "#server/router/credential.ts";
+// import CredentialsPasskeyRouter from "#server/router/credentials-passkey.ts";
+// import PasswordRouter from "#server/router/password.ts";
 
 const router = express.Router();
 
@@ -180,18 +180,18 @@ router.post('/deconnexion', (_, res) => {
 });
 
 
-router.use(CredentialRouter);
-router.use(CredentialsPasskeyRouter);
-router.use(PasswordRouter);
-router.use("/api", ApiRouter);
-router.use("/telecharger", requireRoleMiddleware("READ_ONLY"), DownloadRouter);
-router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, requireRoleMiddleware("READ_ONLY"), AdminRouter);
+// router.use(CredentialRouter);
+// router.use(CredentialsPasskeyRouter);
+// router.use(PasswordRouter);
+// router.use("/api", ApiRouter);
+// router.use("/telecharger", requireRoleMiddleware("READ_ONLY"), DownloadRouter);
+// router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, requireRoleMiddleware("READ_ONLY"), AdminRouter);
 
 if (process.env.NODE_ENV === "development") {
-    const DebugRouter = await import("./debug.ts");
+    const DebugRouter = await import("./debug");
     router.use("/debug", DebugRouter.default);
 
-    const EmailRouter = await import("./email.ts");
+    const EmailRouter = await import("./email");
     router.use("/email", EmailRouter.default);
 }
 

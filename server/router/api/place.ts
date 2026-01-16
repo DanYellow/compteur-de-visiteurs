@@ -6,7 +6,7 @@ import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#s
 
 const router = express.Router();
 
-router.get("/lieux", async (req, res) => {
+router.get("/lieux", async (_, res) => {
     try {
         const [listPlaces] = await sequelize.query(
             `

@@ -4,22 +4,22 @@ import {
     generateRegistrationOptions,
     generateAuthenticationOptions,
     verifyAuthenticationResponse,
-    WebAuthnCredential,
+    type WebAuthnCredential,
 } from "@simplewebauthn/server";
 import base64url from "base64url";
 import dotenv from "dotenv";
 import { isoBase64URL, isoUint8Array } from "@simplewebauthn/server/helpers";
 import jwt from "jsonwebtoken";
-import nunjucks from "nunjucks";
+// import nunjucks from "nunjucks";
 
 import {
     User as UserModel,
     UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
 } from "#models/index.ts";
 import { flashMessageCookieOptions } from "#server/index.ts";
-import { CustomSession, PasskeyTokenData, UserTokenData } from "#types";
-import { mailTransporter, renderEmail } from "#server/utils.server.ts";
-import { DateTime } from "luxon";
+import type { CustomSession } from "#types";
+// import { mailTransporter, renderEmail } from "#server/utils.server.ts";
+// import { DateTime } from "luxon";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` });
 
@@ -115,7 +115,6 @@ router.post("/passkey/creation", async (req, res) => {
         const {
             aaguid,
             credential: { publicKey, id: credentialID },
-            credentialBackedUp,
         } = registrationInfo;
 
         const user = await UserModel.findOne({
@@ -129,55 +128,55 @@ router.post("/passkey/creation", async (req, res) => {
                 Buffer.from(credentialID)
             );
 
-            // const base64PublicKey = base64url.encode(Buffer.from(publicKey));
+            const base64PublicKey = base64url.encode(Buffer.from(publicKey));
 
-            // await UserPublicKeyCredentialsModel.create({
-            //     user_id: user.id,
-            //     id_externe: base64CredentialID,
-            //     cle_publique: base64PublicKey,
-            //     aaguid,
-            //     compteur: 0,
-            // });
+            await UserPublicKeyCredentialsModel.create({
+                user_id: user.id,
+                id_externe: base64CredentialID,
+                cle_publique: base64PublicKey,
+                aaguid,
+                compteur: 0,
+            });
 
             try {
-                jwt.verify(
-                    req.cookies.token,
-                    String(process.env.JWT_SECRET)
-                ) as UserTokenData;
-                res.cookie(
-                    "flash_message",
-                    "passkey_created",
-                    flashMessageCookieOptions
-                );
+                // jwt.verify(
+                //     req.cookies.token,
+                //     String(process.env.JWT_SECRET)
+                // ) as UserTokenData;
+                // res.cookie(
+                //     "flash_message",
+                //     "passkey_created",
+                //     flashMessageCookieOptions
+                // );
 
-                const token = jwt.sign(
-                    { userId: user.id, challenge: expectedChallenge, },
-                    String(process.env.JWT_APPROVAL_SECRET),
-                    {
-                        expiresIn: (process.env.JWT_ACTIVATION_EXPIRES ?? '1d') as jwt.SignOptions['expiresIn'],
-                    }
-                );
+                // const token = jwt.sign(
+                //     { userId: user.id, challenge: expectedChallenge, },
+                //     String(process.env.JWT_APPROVAL_SECRET),
+                //     {
+                //         expiresIn: (process.env.JWT_ACTIVATION_EXPIRES ?? '1d') as jwt.SignOptions['expiresIn'],
+                //     }
+                // );
 
-                const activationLink = `${req.protocol}://${req.get(
-                    "host"
-                )}/passekey/activation/${token}`;
-                const html = renderEmail("emails/new-passkey.njk", {
-                    date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
-                    activation_link: activationLink,
-                });
-                const text = nunjucks.render("pages/emails/new-passkey.txt.njk", {
-                    date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
-                    activation_link: "",
-                });
+                // const activationLink = `${req.protocol}://${req.get(
+                //     "host"
+                // )}/passekey/activation/${token}`;
+                // const html = renderEmail("emails/new-passkey.njk", {
+                //     date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
+                //     activation_link: activationLink,
+                // });
+                // const text = nunjucks.render("pages/emails/new-passkey.txt.njk", {
+                //     date: DateTime.now().toFormat("dd/LL/yyyy 'à' HH:mm"),
+                //     activation_link: "",
+                // });
 
-                const info = await mailTransporter.sendMail({
-                    from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
-                    to: user.email,
-                    subject: "Validation d'un nouveau passkey pour votre compte Fablab Numixs",
-                    text, // plain‑text body
-                    html, // HTML body
-                });
-                console.log("Message sent:", info.messageId);
+                // const info = await mailTransporter.sendMail({
+                //     from: `"Faclab Numixs" <${process.env.EMAIL_NOREPLY}>`,
+                //     to: user.email,
+                //     subject: "Validation d'un nouveau passkey pour votre compte Fablab Numixs",
+                //     text, // plain‑text body
+                //     html, // HTML body
+                // });
+                // console.log("Message sent:", info.messageId);
 
                 return res.redirect(
                     `${res.locals.admin_prefix}/utilisateur/moi/passkeys`
@@ -199,66 +198,66 @@ router.post("/passkey/creation", async (req, res) => {
     return res.status(500).send(false);
 });
 
-router.get("/passkey/activation{/:token}/", async (req, res) => {
-    let errorKey = "";
-    const { token } = req.params;
+// router.get("/passkey/activation{/:token}/", async (req, res) => {
+//     let errorKey = "";
+//     const { token } = req.params;
 
-    try {
-        if (!token) {
-            throw new Error("missing_token");
-        }
+//     try {
+//         if (!token) {
+//             throw new Error("missing_token");
+//         }
 
-        const expectedOrigin = [`${req.protocol}://${req.get("host")}`!];
-        const decoded = jwt.verify(token, process.env.JWT_APPROVAL_SECRET!) as PasskeyTokenData;
+//         const expectedOrigin = [`${req.protocol}://${req.get("host")}`!];
+//         const decoded = jwt.verify(token, process.env.JWT_APPROVAL_SECRET!) as PasskeyTokenData;
 
-        // Verify the attestation response https://web.dev/articles/passkey-registration?hl=fr
-        const { verified, registrationInfo } = await verifyRegistrationResponse({
-            response: req.body,
-            expectedChallenge: decoded.challenge,
-            expectedOrigin,
-        });
+//         // Verify the attestation response https://web.dev/articles/passkey-registration?hl=fr
+//         const { verified, registrationInfo } = await verifyRegistrationResponse({
+//             response: req.body,
+//             expectedChallenge: decoded.challenge,
+//             expectedOrigin,
+//         });
 
-        if (verified) {
-            const {
-                aaguid,
-                credential: { publicKey, id: credentialID },
-                credentialBackedUp,
-            } = registrationInfo;
+//         if (verified) {
+//             const {
+//                 aaguid,
+//                 credential: { publicKey, id: credentialID },
+//                 credentialBackedUp,
+//             } = registrationInfo;
 
-            const user = await UserModel.findByPk(decoded.userId);
+//             const user = await UserModel.findByPk(decoded.userId);
 
-            if (user) {
-                const base64CredentialID = base64url.encode(
-                    Buffer.from(credentialID)
-                );
+//             if (user) {
+//                 const base64CredentialID = base64url.encode(
+//                     Buffer.from(credentialID)
+//                 );
 
-                const base64PublicKey = base64url.encode(Buffer.from(publicKey));
+//                 const base64PublicKey = base64url.encode(Buffer.from(publicKey));
 
-                await UserPublicKeyCredentialsModel.create({
-                    user_id: user.id,
-                    id_externe: base64CredentialID,
-                    cle_publique: base64PublicKey,
-                    aaguid,
-                    compteur: 0,
-                });
-            }
-        }
+//                 await UserPublicKeyCredentialsModel.create({
+//                     user_id: user.id,
+//                     id_externe: base64CredentialID,
+//                     cle_publique: base64PublicKey,
+//                     aaguid,
+//                     compteur: 0,
+//                 });
+//             }
+//         }
 
 
-    } catch (error: any) {
-        if (error.name === "TokenExpiredError") {
-            errorKey = 'expired_token';
-        } else if (error.name === "JsonWebTokenError") {
-            errorKey = 'invalid_token';
-        } else {
-            errorKey = error as string
-        }
+//     } catch (error: any) {
+//         if (error.name === "TokenExpiredError") {
+//             errorKey = 'expired_token';
+//         } else if (error.name === "JsonWebTokenError") {
+//             errorKey = 'invalid_token';
+//         } else {
+//             errorKey = error as string
+//         }
 
-        console.log("ff", error)
-    }
+//         console.log("ff", error)
+//     }
 
-    res.send("ffff")
-});
+//     res.send("ffff")
+// });
 
 router.post("/passkey/connexion-options", async (req, res) => {
     const session: CustomSession = req.session;

@@ -4,11 +4,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import dotenv from 'dotenv';
 
-import { SignInSchema, SignInActivationSchema, LoginSchema } from "#scripts/schemas/index.ts";
-import { flashMessageCookieOptions, wss } from "#server/index.ts";
-import { User as UserModel } from "#models/index.ts";
+import { SignInSchema, SignInActivationSchema, LoginSchema } from "#scripts/schemas/index";
+import { flashMessageCookieOptions, wss } from "#server/index";
+import { User as UserModel } from "#models";
 import type { CustomSession, UserTokenData } from "#types";
-import { SOCKET_EVENTS } from "#scripts/utils.shared.ts";
+import { SOCKET_EVENTS } from "#scripts/utils.shared";
 
 dotenv.config({ path: `${process.cwd()}/.env.local` })
 

@@ -1,9 +1,10 @@
 import type { Align, LineControllerDatasetOptions, TitleOptions } from "chart.js";
 import type { InferAttributes } from "sequelize";
 import type { JwtPayload } from "jsonwebtoken";
+import type { SessionData } from "express-session";
 
 import type { Place as PlaceModel, Visit as VisitModel, Event as EventModel, User as UserModel } from "#models/index.ts";
-import type { SessionData } from "express-session";
+import type { listAgeGroups, listGenders, listDepartments, listGroups } from "#scripts/utils.shared.ts";
 
 export type LineChartEntry = {
     data: Number[];
@@ -27,11 +28,11 @@ export type CustomTitleOptions = Omit<TitleOptions, 'fullSize' | 'text' | "align
     padding?: number | { top: number; bottom: number };
 };
 
-export type VisitRaw = InferAttributes<VisitModel> & {
+export type VisitRaw = InferAttributes<VisitModel> & VisitGroupFields & {
     id: number;
     heure?: number;
     lieu?: string;
-    date_passage: string;
+    // date_passage: string;
     groupe: string;
     liste_evenements?: string;
     "place.nom"?: string;
@@ -134,3 +135,22 @@ declare global {
         }
     }
 }
+
+export type GroupItem = {
+    label: string;
+    value: string;
+    lineColor: string;
+    fullName?: string;
+    listInChoices?: boolean;
+    listInDb?: boolean;
+};
+
+export type VisitValue = (typeof listGenders)[number]['value'] |
+    (typeof listDepartments)[number]['value'] |
+    (typeof listAgeGroups)[number]['value'] |
+    (typeof listGroups)[number]['value'];
+
+
+export type VisitGroupFields = {
+    [K in (typeof listGroups)[number]['value']]: string;
+};

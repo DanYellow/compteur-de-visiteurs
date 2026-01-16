@@ -1,6 +1,8 @@
 import { defineConfig, loadEnv, type UserConfig } from "vite";
 
 import tailwindcss from "@tailwindcss/vite";
+import tsconfigPaths from 'vite-tsconfig-paths';
+
 import path from "path";
 
 const isDocker = process.env.IS_DOCKER === 'true';
@@ -11,6 +13,7 @@ export default defineConfig(({ mode }) => {
     return {
         plugins: [
             tailwindcss(),
+            tsconfigPaths(),
         ],
         appType: "custom",
         define: {
@@ -41,8 +44,10 @@ export default defineConfig(({ mode }) => {
                 ]
             },
         },
+        base: '/assets/',
         build: {
             emptyOutDir: false,
+            outDir: "dist/assets",
             manifest: "manifest.json",
             target: 'esnext',
             lib: {

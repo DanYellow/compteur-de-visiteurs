@@ -11,6 +11,8 @@ COPY . .
 
 RUN npm run email
 
+RUN npm run build:server
+
 RUN npm run build
 
 # ---------- Production ----------

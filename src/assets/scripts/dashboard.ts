@@ -8,9 +8,9 @@ import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { DateTime, Info } from "luxon";
 
 import type { ChartConfigData, EventRaw, LineChartEntry, VisitRaw } from "#types";
-import { capitalizeFirstLetter, baseConfigData, getPivotTable, getWeeksRangeMonth, uniqueByKey } from '#scripts/utils.shared.ts';
-import { TotalVisitors, listGenders, listVisits as _listVisits, listAgeGroups, listDepartments, listGroups as listBusinessSector, greenNumixs, grayNumixs } from '#scripts/utils.client.ts';
-import { chartScales, chartTitleStyle, syncLegend } from '#scripts/utils.chart.ts';
+import { capitalizeFirstLetter, baseConfigData, getPivotTable, getWeeksRangeMonth, uniqueByKey } from '#scripts/utils.shared';
+import { TotalVisitors, listGenders, listVisits as _listVisits, listAgeGroups, listDepartments, listGroups as listBusinessSector, greenNumixs, grayNumixs } from '#scripts/utils.client';
+import { chartScales, chartTitleStyle, syncLegend } from '#scripts/utils.chart';
 
 const detailsChartsDialog = document.getElementById("detailsChartModal") as HTMLDialogElement;
 const linkDownloadChartData = document.querySelector("[data-download-chart-data='simple']") as HTMLLinkElement;

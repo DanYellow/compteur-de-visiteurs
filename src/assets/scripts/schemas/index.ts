@@ -1,10 +1,10 @@
 import * as z from "zod";
 
-import { REQUIRED_MESSAGE } from '#scripts/utils.shared.ts';
+import { REQUIRED_MESSAGE } from '#scripts/utils.shared';
 
-export { VisitSchema, DepartmentSchema, AgeSchema, GenderSchema, GroupSchema, VisitCodeSchema } from "./visit.ts";
-export { PlaceSchema } from "./place.ts";
-export { EventSchema } from "./event.ts";
+export { VisitSchema, DepartmentSchema, AgeSchema, GenderSchema, GroupSchema, VisitCodeSchema } from "./visit";
+export { PlaceSchema } from "./place";
+export { EventSchema } from "./event";
 
 // https://github.com/colinhacks/zod/discussions/4051
 export const SignInSchema = z.object({

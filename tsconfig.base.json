@@ -10,7 +10,7 @@
 
     /* Bundler mode */
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": false,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noEmit": true,
@@ -21,7 +21,17 @@
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+        "#server/utils/*": ["server/utils/*"],
+        "#server/*": ["server/*"],
+        "#models/*": ["models/*"],
+        "#schemas/*": ["src/assets/scripts/schemas/*"],
+        "#scripts/*": ["src/assets/scripts/*"],
+        "#types": ["types"],
+        "#styles/*.css": ["src/assets/styles/*.css"]
+    }
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "vite.config.ts", "**/*.test.ts"]
 }

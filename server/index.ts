@@ -1,4 +1,3 @@
-import { fileURLToPath } from "url";
 import path from "path";
 import nunjucks from "nunjucks";
 import express from "express";
@@ -8,22 +7,19 @@ import { DateTime } from "luxon";
 import ip from "ip";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import dotenv from "dotenv";
+import { loadEnvFile } from 'node:process';
 import fs from "fs";
 import { rateLimit } from 'express-rate-limit';
 
-import router from "#server/router/index.ts";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import router from "#server/router";
 
 const serverip = ip.address();
 
-dotenv.config({ path: `${process.cwd()}/.env.local` });
+loadEnvFile(`${process.cwd()}/.env.local`);
 
 const app = express();
 if (process.env.NODE_ENV === "development") {
-    const viteConfig = await import("../vite.config.ts");
+    const viteConfig = await import("../vite.config");
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
         ...viteConfig.default,
@@ -37,7 +33,7 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.set("view engine", "nunjucks");
-app.set("views", path.join(__dirname, "..", "/src"));
+app.set("views", path.join(path.resolve(), "src"));
 
 app.use(express.static(publicPath));
 app.use(
@@ -67,7 +63,7 @@ app.use(
     })
 );
 
-app.use((req, res, next) => {
+app.use((_, res, next) => {
     const context = {
         NODE_ENV: process.env.NODE_ENV,
         admin_prefix: `/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`,
@@ -93,7 +89,7 @@ if (process.env.NODE_ENV === "production") {
     app.use(limiter);
 }
 
-app.all("/", function (req, res, next) {
+app.all("/", function (_, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     next();
@@ -250,7 +246,7 @@ if (false && process.env.NODE_ENV === "development") {
     });
 }
 
-app.use(function (req, res, next) {
+app.use(function (req, res) {
     res.status(404);
 
     if (req.accepts("html")) {

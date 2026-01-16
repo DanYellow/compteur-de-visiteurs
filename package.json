@@ -4,12 +4,12 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
-        "dev": "cross-env NODE_ENV=development cross-env NODE_ENV=development tsx watch --include \"./server/*\" --include \"./src/*\" server/index.ts",
+        "dev": "cross-env NODE_ENV=development cross-env NODE_ENV=development tsx watch --tsconfig ./tsconfig.server.json server/index.ts",
         "dev:docker": "tsx watch --include \"./server/*\" --include \"./src/*\" server/index.ts",
-        "build": "npm run email && cross-env NODE_ENV=production tsc && vite build",
-        "build:server": "tsc --project tsconfig.server.json",
+        "build": "cross-env NODE_ENV=production tsc && vite build",
+        "build:server": "cross-env NODE_ENV=development npx tsc --project tsconfig.server.json && npx tsc-alias -p tsconfig.server.json",
         "email": "npx @tailwindcss/cli -i ./src/assets/styles/email.css -o ./dist/tailwind-email.tmp.css --minify && npx postcss ./dist/tailwind-email.tmp.css -o ./dist/tailwind-email.css",
-        "prod": "cross-env NODE_ENV=production node --import=tsx server/index.ts"
+        "prod": "cross-env NODE_ENV=production node ./dist/server/index.js"
     },
     "devDependencies": {
         "@tailwindcss/cli": "^4.1.18",
@@ -32,9 +32,12 @@
         "postcss-cli": "^11.0.1",
         "postcss-logical": "^8.1.0",
         "tailwindcss": "^4.1.13",
+        "tsc-alias": "^1.8.16",
+        "tsconfig-paths": "^4.2.0",
         "tsx": "^4.20.6",
         "typescript": "~5.8.3",
-        "vite": "^7.1.2"
+        "vite": "^7.1.2",
+        "vite-tsconfig-paths": "^6.0.4"
     },
     "dependencies": {
         "@ownid/webauthn": "^1.0.0",
@@ -62,13 +65,5 @@
         "sqlite3": "^5.1.7",
         "ws": "^8.18.3",
         "zod": "^4.1.9"
-    },
-    "imports": {
-        "#server/utils/*.ts": "./server/utils/*.ts",
-        "#server/*.ts": "./server/*.ts",
-        "#models/*.ts": "./models/*.ts",
-        "#scripts/*.ts": "./src/assets/scripts/*.ts",
-        "#types": "./types.ts",
-        "#styles/*.css": "./src/assets/styles/*.css"
     }
 }
