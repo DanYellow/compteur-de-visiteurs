@@ -4,11 +4,12 @@ import path from "path";
 import nodemailer from "nodemailer";
 import juice from "juice";
 import nunjucks from "nunjucks";
-import dotenv from "dotenv";
+import { loadEnvFile } from 'node:process';
+
 import { listGroups } from "#scripts/utils.shared";
 import type { VisitRaw, VisitValue } from "#types";
 
-dotenv.config({ path: `${process.cwd()}/.env.local` });
+loadEnvFile(`${process.cwd()}/.env.local`);
 
 export const mailTransporter = nodemailer.createTransport({
     ...(process.env.NODE_ENV === "development"

@@ -9,7 +9,6 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import { loadEnvFile } from 'node:process';
 import fs from "fs";
-import { rateLimit } from 'express-rate-limit';
 
 import router from "#server/router/index";
 
@@ -79,6 +78,8 @@ app.use((_, res, next) => {
 });
 
 if (process.env.NODE_ENV === "production") {
+    const { rateLimit } = await import('express-rate-limit');
+
     const limiter = rateLimit({
         windowMs: 15 * 60 * 1000,
         limit: 100,

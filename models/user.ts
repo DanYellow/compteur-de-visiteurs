@@ -9,12 +9,11 @@ import {
     type BelongsToManyGetAssociationsMixin,
     Op,
 } from "sequelize";
+import { loadEnvFile } from 'node:process';
 import { LIST_ROLES } from "#scripts/utils.shared";
 import type UserPublicKeyCredentials from "./user-public-key-credentials";
 
-import dotenv from "dotenv";
-
-dotenv.config({ path: `${process.cwd()}/.env.local` });
+loadEnvFile(`${process.cwd()}/.env.local`);
 
 export default class User extends Model<
     InferAttributes<User>,

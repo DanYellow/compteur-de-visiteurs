@@ -1,11 +1,11 @@
 import express from 'express';
-import dotenv from 'dotenv';
+import { loadEnvFile } from 'node:process';
 import { DateTime } from 'luxon';
 import nunjucks from 'nunjucks';
 
 import { renderEmail } from '#server/utils.server';
 
-dotenv.config({ path: `${process.cwd()}/.env.local` });
+loadEnvFile(`${process.cwd()}/.env.local`);
 
 const router = express.Router();
 

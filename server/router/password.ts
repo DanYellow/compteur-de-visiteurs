@@ -1,14 +1,14 @@
 import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import dotenv from 'dotenv';
+import { loadEnvFile } from 'node:process';
 
 import { ChangePasswordSchema, PasswordRecoverySchema } from "#scripts/schemas/index";
 import { flashMessageCookieOptions } from "#server/index";
 import { User as UserModel } from "#models/index";
 import type { UserTokenData } from "#types";
 
-dotenv.config({ path: `${process.cwd()}/.env.local` })
+loadEnvFile(`${process.cwd()}/.env.local`);
 
 const router = express.Router();
 

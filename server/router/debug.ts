@@ -1,11 +1,11 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import { loadEnvFile } from 'node:process';
 import bcrypt from "bcryptjs";
 
 import { User as UserModel } from "#models/index";
 
-dotenv.config({ path: `${process.cwd()}/.env.local` });
+loadEnvFile(`${process.cwd()}/.env.local`);
 
 const router = express.Router();
 

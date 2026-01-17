@@ -2,7 +2,7 @@ import express from "express";
 import { UniqueConstraintError } from 'sequelize';
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import dotenv from 'dotenv';
+import { loadEnvFile } from 'node:process';
 
 import { SignInSchema, SignInActivationSchema, LoginSchema } from "#scripts/schemas/index";
 import { flashMessageCookieOptions, wss } from "#server/index";
@@ -10,7 +10,7 @@ import { User as UserModel } from "#models/index";
 import type { CustomSession, UserTokenData } from "#types";
 import { SOCKET_EVENTS } from "#scripts/utils.shared";
 
-dotenv.config({ path: `${process.cwd()}/.env.local` })
+loadEnvFile(`${process.cwd()}/.env.local`);
 
 const router = express.Router();
 

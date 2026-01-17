@@ -7,7 +7,7 @@ import {
     type WebAuthnCredential,
 } from "@simplewebauthn/server";
 import base64url from "base64url";
-import dotenv from "dotenv";
+import { loadEnvFile } from 'node:process';
 import { isoBase64URL, isoUint8Array } from "@simplewebauthn/server/helpers";
 import jwt from "jsonwebtoken";
 // import nunjucks from "nunjucks";
@@ -21,7 +21,7 @@ import type { CustomSession } from "#types";
 // import { mailTransporter, renderEmail } from "#server/utils.server.ts";
 // import { DateTime } from "luxon";
 
-dotenv.config({ path: `${process.cwd()}/.env.local` });
+loadEnvFile(`${process.cwd()}/.env.local`);
 
 const router = express.Router();
 
