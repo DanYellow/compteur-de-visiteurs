@@ -18,7 +18,7 @@ loadEnvFile(`${process.cwd()}/.env.local`);
 
 const app = express();
 if (process.env.NODE_ENV === "development") {
-    const viteConfig = await import("../vite.config.ts");
+    const viteConfig = await import("../vite.config");
     const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
         ...viteConfig.default,
