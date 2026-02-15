@@ -71,7 +71,16 @@
 {% endmacro %}
 
 {% macro download_chart_extensible_button(name) %}
-    <button data-download-chart="{{ name }}" type="button" class="text-white-numixs hocus:text-green-numixs cursor-pointer extensible-button bg-gray-numixs" title="Télécharger graphique">
+    <button 
+        data-download-chart="{{ name }}" 
+        type="button" 
+        class="
+            hocus:text-green-numixs hocus:py-[0.1rem] hocus:px-[0.35rem]
+            hocus:border hocus:border-solid hocus:border-green-numixs
+            rounded-xl
+            text-white-numixs cursor-pointer extensible-button bg-gray-numixs" 
+        title="Télécharger graphique"
+    >
         <span class="size-6">
             {% include "includes/icons/download-fill-icon.svg" %}
         </span>
@@ -86,7 +95,13 @@
         command="show-modal"
         commandfor="{{ dialogId }}"
         title="Afficher la vue détaillée"
-        class="text-white-numixs hocus:text-green-numixs cursor-pointer extensible-button bg-gray-numixs" title="Télécharger graphique">
+        class="
+            hocus:text-green-numixs hocus:py-[0.1rem] hocus:px-[0.35rem]
+            hocus:border hocus:border-solid hocus:border-green-numixs
+            rounded-xl
+            text-white-numixs cursor-pointer extensible-button bg-gray-numixs" 
+        title="Télécharger graphique"
+    >
         <span class="size-6">
             {% include "includes/icons/zoom-icon.svg" %}
         </span>

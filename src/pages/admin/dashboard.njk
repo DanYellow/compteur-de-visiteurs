@@ -35,9 +35,9 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
         {% include "includes/calendar.njk" %}
         <div class="text-black-numixs">
             <div class="flex flex-col md:flex-row gap-y-5 justify-between mb-2">
-                <nav class="flex flex-row text-lg">
+                <nav class="flex flex-row text-lg items-center">
                     <p class="mr-1.5 font-bold whitespace-nowrap">Filter par</p>
-                    <ul class="flex flex-row gap-0.5 overflow-auto whitespace-nowrap">
+                    <ul class="flex flex-row gap-1.5 overflow-auto whitespace-nowrap px-2 py-1.5">
                         <li>
                             <a class="underline hocus:no-underline rounded-md px-2 py-0.5 {{ "bg-green-numixs" if query_params.filtre == "visite" or query_params.filtre is not defined else ""}}" href="{{ formatQueryParams({ filtre: "visite", lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}">Type de visites</a>
                         </li>

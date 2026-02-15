@@ -9,6 +9,11 @@
     {% include "includes/icons/calendar-icon.svg" %}
     <span class="pointer-events-none hidden sm:inline">{{ "Aujourd'hui" if is_today else current_date|date("EEEE dd LLLL yyyy") }}</span>
     <span class="pointer-events-none inline sm:hidden">{{ "Aujourd'hui" if is_today else current_date|date("dd/LL/yyyy") }}</span>
+    <span class="group-not-has-[#calendar:popover-open]:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">
+            <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
+        </svg>
+    </span>
 </button>
 <a href="{{ formatQueryParams({ date: current_date|add_days(1)|date("yyyy-LL-dd"), lieu: lieu or "", filtre: query_params.filtre or "" }, true) }}" title="Demain" class="navigation-month-nav py-2.5 px-3.5 border-black-numixs border rounded-md flex gap-2 items-center justify-center hocus:bg-green-numixs">
     <span class="sr-only">Aller au {{ current_date|add_days(1)|date("dd/LL/yyyy") }}</span>
