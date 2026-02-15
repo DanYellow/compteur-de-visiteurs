@@ -38,7 +38,6 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
             }
         }
     }
-    const listFlashMessages = JSON.parse(req.cookies.flash_message || "[]")
 
     res.render("pages/admin/add_edit-place.njk", {
         place: {
@@ -47,7 +46,6 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
             ...place,
         },
         is_edit: Object.keys(place || {}).length > 0,
-        flash_message: listFlashMessages.reduce((a: Record<string, string>, v: string) => ({ ...a, [v]: v }), {}),
         not_found: req.params.placeId && !place,
         list_place_types: listPlaceTypes.map((item) => ({
             ...item,
@@ -103,7 +101,7 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
                     place_id: Number(req.params.placeId)
                 }
             })
-            res.cookie('flash_message', "update_success", { maxAge: 1000, httpOnly: true });
+            res.cookie('flash_message', JSON.stringify(['update_success']), { maxAge: 1000, httpOnly: true });
         } else {
             const place = await PlaceModel.create({
                 nom: payload.nom,
@@ -122,7 +120,7 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
                 heure_ouverture: `${heure_ouverture_heure}:${heure_ouverture_minutes}:00`,
                 heure_fermeture: `${heure_fermeture_heure}:${heure_fermeture_minutes}:00`,
             })
-            res.cookie('flash_message', "create_success", flashMessageCookieOptions);
+            res.cookie('flash_message', JSON.stringify(['create_success']), flashMessageCookieOptions);
         }
         if (req.params.placeId) {
             res.redirect(`${res.locals.admin_prefix}/lieu/${req.params.placeId}`);
@@ -130,7 +128,7 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
             res.redirect(`${res.locals.admin_prefix}/lieux`);
         }
     } catch (e) {
-        res.cookie('flash_message', "error", flashMessageCookieOptions)
+        res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions)
 
         console.log(e)
         return res.render("pages/admin/add_edit-place.njk");
@@ -142,11 +140,11 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
             await placeToDestroy.setListEvents([])
             await placeToDestroy.destroy()
 
-            res.cookie('flash_message', "delete_success", flashMessageCookieOptions);
+            res.cookie('flash_message', JSON.stringify(['delete_success']), flashMessageCookieOptions);
         }
     } catch (error) {
         console.log(error)
-        res.cookie('flash_message', "delete_error", flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['delete_error']), flashMessageCookieOptions);
     }
 
     res.redirect(`${res.locals.admin_prefix}/lieux`);
@@ -185,7 +183,6 @@ router.get(['/lieux'], getUser, requireRoleMiddleware("ADMIN"), async (req, res)
 
     res.render("pages/admin/places-list.njk", {
         places_list: listPlacesComputed,
-        flash_message: req.cookies.flash_message,
     });
 })
 

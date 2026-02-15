@@ -57,7 +57,6 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
         user,
         is_edit: true,
         list_roles: LIST_ROLES.filter((item) => item.value !== "SUPER_ADMIN"),
-        flash_message: req.cookies.flash_message,
     });
 }).post(['/utilisateur/:userId'], getUser, requireRoleMiddleware(""), async (req, res, next) => {
     if ("userId" in req.params && !NUMBER_REGEX.test(req.params.userId) && req.params.userId !== "moi") {
@@ -75,10 +74,9 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
         if (String(user.id) === String(req.current_user!.id)) {
             req.current_user = user.toJSON();
         }
-        res.cookie('flash_message', "update_success", flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['update_success']), flashMessageCookieOptions);
     } else {
-        res.cookie('flash_message', "update_error", flashMessageCookieOptions);
-
+        res.cookie('flash_message', JSON.stringify(['update_error']), flashMessageCookieOptions);
     }
 
     res.redirect(`${res.locals.admin_prefix}/utilisateur/${req.params.userId}`);
@@ -90,10 +88,10 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
                 role: { [Op.notIn]: ["ADMIN"] }
             }
         })
-        res.cookie('flash_message', "delete_success", flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['delete_success']), flashMessageCookieOptions);
     } catch (error) {
         console.log(error)
-        res.cookie('flash_message', "delete_error", flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['delete_error']), flashMessageCookieOptions);
     }
 
     res.redirect(`${res.locals.admin_prefix}/utilisateurs`);
@@ -114,7 +112,6 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUs
 
     res.render("pages/admin/add_edit-user-passkeys.njk", {
         user,
-        flash_message: req.cookies.flash_message,
     });
 }).post(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res) => {
     if (req.params.userId !== "moi" && String(req.params.userId) !== String(res.locals.current_user!.id)) {
@@ -135,7 +132,7 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUs
 
         await passkey.update(req.body)
 
-        res.cookie('flash_message', "update_success", flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['update_success']), flashMessageCookieOptions);
         res.redirect(`${res.locals.admin_prefix}/utilisateur/moi/passkeys`)
     } catch (error) {
         console.log("error", error)
@@ -165,9 +162,9 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUs
             }
         })
 
-        res.cookie('flash_message', "delete_success", flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['delete_success']), flashMessageCookieOptions);
     } catch (error: any) {
-        res.cookie('flash_message', error.message, flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions);
     }
 
     res.redirect(`${res.locals.admin_prefix}/utilisateur/moi/passkeys`)

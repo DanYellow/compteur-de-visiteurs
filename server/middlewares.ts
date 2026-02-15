@@ -34,12 +34,20 @@ export const requireRoleMiddleware = (role: string = "") => {
                 res.redirect("/interdit")
             }
         } catch (error) {
-            res.cookie('flash_message', "not_logged", flashMessageCookieOptions);
+            let flashMessages;
+
+            try {
+                flashMessages = JSON.parse(req.cookies.flash_message || "[]");
+            } catch {
+                flashMessages = [];
+            }
+
+            flashMessages.push("not_logged");
+
+            res.cookie('flash_message', JSON.stringify(flashMessages), flashMessageCookieOptions);
             (req.session as CustomSession).return_to = req.originalUrl;
 
-            res.redirect("/connexion")
-
-            console.log("error", error)
+            return res.redirect("/connexion")
         }
     };
 };
@@ -66,7 +74,7 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
             res.locals.current_user = user.toJSON();
             req.current_user = user.toJSON();
         } else {
-            res.cookie('flash_message', "forced_logout", flashMessageCookieOptions)
+            res.cookie('flash_message', JSON.stringify(['forced_logout']), flashMessageCookieOptions)
             res.clearCookie("token");
 
             return res.redirect('/connexion');

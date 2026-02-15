@@ -22,14 +22,13 @@ router.get('/connexion', async (req, res) => {
     } catch (error) { }
 
     res.render("pages/login.njk", {
-        flash_message: req.cookies.flash_message,
         user_email: req.query?.email || req.cookies.email,
     });
 }).post('/connexion', async (req, res) => {
     const validator = LoginSchema.safeParse(req.body);
 
     if (!validator.success) {
-        res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['form_not_valid']), flashMessageCookieOptions);
 
         return res.redirect("/connexion");
     }
@@ -60,7 +59,8 @@ router.get('/connexion', async (req, res) => {
             console.log(error)
         }
     } else {
-        res.cookie('flash_message', 'wrong_credentials', flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['wrong_credentials']), flashMessageCookieOptions);
+        res.cookie('email', String(req.body.email), flashMessageCookieOptions);
 
         return res.redirect("/connexion");
     }
@@ -68,7 +68,6 @@ router.get('/connexion', async (req, res) => {
 
 router.get('/inscription', async (req, res) => {
     res.render("pages/sign-in.njk", {
-        flash_message: req.cookies.flash_message,
         signin_email: req.cookies.email,
     });
 }).post('/inscription', async (req, res) => {
@@ -76,7 +75,7 @@ router.get('/inscription', async (req, res) => {
 
     if (!validator.success) {
         res.status(500)
-        res.cookie('flash_message', 'register_fail', flashMessageCookieOptions)
+        res.cookie('flash_message', JSON.stringify(['register_fail']), flashMessageCookieOptions)
 
         return res.redirect("/inscription");
     }
@@ -86,7 +85,7 @@ router.get('/inscription', async (req, res) => {
             email: String(req.body.email),
         });
 
-        res.cookie('flash_message', 'register_success', flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['register_success']), flashMessageCookieOptions);
 
         wss.clients.forEach((client) => {
             if (client.readyState === client.OPEN) {
@@ -100,16 +99,16 @@ router.get('/inscription', async (req, res) => {
             })
             if (user) {
                 if (user?.actif === false) {
-                    res.cookie('flash_message', 'register_duplicate', flashMessageCookieOptions)
+                    res.cookie('flash_message', JSON.stringify(['register_duplicate']), flashMessageCookieOptions)
                 } else {
-                    res.cookie('flash_message', 'user_exists', flashMessageCookieOptions)
+                    res.cookie('flash_message', JSON.stringify(['user_exists']), flashMessageCookieOptions)
                     res.cookie('email', req.body.email, flashMessageCookieOptions)
 
                     return res.redirect("/connexion");
                 }
             }
         } else {
-            res.cookie('flash_message', 'register_fail', flashMessageCookieOptions)
+            res.cookie('flash_message', JSON.stringify(['register_fail']), flashMessageCookieOptions)
         }
     }
     res.cookie('email', req.body.email, flashMessageCookieOptions)
@@ -146,7 +145,6 @@ router.get(['/approbation{/:token}'], async (req, res) => {
     }
 
     res.render("pages/sign-in-activation.njk", {
-        flash_message: req.cookies?.flash_message || errorKey,
         signin_email: user?.email || "",
         is_token_valid: isTokenValid,
     });
@@ -158,7 +156,7 @@ router.get(['/approbation{/:token}'], async (req, res) => {
 
     if (!validator.success) {
         res.status(500)
-        res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['form_not_valid']), flashMessageCookieOptions);
 
         return res.redirect(`/approbation/${token}`);
     }
@@ -188,10 +186,10 @@ router.get(['/approbation{/:token}'], async (req, res) => {
             await user.update(payload);
 
             res.cookie('email', req.body.email, flashMessageCookieOptions);
-            res.cookie('flash_message', 'account_created', flashMessageCookieOptions);
+            res.cookie('flash_message', JSON.stringify(['account_created']), flashMessageCookieOptions);
         } else {
             res.cookie('email', req.body.email, flashMessageCookieOptions);
-            res.cookie('flash_message', 'account_already_created', flashMessageCookieOptions);
+            res.cookie('flash_message', JSON.stringify(['account_already_created']), flashMessageCookieOptions);
         }
 
         return res.redirect("/connexion");
@@ -201,11 +199,11 @@ router.get(['/approbation{/:token}'], async (req, res) => {
         } else if (error.name === "JsonWebTokenError") {
             errorKey = 'invalid_token';
         } else {
-            errorKey = error as string
+            errorKey = 'error' as string
         }
     }
 
-    res.cookie('flash_message', errorKey, flashMessageCookieOptions);
+    res.cookie('flash_message', JSON.stringify([errorKey]), flashMessageCookieOptions);
 
     return res.redirect(`/approbation/${token}`);
 });

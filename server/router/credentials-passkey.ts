@@ -368,10 +368,10 @@ router.post("/passkey/connexion", async (req, res) => {
     } catch (error: any) {
         let errorKey = error.message;
         if ("name" in error) {
-            // errorKey = error.name;
+            errorKey = 'error';
         }
 
-        res.cookie("flash_message", errorKey, flashMessageCookieOptions);
+        res.cookie("flash_message", JSON.stringify([errorKey]), flashMessageCookieOptions);
 
         return res.redirect("/connexion");
     }

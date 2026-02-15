@@ -138,7 +138,6 @@ router.get(["/choix-lieu"], async (req, res) => {
     });
 
     let place = null;
-    const listFlashMessages = JSON.parse(req.cookies.flash_message || "[]")
 
     if ("lieu_numixs" in req.cookies) {
         place = await PlaceModel.findOne({ where: { slug: req.cookies.lieu_numixs } })
@@ -146,7 +145,6 @@ router.get(["/choix-lieu"], async (req, res) => {
 
     res.render("pages/set-place.njk", {
         "places_list": listPlaces,
-        flash_message: listFlashMessages.reduce((a: Record<string, string>, v: string) => ({ ...a, [v]: v }), {}),
         place,
     });
 }).post(["/choix-lieu"], async (req, res) => {

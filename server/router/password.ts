@@ -14,14 +14,13 @@ const router = express.Router();
 
 router.get('/mot-de-passe-oublie', async (req, res) => {
     res.render("pages/forgot-password.njk", {
-        flash_message: req.cookies.flash_message,
         user_email: req.cookies.email,
     });
 }).post('/mot-de-passe-oublie', async (req, res) => {
     const validator = PasswordRecoverySchema.safeParse(req.body);
 
     if (!validator.success) {
-        res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['form_not_valid']), flashMessageCookieOptions);
 
         return res.redirect("/mot-de-passe-oublie");
     }
@@ -43,10 +42,10 @@ router.get('/mot-de-passe-oublie', async (req, res) => {
             })
         });
 
-        res.cookie('flash_message', 'form_success', flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['form_success']), flashMessageCookieOptions);
         res.cookie('email', email, flashMessageCookieOptions);
     } else {
-        res.cookie('flash_message', 'user_not_found', flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['user_not_found']), flashMessageCookieOptions);
 
     }
     return res.redirect("/mot-de-passe-oublie");
@@ -58,7 +57,6 @@ router.get(['/recuperation-mot-de-passe{/:token}'], async (req, res) => {
     const { token } = req.params;
 
     try {
-        console.log(token)
         const decoded = jwt.verify(token, process.env.JWT_PASSWORD_RECOVERY_SECRET!) as UserTokenData;
         user = await UserModel.findByPk(decoded.userId);
 
@@ -75,12 +73,12 @@ router.get(['/recuperation-mot-de-passe{/:token}'], async (req, res) => {
         } else if (error.name === "JsonWebTokenError" || error.name === "SyntaxError") {
             errorKey = 'invalid_token'
         } else {
-            errorKey = error.message
+            errorKey = 'error'
         }
     }
 
     res.render("pages/new-password.njk", {
-        flash_message: errorKey,
+        flash_message: {errorKey},
         user_email: user?.email,
     });
 }).post('/recuperation-mot-de-passe{/:token}', async (req, res) => {
@@ -88,7 +86,7 @@ router.get(['/recuperation-mot-de-passe{/:token}'], async (req, res) => {
     const { token } = req.params;
 
     if (!validator.success) {
-        res.cookie('flash_message', 'form_not_valid', flashMessageCookieOptions);
+        res.cookie('flash_message', JSON.stringify(['form_not_valid']), flashMessageCookieOptions);
 
         return res.redirect(`/recuperation-mot-de-passe/${token}`);
     }
@@ -119,7 +117,7 @@ router.get(['/recuperation-mot-de-passe{/:token}'], async (req, res) => {
         })
 
         res.render("pages/login.njk", {
-            flash_message: "password_updated",
+            flash_message: { password_updated: "password_updated" },
         });
     } catch (error: any) {
         if (error.name === "TokenExpiredError") {
@@ -127,11 +125,11 @@ router.get(['/recuperation-mot-de-passe{/:token}'], async (req, res) => {
         } else if (error.name === "JsonWebTokenError" || error.name === "SyntaxError") {
             errorKey = 'invalid_token'
         } else {
-            errorKey = error.message
+            errorKey = "error"
         }
 
         res.render("pages/new-password.njk", {
-            flash_message: errorKey,
+            flash_message: {errorKey},
         });
     }
 });

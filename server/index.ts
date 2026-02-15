@@ -62,11 +62,14 @@ app.use(
     })
 );
 
-app.use((_, res, next) => {
+app.use((req, res, next) => {
+    const listFlashMessages = JSON.parse(req.cookies.flash_message || "[]")
+
     const context = {
         NODE_ENV: process.env.NODE_ENV,
         admin_prefix: `/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`,
         user_role: {},
+        flash_message: listFlashMessages.reduce((a: Record<string, string>, v: string) => ({ ...a, [v]: v }), {}),
     };
 
     res.locals = {

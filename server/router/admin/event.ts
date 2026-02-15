@@ -73,7 +73,6 @@ router.get(['/evenements'], getUser, requireRoleMiddleware(), async (req, res) =
 
     res.render("pages/admin/events-list.njk", {
         events_list: listEvents.map((p) => p.toJSON()),
-        flash_message: req.cookies.flash_message,
         periode: req.query.periode,
         current_year: req.query?.annee,
         list_years: (listYears as unknown as { annee: number }[]).map(item => Number(item.annee)),
@@ -128,7 +127,6 @@ router.get(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware
             ...(event ? event : {})
         },
         is_edit: Object.keys(event || {}).length > 0,
-        flash_message: req.cookies.flash_message,
         not_found: req.params.eventId && !event,
         list_places: listPlaces,
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
@@ -171,7 +169,7 @@ router.get(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware
                 });
                 await event.setListPlaces(listPlacesId.map(Number))
             }
-            res.cookie('flash_message', "update_success", { maxAge: 1000, httpOnly: true })
+            res.cookie('flash_message', JSON.stringify(['update_success']), { maxAge: 1000, httpOnly: true })
         } else {
             const event = await EventModel.create({
                 nom: payload.nom,
@@ -194,7 +192,7 @@ router.get(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware
             // for (const place of listPlaces) {
             //     await place.addEvent(event);
             // }
-            res.cookie('flash_message', "create_success", { maxAge: 1000, httpOnly: true })
+            res.cookie('flash_message', JSON.stringify(['create_success']), { maxAge: 1000, httpOnly: true })
         }
 
         if (req.params.eventId) {
@@ -203,7 +201,7 @@ router.get(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware
             res.redirect(`${res.locals.admin_prefix}/evenements`);
         }
     } catch (e) {
-        res.cookie('flash_message', "error", { maxAge: 1000, httpOnly: true })
+        res.cookie('flash_message', JSON.stringify(['error']), { maxAge: 1000, httpOnly: true })
 
         console.log(e);
         return res.render("pages/admin/add_edit-event.njk");

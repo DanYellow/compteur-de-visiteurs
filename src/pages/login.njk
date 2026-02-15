@@ -31,39 +31,39 @@ Connexion
                 {{ macros.success_banner(banner_content) }}
             {% endif %}
 
-            {% if flash_message == "success_logout" %}
+            {% if flash_message.success_logout %}
                 {{ macros.success_banner("Vous avez été déconnecté(e) avec succès.") }}
             {% endif %}
 
-            {% if flash_message == "password_updated" %}
+            {% if flash_message.password_updated %}
                 {{ macros.success_banner("Votre mot de passe a été mis à jour, vous pouvez l'utiliser dès maintenant.") }}
             {% endif %}
 
-            {% if flash_message == "forced_logout" %}
+            {% if flash_message.forced_logout %}
                 {{ macros.warning_banner("Une erreur est survenue, vous avez été déconnecté(e).") }}
             {% endif %}
 
-            {% if flash_message == "wrong_credentials" or flash_message == "user_not_found" %}
+            {% if flash_message.wrong_credentials or flash_message.user_not_found %}
                 {{ macros.error_banner("Identifiants incorrects.") }}
             {% endif %}
 
-            {% if flash_message == "passkey_not_found" %}
+            {% if flash_message.passkey_not_found %}
                 {{ macros.error_banner("Passkey inconnu.") }}
             {% endif %}
 
-            {% if flash_message == "form_not_valid" %}
+            {% if flash_message.form_not_valid %}
                 {{ macros.error_banner("Veuillez remplir dûment le formulaire.") }}
             {% endif %}
 
-            {% if flash_message == "no_place" %}
-                {{ macros.error_banner("Aucun lieu n'a été défini. Après connexion, le navigateur vous redirigera vers le formulaire de création de lieu.") }}
+            {% if flash_message.no_place %}
+                {{ macros.error_banner("Aucun lieu n'a été défini, vous ne pouvez pas enregistrer des visites. Après connexion, le navigateur vous redirigera vers le formulaire de création de lieu.") }}
             {% endif %}
 
-            {% if flash_message == "not_logged" %}
+            {% if flash_message.not_logged %}
                 {{ macros.error_banner("Vous devez vous connecter pour accéder à cette page.") }}
             {% endif %}
 
-            {% if flash_message == "user_exists" %}
+            {% if flash_message.user_exists %}
                 {{ macros.warning_banner("Ce compte a déjà été activé. Veuillez vous connecter avec le mot de passe que vous avez défini durant l'activation de votre compte dans le formulaire ci-dessous.") }}
             {% endif %}
         </div>

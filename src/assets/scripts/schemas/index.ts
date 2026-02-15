@@ -38,7 +38,10 @@ export const SignInActivationSchema = z.object({
 
 export const LoginSchema = z.object({
     email: z.email({
-        error: `Identifiant : ${REQUIRED_MESSAGE}`
+        error: (issue) =>
+            issue.input === undefined
+                ? `Identifiant : ${REQUIRED_MESSAGE}`
+                : 'Identifiant : E-mail invalide',
     }),
     mot_de_passe: z.string({
         error: `Mot de passe : ${REQUIRED_MESSAGE}`
