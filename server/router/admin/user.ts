@@ -15,9 +15,10 @@ const router = express.Router();
 router.get(['/utilisateurs'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
     const listUsers = await UserModel.findAll({
         raw: true,
-        ...( req.query?.actif && {
+        ...(req.query?.filtre && {
             where: {
-                actif: false
+                ...(req.query?.filtre === "approuver" && { approuve: false }),
+                ...(req.query?.filtre === "actif" && { actif: true }),
             }
         })
     });
@@ -29,7 +30,7 @@ router.get(['/utilisateurs'], getUser, requireRoleMiddleware("ADMIN"), async (re
                 role: LIST_ROLES.find((role) => item.role === role.value)
             }
         }),
-        actif: req.query.actif,
+        filtre: req.query.filtre,
     });
 })
 
@@ -90,7 +91,6 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
         })
         res.cookie('flash_message', JSON.stringify(['delete_success']), flashMessageCookieOptions);
     } catch (error) {
-        console.log(error)
         res.cookie('flash_message', JSON.stringify(['delete_error']), flashMessageCookieOptions);
     }
 

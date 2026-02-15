@@ -22,9 +22,10 @@ Liste utilisateurs
         <header class="flex flex-col md:flex-row gap-y-3 justify-between md:items-center mb-10 -mt-1.5">
             <div class="text-black-numixs">
                 <h1 class="title-font font-bold text-6xl">Utilisateurs</h1>
-                <select data-select-redirect="actif" id="dropdown" class="py-1">
+                <select data-select-redirect="filtre" id="dropdown" class="py-1">
                     <option value="">Tous</option>
-                    <option {{ "selected" if actif == "1" else "" }}  value="1">A approuver</option>
+                    <option {{ "selected" if filtre == "approuver" else "" }} value="approuver">A approuver</option>
+                    <option {{ "selected" if filtre == "actif" else "" }} value="actif">Actif</option>
                 </select>
             </div>
         </header>
