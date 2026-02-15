@@ -16,6 +16,7 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 - Installer les dépendances : `npm install` dans le dossier du projet
 - Copier et renommer le fichier ".env.dist" en ".env.local"
     > Note : Pensez à définir toutes les variables sinon des comportements inattendus peuvent survenir
+- Remplir les valeurs vides du fichier ".env.local"
 
 ## Utilisation
 **Développement**
@@ -25,7 +26,7 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 **Production**
 - Compiler les ressources : `npm run build`
 - Lancer le serveur de production : `npm run prod`
-
+- Lister les adresses ip autorisées à enregistrer des visites dans le fichier `whitelist-ip.txt`
 
 ## Construit avec
 - tailwindcss
