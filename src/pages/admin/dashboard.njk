@@ -27,7 +27,9 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                 {% include "includes/dropdown-places.njk" %}
             </div>
         </header>
-        {% include "includes/hello-banner.njk" %}
+        <div class="flex flex-col gap-3 mb-4">
+            {% include "includes/hello-banner.njk" %}
+        </div>
         <header class="flex gap-4 mb-6 justify-between sm:justify-normal text-black-numixs">
             {% include "includes/date-nav.njk" %}
         </header>
@@ -36,10 +38,10 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
         <div class="text-black-numixs">
             <div class="flex flex-col md:flex-row gap-y-5 justify-between mb-2">
                 <nav class="flex flex-row text-lg items-center">
-                    <p class="mr-1.5 font-bold whitespace-nowrap">Filter par</p>
+                    <p class="mr-1.5 font-bold whitespace-nowrap">Visites par</p>
                     <ul class="flex flex-row gap-1.5 overflow-auto whitespace-nowrap px-2 py-1.5">
                         <li>
-                            <a class="underline hocus:no-underline rounded-md px-2 py-0.5 {{ "bg-green-numixs" if query_params.filtre == "visite" or query_params.filtre is not defined else ""}}" href="{{ formatQueryParams({ filtre: "visite", lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}">Type de visites</a>
+                            <a class="underline hocus:no-underline rounded-md px-2 py-0.5 {{ "bg-green-numixs" if query_params.filtre == "visite" or query_params.filtre is not defined else ""}}" href="{{ formatQueryParams({ filtre: "visite", lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}">Type</a>
                         </li>
                         <li>
                             <a class="underline hocus:no-underline rounded-md px-2 py-0.5 {{ "bg-green-numixs" if query_params.filtre == "genre" else ""}}" href="{{ formatQueryParams({ filtre: "genre", lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "" }, true) }}">Genre</a>
@@ -152,7 +154,7 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     <canvas id="detailsChart" class="w-full"></canvas>
                 </div>
                 <div class="overflow-x-auto">
-                    <table id="table-details-chart" class="w-full mt-4 whitespace-nowrap" style="width: 100%; border-collapse: collapse;">
+                    <table id="table-details-chart" class="w-full mt-4 whitespace-nowrap table-col-hover" style="width: 100%; border-collapse: collapse;">
                         <caption>
                             Détails
                         </caption>
