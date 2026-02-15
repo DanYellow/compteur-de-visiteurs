@@ -38,6 +38,7 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
             }
         }
     }
+    const listFlashMessages = JSON.parse(req.cookies.flash_message || "[]")
 
     res.render("pages/admin/add_edit-place.njk", {
         place: {
@@ -46,7 +47,7 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
             ...place,
         },
         is_edit: Object.keys(place || {}).length > 0,
-        flash_message: req.cookies.flash_message,
+        flash_message: listFlashMessages.reduce((a: Record<string, string>, v: string) => ({ ...a, [v]: v }), {}),
         not_found: req.params.placeId && !place,
         list_place_types: listPlaceTypes.map((item) => ({
             ...item,

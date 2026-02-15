@@ -27,7 +27,15 @@ Liste lieux numixs
         <div class="flex flex-col gap-3 mb-4">
             {% include "includes/hello-banner.njk" %}
             {% include "includes/form-banner-success.njk" %}
+            {% if flash_message.no_place %}
+                {{ macros.warning_banner("Vous devez sélectionner un lieu avant de pouvoir mettre en place l'enregistrement de vos visiteurs.") }}
+            {% endif %}
+            {% if places_list.length == 0 %}
+            {{ macros.warning_banner("En absence de lieu Numixs, il est impossible d'enregistrer des visites.")}}
+            {% endif %}
         </div>
+
+
         {# <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 mb-4">Les lieux avec des heures d'ouverture non définis ne peuvent pas être définis pour un évènement ou comme lieu de receuil de visites</p> #}
 
         <div class="text-black-numixs">
