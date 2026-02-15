@@ -33,6 +33,11 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 - nunjucks
 - expressjs
 - typescript
+- mailpit. **Pour la gestion des e-mails en mode développement**
+
+## Gestion des emails
+1. Générer le CSS des emails avec la commande `npm run email`
+> Note : Tous les gabarits d'emails sont accessibles à l'adresse : [http://127.0.0.1:3900/email/](http://127.0.0.1:3900/email/) - **Développement uniquement**
 
 ## Licence
 
