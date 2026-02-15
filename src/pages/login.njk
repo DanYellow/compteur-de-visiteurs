@@ -24,7 +24,7 @@ Connexion
             <h1 class="text-6xl title-font text-green-numixs">Connexion</h1>
         </div>
         <div class="flex flex-col gap-3 mb-4">
-            {% if flash_message == "account_created" %}
+            {% if flash_message.account_created %}
                 {% set banner_content %}
                     Votre compte a été confirmé, vous pouvez désormais vous connecter avec l'adresse e-mail <span class="font-bold">"{{ user_email }}"</span> et le mot de passe ou votre passkey définit précédemment.
                 {% endset %}

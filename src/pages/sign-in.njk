@@ -23,18 +23,18 @@ Inscription
             <h1 class="text-6xl title-font text-green-numixs">Inscription</h1>
         </div>
         <div class="flex flex-col gap-3 mb-4">
-            {% if flash_message == "register_success" %}
+            {% if flash_message.register_success %}
                 {% set banner_content %}
                     Votre inscription a été prise en compte. Vous serez notifié(e) par e-mail, à l'adresse <span class="font-bold">"{{ signin_email }}"</span>, lorsque votre compte sera activé par un administrateur. Vous pourrez ensuite compléter votre inscription.
                 {% endset %}
                 {{ macros.success_banner(banner_content)}}
             {% endif %}
 
-            {% if flash_message == "register_fail" %}
+            {% if flash_message.register_fail %}
                 {{ macros.error_banner("Vous ne pouvez pas créer un compte avec cette adresse e-mail.")}}
             {% endif %}
 
-            {% if flash_message == "register_duplicate" %}
+            {% if flash_message.register_duplicate %}
                 {% set banner_content %}
                     Une inscription avec l'adresse <span class="font-bold">"{{ signin_email }}"</span> a déjà été enregistrée, veuillez attendre la validation de votre compte par un administrateur. Vous serez notifié(e) par e-mail lorsque votre inscription sera validée.
                 {% endset %}
