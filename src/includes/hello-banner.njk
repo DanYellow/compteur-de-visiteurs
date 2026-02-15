@@ -1,4 +1,4 @@
-{% if flash_message == "successful_login" %}
+{% if flash_message.successful_login %}
     <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 rounded-lg">
         Bonjour <span class="font-bold">{{ current_user.prenom }} {{ current_user.nom|uppercase }}</span>.
     </p>

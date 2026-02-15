@@ -120,7 +120,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     {% endif %}
                     <p>{{ current_date|date("EEEE dd LLLL yyyy") }}</p>
                 </div>
-                <details class="bg-black-numixs text-white-numixs rounded-md">
+                <details {{ "inert" if is_day_closed and list_day_events | length == 0 else "" }} class="inert:opacity-70 bg-black-numixs text-white-numixs rounded-md">
                     <summary class="p-3 text-2xl">
                         Détails des visites par type de visiteur
                     </summary>

@@ -48,7 +48,7 @@ router.get('/connexion', async (req, res) => {
                 derniere_connexion: new Date().toString()
             })
 
-            res.cookie('flash_message', 'successful_login', flashMessageCookieOptions);
+            res.cookie('flash_message', JSON.stringify(['successful_login']), flashMessageCookieOptions);
             res.cookie("token", token, { httpOnly: true, secure: false, sameSite: 'strict' });
 
             if ("return_to" in (req.session as CustomSession)) {
@@ -57,7 +57,7 @@ router.get('/connexion', async (req, res) => {
 
             return res.redirect(`${res.locals.admin_prefix}/dashboard`);
         } catch (error) {
-            console.log("ee", error)
+            console.log(error)
         }
     } else {
         res.cookie('flash_message', 'wrong_credentials', flashMessageCookieOptions);

@@ -55,6 +55,10 @@ Connexion
                 {{ macros.error_banner("Veuillez remplir dûment le formulaire.") }}
             {% endif %}
 
+            {% if flash_message == "no_place" %}
+                {{ macros.error_banner("Aucun lieu n'a été défini. Après connexion, le navigateur vous redirigera vers le formulaire de création de lieu.") }}
+            {% endif %}
+
             {% if flash_message == "not_logged" %}
                 {{ macros.error_banner("Vous devez vous connecter pour accéder à cette page.") }}
             {% endif %}

@@ -56,16 +56,16 @@ router.get("/", checkIpAdress, async (req, res) => {
     const nbPlaces = await PlaceModel.count();
 
     if (nbPlaces === 0) {
-        res.cookie('flash_message', JSON.stringify(["no_place"]), { maxAge: 1000, httpOnly: true })
+        res.cookie('flash_message', JSON.stringify(["no_place"]), flashMessageCookieOptions)
         return res.redirect(`${res.locals.admin_prefix}/lieu`);
     } else if (!("lieu_numixs" in req.cookies)) {
-        res.cookie('flash_message', JSON.stringify(["unset_place"]), { maxAge: 1000, httpOnly: true })
+        res.cookie('flash_message', JSON.stringify(["unset_place"]), flashMessageCookieOptions)
         return res.redirect("/choix-lieu");
     }
 
     const place = await PlaceModel.findOne({ where: { slug: req.cookies.lieu_numixs } })
     if (!place) {
-        res.cookie('flash_message', JSON.stringify(["unknown_place"]), { maxAge: 1000, httpOnly: true })
+        res.cookie('flash_message', JSON.stringify(["unknown_place"]), flashMessageCookieOptions)
         return res.redirect("/choix-lieu");
     }
 
@@ -174,7 +174,7 @@ router.get("/interdit", async (_, res) => {
 });
 
 router.post('/deconnexion', (_, res) => {
-    res.cookie('flash_message', "success_logout", flashMessageCookieOptions)
+    res.cookie('flash_message', JSON.stringify(["success_logout"]), flashMessageCookieOptions)
     res.clearCookie("token");
     res.redirect('/connexion');
 });
