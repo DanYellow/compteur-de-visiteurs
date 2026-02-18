@@ -128,6 +128,7 @@ router.get(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware
         },
         is_edit: Object.keys(event || {}).length > 0,
         not_found: req.params.eventId && !event,
+        today: DateTime.now().toFormat("yyyy-LL-dd"),
         list_places: listPlaces,
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
