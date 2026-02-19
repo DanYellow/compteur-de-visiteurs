@@ -93,7 +93,7 @@ Compteur de visiteurs
     </div>
 
     <footer class="max-w-7xl px-3 mx-auto text-center text-xs mt-4">
-        <p>Projet inspiré par le projet compteur social développé au FabLab Numixs de Sarcelles en Python.</p>
+        <p>Projet inspiré par le projet compteur social développé au FacLab® numixs de Sarcelles en Python.</p>
     </footer>
 
     <dialog id="result-form-modal" data-dialog="form-submitted" class="backdrop:bg-[#272626] m-auto max-w-5xl w-full bg-transparent px-2 result-form-modal">
@@ -151,6 +151,9 @@ Compteur de visiteurs
             </button>
         </header>
         <hr class="pb-1 mt-1 border-green-numixs">
+        <p class="mb-2">
+            Récolter vos données de visite anonymes nous permet de témoigner de l'affluence de votre lieu et ainsi nous permettre d'obtenir des fonds pour financer nos machines et donc vos projets.
+        </p>
     </dialog>
 
     <dialog id="visit-code" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
@@ -159,7 +162,8 @@ Compteur de visiteurs
         </header>
         <hr class="pb-1 mt-1 border-green-numixs">
         <p class="mb-2">
-            Le code de visite est un moyen simple et rapide de remplir ce formulaire. Récolter ces données nous permet de témoigner de l'affluence de votre lieu et ainsi nous permettre d'obtenir des fonds pour financer nos machines et donc vos projets.
+            Le code de visite est un moyen simple et rapide de remplir ce formulaire. Lors de votre visite, un code unique est géré. Retenez-le, il vous permettra re-remplir ce formulaire avec les mêmes informations que fournies lors de votre dernière visite.
+            Si lors de votre prochaine visite, vous modifiez vos données, le code sera modifié. 
         </p>
         <div class="mb-4 flex flex-col gap-3">
             {{ macros.warning_banner("Un code de visite ne peut pas contenir la lettre \"O\"") }}

@@ -243,15 +243,15 @@ export const DEFAULT_CLOSE_HOURS = '19:30:00';
 
 export const listPlaceTypes = [
     {
-        label: 'Faclab® Numixs',
+        label: 'Faclab® numixs',
         value: 'faclab',
     },
     {
-        label: 'Station Numixs',
+        label: 'Station numixs',
         value: 'station',
     },
     {
-        label: 'Numixs Lab',
+        label: 'numixs Lab',
         value: 'lab',
     },
 ];

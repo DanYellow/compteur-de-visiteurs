@@ -58,6 +58,7 @@ export default defineConfig(({ mode }) => {
                     "dashboard": path.resolve(__dirname, "src/assets/scripts/dashboard.ts"),
                     "download-char": path.resolve(__dirname, "src/assets/scripts/download-chart.ts"),
                     "details-event-dialog": path.resolve(__dirname, "src/assets/scripts/dialogs/details-event-dialog.ts"),
+                    "details-visit-dialog": path.resolve(__dirname, "src/assets/scripts/dialogs/details-visit-dialog.ts"),
                     "sign-in-form": path.resolve(__dirname, "src/assets/scripts/forms/sign-in-form.ts"),
                     "toggle-input-visibility": path.resolve(__dirname, "src/assets/scripts/toggle-input-visibility.ts"),
                 },
