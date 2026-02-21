@@ -47,7 +47,7 @@ router.get(['/evenements'], getUser, requireRoleMiddleware(), async (req, res) =
                     }),
                     ...(req.query?.annee && {
                         [Op.and]: {
-                            [Op.gte]: startDate,
+                            [Op.gte]: req.query?.periode ? `${today.toFormat("yyyy-LL-dd")}` : startDate,
                             [Op.lt]: endDate
                         }
                     }),

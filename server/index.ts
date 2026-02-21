@@ -190,7 +190,7 @@ nunjucksConfig.addGlobal(
 
         const stringifiedParams = params.toString();
 
-        return stringifiedParams.length ? `?${params.toString()}` : "";
+        return stringifiedParams.length ? `?${params.toString()}` : '?';
     }
 );
 
