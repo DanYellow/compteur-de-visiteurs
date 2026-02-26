@@ -418,7 +418,7 @@ select.error {
 }
 
 .custom-select,
-::picker(select) {
+.custom-select::picker(select) {
     border-radius: 4px;
     appearance: base-select;
     padding: 0.35rem;
@@ -447,7 +447,7 @@ select.error {
     }
 
     .img {
-        background-color: #464444;
+        background-color: var(--color-black-numixs);
         padding: 0.5rem;
         border-radius: var(--radius-md);
     }
