@@ -18,10 +18,10 @@ services:
       - --providers.docker=true               # use Docker as provider
       - --entrypoints.web.address=:80         # HTTP entrypoint
     ports:
-      - "80:80"                               # HTTP
-      - "8080:8080"                           # Dashboard
+      - 80:80                             # HTTP
+      - 8080:8080                           # Dashboard
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
     restart: unless-stopped
 
   compteur-de-visiteurs:
@@ -41,12 +41,10 @@ services:
     environment:
       - NODE_ENV=production
       - IS_DOCKER=true
-      - CHOKIDAR_USEPOLLING=true
-      - WATCHPACK_POLLING=true
     env_file:
       - .env.local
     labels:
-      - "traefik.enable=true"
+      - 'traefik.enable=true'
       - 'traefik.http.routers.compteur.rule=Host("faclab.localhost")'
-      - "traefik.http.routers.compteur.entrypoints=web"
+      - 'traefik.http.routers.compteur.entrypoints=web'
     restart: unless-stopped
