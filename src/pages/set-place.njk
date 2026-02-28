@@ -2,6 +2,10 @@
 
 {% import "includes/macros.njk" as macros %}
 
+{% block title %}
+Sélectionner le lieu
+{% endblock %}
+
 {% set root_class = "register" %}
 {% block content %}
     <div class="max-w-7xl mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] justify-center gap-24 mx-auto">
@@ -20,7 +24,7 @@
             {% endif %}
             {% if flash_message.closed_place %}
                 {% set banner_content %}
-                    <span class="font-bold">
+                <span class="font-bold">
                         Le lieu définit n'est pas ouvert aujourd'hui. Les visites ne seront pas enregistrées.
                     </span>
                 {% endset %}
@@ -39,9 +43,28 @@
         <form action="" method="post">
             <div class="flex flex-col">
                 <label for="place" class="title-font text-green-numixs text-5xl">Sélectionner le lieu</label>
-                <select name="place" id="place" class="text-black-numixs">
+                <select name="place" id="place" class="text-black-numixs custom-select selected-content">
+                    <button>
+                        <selectedcontent></selectedcontent>
+                    </button>
                     {% for _place in places_list %}
-                        <option {{ "selected" if _place.slug === place.slug }} value="{{ _place.slug }}">{{ _place.nom }}</option>
+                        <option {{ "selected" if _place.slug === place.slug }} value="{{ _place.slug }}">
+                            <div class="flex gap-3">
+                                <img width="80" class="img" src="/images/logos/{{ _place.logo }}" alt="">
+
+                                <div class="flex flex-col">
+                                    <span class="text-lg">{{ _place.nom }}</span>
+                                    <span class="text-sm">Horaires : {{ _place.heure_ouverture }}-{{ _place.heure_fermeture }} - Jours de fermeture : {{ _place.jours_fermeture or "Aucun" }}</span>
+                                </div>
+                            </div>
+                        </option>
+                    {% endfor %}
+                </select>
+                <select name="place" id="place" class="text-black-numixs no-selected-content">
+                    {% for _place in places_list %}
+                        <option {{ "selected" if _place.slug === place.slug }} value="{{ _place.slug }}">
+                            {{ _place.nom }}
+                        </option>
                     {% endfor %}
                 </select>
             </div>
@@ -52,7 +75,25 @@
                     {% include "includes/icons/next-arrow.svg" %}
                 </button>
             </div>
-
         </form>
     </div>
+    <script>
+        if ("HTMLSelectedContentElement" in window) {
+            document
+                .documentElement
+                .classList
+                .add("supports-selectedcontent");
+            Array
+                .from(document.getElementsByClassName("no-selected-content"))
+                .forEach((item) => item.remove())
+        } else {
+            document
+                .documentElement
+                .classList
+                .add("not-supports-selectedcontent");
+            Array
+                .from(document.getElementsByClassName("selected-content"))
+                .forEach((item) => item.remove())
+        }
+    </script>
 {% endblock %}

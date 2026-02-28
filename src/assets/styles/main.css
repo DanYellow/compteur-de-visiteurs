@@ -442,6 +442,16 @@ select.error {
         border-radius: var(--radius-md);
     }
 
+    option {
+        margin-block: 0.25rem;
+        &:first-of-type {
+            margin-top: 0;
+        }
+        &:last-of-type {
+            margin-bottom: 0;
+        }
+    }
+
     :is(selectedcontent, option)::checkmark {
         content: none;
     }
@@ -455,8 +465,27 @@ select.error {
 
 option:checked {
     font-weight: bold;
-
-    img {
-        border: 2px solid var(--color-green-numixs);
+    &:not(:hover) {
+        background-color: hwb(from var(--color-green-numixs) h w b / 0.85);
+    }
+    .img {
+        border: 2px solid var(--color-white-numixs);
     }
 }
+
+.selected-content, .no-selected-content {
+    display: none;
+}
+
+.supports-selectedcontent {
+    .selected-content {
+        display: inline;
+    }
+}
+
+.not-supports-selectedcontent {
+    .no-selected-content {
+        display: inline;
+    }
+}
+
