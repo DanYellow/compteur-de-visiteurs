@@ -6,8 +6,10 @@ import juice from "juice";
 import nunjucks from "nunjucks";
 import { loadEnvFile } from 'node:process';
 
-import { listGroups } from "#scripts/utils.shared";
-import type { VisitRaw, VisitValue } from "#types";
+import { capitalizeFirstLetter, listGroups } from "#scripts/utils.shared";
+import type { PlaceRaw, VisitRaw, VisitValue } from "#types";
+import type Place from "#models/place";
+import { Info } from "luxon";
 
 loadEnvFile(`${process.cwd()}/.env.local`);
 
@@ -77,4 +79,33 @@ export const getVisitsSummaries = (listVisits: VisitRaw[]) => {
     }, {} as Record<VisitValue, number>);
 
     return result;
+}
+
+export const computedPlaces = async (listPlaces: Place[]) => {
+    const listDays = Info.weekdays('long', { locale: 'fr' }).map(capitalizeFirstLetter);
+
+    const listPlacesComputed = await Promise.all(
+        listPlaces.map(async (place) => {
+            const placeRegularOpening = await place.getRegularOpening()
+            const listClosedDays = (placeRegularOpening?.jours_fermeture || []) as string[];
+
+            const [heure_ouverture_heure, heure_ouverture_minutes] = placeRegularOpening.heure_ouverture.split(":");
+            const [heure_fermeture_heure, heure_fermeture_minutes] = placeRegularOpening.heure_fermeture.split(":");
+
+            const res = {
+                ...place.toJSON(),
+                jours_fermeture: listClosedDays.map((idxDay) => listDays[Number(idxDay) - 1]).join(', '),
+                heure_ouverture: `${heure_ouverture_heure}h${heure_ouverture_minutes}`,
+                heure_fermeture: `${heure_fermeture_heure}h${heure_fermeture_minutes}`,
+                incomplet: placeRegularOpening === null,
+                logo: `${place.toJSON().type}-numixs.svg`
+            } as PlaceRaw;
+
+            delete res.regularOpening;
+
+            return res;
+        })
+    );
+
+    return listPlacesComputed;
 }

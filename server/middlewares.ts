@@ -16,7 +16,7 @@ export const requireRoleMiddleware = (role: string = "") => {
 
         const routeRoleWeight = LIST_ROLES.find((item) => item.value === role);
         if (!routeRoleWeight) {
-            return res.redirect("/interdit");
+            return res.status(401).redirect("/interdit");
         }
 
         try {
@@ -31,7 +31,7 @@ export const requireRoleMiddleware = (role: string = "") => {
             if (userRoleData && userRoleData.weight >= routeRoleWeight?.weight) {
                 return next();
             } else {
-                res.redirect("/interdit")
+                return res.status(401).redirect("/interdit")
             }
         } catch (error) {
             let flashMessages;

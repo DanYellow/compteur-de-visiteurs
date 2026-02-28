@@ -16,6 +16,7 @@ import AdminRouter from "#server/router/admin";
 import CredentialRouter from "#server/router/credential";
 import CredentialsPasskeyRouter from "#server/router/credentials-passkey";
 import PasswordRouter from "#server/router/password";
+import { computedPlaces } from "#server/utils.server";
 
 const router = express.Router();
 
@@ -127,7 +128,6 @@ router.get("/", checkIpAdress, async (req, res) => {
 
 router.get(["/choix-lieu"], async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
-        raw: true,
         order: [["nom", "ASC"]],
         where: {
             ouvert: {
@@ -144,7 +144,7 @@ router.get(["/choix-lieu"], async (req, res) => {
     }
 
     res.render("pages/set-place.njk", {
-        "places_list": listPlaces,
+        "places_list": await computedPlaces(listPlaces),
         place,
     });
 }).post(["/choix-lieu"], async (req, res) => {

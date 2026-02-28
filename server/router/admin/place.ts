@@ -5,9 +5,9 @@ import { capitalizeFirstLetter, DEFAULT_CLOSE_HOURS, DEFAULT_OPEN_HOURS, listPla
 import { PlaceSchema } from "#scripts/schemas/index";
 import { slugify, DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User } from "#models/index";
-import type { PlaceRaw } from "#types";
 import { getUser, requireRoleMiddleware } from "#server/middlewares";
 import { flashMessageCookieOptions } from "#server/index";
+import { computedPlaces } from "#server/utils.server";
 
 const router = express.Router();
 
@@ -150,8 +150,7 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
     res.redirect(`${res.locals.admin_prefix}/lieux`);
 })
 
-router.get(['/lieux'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
-    const listDays = Info.weekdays('long', { locale: 'fr' }).map(capitalizeFirstLetter);
+router.get(['/lieux'], getUser, requireRoleMiddleware("ADMIN"), async (_, res) => {
     const listPlaces = await PlaceModel.findAll({
         include: [{ model: RegularOpeningModel, as: "regularOpening", required: false }],
         order: [
@@ -159,27 +158,7 @@ router.get(['/lieux'], getUser, requireRoleMiddleware("ADMIN"), async (req, res)
         ],
     })
 
-    const listPlacesComputed = await Promise.all(
-        listPlaces.map(async (place) => {
-            const placeRegularOpening = await place.getRegularOpening()
-            const listClosedDays = (placeRegularOpening?.jours_fermeture || []) as string[];
-
-            const [heure_ouverture_heure, heure_ouverture_minutes] = (placeRegularOpening?.heure_ouverture || DEFAULT_OPEN_HOURS).split(":");
-            const [heure_fermeture_heure, heure_fermeture_minutes] = (placeRegularOpening?.heure_fermeture || DEFAULT_CLOSE_HOURS).split(":");
-
-            const res = {
-                ...place.toJSON(),
-                jours_fermeture: listClosedDays.map((idxDay) => listDays[Number(idxDay) - 1]).join(', '),
-                heure_ouverture: `${heure_ouverture_heure}h${heure_ouverture_minutes}`,
-                heure_fermeture: `${heure_fermeture_heure}h${heure_fermeture_minutes}`,
-                incomplet: placeRegularOpening === null,
-            } as PlaceRaw;
-
-            delete res.regularOpening;
-
-            return res;
-        })
-    );
+    const listPlacesComputed = await computedPlaces(listPlaces);
 
     res.render("pages/admin/places-list.njk", {
         places_list: listPlacesComputed,
