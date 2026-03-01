@@ -442,6 +442,15 @@ select.error {
         border-radius: var(--radius-md);
     }
 
+    optgroup {
+        font-weight: bold;
+        font-size: var(--text-xl);
+        option {
+            padding-left: calc(var(--spacing) * 7);
+            font-size: initial;
+        }
+    }
+
     option {
         margin-block: 0.25rem;
         &:first-of-type {

@@ -42,7 +42,10 @@ Sélectionner le lieu
         </div>
         <form action="" method="post">
             <div class="flex flex-col">
-                <label for="place" class="title-font text-green-numixs text-5xl">Sélectionner le lieu</label>
+                <label for="place">
+                    <p class="title-font text-green-numixs text-5xl">Sélectionner le lieu</p>
+                    <p>Note : Seuls les lieux ouverts sont sélectionnables.</p>
+                </label>
                 <select name="place" id="place" class="text-black-numixs custom-select selected-content">
                     <button>
                         <selectedcontent></selectedcontent>
@@ -54,7 +57,8 @@ Sélectionner le lieu
 
                                 <div class="flex flex-col">
                                     <span class="text-lg">{{ _place.nom }}</span>
-                                    <span class="text-sm">Horaires : {{ _place.heure_ouverture }}-{{ _place.heure_fermeture }} - Jours de fermeture : {{ _place.jours_fermeture or "Aucun" }}</span>
+                                    <span class="text-sm">Horaires : {{ _place.heure_ouverture }}-{{ _place.heure_fermeture }} <span class="text-sm hidden md:inline"> - Fermeture : {{ _place.jours_fermeture or "Aucun" }}</span></span>
+                                    <span class="text-sm inline md:hidden">Fermeture : {{ _place.jours_fermeture or "Aucun" }}</span>
                                 </div>
                             </div>
                         </option>

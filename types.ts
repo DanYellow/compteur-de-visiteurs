@@ -3,8 +3,8 @@ import type { InferAttributes } from "sequelize";
 import type { JwtPayload } from "jsonwebtoken";
 import type { SessionData } from "express-session";
 
-import type { Place as PlaceModel, Visit as VisitModel, Event as EventModel, User as UserModel } from "#models/index.ts";
-import type { listAgeGroups, listGenders, listDepartments, listGroups } from "#scripts/utils.shared.ts";
+import type { Place as PlaceModel, Visit as VisitModel, Event as EventModel, User as UserModel } from "#models/index";
+import type { listAgeGroups, listGenders, listDepartments, listGroups } from "#scripts/utils.shared";
 
 export type LineChartEntry = {
     data: Number[];

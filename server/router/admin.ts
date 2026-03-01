@@ -11,7 +11,7 @@ import { Op } from "sequelize";
 import { getUser, requireRoleMiddleware } from "#server/middlewares";
 
 import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared";
-import { getVisitsSummaries } from "#server/utils.server";
+import { computedPlaces, getVisitsSummaries } from "#server/utils.server";
 
 const router = express.Router();
 
@@ -61,6 +61,7 @@ router.get(["/", "/dashboard", "/tableau-de-bord"], getUser, requireRoleMiddlewa
             ['nom', 'ASC'],
         ],
     })
+    const listPlacesComputed = await computedPlaces(listPlaces);
     const placeSelected = req.query?.lieu || "tous";
     let place = undefined;
 
@@ -100,7 +101,7 @@ router.get(["/", "/dashboard", "/tableau-de-bord"], getUser, requireRoleMiddlewa
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
         "is_day_closed": listDaysClosed.includes(String(daySelected.weekday)),
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
-        "list_places": listPlaces,
+        "list_places": listPlacesComputed,
         "list_events": listEventsComputed,
         "query_params": req.query,
         "place": {
@@ -205,12 +206,12 @@ router.get(["/visiteurs", "/visites"], getUser, requireRoleMiddleware(), async (
     const { data: listVisits, pagination } = (await listVisitsReq.json()) || { data: [], pagination: {}};
 
     const listPlaces = await PlaceModel.findAll({
-        raw: true,
         include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
         order: [
             ['nom', 'ASC'],
         ],
-    })
+    });
+    const listPlacesComputed = await computedPlaces(listPlaces);
 
     const listEventsComputed: EventRaw[] = (placeSelected === "tous" ? listAllEvents : place!.listEvents).map((item) => {
         return {
@@ -234,7 +235,7 @@ router.get(["/visiteurs", "/visites"], getUser, requireRoleMiddleware(), async (
         "is_today": daySelected.startOf('day').equals(today.startOf('day')),
         "is_day_closed": isClosedDay,
         "list_months": Info.months('long', { locale: 'fr' }).map(capitalizeFirstLetter),
-        "list_places": listPlaces,
+        "list_places": listPlacesComputed,
         "list_events": listEventsComputed,
         "place": {
             jours_fermeture: DEFAULT_CLOSED_DAYS,
