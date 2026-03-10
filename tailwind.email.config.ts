@@ -48,6 +48,8 @@ export default {
         },
         fontSize: {
             base: "18px",
+            sm: "14px",
+            xs: "12px",
         },
         fontWeight: {
             bold: "bold",
