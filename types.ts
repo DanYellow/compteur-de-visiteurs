@@ -158,6 +158,10 @@ export type VisitGroupFields = {
 export const dbCsvGroupsMapping = [{
     csv_key: 'Education',
     db_key: 'eleve'
+},
+{
+    csv_key: 'IUT / Scolaire',
+    db_key: 'eleve'
 }, {
     csv_key: 'Entrepreneur / Incubateur',
     db_key: 'entreprise_externe'

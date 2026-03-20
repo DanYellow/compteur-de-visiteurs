@@ -9,7 +9,7 @@ import csv from "csv-parser";
 import { capitalizeFirstLetter, listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '#scripts/utils.shared';
 import { getUser, requireRoleMiddleware } from "#server/middlewares";
 
-import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel, Visit } from "#models/index";
+import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel, Visit as VisitModel } from "#models/index";
 import type { CommonRegularOpening, EventRaw, PlaceRaw, csvVisit } from "#types";
 import { flashMessageCookieOptions } from "#server/index";
 import { dbCsvGroupsMapping } from "#types";
@@ -200,7 +200,13 @@ router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddlew
     const validator = await VisitCsvSchema.omit({ file: true }).safeParseAsync(payload);
     const redirectUrl = req.headers.referer || '/';
 
-    if (!validator.success || !payload.file || isCsvFileValid(payload.file) !== null) {
+    const place = await PlaceModel.findByPk(Number(req.body.lieu), {
+        include: [
+            { model: RegularOpeningModel, as: "regularOpening", required: true, attributes: ["heure_ouverture"] },
+        ],
+    });
+
+    if (!validator.success || !payload.file || isCsvFileValid(payload.file) !== null || !place) {
         res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions);
         return res.redirect(redirectUrl);
     }
@@ -208,34 +214,40 @@ router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddlew
     fs.createReadStream(payload.file!.path)
         .pipe(csv({ skipLines: 1, mapHeaders: ({ header }) => header.trim() }))
         .on('data', (data) => csvContent.push(data))
-        .on('end', () => {
-            const listRequestsPayload: Omit<InferCreationAttributes<Visit>, 'id'>[] = [];
+        .on('end', async () => {
+            const listRequestsPayload: Omit<InferCreationAttributes<VisitModel>, 'id'>[] = [];
             const listRowsWithVisits = getRowsWithVisits(csvContent);
 
             listRowsWithVisits.forEach((visit) => {
                 dbCsvGroupsMapping.forEach((key) => {
                     if (visit[key.csv_key]) {
                         for (let index = 0; index < Number(visit[key.csv_key]); index++) {
-                            const visitDate = DateTime.fromFormat(visit.Janvier, "dd/LL/yy");
+                            const visitDate = DateTime.fromFormat(`${visit.Janvier} ${place?.regularOpening.heure_ouverture}`, "dd/LL/yy HH:mm:ss", { zone: "Europe/Paris" });
 
-                            listRequestsPayload.push({
-                                date_passage: visitDate.isValid ? visitDate.toJSDate() : undefined,
-                                genre: '1', // Homme
-                                tranche_age: 2, // 25/34 ans
-                                departement: '75',
-                                [key.db_key]: 'oui',
-                                lieu_id: Number(req.body.place),
-                            })
+                            if (visitDate.isValid) {
+                                listRequestsPayload.push({
+                                    date_passage: visitDate.toJSDate(),
+                                    genre: '0', // Homme
+                                    tranche_age: 2, // 25/34 ans
+                                    departement: '75',
+                                    [key.db_key]: 'oui',
+                                    lieu_id: Number(req.body.lieu),
+                                })
+                            }
                         }
                     }
                 })
             })
 
-            // await User.bulkCreate(users);
-            // console.log(listRequestsPayload);
+            try {
+                await VisitModel.bulkCreate(listRequestsPayload);
+                res.cookie('flash_message', JSON.stringify(['import_success']), flashMessageCookieOptions);
+            } catch (error) {
+                res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions);
+            }
+
             fs.unlinkSync(payload.file!.path);
 
-            res.cookie('flash_message', JSON.stringify(['import_success']), flashMessageCookieOptions);
             return res.redirect(redirectUrl);
         }).on('error', () => {
             fs.unlinkSync(payload.file!.path);

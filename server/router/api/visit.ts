@@ -37,8 +37,8 @@ const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null,
                 SELECT 1
                 FROM regular_opening AS p
                 WHERE p.place_id = ${visitTable}.lieu_id
-                AND p.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                AND p.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                AND p.heure_ouverture <= strftime('%H:%M:%S', ${visitTable}.date_passage, 'localtime')
+                AND p.heure_fermeture >= strftime('%H:%M:%S', ${visitTable}.date_passage, 'localtime')
             )
             )
             OR
@@ -50,8 +50,8 @@ const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null,
                     INNER JOIN place_event pe ON pe.event_id = so.id
                     WHERE pe.place_id = ${visitTable}.lieu_id
                     AND so.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
-                    AND so.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                    AND so.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                    AND so.heure_ouverture <= strftime('%H:%M:%S', ${visitTable}.date_passage, 'localtime')
+                    AND so.heure_fermeture >= strftime('%H:%M:%S', ${visitTable}.date_passage, 'localtime')
                 )
             )
         )

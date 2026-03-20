@@ -52,6 +52,13 @@
                         file:bg-green-numixs/40 file:text-gray-numixs
                         hover:file:bg-green-numixs p-0.5 border-1 border-gray-numixs border-solid"
                 />
+                <div class="text-black-numixs text-xs">
+                    <p>Notes : </p>
+                    <ul class="ml-3 list-disc">
+                        <li>Les visites avec une date incorrecte seront ignorées</li>
+                        <li>L'heure de visite sera égale à l'heure d'ouverture du lieu sélectionné ci-dessous</li>
+                    </ul>
+                </div>
             </div>
 
             <div class="flex flex-col">
@@ -63,7 +70,7 @@
                     <option value="">Sélectionnez un lieu</option>
                     {% if list_places | length %}
                     {% for place in list_places %}
-                        <option value="{{ place.slug }}">
+                        <option value="{{ place.id }}">
                             <div class="flex gap-3 items-center">
                                 <img width="70" class="img" src="/images/logos/{{ place.logo }}" alt="">
                                 <span>{{ place.nom }}</span>
@@ -72,6 +79,7 @@
                     {% endfor %}
                 {% endif %}
                 </select>
+
             </div>
 
             <button type="submit" class="{{ primary_button_classes }}">
