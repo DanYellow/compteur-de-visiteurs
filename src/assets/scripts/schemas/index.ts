@@ -5,6 +5,7 @@ import { REQUIRED_MESSAGE } from '#scripts/utils.shared';
 export { VisitSchema, DepartmentSchema, AgeSchema, GenderSchema, GroupSchema, VisitCodeSchema } from "./visit";
 export { PlaceSchema } from "./place";
 export { EventSchema } from "./event";
+export { VisitCsvSchema } from "./visit-csv";
 
 // https://github.com/colinhacks/zod/discussions/4051
 export const SignInSchema = z.object({

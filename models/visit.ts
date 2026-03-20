@@ -2,10 +2,6 @@ import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAt
 
 import { listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '#scripts/utils.shared';
 import Place from '#models/place';
-// import type { VisitGroupFields } from '#types';
-
-// type VisitAttributes = { id: number; name: string } & VisitGroupFields;
-// type VisitCreation = Omit<VisitAttributes, 'id'>;
 
 export default class Visit extends Model<InferAttributes<Visit>, InferCreationAttributes<Visit>> {
     declare id: CreationOptional<number>;

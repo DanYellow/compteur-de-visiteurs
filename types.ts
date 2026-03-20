@@ -154,3 +154,34 @@ export type VisitValue = (typeof listGenders)[number]['value'] |
 export type VisitGroupFields = {
     [K in (typeof listGroups)[number]['value']]: string;
 };
+
+export const dbCsvGroupsMapping = [{
+    csv_key: 'Education',
+    db_key: 'eleve'
+}, {
+    csv_key: 'Entrepreneur / Incubateur',
+    db_key: 'entreprise_externe'
+}, {
+    csv_key: 'Artisan / Artiste',
+    db_key: 'artisan'
+}, {
+    csv_key: 'Collectivité',
+    db_key: 'eleve'
+}, {
+    csv_key: 'Fablab',
+    db_key: 'fablab'
+}, {
+    csv_key: 'Asso',
+    db_key: 'association'
+}, {
+    csv_key: 'Habitant',
+    db_key: 'autre'
+}] as const;
+
+type csvColsCountVisitField = typeof dbCsvGroupsMapping[number]['csv_key'];
+
+export type csvVisit = {
+    [key: string]: string;
+} & {
+    [K in csvColsCountVisitField]: string;
+};
