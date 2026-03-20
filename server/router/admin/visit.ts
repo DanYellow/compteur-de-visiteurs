@@ -3,13 +3,15 @@ import { DateTime, Info } from "luxon";
 import { Op, type InferCreationAttributes } from "sequelize";
 import multer from "multer";
 import fs from "node:fs";
+import path from "node:path";
 import csv from "csv-parser";
 
 import { capitalizeFirstLetter, listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '#scripts/utils.shared';
 import { getUser, requireRoleMiddleware } from "#server/middlewares";
 
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel, Visit } from "#models/index";
-import type { CommonRegularOpening, EventRaw, PlaceRaw, VisitRaw, csvVisit } from "#types";
+import type { CommonRegularOpening, EventRaw, PlaceRaw, csvVisit } from "#types";
+import { flashMessageCookieOptions } from "#server/index";
 import { dbCsvGroupsMapping } from "#types";
 
 import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared";
@@ -160,12 +162,11 @@ router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddlew
 
     const listPlacesComputed = await computedPlaces(listPlaces);
 
-
     res.render("pages/admin/import-csv.njk", {
         "list_places": listPlacesComputed,
     });
 }).post(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddleware(""), upload.single('file'), async (req, res) => {
-    const results: csvVisit[] = [];
+    const csvContent: csvVisit[] = [];
 
     const listCsvColsCountVisit = dbCsvGroupsMapping.map((item) => item.csv_key);
 
@@ -173,22 +174,43 @@ router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddlew
         return data.filter((item) => listCsvColsCountVisit.some(key => item[key] !== ""))
     }
 
+    const isCsvFileValid = (file: Express.Multer.File) => {
+        if (!file) {
+            return 'Fichier CSV requis';
+        }
+
+        // Check MIME type
+        if (file.mimetype !== 'text/csv' || path.extname(file.originalname).toLowerCase() !== '.csv') {
+            return 'Seuls les fichiers .csv sont autorisés';
+        }
+
+        // const MAX_SIZE = 5 * 1024 * 1024;
+        // if (file.size > MAX_SIZE) {
+        //     return 'Fichier trop volumineux (max 5MB)';
+        // }
+
+        return null;
+    }
+
     const payload = {
         file: req.file,
         ...req.body,
     }
 
-    const validator = await VisitCsvSchema.safeParseAsync(payload);
-    if (!validator.success) {
-        return res.render("pages/admin/import-csv.njk");
+    const validator = await VisitCsvSchema.omit({ file: true }).safeParseAsync(payload);
+    const redirectUrl = req.headers.referer || '/';
+
+    if (!validator.success || !payload.file || isCsvFileValid(payload.file) !== null) {
+        res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions);
+        return res.redirect(redirectUrl);
     }
 
-    fs.createReadStream(req.file!.path)
+    fs.createReadStream(payload.file!.path)
         .pipe(csv({ skipLines: 1, mapHeaders: ({ header }) => header.trim() }))
-        .on('data', (data) => results.push(data))
+        .on('data', (data) => csvContent.push(data))
         .on('end', () => {
             const listRequestsPayload: Omit<InferCreationAttributes<Visit>, 'id'>[] = [];
-            const listRowsWithVisits = getRowsWithVisits(results);
+            const listRowsWithVisits = getRowsWithVisits(csvContent);
 
             listRowsWithVisits.forEach((visit) => {
                 dbCsvGroupsMapping.forEach((key) => {
@@ -210,32 +232,17 @@ router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddlew
             })
 
             // await User.bulkCreate(users);
-            //  Janvier: '02/01/26',
-             console.log(listRequestsPayload);
-            // console.log(listRowsWithVisits.at(-1));
-            //             {
-            //     Janvier: '27/02/26',
-            //     Visiteurs: '8',
-            //     'Total semaine': '',
-            //     'Total mois': '',
-            //     '': '',
-            //     Education: '',
-            //     'Entrepreneur / Incubateur': '3',
-            //     'Artisan / Artiste': '',
-            //     'Collectivité': '',
-            //     Fablab: '',
-            //     Asso: '1',
-            //     Habitant: '4'
-            //   }
-            // res.json(results);
+            // console.log(listRequestsPayload);
+            fs.unlinkSync(payload.file!.path);
 
-            // delete temp file
-            fs.unlinkSync(req.file!.path);
-        });
+            res.cookie('flash_message', JSON.stringify(['import_success']), flashMessageCookieOptions);
+            return res.redirect(redirectUrl);
+        }).on('error', () => {
+            fs.unlinkSync(payload.file!.path);
 
-
-    res.render("pages/admin/import-csv.njk", {
-    });
+            res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions);
+            return res.redirect(redirectUrl);
+        })
 })
 
 export default router;

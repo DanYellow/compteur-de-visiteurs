@@ -58,6 +58,8 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
         return next();
     }
 
+    const redirectUrl = req.headers.referer || '/';
+
     let payload = {
         ...req.body,
         jours_fermeture: JSON.stringify(req.body.jours_fermeture || [])
@@ -65,7 +67,8 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
 
     const validator = PlaceSchema.safeParse(payload);
     if (!validator.success) {
-        return res.render("pages/add_edit-place.njk");
+        res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions);
+        return res.redirect(redirectUrl);
     }
 
     payload = {
@@ -123,15 +126,13 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
             res.cookie('flash_message', JSON.stringify(['create_success']), flashMessageCookieOptions);
         }
         if (req.params.placeId) {
-            res.redirect(`${res.locals.admin_prefix}/lieu/${req.params.placeId}`);
+            res.redirect(redirectUrl);
         } else {
             res.redirect(`${res.locals.admin_prefix}/lieux`);
         }
     } catch (e) {
         res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions)
-
-        console.log(e)
-        return res.render("pages/admin/add_edit-place.njk");
+        return res.redirect(redirectUrl);
     }
 }).post(['/lieu/suppression'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
     try {

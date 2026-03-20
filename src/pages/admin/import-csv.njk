@@ -31,11 +31,11 @@
         <form action="" method="post" class="flex flex-col gap-5" data-import-csv-form enctype="multipart/form-data">
             <div class="flex flex-col gap-2.5">
                 {% if flash_message.error %}
-                    <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Une erreur est survenue</p>
+                    {{ macros.error_banner("Une erreur est survenue")}}
                 {% endif %}
 
-                {% if flash_message.update_success %}
-                    {{ macros.success_banner("L'évènement a été mis à jour avec succès.")}}
+                {% if flash_message.import_success %}
+                    {{ macros.success_banner("Les données ont été importées avec succès")}}
                 {% endif %}
 
                 <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
