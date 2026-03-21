@@ -211,40 +211,54 @@ router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddlew
         return res.redirect(redirectUrl);
     }
 
+    const expectedCsvHeaders = ['Janvier', 'Visiteurs'];
+    let areCsvHeadersValid = true;
+
     fs.createReadStream(payload.file!.path)
         .pipe(csv({ skipLines: 1, mapHeaders: ({ header }) => header.trim() }))
         .on('data', (data) => csvContent.push(data))
+        .on('headers', (headers) => {
+            const missing = expectedCsvHeaders.filter(h => !headers.includes(h));
+
+            if (missing.length) {
+                areCsvHeadersValid = false;
+            }
+        })
         .on('end', async () => {
-            const listRequestsPayload: Omit<InferCreationAttributes<VisitModel>, 'id'>[] = [];
-            const listRowsWithVisits = getRowsWithVisits(csvContent);
+            if (!areCsvHeadersValid) {
+                res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions);
+            } else {
+                const listRequestsPayload: Omit<InferCreationAttributes<VisitModel>, 'id'>[] = [];
+                const listRowsWithVisits = getRowsWithVisits(csvContent);
 
-            listRowsWithVisits.forEach((visit) => {
-                dbCsvGroupsMapping.forEach((key) => {
-                    if (visit[key.csv_key]) {
-                        for (let index = 0; index < Number(visit[key.csv_key]); index++) {
-                            const visitDate = DateTime.fromFormat(`${visit.Janvier} ${place.regularOpening.heure_ouverture}`, "dd/LL/yy HH:mm:ss", { zone: "Europe/Paris" });
+                listRowsWithVisits.forEach((visit) => {
+                    dbCsvGroupsMapping.forEach((key) => {
+                        if (visit[key.csv_key]) {
+                            for (let index = 0; index < Number(visit[key.csv_key]); index++) {
+                                const visitDate = DateTime.fromFormat(`${visit.Janvier} ${place.regularOpening.heure_ouverture}`, "dd/LL/yy HH:mm:ss", { zone: "Europe/Paris" });
 
-                            if (visitDate.isValid) {
-                                listRequestsPayload.push({
-                                    date_passage: visitDate.toJSDate(),
-                                    genre: '0', // Homme
-                                    tranche_age: 2, // 25/34 ans
-                                    departement: '75',
-                                    [key.db_key]: 'oui',
-                                    lieu_id: Number(req.body.lieu),
-                                    est_importe: true,
-                                })
+                                if (visitDate.isValid) {
+                                    listRequestsPayload.push({
+                                        date_passage: visitDate.toJSDate(),
+                                        genre: '0', // Homme
+                                        tranche_age: 2, // 25/34 ans
+                                        departement: '75',
+                                        [key.db_key]: 'oui',
+                                        lieu_id: Number(req.body.lieu),
+                                        est_importe: true,
+                                    })
+                                }
                             }
                         }
-                    }
+                    })
                 })
-            })
 
-            try {
-                await VisitModel.bulkCreate(listRequestsPayload);
-                res.cookie('flash_message', JSON.stringify(['import_success']), flashMessageCookieOptions);
-            } catch (error) {
-                res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions);
+                try {
+                    await VisitModel.bulkCreate(listRequestsPayload);
+                    res.cookie('flash_message', JSON.stringify(['import_success']), flashMessageCookieOptions);
+                } catch (error) {
+                    res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions);
+                }
             }
 
             fs.unlinkSync(payload.file!.path);

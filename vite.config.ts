@@ -61,6 +61,7 @@ export default defineConfig(({ mode }) => {
                     "details-visit-dialog": path.resolve(__dirname, "src/assets/scripts/dialogs/details-visit-dialog.ts"),
                     "sign-in-form": path.resolve(__dirname, "src/assets/scripts/forms/sign-in-form.ts"),
                     "toggle-input-visibility": path.resolve(__dirname, "src/assets/scripts/toggle-input-visibility.ts"),
+                    "import-csv-visits-form": path.resolve(__dirname, "src/assets/scripts/import-csv-visits-form.ts"),
                 },
                 output: {
                     assetFileNames: "[name].[ext]",
