@@ -222,7 +222,7 @@ router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddlew
                 dbCsvGroupsMapping.forEach((key) => {
                     if (visit[key.csv_key]) {
                         for (let index = 0; index < Number(visit[key.csv_key]); index++) {
-                            const visitDate = DateTime.fromFormat(`${visit.Janvier} ${place?.regularOpening.heure_ouverture}`, "dd/LL/yy HH:mm:ss", { zone: "Europe/Paris" });
+                            const visitDate = DateTime.fromFormat(`${visit.Janvier} ${place.regularOpening.heure_ouverture}`, "dd/LL/yy HH:mm:ss", { zone: "Europe/Paris" });
 
                             if (visitDate.isValid) {
                                 listRequestsPayload.push({
@@ -232,6 +232,7 @@ router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddlew
                                     departement: '75',
                                     [key.db_key]: 'oui',
                                     lieu_id: Number(req.body.lieu),
+                                    est_importe: true,
                                 })
                             }
                         }

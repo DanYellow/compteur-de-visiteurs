@@ -21,12 +21,14 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 ## Utilisation
 **Développement**
 - Lancer le serveur : `npm run dev`
+- Si nécessaire. Lancer les migrations : `npx sequelize-cli db:migrate`
 - Ouvrir le lien: http://localhost:3900/ (ou le port que vous aurez défini via la variable d'environnement `VITE_PORT`)
 
 **Production**
 - Compiler les ressources : `npm run build`
 - Lancer le serveur de production : `npm run prod`
 - Lister les adresses ip autorisées à enregistrer des visites dans le fichier `whitelist-ip.txt`
+  - Ceci permet d'éviter qu'une personne externe au lieu puisse s'enregistrer et donc fausser les données
 
 ## Construit avec
 - tailwindcss
@@ -34,7 +36,7 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 - nunjucks
 - expressjs
 - typescript
-- mailpit. **Pour la gestion des e-mails en mode développement**
+- mailpit **Pour la gestion des e-mails en mode développement**
 
 ## Gestion des emails
 1. Générer le CSS des emails avec la commande `npm run email`

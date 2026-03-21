@@ -8,6 +8,7 @@ export default class Visit extends Model<InferAttributes<Visit>, InferCreationAt
     declare lieu_id: ForeignKey<Place['id']>;
     declare genre: string;
     declare departement: string;
+    declare est_importe?: boolean;
     declare tranche_age: number;
     declare groupe?: string;
     declare date_passage: CreationOptional<Date>;
@@ -49,6 +50,10 @@ export default class Visit extends Model<InferAttributes<Visit>, InferCreationAt
                         ...listDepartments.map((item) => item.value)
                     ),
                     allowNull: false,
+                },
+                est_importe: {
+                    type: DataTypes.BOOLEAN,
+                    defaultValue: false,
                 },
                 ...listBusinessSectorKeys,
                 date_passage: {
