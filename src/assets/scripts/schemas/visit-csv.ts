@@ -49,6 +49,6 @@ export const VisitCsvSchema = z.object({
                 reader.readAsText(file);
             })
         }, {
-            message: "Le format du fichier ne respecte pas le format attendu. Veuillez vous réferrer au document \"Rapport de visites\".",
+            message: "Fichier csv : Le format du fichier ne respecte pas le format attendu. Veuillez vous réferrer au document \"Rapport de visites\"",
         })
 })

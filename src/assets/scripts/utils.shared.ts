@@ -1,10 +1,10 @@
+import { DateTime, Info } from 'luxon';
 import type {
     BaseConfigData,
     GroupItem,
     VisitRaw,
     WeekMonth,
 } from '#types';
-import { DateTime, Info } from 'luxon';
 
 export const listGroups = [
     {

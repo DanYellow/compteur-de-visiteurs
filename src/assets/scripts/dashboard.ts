@@ -386,7 +386,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         const chartData = JSON.parse(sourceBtn.closest("div")?.querySelector("canvas")?.dataset.chartData || "{}");
 
         const { xLabels = [], xTitle = "", xValuesSuffix = "", chartTitle, downloadLink } = configData[chartSelected] || {};
-        const totalVisits = Object.values(chartData).flat().length;
+
 
         linkDownloadChartData.href = downloadLink || "";
 
@@ -404,6 +404,8 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         const visitsHasEvents = Object.values(chartData).flat().some((item) => (item as VisitRaw).liste_evenements !== "")
         const tableData = getPivotTable(chartData, xLabels as [], visitsHasEvents)
 
+        const totalVisits = tableData.footer.at(-1)?.total.flat().at(-1) || 0;
+
         const periodTableRow = document.createElement("tr");
         tableDetailsChartTableHead.append(periodTableRow);
 
@@ -411,7 +413,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
         visitTypeTableRow.style.borderBottom = "2px solid white";
         tableDetailsChartTableHead.append(visitTypeTableRow);
 
-        const nb = tableData.body[0].total[0].length;
+        const nbSubColumns = tableData.body[0].total[0].length;
 
         // Table header
         ;[null, ...xLabels, "Total"].forEach((item, cellIndex, array) => {
@@ -424,13 +426,13 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                 th.classList.add(...["sticky", "left-0"]);
                 th.style.backgroundColor = grayNumixs;
             }
-            th.colSpan = cellIndex === 0 ? 1 : nb;
+            th.colSpan = cellIndex === 0 ? 1 : nbSubColumns;
             if (cellIndex === array.length - 1) {
                 th.style.borderLeft = "2px solid white";
             }
             periodTableRow.append(th);
 
-            for (let indexHead = 0; indexHead < nb; indexHead++) {
+            for (let indexHead = 0; indexHead < nbSubColumns; indexHead++) {
                 const th = document.createElement("th");
                 th.classList.add(...['px-2'])
                 th.style.paddingBottom = "0.25rem";
