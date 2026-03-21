@@ -16,7 +16,7 @@ import { dbCsvGroupsMapping } from "#types";
 
 import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared";
 import { computedPlaces, getVisitsSummaries } from "#server/utils.server";
-import { VisitCsvSchema } from "#scripts/schemas/visit-csv";
+import { expectedCsvHeaders, VisitCsvSchema } from "#scripts/schemas/visit-csv";
 
 const router = express.Router();
 
@@ -211,7 +211,6 @@ router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddlew
         return res.redirect(redirectUrl);
     }
 
-    const expectedCsvHeaders = ['Janvier', 'Visiteurs'];
     let areCsvHeadersValid = true;
 
     fs.createReadStream(payload.file!.path)
