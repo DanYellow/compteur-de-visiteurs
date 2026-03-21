@@ -512,7 +512,10 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                 const label = typeof item === 'object' ? item.name : item
                 return `${label}${xValuesSuffix}`;
             }),
-            datasets: lineChartDatasets,
+            datasets: lineChartDatasets.map((item) => ({
+                ...item,
+                data: item.data.toSpliced(-1, 1)
+            }))
         };
 
         new Chart(
