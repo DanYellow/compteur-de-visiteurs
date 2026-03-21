@@ -84,8 +84,11 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
             {% include "includes/hello-banner.njk" %}
         </div>
         <div class="text-black-numixs">
-            <header class="flex gap-4 mb-6 justify-between sm:justify-normal">
-                {% include "includes/date-nav.njk" %}
+            <header class="flex gap-2 justify-between flex-col sm:flex-row mb-6 ">
+                <div class="flex gap-4 justify-between sm:justify-normal">
+                    {% include "includes/date-nav.njk" %}
+                </div>
+                <a href="visiteurs/import" class="py-2.5 px-5 border-black-numixs border rounded-md hocus:bg-green-numixs text-center">Importer csv</a>
             </header>
             {% set todayLink = "/visites" %}
             {% include "includes/calendar.njk" %}
