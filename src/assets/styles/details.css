@@ -73,6 +73,12 @@ details {
         }
     }
 
+    &[inert] {
+        summary::before {
+            background-color: black;
+        }
+    }
+
     > summary {
         cursor: default;
         display: flex;
@@ -87,12 +93,14 @@ details {
         }
 
         &::before {
+            content: "";
             display: block;
             width: var(--size-arrow-icon);
             height: var(--size-arrow-icon);
             aspect-ratio: 1;
             scale: 0.7;
-            content: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0Ij48cGF0aCBmaWxsPSJ3aGl0ZSIgZD0iTTcuMzMgMjRsLTIuODMtMi44MjkgOS4zMzktOS4xNzUtOS4zMzktOS4xNjcgMi44My0yLjgyOSAxMi4xNyAxMS45OTZ6Ii8+PC9zdmc+);
+            mask-image: url('/images/icons/chevron-right.svg');
+            background-color: white;
         }
 
         + * {

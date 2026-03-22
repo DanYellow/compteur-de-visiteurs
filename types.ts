@@ -170,7 +170,7 @@ export const dbCsvGroupsMapping = [{
     db_key: 'artisan'
 }, {
     csv_key: 'Collectivité',
-    db_key: 'eleve'
+    db_key: 'collectivité'
 }, {
     csv_key: 'Fablab',
     db_key: 'fablab'
