@@ -215,8 +215,8 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
                 SELECT 1
                 FROM regular_opening AS p
                 WHERE p.place_id = ${visitTable}.lieu_id
-                AND p.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                AND p.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                AND p.heure_ouverture <= strftime('%H:%M:%S', ${visitTable}.date_passage, 'localtime')
+                AND p.heure_fermeture >= strftime('%H:%M:%S', ${visitTable}.date_passage, 'localtime')
             )
             )
             OR
@@ -228,8 +228,8 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
                     INNER JOIN place_event pe ON pe.event_id = so.id
                     WHERE pe.place_id = ${visitTable}.lieu_id
                     AND so.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
-                    AND so.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                    AND so.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                    AND so.heure_ouverture <= strftime('%H:%M:%S', ${visitTable}.date_passage, 'localtime')
+                    AND so.heure_fermeture >= strftime('%H:%M:%S', ${visitTable}.date_passage, 'localtime')
                 )
             )
         )
@@ -243,8 +243,8 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
                     ON pe.event_id = evt.id
                 WHERE evt.id = ${eventId}
                     AND evt.date = strftime('%Y-%m-%d', ${visitTable}.date_passage, 'localtime')
-                    AND evt.heure_ouverture <= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
-                    AND evt.heure_fermeture >= strftime('%H:%M', ${visitTable}.date_passage, 'localtime')
+                    AND evt.heure_ouverture <= strftime('%H:%M:%S', ${visitTable}.date_passage, 'localtime')
+                    AND evt.heure_fermeture >= strftime('%H:%M:%S', ${visitTable}.date_passage, 'localtime')
         )
     `
     }

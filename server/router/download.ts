@@ -16,10 +16,9 @@ router.get('/', async (req, res) => {
         "semaine": "week",
         "mois": "month",
         "annee": "year",
-    }
+    };
 
     const [configKey] = Object.entries(predicatesDict).filter(([key]) => Object.keys(req.query).includes(key)).at(0) || "jour"
-
     let csvPayload = [];
 
     const extraParams = new URLSearchParams(Object.entries(
@@ -41,7 +40,7 @@ router.get('/', async (req, res) => {
     }
 
     const fileTimestamp = `${slugify(placeName)}_${String(Date.now()).slice(-6)}.csv`;
-    const csvFilename = `liste-visites_${configKey}_${fileTimestamp}`;
+    const csvFilename = `liste-visites_${configKey}-${extraParams.get('jour')}_${fileTimestamp}`;
 
     csvPayload = getLinearCSV(requestRes.data)
 
