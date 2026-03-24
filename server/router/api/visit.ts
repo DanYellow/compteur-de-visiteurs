@@ -5,7 +5,7 @@ import { Op, type ProjectionAlias, type WhereOptions } from 'sequelize';
 
 import sequelize, { Place as PlaceModel, RegularOpening as RegularOpeningModel, Visit as VisitModel, Event as EventModel, VisitRegistered as VisitRegisteredModel } from "#models/index";
 import { PERIOD_PREDICATE } from "#server/router/api/index";
-import { listAgeGroups, listDepartments, listGenders, listGroups, NB_ITEMS_PER_PAGE } from "#scripts/utils.shared";
+import { listAgeGroups, listDepartments, listGenders, listGroups, NB_ITEMS_PER_PAGE, maxYear, minYear } from "#scripts/utils.shared";
 import { VisitCodeSchema } from "#scripts/schemas/index";
 
 const router = express.Router();
@@ -415,8 +415,16 @@ router.get("/visites", async (req, res) => {
 
     const filtreParam = (req.query?.filtre || "jour") as string;
 
-    const startTime = daySelected.startOf((PERIOD_PREDICATE as any)[filtreParam]?.luxon || "day");
-    const endTime = daySelected.endOf((PERIOD_PREDICATE as any)[filtreParam]?.luxon || "day");
+    let startTime = daySelected.startOf((PERIOD_PREDICATE as any)[filtreParam]?.luxon || "day");
+    let endTime = daySelected.endOf((PERIOD_PREDICATE as any)[filtreParam]?.luxon || "day");
+    if (req.query.filtre === "tous") {
+        const start = DateTime.fromISO(`${minYear}-01-01T00:00:00.00`);
+        const end = DateTime.fromISO(`${maxYear}-12-31T00:00:00.00`);
+        if (start.isValid && end.isValid) {
+            startTime = start
+            endTime = end;
+        }
+    }
 
     let place: PlaceModel | null = null;
     if (req.query.lieu && req.query.lieu !== "tous") {

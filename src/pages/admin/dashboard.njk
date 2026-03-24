@@ -106,6 +106,17 @@ Tableau de bord – {{ current_date|date("EEEE dd LLLL yyyy") }}
                     </menu>
                     <canvas id="yearly-chart"></canvas>
                 </div>
+                <div class="col-span-full bg-black-numixs p-3 rounded-2xl h-150 relative">
+                    <menu class="{{ menu_chart_classes }}">
+                        <li>
+                            {{ macros.download_chart_extensible_button("all-chart") }}
+                        </li>
+                        <li>
+                            {{ macros.zoom_chart_extensible_button("tous", "detailsChartModal") }}
+                        </li>
+                    </menu>
+                    <canvas id="all-chart"></canvas>
+                </div>
             </div>
         </div>
 

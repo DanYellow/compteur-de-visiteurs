@@ -21,6 +21,11 @@ export const PERIOD_PREDICATE = {
         "luxon": "year",
         "property": "month",
     },
+    "tous": {
+        "substitution": "%Y",
+        "luxon": "year",
+        "property": "year",
+    },
 }
 
 import UserApiRouter from "#server/router/api/user";

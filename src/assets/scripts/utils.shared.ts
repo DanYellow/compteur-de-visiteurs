@@ -216,6 +216,9 @@ export const getWeeksRangeMonth = (daySelected: DateTime) => {
     return listWeeks;
 };
 
+export const minYear = 2021;
+export const maxYear = new Date().getFullYear();
+
 export const baseConfigData: BaseConfigData = {
     jour: {
         apiKey: 'jour',
@@ -230,6 +233,10 @@ export const baseConfigData: BaseConfigData = {
     annee: {
         apiKey: 'annee',
         listColumns: listMonths,
+    },
+    tous: {
+        apiKey: 'tous',
+        listColumns: Array.from({ length: maxYear - minYear + 1 }, (_, i) => String(minYear + i)),
     },
 };
 

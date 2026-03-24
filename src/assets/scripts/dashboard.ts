@@ -137,6 +137,14 @@ const configData: ChartConfigData = {
         downloadLink: `/telecharger?annee=${daySelected.toFormat("yyyy-LL-dd")}${downloadLinkSuffix}&pivot`,
         xTitle: 'Mois',
         xLabels: baseConfigData.annee.listColumns!,
+    },
+    "tous": {
+        ...baseConfigData.tous,
+        id: "all-chart",
+        chartTitle: `Toutes les visites uniques`,
+        downloadLink: `/telecharger?tous${downloadLinkSuffix}&pivot`,
+        xTitle: 'Année',
+        xLabels: baseConfigData.tous.listColumns!,
     }
 }
 
