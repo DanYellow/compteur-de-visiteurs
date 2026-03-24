@@ -1,8 +1,6 @@
 <dialog id="detail-roles" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
     <header class="flex flex-row justify-between items-start">
-        <div>
-            <p class="title-font text-4xl">Détails rôles</p>
-        </div>
+        <p class="title-font text-4xl">Détails rôles</p>
         <button type="button" command="close" commandfor="detail-roles" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
@@ -10,15 +8,44 @@
         </button>
     </header>
     <hr class="pb-1 mt-1 border-green-numixs">
-    <ul class="list-disc list-inside">
-        <li>
-            <span class="font-bold">Lecteur :</span> Peut lire et exporter les données
-        </li>
-        <li>
-            <span class="font-bold">Numixs lab :</span> Rôle du lecteur + Peut créer/éditer des évènements
-        </li>
-        <li>
-            <span class="font-bold">Administrateur :</span> Rôle Numixs Lab + Peut activer/approuver des comptes et créer/éditer des lieux
-        </li>
-    </ul>
+    <table class="w-full">
+        <thead>
+            <tr class="text-center">
+                <th></th>
+                <th colspan="3">Rôles</th>
+            </tr>
+            <tr class="text-center">
+                <th></th>
+                <th>Lecteur</th>
+                <th>Numixs Lab</th>
+                <th>Administrateur</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="hover:bg-slate-200/30">
+                <td class="px-2">Lire et télécharger les données (.csv)</td>
+                <td class="text-center">✅</td>
+                <td class="text-center">✅</td>
+                <td class="text-center">✅</td>
+            </tr>
+            <tr class="hover:bg-slate-200/30">
+                <td class="px-2">Créer/éditer des évènements</td>
+                <td class="text-center px-2">❌</td>
+                <td class="text-center px-2">✅</td>
+                <td class="text-center px-2">✅</td>
+            </tr>
+            <tr class="hover:bg-slate-200/30">
+                <td class="px-2">Créer/éditer des lieux</td>
+                <td class="text-center px-2">❌</td>
+                <td class="text-center px-2">❌</td>
+                <td class="text-center px-2">✅</td>
+            </tr>
+            <tr class="hover:bg-slate-200/30">
+                <td class="px-2">Activer/approuver/éditer des comptes tiers</td>
+                <td class="text-center px-2">❌</td>
+                <td class="text-center px-2">❌</td>
+                <td class="text-center px-2">✅</td>
+            </tr>
+        </tbody>
+    </table>
 </dialog>
