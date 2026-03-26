@@ -22,7 +22,7 @@ const router = express.Router();
 
 const upload = multer({ dest: 'tmp/' });
 
-router.get(["/visiteurs", "/visites"], getUser, requireRoleMiddleware(), async (req, res) => {
+router.get(["/visiteurs", "/visites"], getUser, async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.date) {
@@ -152,7 +152,7 @@ router.get(["/visiteurs", "/visites"], getUser, requireRoleMiddleware(), async (
     });
 });
 
-router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddleware(""), async (req, res) => {
+router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddleware(""), async (_, res) => {
     const listPlaces = await PlaceModel.findAll({
         include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
         order: [

@@ -67,7 +67,7 @@ export const getUser = async (req: Request, res: Response, next: NextFunction) =
     try {
         const token = jwt.verify(req.cookies.token, String(process.env.JWT_SECRET)) as UserTokenData;
         const user = await UserModel.findByPk(token.id, {
-            attributes: ['id', 'nom', 'email', 'prenom', "role", "actif"]
+            attributes: ['id', 'nom', 'email', 'prenom', 'role', 'actif']
         });
 
         if (user && user.actif === true) {

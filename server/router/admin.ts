@@ -9,7 +9,7 @@ import VisitRouter from "#server/router/admin/visit";
 import type { EventRaw, PlaceRaw } from "#types";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel } from "#models/index";
 import { Op } from "sequelize";
-import { getUser, requireRoleMiddleware } from "#server/middlewares";
+import { getUser } from "#server/middlewares";
 
 import { DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared";
 import { computedPlaces } from "#server/utils.server";
@@ -21,7 +21,7 @@ router.use("/", EventRouter);
 router.use("/", UserRouter);
 router.use("/", VisitRouter);
 
-router.get(["/", "/dashboard", "/tableau-de-bord"], getUser, requireRoleMiddleware("NUMIXS_LAB"), async (req, res) => {
+router.get(["/", "/dashboard", "/tableau-de-bord"], getUser, async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.date) {
@@ -115,8 +115,5 @@ router.get(["/", "/dashboard", "/tableau-de-bord"], getUser, requireRoleMiddlewa
         },
     });
 })
-
-
-
 
 export default router;

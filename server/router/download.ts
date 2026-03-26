@@ -16,6 +16,7 @@ router.get('/', async (req, res) => {
         "semaine": "week",
         "mois": "month",
         "annee": "year",
+        "tous": "tous",
     };
 
     const [configKey] = Object.entries(predicatesDict).filter(([key]) => Object.keys(req.query).includes(key)).at(0) || "jour"
