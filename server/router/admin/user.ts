@@ -2,7 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import { Op } from "sequelize";
 
-import { getUser, requireRoleMiddleware } from "#server/middlewares";
+import { requireMinimumRole } from "#server/middlewares";
 import { User as UserModel, UserPublicKeyCredentials as UserPublicKeyCredentialsModel } from "#models/index";
 import { LIST_ROLES } from "#scripts/utils.shared";
 import { flashMessageCookieOptions } from "#server/index";
@@ -12,7 +12,7 @@ const NUMBER_REGEX = /^\d+$/;
 
 const router = express.Router();
 
-router.get(['/utilisateurs'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
+router.get(['/utilisateurs'], requireMinimumRole("ADMIN"), async (req, res) => {
     const listUsers = await UserModel.findAll({
         raw: true,
         ...(req.query?.filtre && {
@@ -34,7 +34,7 @@ router.get(['/utilisateurs'], getUser, requireRoleMiddleware("ADMIN"), async (re
     });
 })
 
-router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMiddleware(""), async (req, res) => {
+router.get(['/utilisateur/:userId', '/utilisateur/moi'], requireMinimumRole(), async (req, res) => {
     let user = await UserModel.findByPk(req.params.userId, {
         raw: true,
     });
@@ -59,7 +59,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
         is_edit: true,
         list_roles: LIST_ROLES.filter((item) => item.value !== "SUPER_ADMIN"),
     });
-}).post(['/utilisateur/:userId'], getUser, requireRoleMiddleware(""), async (req, res, next) => {
+}).post(['/utilisateur/:userId'], requireMinimumRole(""), async (req, res, next) => {
     if ("userId" in req.params && !NUMBER_REGEX.test(req.params.userId) && req.params.userId !== "moi") {
         return next();
     }
@@ -81,7 +81,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
     }
 
     res.redirect(`${res.locals.admin_prefix}/utilisateur/${req.params.userId}`);
-}).post(['/utilisateur/suppression'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
+}).post(['/utilisateur/suppression'], requireMinimumRole("ADMIN"), async (req, res) => {
     try {
         await UserModel.destroy({
             where: {
@@ -97,7 +97,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], getUser, requireRoleMid
     res.redirect(`${res.locals.admin_prefix}/utilisateurs`);
 })
 
-router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res) => {
+router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], requireMinimumRole(), async (req, res) => {
     if (req.params.userId !== "moi" && String(req.params.userId) !== String(res.locals.current_user!.id)) {
         return res.redirect("/interdit");
     }
@@ -113,7 +113,7 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUs
     res.render("pages/admin/add_edit-user-passkeys.njk", {
         user,
     });
-}).post(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUser, requireRoleMiddleware(""), async (req, res) => {
+}).post(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], requireMinimumRole(), async (req, res) => {
     if (req.params.userId !== "moi" && String(req.params.userId) !== String(res.locals.current_user!.id)) {
         return res.redirect("/interdit");
     }
@@ -139,7 +139,7 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], getUs
 
         res.redirect(`${res.locals.admin_prefix}/utilisateur/moi/passkeys`)
     }
-}).post(['/utilisateur/passkey/suppression'], getUser, requireRoleMiddleware(""), async (req, res) => {
+}).post(['/utilisateur/passkey/suppression'], requireMinimumRole(), async (req, res) => {
     try {
         const user = await UserModel.findByPk(req.body.userId, {
             include: [{

@@ -193,7 +193,7 @@ modal?.addEventListener("toggle", async (e: Event) => {
                         }
                     },
                     totalVisitors: {
-                        text: "Visites : " + allVisits.length,
+                        text: "Visites sur la période : " + allVisits.length,
                         totalColor: greenNumixs,
                     },
                     subtitle: {

@@ -7,7 +7,7 @@ import path from "node:path";
 import csv from "csv-parser";
 
 import { capitalizeFirstLetter, listAgeGroups, listGroups as listBusinessSector, listDepartments, listGenders } from '#scripts/utils.shared';
-import { getUser, requireRoleMiddleware } from "#server/middlewares";
+import { requireMinimumRole } from "#server/middlewares";
 
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, Event as EventModel, Visit as VisitModel } from "#models/index";
 import type { CommonRegularOpening, EventRaw, PlaceRaw, csvVisit } from "#types";
@@ -22,7 +22,7 @@ const router = express.Router();
 
 const upload = multer({ dest: 'tmp/' });
 
-router.get(["/visiteurs", "/visites"], getUser, async (req, res) => {
+router.get(["/visiteurs", "/visites"], async (req, res) => {
     let daySelected = DateTime.now();
     const today = daySelected;
     if (req.query.date) {
@@ -152,7 +152,7 @@ router.get(["/visiteurs", "/visites"], getUser, async (req, res) => {
     });
 });
 
-router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddleware(""), async (_, res) => {
+router.get(["/visiteurs/import", "/visites/import"], requireMinimumRole(""), async (_, res) => {
     const listPlaces = await PlaceModel.findAll({
         include: [{ model: RegularOpeningModel, as: "regularOpening", required: true }],
         order: [
@@ -165,7 +165,7 @@ router.get(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddlew
     res.render("pages/admin/import-csv.njk", {
         "list_places": listPlacesComputed,
     });
-}).post(["/visiteurs/import", "/visites/import"], getUser, requireRoleMiddleware(""), upload.single('file'), async (req, res) => {
+}).post(["/visiteurs/import", "/visites/import"], requireMinimumRole(""), upload.single('file'), async (req, res) => {
     const csvContent: csvVisit[] = [];
 
     const listCsvColsCountVisit = dbCsvGroupsMapping.map((item) => item.csv_key);

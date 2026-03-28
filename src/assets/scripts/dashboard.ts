@@ -316,7 +316,7 @@ listCharts.forEach(async ({ apiKey, id, chartTitle, xTitle, xLabels, xValuesSuff
                             },
                         },
                         totalVisitors: {
-                            text: 'Visites : ' + res.data.length,
+                            text: 'Visites sur la période : ' + res.data.length,
                             totalColor: greenNumixs,
                         },
                         datalabels: {
@@ -575,7 +575,7 @@ detailsChartsDialog.addEventListener("toggle", async (e: Event) => {
                             },
                         },
                         totalVisitors: {
-                            text: 'Visites : ' + totalVisits,
+                            text: 'Visites sur la période : ' + totalVisits,
                             fontSize: "18px",
                             totalColor: greenNumixs,
                         },

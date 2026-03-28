@@ -6,11 +6,11 @@ import sequelize, { Place as PlaceModel, Event as EventModel, RegularOpening as 
 import { capitalizeFirstLetter } from '#scripts/utils.shared';
 import { EventSchema } from "#scripts/schemas/index";
 import type { EventRaw, PlaceRaw } from "#types";
-import { getUser, requireRoleMiddleware } from "#server/middlewares";
+import { requireMinimumRole } from "#server/middlewares";
 
 const router = express.Router();
 
-router.get(['/evenements'], getUser, requireRoleMiddleware(), async (req, res) => {
+router.get(['/evenements'], requireMinimumRole(), async (req, res) => {
     const today = DateTime.now();
 
     const eventTable = EventModel.getTableName();
@@ -79,7 +79,7 @@ router.get(['/evenements'], getUser, requireRoleMiddleware(), async (req, res) =
     });
 })
 
-router.get(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware(), async (req, res) => {
+router.get(['/evenement', '/evenement/:eventId'], requireMinimumRole(), async (req, res) => {
     const listPlaces = await PlaceModel.findAll({
         raw: true,
         order: [["nom", "ASC"]],
@@ -132,7 +132,7 @@ router.get(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware
         list_places: listPlaces,
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
-}).post(['/evenement', '/evenement/:eventId'], getUser, requireRoleMiddleware(), async (req, res) => {
+}).post(['/evenement', '/evenement/:eventId'], requireMinimumRole(), async (req, res) => {
     const payloadValidation = {
         ...req.body,
         lieux: JSON.stringify(req.body.lieux || [])

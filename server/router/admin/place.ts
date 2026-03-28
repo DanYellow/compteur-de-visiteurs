@@ -5,7 +5,7 @@ import { capitalizeFirstLetter, DEFAULT_CLOSE_HOURS, DEFAULT_OPEN_HOURS, listPla
 import { PlaceSchema } from "#scripts/schemas/index";
 import { slugify, DEFAULT_CLOSED_DAYS } from "#scripts/utils.shared";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, User } from "#models/index";
-import { getUser, requireRoleMiddleware } from "#server/middlewares";
+import { requireMinimumRole } from "#server/middlewares";
 import { flashMessageCookieOptions } from "#server/index";
 import { computedPlaces } from "#server/utils.server";
 
@@ -13,7 +13,7 @@ const router = express.Router();
 
 const NUMBER_REGEX = /^\d+$/;
 
-router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
+router.get(['/lieu', '/lieu/:placeId'], requireMinimumRole("ADMIN"), async (req, res) => {
     let place = null
     if (req.params.placeId) {
         place = await PlaceModel.findByPk(req.params.placeId, {
@@ -53,7 +53,7 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
         })).sort((itemA, itemB) => itemA.label.localeCompare(itemB.label)),
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
-}).post(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"), async (req, res, next) => {
+}).post(['/lieu', '/lieu/:placeId'], requireMinimumRole("ADMIN"), async (req, res, next) => {
     if ("placeId" in req.params && !NUMBER_REGEX.test(req.params.placeId)) {
         return next();
     }
@@ -134,7 +134,7 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
         res.cookie('flash_message', JSON.stringify(['error']), flashMessageCookieOptions)
         return res.redirect(redirectUrl);
     }
-}).post(['/lieu/suppression'], getUser, requireRoleMiddleware("ADMIN"), async (req, res) => {
+}).post(['/lieu/suppression'], requireMinimumRole("ADMIN"), async (req, res) => {
     try {
         const placeToDestroy = await PlaceModel.findByPk(req.body.id)
         if (placeToDestroy) {
@@ -151,7 +151,7 @@ router.get(['/lieu', '/lieu/:placeId'], getUser, requireRoleMiddleware("ADMIN"),
     res.redirect(`${res.locals.admin_prefix}/lieux`);
 })
 
-router.get(['/lieux'], getUser, requireRoleMiddleware("ADMIN"), async (_, res) => {
+router.get(['/lieux'], requireMinimumRole("ADMIN"), async (_, res) => {
     const listPlaces = await PlaceModel.findAll({
         include: [{ model: RegularOpeningModel, as: "regularOpening", required: false }],
         order: [

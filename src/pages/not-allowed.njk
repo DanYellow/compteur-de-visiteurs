@@ -10,10 +10,20 @@ Accès interdit
 {% block content %}
     <div class="max-w-7xl mt-8 px-3 mx-auto">
         <h1 class="text-6xl title-font">Accès interdit</h1>
-        <p>Vous n'avez pas accès à cette page. <a href="/" class="underline text-green-numixs hocus:no-underline">Retourner à la page d'accueil</a>.</p>
+        <p>Vous n'avez pas accès à cette page.</p>
+        <ul class="list-disc list-inside">
+            <li>
+                <a href="/" class="underline text-green-numixs hocus:no-underline">Retourner à la page d'accueil</a>
+            </li>
+            {% if is_connected %}
+                <li>
+                    <a href="{{ admin_prefix }}" class="underline text-green-numixs hocus:no-underline">Retourner à l'administration</a>
+                </li>
+            {% endif %}
+        </ul>
         {% if ip %}
             {% set message %}
-                Votre adresse ip <span class="font-bold">{{ ip }}</span> n'est pas autorisée, si vous pensez que c'est une erreur, veuillez contacter l'administrateur.
+                <p>Votre adresse ip <span class="font-bold">{{ ip }}</span> n'est pas autorisée, si vous pensez que c'est une erreur, veuillez contacter l'administrateur.</p>
             {% endset %}
             <div class="mt-4">
                 {{ macros.warning_banner(message) }}

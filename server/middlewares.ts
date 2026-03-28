@@ -8,7 +8,7 @@ import type { CustomSession, UserTokenData } from "#types";
 import { flashMessageCookieOptions } from ".";
 import { User as UserModel } from "#models/index";
 
-export const requireRoleMiddleware = (role: string = "") => {
+export const requireMinimumRole = (role: string = "") => {
     return async (req: Request, res: Response, next: NextFunction) => {
         if (role === "") {
             return next();

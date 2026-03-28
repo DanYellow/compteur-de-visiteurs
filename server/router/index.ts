@@ -8,7 +8,7 @@ import { SOCKET_EVENTS } from "#scripts/utils.shared";
 import { VisitSchema } from "#scripts/schemas/index";
 import { flashMessageCookieOptions, wss } from "#server/index";
 import { Place as PlaceModel, RegularOpening as RegularOpeningModel, VisitRegistered as VisitRegisteredModel, Visit as VisitModel } from "#models/index";
-import { checkIpAdress, parseManifest, requireRoleMiddleware } from "#server/middlewares";
+import { checkIpAdress, getUser, parseManifest, requireMinimumRole } from "#server/middlewares";
 
 import ApiRouter from "#server/router/api/index";
 import DownloadRouter from "#server/router/download";
@@ -19,7 +19,6 @@ import PasswordRouter from "#server/router/password";
 import { computedPlaces } from "#server/utils.server";
 
 const router = express.Router();
-
 router.use(async (req, res, next) => {
     const manifest = await parseManifest("manifest.json");
     res.locals = {
@@ -27,7 +26,6 @@ router.use(async (req, res, next) => {
         manifest,
         lieu: req.query.lieu,
     };
-
     next();
 });
 
@@ -167,8 +165,10 @@ router.get(["/choix-lieu"], async (req, res) => {
     res.redirect("/choix-lieu");
 });
 
-router.get("/interdit", async (_, res) => {
-    res.status(403).render("pages/not-allowed.njk");
+router.get("/interdit", getUser, async (_, res) => {
+    res.status(403).render("pages/not-allowed.njk", {
+        is_connected: Object.keys(res.locals?.current_user || {}).length > 0
+    });
 });
 
 router.post('/deconnexion', (_, res) => {
@@ -182,8 +182,8 @@ router.use(CredentialRouter);
 router.use(CredentialsPasskeyRouter);
 router.use(PasswordRouter);
 router.use("/api", ApiRouter);
-router.use("/telecharger", requireRoleMiddleware("READ_ONLY"), DownloadRouter);
-router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, requireRoleMiddleware("READ_ONLY"), AdminRouter);
+router.use("/telecharger", requireMinimumRole("READ_ONLY"), DownloadRouter);
+router.use(`/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`, getUser, requireMinimumRole("READ_ONLY"), AdminRouter);
 
 if (process.env.NODE_ENV === "development") {
     const DebugRouter = await import("./debug");

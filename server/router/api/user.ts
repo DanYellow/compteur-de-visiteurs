@@ -8,13 +8,13 @@ import {
     UserPublicKeyCredentials as UserPublicKeyCredentialsModel,
 } from "#models/index";
 import { mailTransporter, renderEmail } from "#server/utils.server";
-import { requireRoleMiddleware } from "#server/middlewares";
+import { requireMinimumRole } from "#server/middlewares";
 
 loadEnvFile(`${process.cwd()}/.env.local`);
 
 const router = express.Router();
 
-router.post("/utilisateur/statut", requireRoleMiddleware("ADMIN"), async (req, res) => {
+router.post("/utilisateur/statut", requireMinimumRole("ADMIN"), async (req, res) => {
     const user = await UserModel.findByPk(Number(req.body.userId));
     if (user) {
         try {
