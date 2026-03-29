@@ -14,28 +14,34 @@ export const SignInSchema = z.object({
     }),
 })
 
-const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&|;,_-])[A-Za-z\d@$!%*#?&|;,_-]{6,}$/
+const PASSWORD_REGEX:RegExp = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&|;,_-])[A-Za-z\d@$!%*#?&|;,_-]{6,}$/
 
-export const SignInActivationSchema = z.object({
+const BasePasswordSchema = z.object({
     email: z.email({
         error: `Email : ${REQUIRED_MESSAGE}`
     }),
     password: z.string({
         error: `Mot de passe : ${REQUIRED_MESSAGE}`
     })
-        .refine((value) => PASSWORD_REGEX.test(value ?? ""), 'Le mot de passe ne correspond pas aux critères attendus : un nombre et un caractère spécial minimum'),
+        .refine((value: string = "") => PASSWORD_REGEX.test(value), 'Le mot de passe ne correspond pas aux critères attendus : un nombre et un caractère spécial minimum'),
     confirm_password: z.string({
         error: `Confirmer mot de passe : ${REQUIRED_MESSAGE}`
     })
-}).superRefine(({ confirm_password, password }, ctx) => {
-    if (confirm_password !== password) {
-        ctx.addIssue({
-            code: "custom",
-            message: "Les mots de passe ne correspondent pas",
-            path: ['confirm_password']
-        });
-    }
 });
+
+const withPasswordMatch =  <T extends z.ZodObject<z.ZodRawShape & { password: z.ZodString; confirm_password: z.ZodString }>>(schema: T) =>
+    schema.superRefine(({ confirm_password, password }: z.output<T>, ctx) => {
+        if (confirm_password !== password) {
+            ctx.addIssue({
+                code: "custom",
+                message: "Les mots de passe ne correspondent pas",
+                path: ['confirm_password']
+            });
+        }
+    });
+
+
+export const SignInActivationSchema = withPasswordMatch(BasePasswordSchema);
 
 export const LoginSchema = z.object({
     email: z.email({
@@ -61,12 +67,4 @@ export const UserSchema = z.object({
 });
 
 export const PasswordRecoverySchema = LoginSchema.pick({ email: true })
-export const ChangePasswordSchema = SignInActivationSchema.omit({ email: true }).superRefine(({ confirm_password, password }, ctx) => {
-    if (confirm_password !== password) {
-        ctx.addIssue({
-            code: "custom",
-            message: "Les mots de passe ne correspondent pas",
-            path: ['confirm_password']
-        });
-    }
-});
+export const ChangePasswordSchema = withPasswordMatch(BasePasswordSchema.omit({ email: true }));

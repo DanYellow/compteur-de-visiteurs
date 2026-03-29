@@ -12,6 +12,7 @@ import {
     type BelongsToManyAddAssociationsMixin,
     type BelongsToManySetAssociationsMixin,
     type ForeignKey,
+    type NonAttribute,
 } from 'sequelize';
 import { RegularOpening, Event } from '.';
 import type { PlaceType } from '#types';
@@ -29,6 +30,7 @@ export default class Place extends Model<
     declare description: string;
     declare ouvert: boolean;
     declare dernier_editeur_id?: ForeignKey<number>;
+    declare regularOpening?: NonAttribute<RegularOpening>;
 
     declare addRegularOpening: HasOneCreateAssociationMixin<RegularOpening>;
     declare getRegularOpening: HasOneGetAssociationMixin<RegularOpening>;
