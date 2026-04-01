@@ -7,7 +7,7 @@ export const PERIOD_PREDICATE = {
         "property": "hour",
     },
     "semaine": {
-        "substitution": "%u",
+        "substitution": "%w",
         "luxon": "week",
         "property": "weekday",
     },

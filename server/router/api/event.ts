@@ -10,6 +10,8 @@ import { capitalizeFirstLetter } from "#scripts/utils.shared";
 const router = express.Router();
 
 router.get("/evenements", async (req, res) => {
+    // const [results] = await sequelize.query("SELECT sqlite_version() AS version;");
+
     try {
         let daySelected = DateTime.now();
 
@@ -22,14 +24,17 @@ router.get("/evenements", async (req, res) => {
 
         const filtreParam = (req.query?.filtre || "jour") as string;
 
-        let groupQuery = [sequelize.fn("trim",
-            sequelize.fn("strftime", (PERIOD_PREDICATE as any)[filtreParam]?.substitution, sequelize.col("date_passage"), "localtime")
-        ), "groupe"]
+        let groupQuery = [sequelize.fn("strftime", (PERIOD_PREDICATE as any)[filtreParam]?.substitution, sequelize.col("date"), "localtime"), "groupe"]
         if (req.query.filtre === "mois") {
             groupQuery = [
-                sequelize.literal("(strftime('%j', date(date_passage, '-3 days', 'weekday 4')) - 1) / 7 + 1") as any, 'groupe'
+                sequelize.literal("(strftime('%j', date(date, '-3 days', 'weekday 4')) - 1) / 7 + 1") as any, 'groupe'
             ]
-        }
+        } 
+        // else if (req.query.filtre === "semaine") {
+        //     groupQuery = [
+        //         sequelize.literal("(strftime('%w', date(date)) + 6) % 7 + 1") as any, 'groupe'
+        //     ]
+        // }
 
         const startTime = daySelected.startOf((PERIOD_PREDICATE as any)[filtreParam]?.luxon || "day");
         const endTime = daySelected.endOf((PERIOD_PREDICATE as any)[filtreParam]?.luxon || "day");
@@ -39,11 +44,11 @@ router.get("/evenements", async (req, res) => {
                 include: [
                     groupQuery,
                     [
-                        sequelize.fn("strftime", "%H:%M", sequelize.fn('MIN', sequelize.col(`${table}.heure_ouverture`))),
+                        sequelize.fn("strftime", "%H:%M:%S", sequelize.fn('MIN', sequelize.col(`${table}.heure_ouverture`))),
                         'heure_ouverture'
                     ],
                     [
-                        sequelize.fn("strftime", "%H:%M", sequelize.fn('MAX', sequelize.col(`${table}.heure_fermeture`))),
+                        sequelize.fn("strftime", "%H:%M:%S", sequelize.fn('MAX', sequelize.col(`${table}.heure_fermeture`))),
                         'heure_fermeture'
                     ],
                 ],
@@ -82,9 +87,9 @@ router.get("/evenements", async (req, res) => {
                     [Op.between]: [startTime.toString(), endTime.toString()],
                 },
             },
-            // group: [
-            //     sequelize.fn('strftime', (PERIOD_PREDICATE as any)[filtreParam]?.substitution, sequelize.col(`${table}.date`)),
-            // ],
+            group: [
+                sequelize.fn('strftime', (PERIOD_PREDICATE as any)[filtreParam]?.substitution, sequelize.col(`${table}.date`)),
+            ],
             raw: true,
         });
 
@@ -136,7 +141,7 @@ router.get("/evenements/:event{/:place}", async (req, res) => {
                     where: {
                         [Op.and]: [
                             sequelize.where(
-                                sequelize.fn("strftime", "%H:%M", sequelize.col("date_passage"), "localtime"), {
+                                sequelize.fn("strftime", "%H:%M:%S", sequelize.col("date_passage"), "localtime"), {
                                 [Op.between]: [sequelize.col(`${table}.heure_ouverture`), sequelize.col(`${table}.heure_fermeture`)]
                             }
                             ),

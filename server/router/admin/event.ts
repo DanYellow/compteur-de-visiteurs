@@ -31,8 +31,8 @@ router.get(['/evenements'], requireMinimumRole(), async (req, res) => {
                         JOIN place_event AS pe ON pe.place_id = v."lieu_id"
                         WHERE pe."event_id" = ${eventTable}."id"
                             AND strftime("%Y-%m-%d", ${eventTable}.date, 'localtime') = strftime("%Y-%m-%d", v.date_passage, 'localtime')
-                            AND ${eventTable}."heure_ouverture" <= strftime("%H:%M", v.date_passage, 'localtime')
-                            AND ${eventTable}."heure_fermeture" >= strftime("%H:%M", v.date_passage, 'localtime')
+                            AND ${eventTable}."heure_ouverture" <= strftime("%H:%M:%S", v.date_passage, 'localtime')
+                            AND ${eventTable}."heure_fermeture" >= strftime("%H:%M:%S", v.date_passage, 'localtime')
                         )`
                     ),
                     'nombre_de_visites',
@@ -94,7 +94,7 @@ router.get(['/evenement', '/evenement/:eventId'], requireMinimumRole(), async (r
 
     let event = null;
     if (req.params.eventId) {
-        event = await EventModel.findByPk(req.params.eventId, {
+        event = await EventModel.findByPk(String(req.params.eventId), {
             include: [{
                 model: PlaceModel,
                 as: "listPlaces",

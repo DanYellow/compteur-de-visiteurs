@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import { loadEnvFile } from 'node:process';
 import bcrypt from "bcryptjs";
 
-import { User as UserModel } from "#models/index";
+import { User as UserModel, Visit as VisitModel } from "#models/index";
 
 loadEnvFile(`${process.cwd()}/.env.local`);
 
@@ -49,6 +49,14 @@ router.get("/promote", async (req, res) => {
     }
 
     return res.status(500).json({"message": "erreur"});
+});
+
+router.get("/clear/visits", async (_, res) => {
+    await VisitModel.destroy({
+        truncate: true,
+    });
+    
+    return res.status(200).json({"message": "Nettoyage de la table \"Visit\""});
 });
 
 export default router;

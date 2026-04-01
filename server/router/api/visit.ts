@@ -66,7 +66,6 @@ const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null,
         attributes: {
             include: [
                 [sequelize.literal("ROW_NUMBER() OVER (ORDER by date_passage ASC)"), "order"] as ProjectionAlias,
-                // [sequelize.literal(`strftime('%u', ${visitTable}.date_passage, 'localtime')`), "ff"],
                 [sequelize.fn("datetime", sequelize.col("date_passage"), "localtime"), "date_passage"] as ProjectionAlias,
                 query,
                 [
@@ -79,8 +78,8 @@ const getLinearVisits = async (query: ProjectionAlias, place: PlaceModel | null,
                                     ON f.place_id = ${visitTable}.lieu_id
                                     AND f.event_id = so.id
                                 WHERE strftime("%Y-%m-%d", so.date, 'localtime') = strftime("%Y-%m-%d", ${visitTable}.date_passage, 'localtime')
-                                AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
-                                AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                                AND so.heure_ouverture <= strftime("%H:%M:%S", ${visitTable}.date_passage, 'localtime')
+                                AND so.heure_fermeture >= strftime("%H:%M:%S", ${visitTable}.date_passage, 'localtime')
                             ),
                             "/"
                         )`
@@ -319,8 +318,8 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
                             ON f.place_id = ${visitTable}.lieu_id
                             AND f.event_id = so.id
                         WHERE strftime("%Y-%m-%d", so.date, 'localtime') = strftime("%Y-%m-%d", ${visitTable}.date_passage, 'localtime')
-                        AND so.heure_ouverture <= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
-                        AND so.heure_fermeture >= strftime("%H:%M", ${visitTable}.date_passage, 'localtime')
+                        AND so.heure_ouverture <= strftime("%H:%M:%S", ${visitTable}.date_passage, 'localtime')
+                        AND so.heure_fermeture >= strftime("%H:%M:%S", ${visitTable}.date_passage, 'localtime')
                     ),
                     "/"
                 )`
