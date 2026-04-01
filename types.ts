@@ -68,13 +68,6 @@ export type CommonRegularOpening = {
     jours_fermeture_litteral?: string;
 }
 
-export type CSVLinearHeader = Omit<VisitRaw, 'id'> & {
-    id: number;
-    groupe?: number;
-    order?: number;
-    [key: string]: number | undefined;
-}
-
 export interface GroupVisit {
     [key: number]: VisitRaw[];
 }
