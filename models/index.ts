@@ -125,6 +125,10 @@ if (process.env.NODE_ENV === "development") {
     await sequelize.sync();
 }
 
+// await Visit.destroy({
+//   truncate: true,
+// });
+
 const adminCount = await User.count({
     where: { role: "ADMIN" },
 });

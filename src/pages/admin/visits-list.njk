@@ -205,6 +205,7 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                             <th class="font-bold px-4 py-3 text-left">Genre</th>
                             <th class="font-bold px-4 py-3 text-left">Département</th>
                             <th class="font-bold px-4 py-3 text-left">Tranche d'âge</th>
+                            <th class="font-bold px-4 py-3 text-left">Import csv</th>
                             <th class="font-bold px-4 py-3 text-left"></th>
                         </tr>
                     </thead>
@@ -238,6 +239,10 @@ Liste des visiteurs – {{ current_date|date("EEEE dd LLLL yyyy") }}
                                     {% set age = list_age_groups|find({value: visit['tranche_age']}) %}
                                     {{ age.label }}
                                 </td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left ">
+                                    {{ "Oui" if visit['est_importe'] == 1 else "Non" }}
+                                </td>
+
                                 <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3">
                                     <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="detail-visit" command="show-modal" data-visit-data='{{ visit | json }}'>
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-6">

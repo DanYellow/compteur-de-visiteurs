@@ -136,7 +136,7 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
 
     const totalAttributes: ProjectionAlias[] = [
         [
-            sequelize.literal(`'Total: ' || COUNT(*)`),
+            sequelize.literal(`'Total : ' || COUNT(*)`),
             "id"
         ],
         [sequelize.literal(`'${period.startTime.toFormat("dd/LL/yyyy")} ➜ ${period.endTime.toFormat("dd/LL/yyyy")}'`), 'date_passage'],
@@ -197,6 +197,13 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
                 `age_${item.label}`
             ]
         }),
+        [
+            sequelize.literal(`
+                'Oui : ' || COUNT(CASE WHEN est_importe = 1 THEN 1 END) ||
+                ' • Non : ' || COUNT(CASE WHEN est_importe = 0 THEN 1 END)
+            `),
+            "Import csv"
+        ]
     ];
 
     let subQuery = `
@@ -322,9 +329,19 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
         ],
         ...listGroupsFiltered.map((c) => c.value),
         ...listGenders.map(() => "genre"),
-        ...listAgeGroups.map(() => "tranche_age"),
         ...listDepartments.map(() => "departement"),
+        ...listAgeGroups.map(() => "tranche_age"),
+        [
+            sequelize.literal(`
+                CASE 
+                    WHEN ${visitTable}.est_importe = 1 THEN 'Oui'
+                    ELSE 'Non'
+                END
+            `),
+            "Import csv"
+        ]
     ];
+
 
     const allVisits = await VisitModel.findAll({
         attributes: [
@@ -360,7 +377,7 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
             ['date_passage', 'DESC'],
         ],
         raw: true
-    }) as VisitModel[];
+    }) as (VisitModel & { "Import csv": "Oui" | "Non" })[];
 
     const pivotedRows = allVisits.map((row, idx) => {
         const pivoted: Record<string, number | string> = {};
@@ -386,6 +403,8 @@ const getPivotVisits = async (place: PlaceModel | null, period: { startTime: Dat
             pivoted[`age_${item.label}`] = String(row.tranche_age) === String(item.value) ? "oui" : "non";
         });
 
+        pivoted["Import csv"] = row["Import csv"];
+        
         return pivoted;
     });
 
