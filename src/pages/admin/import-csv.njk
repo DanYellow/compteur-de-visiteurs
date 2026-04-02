@@ -55,11 +55,22 @@
                 <div class="p-2 mt-2 text-xs bg-amber-50 text-amber-800 border-t-4 border-1 border-amber-800/30 border-t-amber-800 rounded-md">
                     <p>Notes : </p>
                     <ul class="ml-3 list-disc">
-                        <li>Les visites avec une date incorrecte seront ignorées</li>
-                        <li>La date de la visite doit être au format jj//mm/aa</li>
+                        <li>Les visites avec une date incorrecte seront ignorées. Celles qui ne respectent pas le format jj/mm/aa</li>
                         <li>L'heure de visite sera égale à l'heure d'ouverture du lieu sélectionné ci-dessous</li>
                         <li>Le traitement de l'import est basé sur le Google Doc "Rapport de visites"</li>
-                        <li>La fonctionnalité ne gère pas les données dupliquées, c'est à vous d'éviter d'importer une nouvelle fois des données</li>
+                        <li>La fonctionnalité ne gère pas les données dupliquées, <span class="font-bold">c'est à vous d'éviter d'importer une nouvelle fois des données</span></li>
+                        <li>Comme pour une visite enregistrée via le formulaire, les visites ayant lieu hors des jours d'ouverture ou d'évènements ne seront pas enregistrées
+                            <ul class="list-disc list-inside">
+                                <li>Il est toujours possible de mettre à jour les jours d'ouverture du lieu ainsi que d'ajouter des évènements après l'import</li>
+                            </ul>
+                        </li>
+                        <li>Par défaut, chaque visite aura les valeurs suivantes :
+                            <ul class="list-inside list-disc">
+                                <li>Genre : Homme</li>
+                                <li>Age : 25/34 ans</li>
+                                <li>Département : Paris</li>
+                            </ul>
+                        </li>
                     </ul>
                 </div>
             </div>
