@@ -16,7 +16,7 @@ const NUMBER_REGEX = /^\d+$/;
 router.get(['/lieu', '/lieu/:placeId'], requireMinimumRole("ADMIN"), async (req, res) => {
     let place = null
     if (req.params.placeId) {
-        place = await PlaceModel.findByPk(req.params.placeId, {
+        place = await PlaceModel.findByPk(String(req.params.placeId), {
             include: [
                 { model: RegularOpeningModel, as: "regularOpening", required: false },
                 { model: User, as: 'dernier_editeur', required: false }
@@ -54,7 +54,7 @@ router.get(['/lieu', '/lieu/:placeId'], requireMinimumRole("ADMIN"), async (req,
         list_days: Info.weekdays('long', { locale: 'fr' }).map((item, idx) => ({ value: String(idx + 1), label: capitalizeFirstLetter(item) }))
     });
 }).post(['/lieu', '/lieu/:placeId'], requireMinimumRole("ADMIN"), async (req, res, next) => {
-    if ("placeId" in req.params && !NUMBER_REGEX.test(req.params.placeId)) {
+    if ("placeId" in req.params && !NUMBER_REGEX.test(String(req.params.placeId))) {
         return next();
     }
 

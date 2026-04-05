@@ -35,7 +35,7 @@ router.get(['/utilisateurs'], requireMinimumRole("ADMIN"), async (req, res) => {
 })
 
 router.get(['/utilisateur/:userId', '/utilisateur/moi'], requireMinimumRole(), async (req, res) => {
-    let user = await UserModel.findByPk(req.params.userId, {
+    let user = await UserModel.findByPk(Number(req.params.userId), {
         raw: true,
     });
 
@@ -48,7 +48,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], requireMinimumRole(), a
                     email: token.email
                 },
                 raw: true,
-            });
+            }) as UserModel;
         } catch (error) {
             console.log(error)
         }
@@ -60,7 +60,7 @@ router.get(['/utilisateur/:userId', '/utilisateur/moi'], requireMinimumRole(), a
         list_roles: LIST_ROLES.filter((item) => item.value !== "SUPER_ADMIN"),
     });
 }).post(['/utilisateur/:userId'], requireMinimumRole(""), async (req, res, next) => {
-    if ("userId" in req.params && !NUMBER_REGEX.test(req.params.userId) && req.params.userId !== "moi") {
+    if ("userId" in req.params && !NUMBER_REGEX.test(String(req.params.userId)) && req.params.userId !== "moi") {
         return next();
     }
 
@@ -102,7 +102,8 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], requi
         return res.redirect("/interdit");
     }
 
-    const user = await UserModel.findByPk(req.params.userId === "moi" ? res.locals.current_user!.id : req.params.userId, {
+    const userId = req.params.userId === "moi" ? res.locals.current_user!.id : req.params.userId;
+    const user = await UserModel.findByPk(Number(userId), {
         nest: true,
         include: [{
             model: UserPublicKeyCredentialsModel,

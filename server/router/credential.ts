@@ -122,7 +122,7 @@ router.get(['/approbation{/:token}'], async (req, res) => {
     let isTokenValid = false;
     try {
         const { token } = req.params;
-        const decoded = jwt.verify(token, process.env.JWT_APPROVAL_SECRET!) as UserTokenData;
+        const decoded = jwt.verify(token as string, process.env.JWT_APPROVAL_SECRET!) as UserTokenData;
 
         user = await UserModel.findByPk(decoded.userId);
 
@@ -143,6 +143,8 @@ router.get(['/approbation{/:token}'], async (req, res) => {
             errorKey = error.message
         }
     }
+
+    res.cookie('flash_message', JSON.stringify([errorKey]), flashMessageCookieOptions);
 
     res.render("pages/sign-in-activation.njk", {
         signin_email: user?.email || "",

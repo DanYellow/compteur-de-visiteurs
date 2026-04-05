@@ -32,6 +32,8 @@ export default class Place extends Model<
     declare dernier_editeur_id?: ForeignKey<number>;
     declare regularOpening?: NonAttribute<RegularOpening>;
 
+    listEvents: NonAttribute<Event[]> = [];
+    
     declare addRegularOpening: HasOneCreateAssociationMixin<RegularOpening>;
     declare getRegularOpening: HasOneGetAssociationMixin<RegularOpening>;
 

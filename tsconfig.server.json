@@ -15,8 +15,8 @@
         "models",
         "src/assets/scripts/utils.shared.ts",
         "src/assets/schemas",
-        "src/declare.d.ts",
-        "src/vite-env.d.ts",
+        "declare.d.ts",
+        "vite-env.d.ts",
         "types.ts",
         "vite.config.ts"
     ],

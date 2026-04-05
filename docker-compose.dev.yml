@@ -3,24 +3,24 @@ services:
     container_name: compteur-social-dev
     build:
       context: .
-      dockerfile: node.dev.Dockerfile
-    stdin_open: true
-    tty: true
-    working_dir: /home/node/app
+      target: dev
     ports:
-      - 3900:3900
+      - "${PORT}:${PORT}"
       - 5173:5173
     volumes:
-      - ./:/home/node/app
-      - node_modules:/home/node/app/node_modules
+      - ./:/app
+      - /app/node_modules
     environment:
       - NODE_ENV=development
       - NODE_OPTIONS=--max_old_space_size=2048
       - IS_DOCKER=true
       - CHOKIDAR_USEPOLLING=true
+    command: npm run dev
+    networks:
+      - compteur-social-network
   mailer:
     image: axllent/mailpit
-    container_name: mailpit
+    container_name: compteur-social-mailpit
     ports:
         - 1025:1025
         - 8025:8025
@@ -31,3 +31,7 @@ services:
 
 volumes:
   node_modules:
+
+networks:
+  compteur-social-network:
+    driver: bridge

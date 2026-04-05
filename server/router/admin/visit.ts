@@ -24,6 +24,7 @@ const upload = multer({ dest: 'tmp/' });
 
 router.get(["/visiteurs", "/visites"], async (req, res) => {
     let daySelected = DateTime.now();
+    console.log("req.get('host')", req.get('host'))
     const today = daySelected;
     if (req.query.date) {
         const tmpDate = DateTime.fromISO(req.query.date as string);

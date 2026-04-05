@@ -8,6 +8,7 @@ import {
     type BelongsToManySetAssociationsMixin,
     type BelongsToManyGetAssociationsMixin,
     Op,
+    type NonAttribute,
 } from "sequelize";
 import { loadEnvFile } from 'node:process';
 import { LIST_ROLES } from "#scripts/utils.shared";
@@ -29,6 +30,8 @@ export default class User extends Model<
     declare derniere_connexion?: string;
     declare role?: string;
     declare utilise_mdp?: boolean;
+
+    listPasskeys: NonAttribute<UserPublicKeyCredentials[]> = [];
 
     declare setListPasskeys: BelongsToManySetAssociationsMixin<
         UserPublicKeyCredentials,

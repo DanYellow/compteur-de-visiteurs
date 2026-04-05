@@ -1,4 +1,7 @@
 import path from "path";
+import fs from "node:fs";
+import { loadEnvFile } from 'node:process';
+
 import nunjucks from "nunjucks";
 import express from "express";
 import cors from "cors";
@@ -7,8 +10,8 @@ import { DateTime } from "luxon";
 import ip from "ip";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { loadEnvFile } from 'node:process';
-import fs from "fs";
+import { RedisStore } from "connect-redis";
+import { createClient as createRedisClient } from "redis";
 
 import router from "#server/router/index";
 
@@ -54,13 +57,44 @@ app.use(
         ],
     })
 );
-app.use(
-    session({
-        secret: "your_session_secret",
-        resave: false,
-        saveUninitialized: true,
-    })
-);
+
+if (process.env.NODE_ENV === "development") {
+    app.use(
+        session({
+            secret: process.env.SESSION_SECRET,
+            resave: false,
+            saveUninitialized: false,
+        })
+    );
+} else {
+    const redisClient = createRedisClient({
+        url: 'redis://redis:6379',
+        password: process.env.REDIS_PASSWORD
+    });
+
+    redisClient.connect().catch(console.error);
+
+    const redisStore = new RedisStore({
+        client: redisClient,
+        prefix: "myapp:",
+    });
+
+    app.use(
+        session({
+            store: redisStore,
+            secret: process.env.SESSION_SECRET,
+            resave: false,
+            saveUninitialized: false,
+            cookie: {
+                secure: true,      // HTTPS in production
+                httpOnly: true,
+                sameSite: 'strict',
+                // maxAge: 24*60*60*1000
+            }
+        })
+    );
+}
+
 
 app.use((req, res, next) => {
     const listFlashMessages = JSON.parse(req.cookies.flash_message || "[]")
@@ -199,7 +233,7 @@ const listDomains: string[] =
         process.env.NODE_ENV === "production"
         ? ["faclab.localhost"]
         : ["localhost", "0.0.0.0"];
-const port = Number(process.env.VITE_PORT || 3900);
+const port = Number(process.env.PORT || 3900);
 
 let server = null;
 

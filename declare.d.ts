@@ -42,6 +42,8 @@ declare global {
             JWT_PASSKEY_EXPIRE_TIME: number;
             JWT_PASSWORD_RECOVERY_SECRET: string;
             JWT_PASSWORD_RECOVERY_EXPIRE_TIME: number;
+            SESSION_SECRET: CipherKey;
+            REDIS_PASSWORD: string;
 
             ADMIN_SUFFIX: string;
             EMAIL_NOREPLY: string;

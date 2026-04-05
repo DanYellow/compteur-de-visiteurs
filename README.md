@@ -22,13 +22,25 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 **Développement**
 - Lancer le serveur : `npm run dev`
 - Si nécessaire. Lancer les migrations : `npx sequelize-cli db:migrate`
-- Ouvrir le lien: http://localhost:3900/ (ou le port que vous aurez défini via la variable d'environnement `VITE_PORT`)
+- Ouvrir le lien: http://localhost:3900/ (ou le port que vous aurez défini via la variable d'environnement `PORT`)
+
+### Docker
+
+```bash
+  docker compose -f docker-compose.dev.yml --env-file .env.local up
+```
 
 **Production**
 - Compiler les ressources : `npm run build`
 - Lancer le serveur de production : `npm run prod`
 - Lister les adresses ip autorisées à enregistrer des visites dans le fichier `whitelist-ip.txt`
   - Ceci permet d'éviter qu'une personne externe au lieu puisse s'enregistrer et donc fausser les données
+
+### Docker
+
+```bash
+  docker compose -f docker-compose.yml --env-file .env.local up
+```
 
 ## Construit avec
 - tailwindcss
