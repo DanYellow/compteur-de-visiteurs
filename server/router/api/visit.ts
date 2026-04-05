@@ -494,7 +494,6 @@ router.get("/visites", async (req, res) => {
             pagination,
         });
     } catch (e) {
-        console.log("error", e)
         res.status(500).json({
             data: []
         });

@@ -29,7 +29,7 @@ services:
       target: prod
     volumes:
       - ./whitelist-ip.tmp.txt:/app/whitelist-ip.tmp.txt
-      # - ./database-docker.tmp.sqlite:/app/database-prod.tmp.sqlite:rw
+      - sqlite-database:/app
       - /app/node_modules
     depends_on:
       - init-tmp
@@ -48,12 +48,14 @@ services:
     restart: unless-stopped
     networks:
       - compteur-social-network
-    # command: npm run docker:prod
     command: >
       sh -c "
         npx --yes sequelize-cli db:migrate --env production &&
         npm run docker:prod
       "
+    extra_hosts:
+      - "faclab.localhost:172.18.0.1"
 
 volumes:
   node_modules:
+  sqlite-database:

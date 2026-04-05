@@ -53,7 +53,6 @@ baseConfigData.semaine = {
 
 inputSyncCharts.addEventListener("change", () => {
     areChartsSync = inputSyncCharts.checked
-    console.log("inputSyncCharts.checked", inputSyncCharts.checked)
 })
 
 let daySelected = DateTime.now();

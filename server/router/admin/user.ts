@@ -136,8 +136,6 @@ router.get(['/utilisateur/:userId/passkeys', '/utilisateur/moi/passkeys'], requi
         res.cookie('flash_message', JSON.stringify(['update_success']), flashMessageCookieOptions);
         res.redirect(`${res.locals.admin_prefix}/utilisateur/moi/passkeys`)
     } catch (error) {
-        console.log("error", error)
-
         res.redirect(`${res.locals.admin_prefix}/utilisateur/moi/passkeys`)
     }
 }).post(['/utilisateur/passkey/suppression'], requireMinimumRole(), async (req, res) => {

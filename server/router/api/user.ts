@@ -61,7 +61,6 @@ router.post("/utilisateur/statut", requireMinimumRole("ADMIN"), async (req, res)
                 utilisateur: user.toJSON(),
             });
         } catch (e) {
-            console.log("e", e);
             res.status(404).json({
                 success: false,
                 message: "Utilisateur inconnu",
