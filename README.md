@@ -4,7 +4,7 @@
 ## A propos du projet
 Projet inspiré par le projet compteur social développé au FacLab Numixs de Sarcelles en Python.
 
-Le but du projet est de permettre de compter le nombre de visiteurs quotidiens aux FacLab de Sarcelles (Val-d'Oise) et Gennevilliers (Hauts-de-Seine) et de faire signer la charte du FabLab aux utilisateurs qui souhaitent utiliser les machines des locaux.
+Le but du projet est de permettre de compter le nombre de visiteurs quotidiens aux FacLab de Sarcelles (Val-d'Oise), Gennevilliers (Hauts-de-Seine) et les lieux satellites.
 
 ## Pré-requis
 
@@ -31,7 +31,9 @@ Le but du projet est de permettre de compter le nombre de visiteurs quotidiens a
 ```
 
 **Production**
-- Compiler les ressources : `npm run build`
+- Compiler les ressources front et serveur : `npm run build` et `npm run build:server`
+- Compiler les ressources des emails : `npm run email`
+- Créer la base de données et migrations : `npm run database`
 - Lancer le serveur de production : `npm run prod`
 - Lister les adresses ip autorisées à enregistrer des visites dans le fichier `whitelist-ip.txt`
   - Ceci permet d'éviter qu'une personne externe au lieu puisse s'enregistrer et donc fausser les données

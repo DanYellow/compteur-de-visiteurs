@@ -27,9 +27,10 @@ services:
     build:
       context: .
       target: prod
+    restart: unless-stopped
     volumes:
       - ./whitelist-ip.tmp.txt:/app/whitelist-ip.tmp.txt
-      - sqlite-database:/app
+      - ./database:/app/database
       - /app/node_modules
     depends_on:
       - init-tmp
@@ -50,7 +51,7 @@ services:
       - compteur-social-network
     command: >
       sh -c "
-        npx --yes sequelize-cli db:migrate --env production &&
+        npm run database:prod &&
         npm run docker:prod
       "
     extra_hosts:

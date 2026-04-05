@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN npm ci
-# redis://127.0.0.1:6379
+
 COPY . .
 
 ARG PORT
@@ -60,13 +60,11 @@ COPY --from=builder /app/src/includes ./src/includes
 COPY --from=builder /app/src/layouts ./src/layouts
 COPY --from=builder /app/src/pages ./src/pages
 
-RUN node ./dist/models/index.js
-
 ARG PORT
 ENV PORT=$PORT
 
 EXPOSE $PORT
 
-RUN chown -R node:node /app
-USER node
+# RUN chown -R node:node /app
+# USER node
 

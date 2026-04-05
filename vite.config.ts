@@ -22,7 +22,7 @@ export default defineConfig(({ mode }) => {
             host: true,
             port: 5173,
             hmr: {
-                host: isDocker ? 'localhost' : undefined,
+                host: 'localhost',
                 port: 5173,
                 protocol: 'ws',
             },

@@ -18,6 +18,10 @@ Créer évènement
     {% endif %}
 {% endblock %}
 
+{% block styles %}
+<link rel="stylesheet" href="/choices.css">
+{% endblock %}
+
 {% set date_format = "dd/LL/yyyy à HH:mm" %}
 {% set root_class = "admin" %}
 {% block content %}

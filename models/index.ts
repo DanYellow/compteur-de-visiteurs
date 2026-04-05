@@ -18,7 +18,7 @@ if (process.env.NODE_ENV === "production") {
 
 const sequelize = new Sequelize({
     dialect: "sqlite",
-    storage: path.resolve(path.resolve(), databaseFileName),
+    storage: path.resolve(path.resolve(), "database", databaseFileName),
     define: {
         freezeTableName: true,
     },

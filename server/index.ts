@@ -1,6 +1,7 @@
 import path from "path";
 import fs from "node:fs";
 import { loadEnvFile } from 'node:process';
+import type { CipherKey } from "node:crypto";
 
 import nunjucks from "nunjucks";
 import express from "express";
@@ -10,8 +11,6 @@ import { DateTime } from "luxon";
 import ip from "ip";
 import cookieParser from "cookie-parser";
 import session from "express-session";
-import { RedisStore } from "connect-redis";
-import { createClient as createRedisClient } from "redis";
 
 import router from "#server/router/index";
 
@@ -67,34 +66,46 @@ if (process.env.NODE_ENV === "development") {
         })
     );
 } else {
-    const redisClient = createRedisClient({
+    const { RedisStore } = await import('connect-redis');
+    const { createClient: createRedisClient } = await import('redis');
+
+    let sessionOptions = {}
+
+    try {
+        const redisClient = createRedisClient({
         url: 'redis://redis:6379',
         password: process.env.REDIS_PASSWORD
     });
+        await redisClient.connect();
 
-    redisClient.connect().catch(console.error);
+        const redisStore = new RedisStore({
+            client: redisClient,
+            prefix: "redis-visits:",
+        });
 
-    const redisStore = new RedisStore({
-        client: redisClient,
-        prefix: "myapp:",
-    });
-
-    app.use(
-        session({
+        sessionOptions = {
             store: redisStore,
-            secret: process.env.SESSION_SECRET,
-            resave: false,
-            saveUninitialized: false,
-            cookie: {
-                secure: true,      // HTTPS in production
-                httpOnly: true,
-                sameSite: 'strict',
-                // maxAge: 24*60*60*1000
-            }
-        })
-    );
+            
+        }
+    } catch (error) {
+        console.warn("\x1b[41m ----- NO REDIS. FALLBACK TO MEMORY ----- \x1b[0m")
+    } finally {
+        app.use(
+            session({
+                ...sessionOptions,
+                secret: process.env.SESSION_SECRET as CipherKey,
+                resave: false,
+                saveUninitialized: false,
+                cookie: {
+                    secure: true,      // HTTPS in production
+                    httpOnly: true,
+                    sameSite: 'strict',
+                    // maxAge: 24*60*60*1000
+                }
+            })
+        );
+    }
 }
-
 
 app.use((req, res, next) => {
     const listFlashMessages = JSON.parse(req.cookies.flash_message || "[]")

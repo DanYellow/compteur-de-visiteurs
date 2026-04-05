@@ -7,6 +7,8 @@ services:
     ports:
       - "${PORT}:${PORT}"
       - 5173:5173
+      - 24678:24678
+    restart: unless-stopped
     volumes:
       - ./:/app
       - /app/node_modules
@@ -15,7 +17,11 @@ services:
       - NODE_OPTIONS=--max_old_space_size=2048
       - IS_DOCKER=true
       - CHOKIDAR_USEPOLLING=true
-    command: npm run dev
+    command: >
+      sh -c "
+        npm run database:dev &&
+        npm run dev
+      "
     networks:
       - compteur-social-network
   mailer:
