@@ -71,9 +71,9 @@ router.get("/", checkIpAdress, async (req, res) => {
     return res.render("pages/index.njk", {
         "list_business_sector": listBusinessSector.filter((item) => (!("listInChoices" in item) || item.listInChoices)),
         place,
-        list_departments: listDepartments,
-        list_age_groups: listAgeGroups,
-        list_genders: listGenders,
+        list_departments: listDepartments.filter((item) => item.value != "-1"),
+        list_age_groups: listAgeGroups.filter((item) => item.value != "-1"),
+        list_genders: listGenders.filter((item) => item.value != "-1"),
     });
 }).post("/", checkIpAdress, async (req, res) => {
     const validator = VisitSchema.safeParse(req.body);

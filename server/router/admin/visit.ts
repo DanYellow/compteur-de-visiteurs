@@ -239,9 +239,9 @@ router.get(["/visiteurs/import", "/visites/import"], requireMinimumRole(""), asy
                                 if (visitDate.isValid) {
                                     listRequestsPayload.push({
                                         date_passage: visitDate.toJSDate(),
-                                        genre: '0', // Homme
-                                        tranche_age: 2, // 25/34 ans
-                                        departement: '75',
+                                        genre: '-1', // Non communiqué
+                                        tranche_age: -1, // Non communiqué
+                                        departement: '-1', // Non communiqué
                                         [key.db_key]: 'oui',
                                         lieu_id: Number(req.body.lieu),
                                         est_importe: true,

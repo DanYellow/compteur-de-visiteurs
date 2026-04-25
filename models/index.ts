@@ -116,6 +116,36 @@ sequelize.models.user_public_key_credentials.belongsTo(sequelize.models.user, {
     as: "user",
 });
 
+// if (process.env.MERGE_DB) {
+//     console.log("Hello merged")
+//     await sequelize.query(`ATTACH DATABASE './database/database-old.tmp.sqlite' AS other`);
+
+//     const [[{ maxId }]] = await sequelize.query(`
+//         SELECT COALESCE(MAX(id), 0) AS maxId FROM visit;
+//     `);
+
+//     const offset = maxId;
+
+//     const [columns] = await sequelize.query(`
+//         PRAGMA table_info(visit);
+//     `);
+
+//     const colNames = columns.map(c => c.name);
+
+//     const selectCols = colNames.map(name =>
+//         name === "id" ? `id + ${offset} AS id` : name
+//     );
+
+//     const sql = `
+//         INSERT INTO visit (${colNames.join(", ")})
+//         SELECT ${selectCols.join(", ")}
+//         FROM other.visit;
+//     `;
+
+//     await sequelize.query(sql);
+//     await sequelize.query(`DETACH DATABASE other`);
+// }
+
 if (process.env.NODE_ENV === "development") {
     await sequelize.sync({
         // force: true,

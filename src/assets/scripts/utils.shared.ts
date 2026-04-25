@@ -288,6 +288,10 @@ export const LIST_ROLES = [
 
 export const listDepartments = [
     {
+        label: 'Non communiqué',
+        value: '-1',
+    },
+    {
         label: 'Paris (75)',
         value: '75',
     },
@@ -327,6 +331,10 @@ export const listDepartments = [
 
 export const listAgeGroups = [
     {
+        label: 'Non communiqué',
+        value: '-1',
+    },
+    {
         label: '17 ans et moins',
         value: '0',
     },
@@ -353,6 +361,10 @@ export const listAgeGroups = [
 ] as const;
 
 export const listGenders = [
+    {
+        label: 'Non communiqué',
+        value: '-1',
+    },
     {
         label: 'Homme',
         value: '0',
