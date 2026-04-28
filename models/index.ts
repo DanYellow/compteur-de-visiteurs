@@ -1,4 +1,8 @@
-import { Sequelize } from "sequelize";
+import fs from "node:fs";
+import { QueryTypes, Sequelize } from "sequelize";
+import bcrypt from "bcryptjs";
+import path from "path";
+
 import Place from "./place";
 import Visit from "./visit";
 import VisitRegistered from "./visit-registered";
@@ -7,22 +11,20 @@ import Event from "./event";
 import User from "./user";
 import UserPublicKeyCredentials from "./user-public-key-credentials";
 
-import bcrypt from "bcryptjs";
-import path from "path";
-
 let databaseFileName = "database.tmp.sqlite";
 
 if (process.env.NODE_ENV === "production") {
     databaseFileName = "database-prod.tmp.sqlite";
 }
 
+const ENABLE_SEQUELIZE_LOGGING = process.env.ENABLE_SEQUELIZE_LOGGING === "true" && process.env.NODE_ENV === "development";
 const sequelize = new Sequelize({
     dialect: "sqlite",
     storage: path.resolve(path.resolve(), "database", databaseFileName),
     define: {
         freezeTableName: true,
     },
-    logging: false, //process.env.NODE_ENV === "development",
+    logging: ENABLE_SEQUELIZE_LOGGING,
 });
 
 try {
@@ -116,43 +118,42 @@ sequelize.models.user_public_key_credentials.belongsTo(sequelize.models.user, {
     as: "user",
 });
 
-// if (process.env.MERGE_DB) {
-//     console.log("Hello merged")
-//     await sequelize.query(`ATTACH DATABASE './database/database-old.tmp.sqlite' AS other`);
+if (process.env.MERGE_DB && process.env.MERGE_DB === "true") {
+    const dbToMergeFile = './database/database-to-merge.tmp.sqlite';
+    if (fs.existsSync(dbToMergeFile)) {
+        await sequelize.query(`ATTACH DATABASE '${dbToMergeFile}' AS other`);
 
-//     const [[{ maxId }]] = await sequelize.query(`
-//         SELECT COALESCE(MAX(id), 0) AS maxId FROM visit;
-//     `);
+        type MaxIdRow = { maxId: number };
 
-//     const offset = maxId;
+        const rows = await sequelize.query<MaxIdRow>(`
+            SELECT COALESCE(MAX(id), 0) AS maxId FROM visit;
+        `, { type: QueryTypes.SELECT });
 
-//     const [columns] = await sequelize.query(`
-//         PRAGMA table_info(visit);
-//     `);
+        const maxId = rows[0]?.maxId ?? 0;
 
-//     const colNames = columns.map(c => c.name);
+        const idOffset = maxId;
 
-//     const selectCols = colNames.map(name =>
-//         name === "id" ? `id + ${offset} AS id` : name
-//     );
+        const [columns] = await sequelize.query(`
+            PRAGMA table_info(visit);
+        `);
 
-//     const sql = `
-//         INSERT INTO visit (${colNames.join(", ")})
-//         SELECT ${selectCols.join(", ")}
-//         FROM other.visit;
-//     `;
+        const colNames = columns.map(c => c.name);
 
-//     await sequelize.query(sql);
-//     await sequelize.query(`DETACH DATABASE other`);
-// }
+        const selectCols = colNames.map(name =>
+            name === "id" ? `id + ${idOffset} AS id` : name
+        );
 
-if (process.env.NODE_ENV === "development") {
-    await sequelize.sync({
-        // force: true,
-        // alter: true
-    });
-} else {
-    await sequelize.sync();
+        const sql = `
+            INSERT INTO visit (${colNames.join(", ")})
+            SELECT ${selectCols.join(", ")}
+            FROM other.visit;
+        `;
+
+        await sequelize.query(sql);
+        await sequelize.query(`DETACH DATABASE other`);
+    } else {
+        console.log(`"dbToMergeFile" is missing`);
+    }
 }
 
 const adminCount = await User.count({
