@@ -27,7 +27,6 @@ services:
     build:
       context: .
       target: prod
-    restart: unless-stopped
     volumes:
       - ./whitelist-ip.tmp.txt:/app/whitelist-ip.tmp.txt
       - ./database:/app/database
@@ -35,8 +34,8 @@ services:
     depends_on:
       - init-tmp
       - redis
-    ports:
-      - "${PORT}:${PORT}"
+    # ports:
+    #   - "${PORT}:${PORT}"
     environment:
       - NODE_ENV=production
       - IS_DOCKER=true
@@ -51,12 +50,30 @@ services:
       - compteur-social-network
     command: >
       sh -c "
-        npm run database:prod &&
+        npm run migration:prod &&
         npm run docker:prod
       "
     extra_hosts:
       - "faclab.localhost:172.18.0.1"
 
+  backup:
+    build:
+      context: .
+      dockerfile: backup-db.Dockerfile
+    volumes:
+      - ./database:/app/database
+      - ./backups:/app/backups
+    environment:
+      - FILE=database-prod.tmp.sqlite
+    #   - FTP_HOST=...
+    #   - FTP_USER=...
+    #   - FTP_PASSWORD=...
+    env_file:
+      - .env.local
+    command: >
+      sh -c "
+        node --experimental-strip-types server/backup.ts
+      "
 volumes:
   node_modules:
   sqlite-database:

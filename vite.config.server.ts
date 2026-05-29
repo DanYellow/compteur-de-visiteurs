@@ -1,7 +1,7 @@
-import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
-import path from "path";
 import fs from "fs";
+import { defineConfig } from "vite";
+import { viteStaticCopy } from 'vite-plugin-static-copy'
+
 import { builtinModules } from "module";
 
 const pkg = JSON.parse(fs.readFileSync("./package.json", "utf-8"));
@@ -31,18 +31,5 @@ export default defineConfig({
             }
         }
     },
-    // plugins: [
-    //     tsconfigPaths({
-    //         projects: ["./tsconfig.server.json"]
-    //     })
-    // ],
-    // resolve: {
-    //     alias: {
-    //         "#server": path.resolve(__dirname, "./server"),
-    //         "#scripts": path.resolve(__dirname, "./src/assets/scripts"),
-    //         "#models": path.resolve(__dirname, "./models"),
-    //         "#schemas": path.resolve(__dirname, "./src/assets/scripts/schemas"),
-    //         "#types": path.resolve(__dirname, "./types.ts"),
-    //     }
-    // }
+
 });

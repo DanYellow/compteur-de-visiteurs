@@ -19,7 +19,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
     command: >
       sh -c "
-        npm run database:dev &&
+        npm run migration:dev &&
         npm run dev
       "
     networks:
