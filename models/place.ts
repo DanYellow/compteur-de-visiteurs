@@ -14,7 +14,9 @@ import {
     type ForeignKey,
     type NonAttribute,
 } from 'sequelize';
-import { RegularOpening, Event } from '.';
+
+import RegularOpening from './regular-opening';
+import Event from './event';
 import type { PlaceType } from '#types';
 import { listPlaceTypes } from '#scripts/utils.shared';
 
@@ -33,7 +35,7 @@ export default class Place extends Model<
     declare regularOpening?: NonAttribute<RegularOpening>;
 
     listEvents: NonAttribute<Event[]> = [];
-    
+
     declare addRegularOpening: HasOneCreateAssociationMixin<RegularOpening>;
     declare getRegularOpening: HasOneGetAssociationMixin<RegularOpening>;
 

@@ -156,6 +156,14 @@ if (process.env.MERGE_DB && process.env.MERGE_DB === "true") {
     }
 }
 
+try {
+    await sequelize.authenticate();
+    await sequelize.sync();
+    console.log('Connection has been established successfully.');
+} catch (error) {
+    console.error('Unable to connect to the database:', error);
+}
+
 const adminCount = await User.count({
     where: { role: "ADMIN" },
 });
