@@ -34,7 +34,6 @@ declare global {
     namespace NodeJS {
         export interface ProcessEnv {
             NODE_ENV: 'development' | 'production';
-            FORM_RESULT_TIMEOUT: number;
 
             JWT_APPROVAL_SECRET: string;
             JWT_APPROVAL_EXPIRE_TIME: string;

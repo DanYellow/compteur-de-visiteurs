@@ -15,7 +15,6 @@ export const SignInSchema = z.object({
 })
 
 const PASSWORD_REGEX:RegExp = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&|;,_-])[A-Za-z\d@$!%*#?&|;,_-]{6,}$/
-
 const BasePasswordSchema = z.object({
     email: z.email({
         error: `Email : ${REQUIRED_MESSAGE}`
@@ -67,4 +66,4 @@ export const UserSchema = z.object({
 });
 
 export const PasswordRecoverySchema = LoginSchema.pick({ email: true })
-export const ChangePasswordSchema = withPasswordMatch(BasePasswordSchema.omit({ email: true }));
+export const ChangePasswordSchema = withPasswordMatch(BasePasswordSchema);

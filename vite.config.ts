@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv, type UserConfig } from "vite";
+import { defineConfig, type UserConfig } from "vite";
 
 import tailwindcss from "@tailwindcss/vite";
 
@@ -6,17 +6,12 @@ import path from "path";
 
 const isDocker = process.env.IS_DOCKER === 'true';
 
-export default defineConfig(({ mode }) => {
-    const env = loadEnv(mode, process.cwd(), '');
-
+export default defineConfig(() => {
     return {
         plugins: [
             tailwindcss(),
         ],
         appType: "custom",
-        define: {
-            'import.meta.env.FORM_RESULT_TIMEOUT': JSON.stringify(env.FORM_RESULT_TIMEOUT),
-        },
         server: {
             // Expose the server to the network allowing access from ip address
             host: true,

@@ -16,7 +16,7 @@ import { dbCsvGroupsMapping } from "#types";
 
 import { DEFAULT_CLOSED_DAYS, DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS } from "#scripts/utils.shared";
 import { computedPlaces, getVisitsSummaries } from "#server/utils.server";
-import { expectedCsvHeaders, VisitCsvSchema } from "#scripts/schemas/visit-csv";
+import { BaseVisitCsvSchema, expectedCsvHeaders } from "#scripts/schemas/visit-csv";
 
 const router = express.Router();
 
@@ -197,7 +197,7 @@ router.get(["/visiteurs/import", "/visites/import"], requireMinimumRole(""), asy
         ...req.body,
     }
 
-    const validator = await VisitCsvSchema.omit({ file: true }).safeParseAsync(payload);
+    const validator = await BaseVisitCsvSchema.safeParseAsync(payload);
     const redirectUrl = req.headers.referer || '/';
 
     const place = await PlaceModel.findByPk(Number(req.body.lieu), {
