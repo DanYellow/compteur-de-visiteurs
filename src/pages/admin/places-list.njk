@@ -1,0 +1,106 @@
+{% extends "layouts/admin.njk" %}
+
+{% block title %}
+Liste lieux numixs
+{% endblock %}
+
+{% import "includes/macros.njk" as macros %}
+
+{% set active_menu_item = "lieu" %}
+{% set date_format = "dd/LL/yyyy à HH:mm" %}
+{% set root_class = "admin" %}
+
+{% block scripts %}
+    {% if NODE_ENV == "development" %}
+    {% else %}
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <div class="bg-slate-50 rounded-md py-5 px-6 md:py-10 md:px-13 min-w-0">
+        <header class="flex flex-col md:flex-row gap-y-3 justify-between md:items-center mb-10 -mt-1.5">
+            <h1 class="text-black-numixs title-font font-bold text-6xl">Lieux numixs</h1>
+            {% if user_role.weight >= 100 %}
+            <a href="{{ admin_prefix }}/lieu" class="{{ primary_button_classes_filled }}">Créer un nouveau lieu</a>
+            {% endif %}
+        </header>
+
+        <div class="flex flex-col gap-3 mb-4">
+            {% include "includes/hello-banner.njk" %}
+            {% include "includes/form-banner-success.njk" %}
+            {% if flash_message.no_place %}
+                {{ macros.warning_banner("Vous devez sélectionner un lieu avant de pouvoir mettre en place l'enregistrement de vos visiteurs.") }}
+            {% endif %}
+            {% if places_list.length == 0 %}
+            {{ macros.warning_banner("En absence de lieu Numixs, il est impossible d'enregistrer des visites.")}}
+            {% endif %}
+        </div>
+
+
+        {# <p class="p-4 bg-blue-50 text-blue-800 border-t-4 border-t-blue-800 mb-4">Les lieux avec des heures d'ouverture non définis ne peuvent pas être définis pour un évènement ou comme lieu de receuil de visites</p> #}
+
+        <div class="text-black-numixs">
+            <div class="overflow-x-auto rounded-md">
+                <table class="w-full bg-white border-collapse whitespace-nowrap fixed-table-header">
+                    <thead>
+                        <tr class="bg-gray-200">
+                            <th class="font-bold px-4 py-3 text-left">#</th>
+                            <th class="font-bold px-4 py-3 text-left">Nom</th>
+                            <th class="font-bold px-4 py-3 text-left">Horaires d'ouverture</th>
+                            <th class="font-bold px-4 py-3 text-left">Jours de fermeture</th>
+                            <th class="font-bold px-4 py-3 text-left">Ouvert</th>
+                            <th class="font-bold px-4 py-3 text-left"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for place in places_list %}
+                            <tr class="even:bg-green-numixs/50 group hover:bg-slate-200">
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ loop.index }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.nom }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                    {% if place.incomplet %}
+                                        Non défini
+                                    {% else %}
+                                    {{ place.heure_ouverture }}-{{ place.heure_fermeture }}
+                                    {% endif %}
+                                </td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ place.jours_fermeture or "Aucun" }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">{{ "Oui" if place.ouvert == 1 else "Non" }}</td>
+                                <td class="group-hover:bg-slate-200 bg-gray-100 group-even:bg-green-numixs/50 px-4 py-3 text-left">
+                                    <div class="flex flex-row gap-3">
+                                        <a href="{{ admin_prefix }}/lieu/{{ place.id }}" class="font-bold hocus:opacity-75">Éditer</a>
+                                        <button type="button" class="font-bold text-red-800 hover:text-red-950" commandfor="delete-place" command="show-modal" data-item-id="{{ place.id }}">Supprimer</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr class="">
+                                <td colspan="6" class="px-4 py-3 text-center">
+                                    Aucun lieux
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="delete-place" data-delete-item-dialog class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-2xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Supprimer</p>
+            </div>
+        </header>
+
+        <hr class="pb-1 mt-1 border-red-800">
+        <p class="p-4 bg-red-50 text-red-800 border-t-4 border-t-red-800 mb-4">Cette action est irréversible. Supprimer ce lieu entraînera la suppression des visites associées</p>
+
+        <form method="post" action="{{ admin_prefix }}/lieu/suppression">
+            <input type="hidden" name="id" value=""/>
+            <div class="flex flex-row gap-3">
+                <button type="submit" class="text-white-numixs bg-red-800 hocus:bg-red-950 px-3 py-1.5 rounded-md">Supprimer</button>
+                <button type="button" command="close" commandfor="delete-place" class="bg-black-numixs hocus:bg-black px-3.5 py-1.5 rounded-md text-white-numixs">Annuler</button>
+            </div>
+        </form>
+    </dialog>
+{% endblock %}

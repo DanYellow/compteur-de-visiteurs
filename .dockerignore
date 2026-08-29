@@ -9,6 +9,8 @@ dist
 *.yml
 *.tmp.*
 
+tmp
+
 .editorconfig
 .env.dist
 config.local.json
@@ -23,3 +25,5 @@ LICENSE
 .idea
 *.swp
 *.swo
+
+!.env.local

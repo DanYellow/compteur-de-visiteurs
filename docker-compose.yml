@@ -1,31 +1,79 @@
 services:
+  init-tmp:
+    image: busybox
+    container_name: init-tmp
+    command: ["sh", "-c", "mkdir -p /host/tmp && chmod 777 /host/tmp"]
+    volumes:
+      - ./tmp:/host/tmp
+    # This service exits immediately after creating the folder
+    restart: "no"
+
   traefik:
     image: traefik:v3
     container_name: traefik
-    command: --api.insecure=true --providers.docker
+    command:
+      - --api.insecure=true                   # enable dashboard
+      - --providers.docker=true               # use Docker as provider
+      - --entrypoints.web.address=:80         # HTTP entrypoint
     ports:
-      - 80:80
-      - 8081:8081
+      - 80:80                             # HTTP
+      - 8081:8080                           # Dashboard
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - '/var/run/docker.sock:/var/run/docker.sock:ro'
+    restart: unless-stopped
 
   compteur-de-visiteurs:
     container_name: compteur-social-production
     build:
       context: .
-      dockerfile: node.Dockerfile
+      target: prod
+    volumes:
+      - ./whitelist-ip.tmp.txt:/app/whitelist-ip.tmp.txt
+      - ./database:/app/database
+      - /app/node_modules
     depends_on:
-      - traefik
-    stdin_open: true
-    tty: true
-    ports:
-      - 3900:3900
+      - init-tmp
+      - redis
+    # ports:
+    #   - "${PORT}:${PORT}"
     environment:
       - NODE_ENV=production
-      - NODE_OPTIONS=--max_old_space_size=8192
       - IS_DOCKER=true
     env_file:
       - .env.local
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.compteur-de-visiteurs.rule=Host(`faclab.localhost`)"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.compteur.rule=Host("faclab.localhost")'
+      - 'traefik.http.routers.compteur.entrypoints=web'
+    restart: unless-stopped
+    networks:
+      - compteur-social-network
+    command: >
+      sh -c "
+        npm run migration:prod &&
+        npm run docker:prod
+      "
+    extra_hosts:
+      - "faclab.localhost:172.18.0.1"
+
+  backup:
+    build:
+      context: .
+      dockerfile: backup-db.Dockerfile
+    volumes:
+      - ./database:/app/database
+      - ./backups:/app/backups
+    environment:
+      - FILE=database-prod.tmp.sqlite
+    #   - FTP_HOST=...
+    #   - FTP_USER=...
+    #   - FTP_PASSWORD=...
+    env_file:
+      - .env.local
+    command: >
+      sh -c "
+        node --experimental-strip-types server/backup.ts
+      "
+volumes:
+  node_modules:
+  sqlite-database:

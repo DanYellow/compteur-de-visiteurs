@@ -3,12 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath, URLSearchParams } from "url";
 import { stringify } from "csv-stringify/sync";
-import { DateTime, DateTimeUnit } from "luxon";
-
-import config from "#config" with { type: "json" };
-import { configData, getLinearCSV, getPivotTable } from "#scripts/utils.shared.ts";
-import { slugify } from "#scripts/utils.ts";
-import { Visit } from "#types";
+import { getLinearCSV, slugify } from "#scripts/utils.shared";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,39 +16,34 @@ router.get('/', async (req, res) => {
         "semaine": "week",
         "mois": "month",
         "annee": "year",
-    }
+        "tous": "tous",
+    };
 
     const [configKey] = Object.entries(predicatesDict).filter(([key]) => Object.keys(req.query).includes(key)).at(0) || "jour"
-    const isGrouped = "groupe" in req.query;
-
     let csvPayload = [];
 
-    const extraParams = new URLSearchParams({ jour: req.query[configKey] } as Record<string, string>);
+    const extraParams = new URLSearchParams(Object.entries(
+        {
+            jour: req.query[configKey],
+            lieu: req.query.lieu,
+            ...("evenement" in req.query ? { evenement: encodeURIComponent(req.query.evenement as string) } : { pivot: "" }),
+        } as Record<string, string>).filter(([_, value]) => value !== undefined && value !== null)
+    );
 
-    const request = await fetch(`http://${req.get('host')}/api?filtre=${configKey}&${extraParams.toString()}`);
+    const request = await fetch(`http://${req.get('host')}/api/visites?filtre=${configKey}&${extraParams.toString()}`);
     const requestRes = await request.json();
 
-    const fileTimestamp = `_${slugify(config.PLACE)}_${String(Date.now()).slice(-6)}.csv`;
-    let csvFilename = "";
-
-    if (isGrouped) {
-        const config = configData[configKey];
-
-        csvFilename = `liste-visites-detaillee_${configKey}`;
-        const pivotPayload = Object.groupBy(requestRes.data, (item) => {
-            return (item as Visit).groupe;
-        });
-        csvPayload = getPivotTable(pivotPayload, config.listColumns, { columnSuffix: config?.xValuesSuffix || "" });
-    } else {
-        csvFilename = `liste-visites_${configKey}`;
-        const filterPredicate: DateTimeUnit = predicatesDict[configKey] as DateTimeUnit;
-        const daySelected = DateTime.fromISO(Object.values(req.query)[0] as string);
-        const totalPeriodCell = `${daySelected.startOf(filterPredicate).toFormat("dd/LL/yyyy")} ➜ ${daySelected.endOf(filterPredicate).toFormat("dd/LL/yyyy")}`;
-
-        csvPayload = getLinearCSV(requestRes.data, totalPeriodCell);
+    let placeName = "tous";
+    if (req.query.lieu && req.query.lieu !== "tous") {
+        placeName = req.query.lieu.toString() || "tous";
+    } else if ("evenement" in req.query) {
+        placeName = (req.query.nom_evenement || "evenement").toString();
     }
 
-    csvFilename += fileTimestamp;
+    const fileTimestamp = `${slugify(placeName)}_${String(Date.now()).slice(-6)}.csv`;
+    const csvFilename = `liste-visites_${configKey}-${extraParams.get('jour')}_${fileTimestamp}`;
+
+    csvPayload = getLinearCSV(requestRes.data)
 
     const tempCsvFile = path.join(__dirname, "..", "liste-visites.tmp.csv");
 

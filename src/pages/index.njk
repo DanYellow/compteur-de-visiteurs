@@ -1,5 +1,5 @@
 {% extends "layouts/page.njk" %}
-{% import "includes/macros.njk" as forms %}
+{% import "includes/macros.njk" as macros %}
 
 {% set root_class = "register" %}
 
@@ -7,73 +7,128 @@
 Compteur de visiteurs
 {% endblock %}
 {% block scripts %}
-{% if NODE_ENV == "development" %}
-    <script type="module" src="/src/assets/scripts/register-form.ts" defer></script>
-{% else %}
-    <script type="module" src="/{{ manifest['src/assets/scripts/register-form.ts'].file }}" defer></script>
-{% endif %}
+    {% if NODE_ENV == "development" %}
+        <script type="module" src="/src/assets/scripts/forms/register-form.ts" defer></script>
+    {% else %}
+        <script type="module" src="/{{ manifest['src/assets/scripts/forms/register-form.ts'].file }}" defer></script>
+    {% endif %}
 {% endblock %}
 {% block content %}
     <div class="max-w-7xl mt-8 pr-[max(env(safe-area-inset-right),_theme(space.3))] pl-[max(env(safe-area-inset-left),_theme(space.3))] grid grid-cols-1 lg:grid-cols-[1fr_456px] justify-center gap-24 mx-auto">
         <form class="w-full" novalidate action="" method="post" data-sign-in-form>
             <header class="mb-6">
-                <img src="/images/faclab-logo-light.svg" class="w-20" alt="">
+                <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-20" alt="">
+                <p class="text-sm">{{ place.nom }}</p>
+                <div class="flex gap-3 flex-col sm:flex-row">
+                    <button type="button" class="bg-white-numixs hocus:bg-white-numixs/80 text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="explanation" command="show-modal">Pourquoi remplir ce formulaire ?</button>
+                    <button type="button" class="bg-green-numixs hocus:bg-dark-green-numixs text-gray-numixs px-3 py-1.5 w-full rounded-md" commandfor="visit-code" command="show-modal">J'ai un code de visite</button>
+                </div>
             </header>
-            <div class="flex flex-col gap-3">
-                <div class="mb-11">
-                    <p class="title-font leading-none text-7xl uppercase">À quel(s) groupe(s)<br /><span class="text-green-numixs">appartenez-vous</span> ?</p>
-                    <p class="text-sm opacity-70 -mt-1">Vous devez choisir au moins un groupe</p>
-                </div>
-                <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
+            <ul class="form-errors-list-container not-empty:mb-3" role="alert" id="error-container"></ul>
+            <div class="relative" id="wizard-steps">
+                <div class="form-step-wrapper overflow-hidden snap-y snap-mandatory overscroll-contain inset-0" style="position: absolute;" id="steps-container">
+                    <div data-step="1" class="form-step">
+                        {% include "includes/registration-steps/group-step.njk" %}
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-7">
-                    {% for sector in list_business_sector %}
-                        {% set children = null %}
-                        {% if sector.value == "entreprise" %}
-                            {% set children %}
-                            <div data-input-switch-toggle-recipient="entreprise">
-                                <div class="ml-12 flex flex-col mt-2">
-                                    {{ forms.switch("Station Numixs", "station_numixs", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"label_classes": "text-xl" }) }}
-                                    {{ forms.switch("Externe", "entreprise_externe", value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"label_classes": "text-xl" }) }}
-                                </div>
-                            </div>
-                            {% endset %}
-                        {% endif %}
-                        {{ forms.switch(sector.name, sector.value, value = "oui", color = "peer-checked:bg-green-numixs", ring_color = "peer-focus:ring-dark-green-numixs/30", options = {"children": children }) }}
-                    {% endfor %}
-                </div>
-            </div>
+                        <div class="mt-7 flex flex-row justify-between">
+                            <div inert></div>
+                            <button type="button" data-button-step="next" data-step-name="group" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-dark-green-numixs items-center">
+                            Continuer
+                            {% include "includes/icons/next-arrow.svg" %}
+                            </button>
+                        </div>
+                    </div>
+                    <div data-step="2" class="form-step">
+                        {% include "includes/registration-steps/gender-step.njk" %}
 
-            <div class="mt-7">
-                <button type="submit" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white items-center">
-                    Envoyer
-                    {% include "includes/icons/next-arrow.svg" %}
-                </button>
+                        <div class="mt-7 flex flex-row justify-between">
+                            <button type="button" data-button-step="prev" data-step-name="group" class="text-white-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white/80 items-center">
+                                <span class="-scale-x-100">
+                                    {% include "includes/icons/next-arrow.svg" %}
+                                </span>
+                                Revenir
+                            </button>
+                            <button type="button" data-button-step="next" data-step-name="gender" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-dark-green-numixs items-center">
+                                Continuer
+                                {% include "includes/icons/next-arrow.svg" %}
+                            </button>
+                        </div>
+                    </div>
+                    <div data-step="3" class="form-step">
+                        {% include "includes/registration-steps/department-step.njk" %}
+
+                        <div class="mt-7 flex flex-row justify-between">
+                            <button type="button" data-button-step="prev" class="text-white-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white/80 items-center">
+                                <span class="-scale-x-100">
+                                    {% include "includes/icons/next-arrow.svg" %}
+                                </span>
+                                Revenir
+                            </button>
+                            <button type="button" data-button-step="next" data-step-name="department" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-dark-green-numixs items-center">
+                                Continuer
+                                {% include "includes/icons/next-arrow.svg" %}
+                            </button>
+                        </div>
+                    </div>
+                    <div data-step="4" class="form-step">
+                        {% include "includes/registration-steps/age-step.njk" %}
+
+                        <div class="mt-7 flex flex-row justify-between">
+                            <button type="button" data-button-step="prev" class="text-white-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-white/80 items-center">
+                                <span class="-scale-x-100">
+                                    {% include "includes/icons/next-arrow.svg" %}
+                                </span>
+                                Revenir
+                            </button>
+                            <button type="button" data-button-step="next" data-step-name="age" class="text-green-numixs inline-flex w-fit title-font rounded-md text-2xl gap-2.5 py-3.5 font-bold hocus:text-dark-green-numixs items-center">
+                                Envoyer
+                                {% include "includes/icons/next-arrow.svg" %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
-        <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full" style="background-image: url('/images/compteur-deco-image.png')">
-        </div>
+        <div class="hidden lg:block rounded-md w-full overflow-hidden bg-no-repeat h-full" style="background-image: url('/images/compteur-deco-image.png')"></div>
     </div>
 
-    {# <footer class="max-w-7xl px-3 mx-auto text-center text-xs mt-4">
-        <p>Projet inspiré par le projet compteur social développé au FabLab Numixs de Sarcelles en Python.</p>
-    </footer> #}
+    <footer class="max-w-7xl px-3 mx-auto text-center text-xs mt-4">
+        <p>Projet inspiré par le projet compteur social développé au FacLab® numixs de Sarcelles en Python.</p>
+    </footer>
 
     <dialog id="result-form-modal" data-dialog="form-submitted" class="backdrop:bg-[#272626] m-auto max-w-5xl w-full bg-transparent px-2 result-form-modal">
         <div class="flex gap-4 flex-col py-4">
-            <img src="/images/faclab-logo-light.svg" class="w-30 block mb-6" alt="Logo faclab numixs">
+            <div class="mb-6">
+                <img src="/images/logos/{{place.type or "faclab"}}-numixs.svg" class="w-30 block" alt="Logo faclab numixs">
+                <p class="text-sm text-white-numixs">{{ place.nom }}</p>
+            </div>
             <div class="flex flex-col" data-swap-content>
                 <img src="/images/loading.svg" class="animate-spin w-16" alt="">
             </div>
         </div>
     </dialog>
     <template data-template-id="form-success">
-        <p class="title-font text-white text-7xl mb-4">Merci de votre retour, excellent passage au<br class="hidden lg:inline" /> <span class="text-green-numixs">FacLab numixs<sup>®</sup></span>.</p>
+        <div class="text-white text-center mb-4">
+            <p class="text-lg">Code de visite</p>
+            <p class="title-font text-7xl flex gap-2 justify-center">
+                <span data-visit-code></span>
+                <button type="button" class="align-middle hocus:opacity-80" title="Voir détails" commandfor="visit-code-explanation" command="show-modal" data-visit-code-info=''>
+                    <span class="size-15 inline-block">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                            <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 0 1 .67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 1 1-.671-1.34l.041-.022ZM12 9a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
+                        </svg>
+                    </span>
+                </button>
+            </p>
+        </div>
+        <p class="title-font text-white text-7xl mb-4">Merci de votre retour, excellent passage au<br class="hidden lg:inline"/>
+            <span class="text-green-numixs" data-place>FacLab numixs<sup>®</sup>
+            </span>.</p>
         <div class="overflow-hidden rounded-md h-52 lg:h-auto flex items-center lg:block">
             <img src="/images/register-complete.jpg" class="rounded-md" alt="">
         </div>
 
-        <button type="button" data-close-dialog command="close" commandfor="result-form-modal" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 active:bg-dark-green-numixs">Revenir à l'accueil</button>
+        <button type="button" data-close-dialog command="close" commandfor="result-form-modal" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 hocus:bg-dark-green-numixs active:bg-dark-green-numixs">Revenir à l'accueil</button>
     </template>
     <template data-template-id="form-submitting">
         <img src="/images/loading.svg" class="animate-spin w-16" alt="Chargement">
@@ -81,6 +136,67 @@ Compteur de visiteurs
     <template data-template-id="form-error">
         <p class="title-font text-white text-7xl mb-4">Une erreur est survenue lors de votre enregistrement.</p>
 
-        <button type="button" data-close-dialog command="close" commandfor="result-form-modal" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 active:bg-dark-green-numixs">Recommencer</button>
+        <button type="button" data-close-dialog command="close" commandfor="result-form-modal" class="bg-green-numixs w-fit rounded-md px-16 py-3.5 mx-auto block mt-8 hocus:bg-dark-green-numixs active:bg-dark-green-numixs">Recommencer</button>
     </template>
+
+    <dialog id="explanation" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Pourquoi remplir ce formulaire ?</p>
+            </div>
+            <button type="button" command="close" commandfor="explanation" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <p class="mb-2">
+            Récolter vos données de visite anonymes nous permet de témoigner de l'affluence de votre lieu et ainsi nous permettre d'obtenir des fonds pour financer nos machines et donc vos projets.
+        </p>
+    </dialog>
+
+    <dialog id="visit-code" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <p class="title-font text-4xl">Code de visite</p>
+        </header>
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <p class="mb-2">
+            Le code de visite est un moyen simple et rapide de remplir ce formulaire. Lors de votre visite, un code unique est géré. Retenez-le, il vous permettra re-remplir ce formulaire avec les mêmes informations que fournies lors de votre dernière visite.
+            Si lors de votre prochaine visite, vous modifiez vos données, le code sera modifié. 
+        </p>
+        <div class="mb-4 flex flex-col gap-3">
+            {{ macros.warning_banner("Un code de visite ne peut pas contenir la lettre \"O\"") }}
+            <ul class="form-errors-list-container" role="alert" data-form-errors id="error-visit-code-container"></ul>
+        </div>
+        <form action="" class="flex flex-col gap-5" autocomplete="off">
+            <div class="flex flex-col">
+                <label for="code">Code</label>
+                <input type="text" id="code" name="code" maxlength="3" placeholder="Code à 3 caractères" class="text-gray-numixs uppercase">
+            </div>
+            <div class="flex justify-between flex-row gap-3">
+                <button type="button" command="close" commandfor="visit-code" class="title-font text-2xl py-1.5 rounded-md text-white-numixs hocus:opacity-70">Annuler</button>
+                <button type="submit" class="text-green-numixs w-fit title-font rounded-md text-2xl py-3.5 font-bold hocus:text-dark-green-numixs">
+                    Envoyer
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <dialog id="visit-code-explanation" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Code de visite</p>
+            </div>
+            <button type="button" command="close" commandfor="visit-code-explanation" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-10">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <p class="text-lg">Vous revenez régulièrement ? Le code de visite est fait pour vous ! Quatre pages de formulaire, ça peut être fastidieux à remplir à chaque visite. Alors pour gagner du temps, vous pouvez utiliser le code ci-dessous pour remplir le formulaire (que vous pouvez toujours éditer) avec trois caractères et une validation pour votre prochain passage.</p>
+        <p class="title-font text-7xl text-center text-green-numixs" data-visit-code>_NO_CODE_</p>
+        <p class="text-lg">Remplir ce formulaire permet de récolter les données de fréquentation du lieu pour nous permettre de récolter des fonds.</p>
+    </dialog>
 {% endblock %}

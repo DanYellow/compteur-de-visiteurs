@@ -1,0 +1,11 @@
+services:
+    redis:
+      image: redis
+      container_name: redis-container
+      command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+      networks:
+        - compteur-social-network
+
+networks:
+  compteur-social-network:
+    driver: bridge

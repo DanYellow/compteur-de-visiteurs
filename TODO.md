@@ -5,3 +5,5 @@
 - ~~Proposer le téléchargement du tableau affiché dans la vue détail d'un graphique~~
 - ~~Base de données de production et de dev~~
 - ~~Navigation avec les flèches pour le calendrier~~
+- ~~Ajouter colonne “est import csv” dans la liste de visites + export csv~~
+- Prendre en compte les évènements dans l’import csv s’ils sont rétro-actifs

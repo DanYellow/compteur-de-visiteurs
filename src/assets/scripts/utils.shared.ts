@@ -1,254 +1,412 @@
-import type { BaseConfigData, PivotTableOptions, Result, Visit, WeekMonth } from "#types";
-import { DateTime, Info, Interval } from "luxon";
-
-import config from "#config" with { type: "json" };
+import { DateTime, Info } from 'luxon';
+import type {
+    BaseConfigData,
+    GroupItem,
+    VisitRaw,
+    WeekMonth,
+} from '#types';
 
 export const listGroups = [
     {
-        "name": "Entreprise\nexterne",
-        "value": "entreprise_externe",
-        "lineColor": '#ffc8fa',
-        "listInChoices": false,
+        label: 'Entreprise\nexterne',
+        value: 'entreprise_externe',
+        lineColor: '#ffc8fa',
+        listInChoices: false,
     },
     {
-        "name": "Entreprise\nStation Numixs",
-        "value": "station_numixs",
-        "lineColor": 'rgb(213, 217, 22)',
-        "listInChoices": false,
+        label: 'Entreprise\nStation Numixs',
+        value: 'station_numixs',
+        lineColor: 'rgb(213, 217, 22)',
+        listInChoices: false,
     },
     {
-        "name": "Entreprise",
-        "value": "entreprise",
-        "lineColor": 'rgb(15, 92, 192)',
-        "listInDb": false,
+        label: 'Entreprise',
+        value: 'entreprise',
+        lineColor: '',
+        listInDb: false,
     },
     {
-        "name": "Éducation",
-        "value": "education",
-        "lineColor": 'rgb(75, 192, 192)',
+        label: 'Enseignant',
+        value: 'enseignant',
+        lineColor: 'rgb(15, 92, 192)',
+        listInChoices: false,
     },
     {
-        "name": "Artisan",
-        "value": "artisan",
-        "lineColor": 'rgb(255, 255, 255)',
+        label: 'Élève',
+        value: 'eleve',
+        lineColor: 'rgb(75, 192, 192)',
+        listInChoices: false,
     },
     {
-        "name": "Artiste",
-        "value": "artiste",
-        "lineColor": '#ffdc00',
+        label: 'Éducation / Scolaire',
+        value: 'education',
+        lineColor: '',
+        listInDb: false,
     },
     {
-        "name": "Agent CARPF",
-        "value": "agent_carpf",
-        "lineColor": 'rgb(255, 108, 0)',
-        "fullName": "(Communauté d'Agglomération Roissy Pays de France)"
+        label: 'Artisan',
+        value: 'artisan',
+        lineColor: 'rgb(255, 255, 255)',
     },
     {
-        "name": "Collectivité",
-        "value": "collectivité",
-        "lineColor": '#00610d',
+        label: 'Artiste',
+        value: 'artiste',
+        lineColor: '#ffdc00',
     },
     {
-        "name": "FabLab",
-        "value": "fablab",
-        "lineColor": 'rgb(217, 22, 123)',
+        label: 'Agent CARPF',
+        value: 'agent_carpf',
+        lineColor: 'rgb(255, 108, 0)',
+        fullName: "(Communauté d'Agglomération Roissy Pays de France)",
     },
     {
-        "name": "numixs Lab",
-        "value": "numixs_lab",
-        "lineColor": 'rgb(22, 180, 217)',
+        label: 'Collectivité',
+        value: 'collectivité',
+        lineColor: '#00610d',
     },
     {
-        "name": "Retraité",
-        "value": "retraité",
-        "lineColor": '#d901ff',
+        label: 'FabLab',
+        value: 'fablab',
+        lineColor: 'rgb(217, 22, 123)',
     },
     {
-        "name": "Association",
-        "value": "association",
-        "lineColor": 'rgb(3, 252, 7)',
+        label: 'numixs Lab',
+        value: 'numixs_lab',
+        lineColor: '#000',
     },
     {
-        "name": "En réinsertion pro",
-        "value": "réinsertion_pro",
-        "lineColor": 'rgb(3, 252, 205)',
+        label: 'Retraité',
+        value: 'retraité',
+        lineColor: '#d901ff',
     },
     {
-        "name": "Autre",
-        "value": "autre",
-        "lineColor": 'rgb(252, 26, 3)',
+        label: 'Association',
+        value: 'association',
+        lineColor: 'rgb(3, 252, 7)',
     },
-];
+    {
+        label: 'En réinsertion pro',
+        value: 'réinsertion_pro',
+        lineColor: 'rgb(3, 252, 205)',
+    },
+    {
+        label: 'Autre',
+        value: 'autre',
+        lineColor: 'rgb(252, 26, 3)',
+    },
+] as const satisfies readonly GroupItem[];
 
-export const getPivotTable = (data: Result, columns = [], options: PivotTableOptions = { columnSuffix: "" }) => {
-    const tableValues = [];
-    const totalVisits = Object.values(data)
-        .flat()
-        .map((item) => Object.values(item).reduce((total: number, x) => (x === "oui" ? total + 1 : total), 0))
-        .reduce((total: number, val: number) => total + val, 0)
+export const getPivotTable = (
+    data: Record<string, VisitRaw[]>,
+    columns: string[] | { id: number; name: string }[] = [],
+    hasEvents: boolean
+) => {
+    const listGroupsFiltered = listGroups.filter((item) => !('listInDb' in item) || item.listInDb)
 
-    const tableHeaderColumns = ["Groupe"];
-    const tableValuesPlaceholder: number[] = [];
+    const res: { label: string, total: number[][] }[] = [];
 
-    ;[...columns].forEach((label: string | Record<string, string>) => {
-        if (typeof label === "object") {
-            tableHeaderColumns.push(`${label.name}${options.columnSuffix}`);
-        } else {
-            tableHeaderColumns.push(`${label}${options.columnSuffix}`);
-        }
-        tableValuesPlaceholder.push(0);
-    });
-    tableHeaderColumns.push("Total par groupe");
-    tableValues.push(tableHeaderColumns);
+    listGroupsFiltered.forEach((item) => {
+        const valuesForGroup: number[][] = columns.map((col) => {
+            const visitGroupKey = typeof col === 'object' ? col.id : col;
+            const visitsForGroup = data[visitGroupKey];
+            if (visitsForGroup) {
+                return visitsForGroup.reduce(
+                    (accumulator, currentVisit) => {
+                        const isEventVisit = currentVisit.liste_evenements !== '';
 
-    const tableFooter = ["Total (visites)", ...tableValuesPlaceholder];
-
-    listGroups.forEach((business) => {
-        const rowValues = [business.name];
-
-        const visitorPerTypeAndPeriod = {
-            [business.value]: new Array(columns.length || 0).fill(0),
-        };
-
-        Object.entries(data).forEach(([group, listVisits]) => {
-            const totalPerGroup = (listVisits as unknown as Visit[]).reduce(
-                (acc: Record<string, number>, visit) => ((acc[business.value] = (acc[business.value] || 0) + ((visit[business.value] === "oui") ? 1 : 0)), acc),
-                {});
-
-            let indexArray = columns.findIndex((label: string | Record<string, number>) => {
-                if (typeof label === "object") {
-                    return Number(label.id) === Number(group);
-                }
-                return Number(label) === Number(group);
-            });
-
-            if (indexArray >= 0) {
-                (tableFooter[indexArray + 1] as number) += totalPerGroup[business.value];
-                visitorPerTypeAndPeriod[business.value][indexArray] = totalPerGroup[business.value];
+                        return [
+                            accumulator[0] + (!isEventVisit && currentVisit[item.value as keyof VisitRaw] === "oui" ? 1 : 0),
+                            ...(hasEvents ? [accumulator[1] + (isEventVisit && currentVisit[item.value as keyof VisitRaw] === "oui" ? 1 : 0)] : [])
+                        ]
+                    }, [0, ...(hasEvents ? [0] : [])]
+                );
             }
-        });
-
-        visitorPerTypeAndPeriod[business.value].forEach((value) => {
-            rowValues.push(value);
-        });
-
-        const totalBusiness = visitorPerTypeAndPeriod[business.value].reduce((acc, value) => acc + value, 0);
-        rowValues.push(totalBusiness);
-
-        tableValues.push(rowValues);
-    });
-
-    tableFooter.push(totalVisits);
-    tableValues.push(tableFooter);
-
-    return tableValues;
-}
-
-export const getLinearCSV = (data: Result[], totalPeriodCell = "") => {
-    const csvHeader = Object.keys(data?.[0] || {});
-    csvHeader[1] = "Période";
-    csvHeader.pop();
-
-    const csvTotal = data.length > 0 ? [
-        `Total : ${data.length}`,
-        totalPeriodCell,
-        // `${DateTime.fromISO(new Date(data.at(0).date_passage).toISOString()).toFormat("dd/LL/yyyy")} ➜ ${DateTime.fromISO(new Date(data.at(-1).date_passage).toISOString()).toFormat("dd/LL/yyyy")}`,
-        config.PLACE,
-        ...new Array(listGroups.filter((item) => (!("listInDb" in item) || item.listInDb)).length).fill(0)
-    ] : [];
-    const csvPayload = [csvHeader];
-
-    data.forEach((item, idx) => {
-        // let groupName = xLabels[item.groupe];
-        // if (typeof groupName === 'object') {
-        //     groupName = groupName.name;
-        // }
-
-        Object.values(item).forEach((value, idx) => {
-            if (value === "oui") {
-                csvTotal[idx] += 1
-            }
-        });
-        item.id = String(idx + 1);
-        const rowData: string[] = Object.values({
-            ...item,
-            // groupe: groupName
+            return [0, ...(hasEvents ? [0] : [])];
         })
 
-        rowData.pop()
-        csvPayload.push(rowData);
+        const totalForGroup = valuesForGroup.reduce((acc, totalVisits) => {
+            return [
+                acc[0] + totalVisits[0],
+                ...(hasEvents ? [acc[1] + totalVisits[1]] : [])
+            ]
+        }, [0, ...(hasEvents ? [0] : [])]);
+
+        valuesForGroup.push(totalForGroup);
+
+        res.push({
+            label: item.label,
+            total: valuesForGroup
+        })
+    })
+
+    const columnCount = res[0].total.length;
+
+    const columnTotals = Array.from({ length: columnCount }, (_, colIndex) =>
+        res.reduce(
+            ([sumA, sumB], item) => [
+                sumA + (item.total[colIndex] as number[])[0],
+                ...(hasEvents ? [sumB + (item.total[colIndex] as number[])[1]] : [])
+            ],
+            [0, ...(hasEvents ? [0] : [])]
+        )
+    );
+
+    const total: { label: string, total: number[][] }[] = []
+
+    if (hasEvents) {
+        total.push({
+            label: "Total par type",
+            total: columnTotals
+        })
+    }
+
+    total.push({
+        label: "Total",
+        total: columnTotals.map(([totalReg, totalEvent]) => [totalReg + (hasEvents ? totalEvent : 0)])
     });
 
-    csvPayload.splice(1, 0, csvTotal);
+    return { body: res, footer: total };
+};
+
+export const getLinearCSV = (
+    data: Record<string, unknown>[]
+) => {
+    const csvPayload: (string | number)[][] = [];
+
+    data.forEach((item, idx) => {
+        if (idx === 0) {
+            csvPayload.push(Object.keys(item))
+            csvPayload.push(Object.values(item) as (string | number)[])
+        } else {
+            csvPayload.push(Object.values(item) as (string | number)[])
+        }
+    })
 
     return csvPayload;
-}
+};
 
-const [openHours, closeHours] = config.OPENING_HOURS.split("-").map(Number);
-const rangeOpeningHours = Math.abs(Number(closeHours) - Number(openHours) + 1);
+const listMonths = Info.months('long', { locale: 'fr' }).map((item, idx) => ({
+    name: item.charAt(0).toUpperCase() + String(item).slice(1),
+    id: String(idx + 1).padStart(2, '0'),
+}));
 
-const listTimeSlots = Array.from(new Array(rangeOpeningHours), (_, i) => i + openHours).map((item) => String(item));
+export const getWeeksRangeMonth = (daySelected: DateTime) => {
+    const startOfMonth = daySelected.startOf('month');
+    const endOfMonth = daySelected.endOf('month');
 
-const listClosedDaysIndex = config.CLOSED_DAYS_INDEX.split(",").filter(Boolean).map(Number);
-const listDays = Info.weekdays('long', { locale: 'fr' })
-    .map((item, idx) => ({
-        name: item.charAt(0).toUpperCase() + String(item).slice(1),
-        id: idx + 1
-    }))
-    .filter((_, index) => !listClosedDaysIndex.includes(index + 1))
+    let cursor = startOfMonth.startOf('week');
 
-const listMonths = Info.months('long', { locale: 'fr' })
-    .map((item, idx) => ({
-        name: item.charAt(0).toUpperCase() + String(item).slice(1),
-        id: idx + 1
-    }));
+    const listWeeks: WeekMonth[] = [];
 
-const getWeeksRangeMonth = (_startDate = null) => {
-    const today = DateTime.now();
-    const startMonth = today.startOf("month");
-    const endMonth = today.endOf("month");
+    while (cursor <= endOfMonth) {
+        const weekStart = cursor;
+        const weekEnd = cursor.plus({ days: 6 });
 
-    const firstWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: startMonth.weekNumber });
-    const lastWeekInMonth = DateTime.fromObject({ weekYear: today.year, weekNumber: endMonth.weekNumber });
+        const from = weekStart < startOfMonth ? startOfMonth : weekStart;
+        const to = weekEnd > endOfMonth ? endOfMonth : weekEnd;
 
-    const intervalMonth = firstWeekInMonth.until(lastWeekInMonth.endOf("month"));
-    if (intervalMonth.isValid) {
-        const intervalWeeks = intervalMonth.splitBy({ weeks: 1 });
-        const listWeeks: WeekMonth[] = [];
-
-        intervalWeeks.forEach((item: Interval<true>, index: number, array: Interval<boolean>[]) => {
-            listWeeks.push({
-                id: item.start!.weekNumber,
-                name: `${(index === 0 ? startMonth : item.start!).toFormat("dd/LL")} ➜ ${(index === array.length - 1 ? endMonth : item.end!).toFormat("dd/LL")}`
-            });
+        listWeeks.push({
+            id: weekStart.weekNumber,
+            name: `${from.toFormat('dd/LL')} ➜ ${to.toFormat('dd/LL')}`,
         });
 
-        return listWeeks;
+        cursor = cursor.plus({ weeks: 1 });
     }
 
-    return [];
-}
+    return listWeeks;
+};
 
-export const configData: BaseConfigData = {
-    "jour": {
-        apiKey: "jour",
-        listColumns: listTimeSlots,
-        xValuesSuffix: "h",
+export const minYear = 2021;
+export const maxYear = new Date().getFullYear();
+
+export const baseConfigData: BaseConfigData = {
+    jour: {
+        apiKey: 'jour',
+        xValuesSuffix: 'h',
     },
-    "semaine": {
-        apiKey: "semaine",
-        listColumns: listDays,
+    semaine: {
+        apiKey: 'semaine',
     },
-    "mois": {
-        apiKey: "mois",
-        listColumns: getWeeksRangeMonth(),
+    mois: {
+        apiKey: 'mois',
     },
-    "annee": {
-        apiKey: "annee",
+    annee: {
+        apiKey: 'annee',
         listColumns: listMonths,
-    }
-}
+    },
+    tous: {
+        apiKey: 'tous',
+        listColumns: Array.from({ length: maxYear - minYear + 1 }, (_, i) => String(minYear + i)),
+    },
+};
 
 export const capitalizeFirstLetter = (val: unknown) => {
     return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+};
+
+export const DEFAULT_CLOSED_DAYS = ['1', '6', '7'];
+export const DEFAULT_OPEN_HOURS = '10:00:00';
+export const DEFAULT_CLOSE_HOURS = '19:30:00';
+
+export const listPlaceTypes = [
+    {
+        label: 'Faclab® numixs',
+        value: 'faclab',
+    },
+    {
+        label: 'Station numixs',
+        value: 'station',
+    },
+    {
+        label: 'numixs Lab',
+        value: 'lab',
+    },
+];
+
+export const LIST_ROLES = [
+    {
+        label: 'Super Administrateur',
+        value: 'SUPER_ADMIN',
+        weight: 1000,
+    },
+    {
+        label: 'Administrateur',
+        value: 'ADMIN',
+        weight: 100,
+    },
+    {
+        label: 'Numixs lab',
+        value: 'NUMIXS_LAB',
+        weight: 10,
+    },
+    {
+        label: 'Lecteur',
+        value: 'READ_ONLY',
+        weight: 1,
+    },
+] as const;
+
+export const listDepartments = [
+    {
+        label: 'Non communiqué',
+        value: '-1',
+    },
+    {
+        label: 'Paris (75)',
+        value: '75',
+    },
+    {
+        label: 'Seine-et-Marne (77)',
+        value: '77',
+    },
+    {
+        label: 'Yvelines (78)',
+        value: '78',
+    },
+    {
+        label: 'Essonne (91)',
+        value: '91',
+    },
+    {
+        label: 'Hauts-de-Seine (92)',
+        value: '92',
+    },
+    {
+        label: 'Seine-Saint-Denis (93)',
+        value: '93',
+    },
+    {
+        label: 'Val-de-Marne (94)',
+        value: '94',
+    },
+    {
+        label: 'Val d\'Oise (95)',
+        value: '95',
+    },
+    {
+        label: 'Autre / Hors Île-de-France',
+        value: '99',
+    },
+] as const;
+
+export const listAgeGroups = [
+    {
+        label: 'Non communiqué',
+        value: '-1',
+    },
+    {
+        label: '17 ans et moins',
+        value: '0',
+    },
+    {
+        label: '18/24 ans',
+        value: '1',
+    },
+    {
+        label: '25/34 ans',
+        value: '2',
+    },
+    {
+        label: '35/49 ans',
+        value: '3',
+    },
+    {
+        label: '50/64 ans',
+        value: '4',
+    },
+    {
+        label: '65 ans et plus',
+        value: '5',
+    },
+] as const;
+
+export const listGenders = [
+    {
+        label: 'Non communiqué',
+        value: '-1',
+    },
+    {
+        label: 'Homme',
+        value: '0',
+    },
+    {
+        label: 'Femme',
+        value: '1',
+    },
+    {
+        label: 'Non-binaire',
+        value: '2',
+    },
+] as const;
+
+export const REQUIRED_MESSAGE = 'Ce champ est obligatoire';
+
+export const uniqueByKey = (arr: any[], key: string) => {
+    return [...new Map(arr.map(item => [item[key], item])).values()];
+};
+
+export const NB_ITEMS_PER_PAGE = 25;
+
+export const SOCKET_EVENTS = {
+    VISITOR_REGISTERED: "VISITOR_REGISTERED",
+    NEW_USER: "NEW_USER",
+}
+
+export const slugify = (input: string): string => {
+    if (!input)
+        return '';
+
+    // make lower case and trim
+    let slug = input.toLowerCase().trim();
+
+    // remove accents from charaters
+    slug = slug.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
+    // replace invalid chars with spaces
+    slug = slug.replace(/[^a-z0-9\s-]/g, ' ').trim();
+
+    // replace multiple spaces or hyphens with a single hyphen
+    slug = slug.replace(/[\s-]+/g, '-');
+
+    return slug;
 }

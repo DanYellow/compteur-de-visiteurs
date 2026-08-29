@@ -1,0 +1,69 @@
+import {
+    DataTypes,
+    Sequelize,
+    Model,
+    type InferAttributes,
+    type InferCreationAttributes,
+    type CreationOptional,
+    type ForeignKey,
+} from "sequelize";
+
+export default class UserPublicKeyCredentials extends Model<
+    InferAttributes<UserPublicKeyCredentials>,
+    InferCreationAttributes<UserPublicKeyCredentials>
+> {
+    declare id: CreationOptional<number>;
+    declare user_id: ForeignKey<number>;
+    declare cle_publique: string;
+    declare id_externe: string;
+    declare derniere_utilisation?: string;
+    declare nom?: string;
+    declare aaguid: string;
+    declare compteur: number;
+
+    static initModel(sequelize: Sequelize) {
+        UserPublicKeyCredentials.init(
+            {
+                id: {
+                    type: DataTypes.INTEGER,
+                    primaryKey: true,
+                    autoIncrement: true,
+                    allowNull: false,
+                },
+                cle_publique: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                nom: {
+                    type: DataTypes.STRING,
+                    allowNull: true,
+                },
+                id_externe: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                    unique: true,
+                },
+                derniere_utilisation: {
+                    type: DataTypes.DATE,
+                },
+                // https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API/Authenticator_data#attestedcredentialdata
+                aaguid: {
+                    type: DataTypes.STRING,
+                    allowNull: false,
+                },
+                compteur: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    defaultValue: 0,
+                },
+            },
+            {
+                sequelize,
+                createdAt: "date_creation",
+                updatedAt: false,
+                modelName: "user_public_key_credentials",
+                underscored: true,
+            }
+        );
+    }
+}

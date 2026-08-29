@@ -1,130 +1,215 @@
 import { DateTime } from "luxon";
 import { Chart } from 'chart.js';
-import { loadImage, slugify } from "./utils";
-import config from "#config" with { type: "json" };
+import { loadImage } from "#scripts/utils.client";
+import { slugify } from "#scripts/utils.shared";
 
 const listDownloadButtons = document.querySelectorAll("[data-download-chart]");
+const placeData = JSON.parse((document.querySelector("[data-place]") as HTMLDivElement)?.dataset.place || "{}")
 
 const grayNumixs = window.getComputedStyle(document.body).getPropertyValue('--color-black-numixs')
-const WATERMARK_SCALE_FACTOR = 0.85;
+const WATERMARK_SCALE_FACTOR = 0.75;
 
-const [width, height] = (import.meta.env.CHART_EXPORT_SIZE || "1200x800").split("x");
-const SIZE_EXPORT = {
-    width,
-    height,
+const CHART_SIZE = {
+    width: 1600,
+    height: 950,
 }
+
+const PADDING = {
+    x: 10,
+    y: 12,
+}
+
+const TOP_MARGIN = 20;
+const CHART_TABLE_GAP = 20;
+const BOTTOM_MARGIN = 40;
+const SIDE_PADDING = 12;
 
 const today = DateTime.now();
 
 listDownloadButtons.forEach((item) => {
     (item as HTMLButtonElement).addEventListener("click", async (e: MouseEvent) => {
-        const element = e.currentTarget as HTMLButtonElement;
-        const chartId = element.dataset.downloadChart!;
+        const button = e.currentTarget as HTMLButtonElement;
+        button.inert = true;
+        const chartId = button.dataset.downloadChart!;
+        const chartData = JSON.parse(button.dataset.chartData || "{}");
 
         const link = document.createElement("a");
         const chart = document.getElementById(chartId) as HTMLCanvasElement;
-        chart.style.opacity = "0";
+
         const chartInstance = Chart.getChart(chart)!;
 
-        const originalSize = { width: chart.style.width, height: chart.style.height };
-        const startDatalabelsSize = (chartInstance.options!.plugins!.datalabels!.font! as any).size;
-        const chartXTitleFontSize = (chartInstance.config!.options!.scales!.x! as any).title!.font.size;
-        const chartYTitleFontSize = (chartInstance.config!.options!.scales!.y! as any).title!.font.size;
-        const chartTitleFontSize = (chartInstance.config!.options!.plugins!.title!.font! as any).size!;
+        // Compute export canvas size
+        const dialog = chart.closest("dialog");
+        const table = dialog?.querySelector("table") as HTMLTableElement | null;
 
-        const chartScaleOptions = chartInstance!.config!.options!.scales!;
+        const tableWidth = table ? table.offsetWidth : 0;
+        const tableHeight = table ? table.offsetHeight : 0;
 
-        chartInstance.options.plugins!.totalVisitors!.fontSize = "18px";
-        (chartScaleOptions.x! as any).title!.font!.size = 20;
-        (chartScaleOptions.y! as any).title!.font!.size = 20;
-        (chartInstance.config!.options!.plugins!.title!.font! as any).size = 32;
+        const exportWidth = Math.max(
+            CHART_SIZE.width + SIDE_PADDING * 2,
+            tableWidth + SIDE_PADDING * 2
+        );
+        const exportHeight =
+            TOP_MARGIN +
+            CHART_SIZE.height +
+            (table ? CHART_TABLE_GAP + tableHeight : 0) +
+            BOTTOM_MARGIN;
 
-        // (chartInstance.options!.plugins!.datalabels!.font! as any).size = 24;
-        // chartInstance.options!.plugins!.datalabels!.backgroundColor = grayNumixs;
-        chartInstance.options.plugins!.tooltip!.enabled = false;
-        chartInstance.resize(SIZE_EXPORT.width, SIZE_EXPORT.height);
+        // Create offscreen canvas for chart only
+        const offscreenChart = document.createElement("canvas");
+        offscreenChart.width = CHART_SIZE.width;
+        offscreenChart.height = CHART_SIZE.height;
+        const offscreenCtx = offscreenChart.getContext("2d")!;
 
-        const download = () => {
-            const filename = slugify(chartInstance.config!.options!.plugins!.title!.text as string)
+        // Clone config with TypeScript fix
+        const baseConfig = chartInstance.config;
 
-            link.download =  `${filename}_${String(Date.now()).slice(-6)}.jpg`;
-            link.href = chartClone.toDataURL("image/jpeg", 1);
-            link.click();
+        const exportedChartConfig: any = {
+            ...("type" in baseConfig ? { type: baseConfig.type } : {}),
+            data: {
+                ...baseConfig.data,
+                datasets: baseConfig.data.datasets.map(ds => ({ ...ds })),
+            },
+            options: {
+                ...baseConfig.options,
+                responsive: false,
+                maintainAspectRatio: false,
+                animation: false as const,
+            },
+            plugins: baseConfig.plugins,
         }
 
-        const chartClone = chart.cloneNode(true) as HTMLCanvasElement;
-        const cloneCtx = chartClone.getContext("2d");
-        if (cloneCtx) {
-            chartClone.width = chartClone.width + 75;
-            const table = chart.closest("dialog")?.querySelector("table");
-            chartClone.height = chartClone.height + 75;
-            if (table) {
-                chartClone.height += table.offsetHeight;
+        // Update font sizes for export
+        exportedChartConfig.options.plugins.totalVisitors.fontSize = "18px";
+        exportedChartConfig.options.scales.x.title.font.size = 20;
+        exportedChartConfig.options.scales.y.title.font.size = 20;
+        exportedChartConfig.options.plugins.title.font.size = 32;
+        exportedChartConfig.options.plugins.subtitle.font.size = 16;
+
+        exportedChartConfig.options.scales.x.ticks.font.size = 18;
+        exportedChartConfig.options.scales.y.ticks.font.size = 18;
+
+        exportedChartConfig.options.plugins.legend = {
+            ...exportedChartConfig.options.plugins.legend,
+            title: {
+                ...exportedChartConfig.options.plugins.legend.title,
+                font: {
+                    ...exportedChartConfig.options.plugins.legend.title?.font,
+                    size: 20
+                }
+            },
+            labels: {
+                ...exportedChartConfig.options.plugins.legend.labels,
+                font: {
+                    ...exportedChartConfig.options.plugins.legend.labels?.font,
+                    size: 16
+                }
             }
-
-            cloneCtx.drawImage(chart,
-                (Math.abs(chart.width - chartClone.width)) / 2, 0,
-                chart.width, chart.height
-            );
-
-            const watermark = new Image();
-            watermark.src = '/images/watermark.svg';
-            await loadImage(watermark);
-
-            cloneCtx.drawImage(watermark, chartClone.width - watermark.width, chartClone.height - watermark.height - 12, watermark.width * WATERMARK_SCALE_FACTOR, watermark.height * WATERMARK_SCALE_FACTOR);
-            cloneCtx.font = "12px Calibri";
-            cloneCtx.fillStyle = "white";
-            cloneCtx.fillText(`Généré le ${today.toFormat("dd/LL/yyyy à HH:mm")}`, 5, chartClone.height - 7);
-
-            cloneCtx.fillText(config.PLACE, chartClone.width - 46, chartClone.height - 7);
-
-            if (chart.closest("dialog")) {
-                const table = chart.closest("dialog")?.querySelector("table");
-                const tableDetailsSVG = `
-                    <svg xmlns="http://www.w3.org/2000/svg" width="${chart.width}px" height="${chart?.offsetHeight}">
-                        <foreignObject width="100%" height="100%">
-                            <div xmlns="http://www.w3.org/1999/xhtml" style="color: white; font-family: Calibri, sans-serif;">
-                                ${table?.outerHTML}
-                            </div>
-                        </foreignObject>
-                    </svg>
-                `;
-
-                const tableDetailsImg = new Image();
-                const svg = new Blob([tableDetailsSVG], { type: 'image/svg+xml;charset=utf-8' });
-                const url = window.URL.createObjectURL(svg);
-                tableDetailsImg.src = url;
-                await loadImage(tableDetailsImg);
-
-                cloneCtx.drawImage(tableDetailsImg, chartClone.width - tableDetailsImg.width, chart.height + 10);
-                window.URL.revokeObjectURL(url);
-            }
-
-            // Background
-            cloneCtx.fillStyle = grayNumixs;
-            cloneCtx.globalCompositeOperation = 'destination-over';
-            cloneCtx.fillRect(0, 0, chartClone.width, chartClone.height);
-
-            download();
-
-            (chartInstance.options.plugins!.datalabels!.font! as any).size = startDatalabelsSize;
-            chartInstance.options!.plugins!.datalabels!.backgroundColor = "";
-
-            (chartInstance.config!.options!.scales!.x! as any).title!.font.size = chartXTitleFontSize;
-            (chartInstance.config!.options!.scales!.y! as any).title.font.size = chartYTitleFontSize;
-            (chartInstance.config!.options!.plugins!.title!.font! as any).size = chartTitleFontSize;
-            chartInstance.options.plugins!.totalVisitors!.fontSize = "14px";
-
-            chartInstance.options.plugins!.tooltip!.enabled = true;
-            chartInstance.resize();
-            chartInstance.update();
-            chartInstance.reset();
-
-            setTimeout(() => {
-                chart.style.width = originalSize.width;
-                chart.style.height = originalSize.height;
-                chart.style.opacity = "1";
-            }, 300)
         }
+
+        // Create offscreen chart
+        const exportChart = new Chart(offscreenCtx, exportedChartConfig);
+
+        chartInstance.data.datasets.forEach((_, i) => {
+            exportChart.setDatasetVisibility(i, chartInstance.isDatasetVisible(i));
+        });
+
+        // Force synchronous render
+        exportChart.update();
+
+        // Wait one frame to ensure render completes
+        await new Promise(resolve => requestAnimationFrame(resolve));
+
+        // Create final export canvas
+        const exportCanvas = document.createElement("canvas");
+        exportCanvas.width = exportWidth;
+        exportCanvas.height = exportHeight;
+        const ctx = exportCanvas.getContext("2d")!;
+
+        // Draw chart centered at top
+        const chartX = (exportWidth - CHART_SIZE.width) / 2;
+        const chartY = TOP_MARGIN;
+
+        ctx.drawImage(
+            offscreenChart,
+            chartX,
+            chartY,
+            CHART_SIZE.width,
+            CHART_SIZE.height
+        );
+
+        // Draw table if exists
+        if (table) {
+            const tableDetailsSVG = `
+                <svg xmlns="http://www.w3.org/2000/svg" width="${tableWidth}px" height="${tableHeight}px">
+                    <foreignObject width="100%" height="100%">
+                        <div xmlns="http://www.w3.org/1999/xhtml" style="color: white; font-family: Calibri, sans-serif;">
+                            ${table.outerHTML}
+                        </div>
+                    </foreignObject>
+                </svg>
+            `;
+
+            const svg = new Blob([tableDetailsSVG], { type: "image/svg+xml;charset=utf-8" });
+            const url = window.URL.createObjectURL(svg);
+            const tableImg = new Image();
+            tableImg.src = url;
+            await loadImage(tableImg);
+
+            const tableX = (exportWidth - tableWidth) / 2;
+            const tableY = chartY + CHART_SIZE.height + CHART_TABLE_GAP;
+            ctx.drawImage(tableImg, tableX, tableY, tableWidth, tableHeight);
+
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Draw watermark
+        const watermark = new Image();
+        watermark.src = "/images/watermark.svg";
+        await loadImage(watermark);
+
+        ctx.drawImage(
+            watermark,
+            exportWidth - watermark.width * WATERMARK_SCALE_FACTOR - PADDING.x,
+            exportHeight - watermark.height * WATERMARK_SCALE_FACTOR - PADDING.y - 12,
+            watermark.width * WATERMARK_SCALE_FACTOR,
+            watermark.height * WATERMARK_SCALE_FACTOR
+        );
+
+        // Draw footer text
+        ctx.font = "12px Calibri";
+        ctx.fillStyle = "white";
+        ctx.fillText(
+            `Généré le ${today.toFormat("dd/LL/yyyy à HH:mm")}`,
+            PADDING.x,
+            exportHeight - PADDING.y
+        );
+
+        const placeName = placeData.nom || chartData.nom || "Tous";
+        ctx.fillText(
+            placeName,
+            exportWidth - (ctx.measureText(placeName).width + PADDING.x),
+            exportHeight - PADDING.y
+        );
+
+        // Background
+        ctx.globalCompositeOperation = "destination-over";
+        ctx.fillStyle = grayNumixs;
+        ctx.fillRect(0, 0, exportWidth, exportHeight);
+
+        // Export
+        let title = chartInstance.config!.options!.plugins!.title!.text;
+        if (Array.isArray(title)) {
+            title = title.join(" ")
+        }
+        const filename = slugify(title as string);
+        link.download = `${filename}_${String(Date.now()).slice(-6)}.jpg`;
+        link.href = exportCanvas.toDataURL("image/jpeg", 1);
+        link.click();
+
+        // Cleanup
+        exportChart.destroy();
+
+        button.inert = false;
     });
 });

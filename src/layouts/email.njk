@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            {{tailwindCss | safe}}
+        </style>
+        <title>
+            {% block title %}
+                E-mail numixs
+            {% endblock %}
+        </title>
+    </head>
+    <body class="p-0 m-0">
+        <table width="100%" class="bg-gray-numixs text-white-numixs font-sans text-base" role="presentation" width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td align="center">
+                    <img src="{{ host_path }}/images/emails/header-email-large.jpg" class="hidden md:inline! w-full h-auto mb-3" alt="Image en-tête">
+                    <img src="{{ host_path }}/images/emails/header-email-small.jpg" class="inline md:hidden! w-full h-auto mb-3" alt="Image en-tête">
+                    {% block content %}{% endblock %}
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <footer class="py-2 mt-6">
+                        <img src="{{ host_path }}/images/logos/faclab-logo-light.png" class="w-14" alt="Logo faclab">
+                    </footer>
+                </td>
+            </tr>
+            <tr>
+                <td align="center">
+                    <p class="text-xs">
+                        Le FacLab ne vous demandera jamais votre identifiant de connexion ni vos coordonnées bancaires quelque soit la raison.
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </body>
+</html>
