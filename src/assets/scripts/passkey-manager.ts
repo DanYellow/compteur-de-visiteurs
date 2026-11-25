@@ -1,0 +1,58 @@
+export const getPasskeyOptions = async (id: string) => {
+    const publicKey = await fetch("/passkey/creation-options", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: id }),
+    });
+
+    const options = PublicKeyCredential.parseCreationOptionsFromJSON(
+        await publicKey.json()
+    );
+
+    const credential = (await navigator.credentials.create({
+        publicKey: options,
+    })) as PublicKeyCredential;
+
+    const serializedPublicKey = JSON.stringify(credential.toJSON());
+
+    return serializedPublicKey;
+};
+
+export const createPasskey = async (publicKey: string) => {
+    return await fetch("/passkey/creation", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: publicKey,
+    });
+};
+
+
+export const togglePasskeysVisibility = () => {
+    const passkeyItems = document.querySelectorAll(
+        "[data-passkey-toggle]"
+    ) as NodeListOf<HTMLElement>;
+
+    const hideElements = () => {
+        Array.from(passkeyItems).forEach(async (item) => {
+            (item.parentNode as HTMLElement)!.classList.replace(
+                "md:grid-cols-[1fr_auto_1fr]",
+                "md:grid-cols-1"
+            );
+            item.remove();
+        });
+    }
+
+    if (!window.PublicKeyCredential) {
+        return hideElements();
+    }
+
+    PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
+    .then((isAvailable) => {
+      if (!isAvailable) hideElements();
+    });
+};

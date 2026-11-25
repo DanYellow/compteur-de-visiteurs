@@ -1,4 +1,10 @@
 import type { Align, LineControllerDatasetOptions, TitleOptions } from "chart.js";
+import type { InferAttributes } from "sequelize";
+import type { JwtPayload } from "jsonwebtoken";
+import type { SessionData } from "express-session";
+
+import type { Place as PlaceModel, Visit as VisitModel, Event as EventModel, User as UserModel } from "#models/index";
+import type { listAgeGroups, listGenders, listDepartments, listGroups } from "#scripts/utils.shared";
 
 export type LineChartEntry = {
     data: Number[];
@@ -12,6 +18,7 @@ export interface WeekMonth {
 export interface TotalVisitorsPluginOptions {
     text?: string;
     fontSize?: string;
+    totalColor?: string;
 }
 
 export type CustomTitleOptions = Omit<TitleOptions, 'fullSize' | 'text' | "align" | "padding" | "position"> & {
@@ -21,33 +28,55 @@ export type CustomTitleOptions = Omit<TitleOptions, 'fullSize' | 'text' | "align
     padding?: number | { top: number; bottom: number };
 };
 
-export type Result = Record<string, string>;
-
-export interface PivotTableOptions {
-    columnSuffix: string;
-}
-
-type Groups = {
-    [key: string]: string;
-}
-
-export type Visit = Groups & {
+export type VisitRaw = InferAttributes<VisitModel> & VisitGroupFields & {
     id: number;
     heure?: number;
-    date_passage: string;
     lieu?: string;
+    // date_passage: string;
     groupe: string;
+    liste_evenements?: string;
+    "place.nom"?: string;
+}
+
+export type EventRaw = InferAttributes<EventModel> & {
+    groupe: string;
+    jour?: {
+        id: number;
+        name: string;
+    };
+    aujourdhui?: boolean;
+    listPlaces: PlaceRaw[];
+}
+
+export type PlaceRaw = InferAttributes<PlaceModel> & {
+    regularOpening?: {
+        jours_fermeture: string;
+        heure_fermeture: string;
+        heure_ouverture: string;
+    };
+    listEvents: EventRaw[];
+};
+
+export type Place_Visits = InferAttributes<PlaceModel> & {
+    listVisits: VisitRaw[];
+};
+
+export type CommonRegularOpening = {
+    jours_fermeture: string[] | string;
+    heure_ouverture: string;
+    heure_fermeture: string;
+    jours_fermeture_litteral?: string;
 }
 
 export interface GroupVisit {
-    [key: number]: Visit[];
+    [key: number]: VisitRaw[];
 }
 
 export interface BaseConfigData {
     [key: string]: {
         apiKey: string;
         xValuesSuffix?: string;
-        listColumns: string[] | { id: number; name: string; }[];
+        listColumns?: string[] | { id: number | string; name: string; }[];
     }
 }
 
@@ -57,6 +86,99 @@ export type ChartConfigData = BaseConfigData & {
         chartTitle: string;
         downloadLink: string;
         xTitle: string;
-        xLabels: string[] | { id: number; name: string; }[];
+        xLabels: string[] | { id: number | string; name: string; }[];
     }
 }
+
+export type PlaceType = "fablab" | "station" | "lab";
+
+export interface UserTokenData extends JwtPayload {
+    email: string;
+    role: string;
+    userId?: number;
+}
+
+export interface PasskeyTokenData extends JwtPayload {
+    email: string;
+    role: string;
+    userId?: number;
+}
+
+export interface CustomSession extends SessionData {
+    return_to?: string;
+    user?: {
+        nom: string;
+        id: number;
+        prenom: string;
+        email: string;
+    };
+    email?: string;
+    challenge?: string;
+}
+
+declare global {
+    namespace Express {
+        interface Request {
+            current_user?: InferAttributes<UserModel>;
+        }
+
+        interface Locals {
+            current_user: InferAttributes<UserModel> | null;
+            isAuthenticated: boolean;
+        }
+    }
+}
+
+export type GroupItem = {
+    label: string;
+    value: string;
+    lineColor: string;
+    fullName?: string;
+    listInChoices?: boolean;
+    listInDb?: boolean;
+};
+
+export type VisitValue = (typeof listGenders)[number]['value'] |
+    (typeof listDepartments)[number]['value'] |
+    (typeof listAgeGroups)[number]['value'] |
+    (typeof listGroups)[number]['value'];
+
+
+export type VisitGroupFields = {
+    [K in (typeof listGroups)[number]['value']]: string;
+};
+
+export const dbCsvGroupsMapping = [{
+    csv_key: 'Education',
+    db_key: 'eleve'
+},
+{
+    csv_key: 'IUT / Scolaire',
+    db_key: 'eleve'
+}, {
+    csv_key: 'Entrepreneur / Incubateur',
+    db_key: 'entreprise_externe'
+}, {
+    csv_key: 'Artisan / Artiste',
+    db_key: 'artisan'
+}, {
+    csv_key: 'Collectivité',
+    db_key: 'collectivité'
+}, {
+    csv_key: 'Fablab',
+    db_key: 'fablab'
+}, {
+    csv_key: 'Asso',
+    db_key: 'association'
+}, {
+    csv_key: 'Habitant',
+    db_key: 'autre'
+}] as const;
+
+type csvColsCountVisitField = typeof dbCsvGroupsMapping[number]['csv_key'];
+
+export type csvVisit = {
+    [key: string]: string;
+} & {
+    [K in csvColsCountVisitField]: string;
+};

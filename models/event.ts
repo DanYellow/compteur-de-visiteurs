@@ -1,0 +1,67 @@
+import { DataTypes, Sequelize, Model, type InferAttributes, type InferCreationAttributes, type CreationOptional, type BelongsToManySetAssociationsMixin, type BelongsToManyGetAssociationsMixin } from 'sequelize';
+import { DEFAULT_OPEN_HOURS, DEFAULT_CLOSE_HOURS, slugify } from "#scripts/utils.shared";
+import Place from './place';
+
+export default class Event extends Model<InferAttributes<Event>, InferCreationAttributes<Event>> {
+    declare id: CreationOptional<number>;
+    declare nom: string;
+    declare description: string;
+    declare slug?: string;
+    declare date: Date;
+    declare heure_fermeture: string;
+    declare heure_ouverture: string;
+    declare ouvert?: boolean;
+
+    declare setListPlaces: BelongsToManySetAssociationsMixin<Place, number>;
+    declare getListPlaces: BelongsToManyGetAssociationsMixin<Place>;
+
+    static initModel(sequelize: Sequelize) {
+        Event.init(
+            {
+                id: {
+                    type: DataTypes.INTEGER,
+                    primaryKey: true,
+                    autoIncrement: true,
+                },
+                nom: DataTypes.STRING,
+                slug: {
+                    type: DataTypes.STRING,
+                    unique: true,
+                    allowNull: false,
+                },
+                description: DataTypes.STRING,
+                date: {
+                    type: DataTypes.DATEONLY,
+                },
+                heure_ouverture: {
+                    type: DataTypes.TIME,
+                    defaultValue: DEFAULT_OPEN_HOURS
+                },
+                heure_fermeture: {
+                    type: DataTypes.TIME,
+                    defaultValue: DEFAULT_CLOSE_HOURS,
+                    validate: {
+                        isGreaterThanOtherField(value: number) {
+                            if (Number(value) <= Number(this.heure_ouverture)) {
+                                throw new Error('L\'heure de fermeture ne peut pas être inférieure à celle d\'ouverture.');
+                            }
+                        }
+                    }
+                },
+            },
+            {
+                sequelize,
+                updatedAt: false,
+                createdAt: false,
+                modelName: 'event',
+                underscored: true,
+                hooks: {
+                    beforeValidate(record) {
+                        record.slug = `${slugify(record.nom)}-${record.date}-${String(Date.now()).slice(-6)}`
+                    },
+                }
+            }
+        )
+    }
+}
+

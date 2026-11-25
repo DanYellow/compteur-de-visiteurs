@@ -1,0 +1,19 @@
+<div class="flex flex-col gap-3">
+    <div class="mb-11">
+        <p class="title-font leading-none text-7xl uppercase">Quel est votre <span class="text-green-numixs">genre</span> ?</p>
+        <p class="text-sm opacity-70 -mt-1 font-bold">Vous devez sélectionner une proposition</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-14 gap-y-7">
+        {% for gender in list_genders %}
+            <div class="w-full text-black switch-container title-font font-bold bg-[#F5F5F5] rounded-md h-fit relative">
+                <label class="ripple-effect switch border-3 border-solid border-transparent rounded-md w-full p-3 justify-between inline-flex items-center cursor-pointer text-2xl">
+                    <span class="relative z-50">{{ gender.label }}</span>
+                    <input type="radio" name="genre" class="sr-only" value="{{ gender.value }}" id="{{ gender.value }}">
+                </label>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+

@@ -1,18 +1,43 @@
 services:
   compteur-de-visiteurs:
     container_name: compteur-social-dev
-    image: node:24.8.0
-    command: sh -c "npm install --verbose && npm run dev"
-    stdin_open: true
-    tty: true
-    working_dir: /home/node/app
+    build:
+      context: .
+      target: dev
     ports:
-      - 3900:3900
+      - "${PORT}:${PORT}"
+      - 5173:5173
       - 24678:24678
+    restart: unless-stopped
     volumes:
-      - ./:/home/node/app
-      - /home/node/app/node_modules
+      - ./:/app
+      - /app/node_modules
     environment:
       - NODE_ENV=development
-      - NODE_OPTIONS=--max_old_space_size=8192
+      - NODE_OPTIONS=--max_old_space_size=2048
       - IS_DOCKER=true
+      - CHOKIDAR_USEPOLLING=true
+    command: >
+      sh -c "
+        npm run migration:dev &&
+        npm run dev
+      "
+    networks:
+      - compteur-social-network
+  mailer:
+    image: axllent/mailpit
+    container_name: compteur-social-mailpit
+    ports:
+        - 1025:1025
+        - 8025:8025
+    environment:
+        MP_SMTP_AUTH_ACCEPT_ANY: 1
+        MP_SMTP_AUTH_ALLOW_INSECURE: 1
+        MAILPIT_RELAY: 127.0.0.1:25
+
+volumes:
+  node_modules:
+
+networks:
+  compteur-social-network:
+    driver: bridge

@@ -1,0 +1,23 @@
+{
+    "extends": "./tsconfig.base.json",
+    "compilerOptions": {
+        "rootDir": ".",
+        "outDir": "dist",
+        "noEmitOnError": false,
+        "target": "ES2020",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "composite": false,
+        "noEmit": false
+    },
+    "include": [
+        "server",
+        "models",
+        "src/assets/scripts/utils.shared.ts",
+        "src/assets/schemas",
+        "declare.d.ts",
+        "vite-env.d.ts",
+        "types.ts",
+        "vite.config.ts"
+    ],
+}

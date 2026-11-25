@@ -1,0 +1,65 @@
+{% extends "layouts/page.njk" %}
+
+{% set root_class = "register" %}
+
+{% block title %}
+Inscription
+{% endblock %}
+
+{% import "includes/macros.njk" as macros %}
+
+{% block scripts %}
+    {% if NODE_ENV == "development" %}
+        <script type="module" src="/src/assets/scripts/forms/sign-in-form.ts" defer></script>
+    {% else %}
+        <script type="module" src="/{{ manifest['src/assets/scripts/forms/sign-in-form.ts'].file }}" defer></script>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mt-8 px-3 mx-auto">
+        <div>
+            <img src="/images/logos/faclab-numixs.svg" class="w-20" alt="">
+            <h1 class="text-6xl title-font text-green-numixs">Inscription</h1>
+        </div>
+        <div class="flex flex-col gap-3 mb-4">
+            {% if flash_message.register_success %}
+                {% set banner_content %}
+                    Votre inscription a été prise en compte. Vous serez notifié(e) par e-mail, à l'adresse <span class="font-bold">"{{ signin_email }}"</span>, lorsque votre compte sera activé par un administrateur. Vous pourrez ensuite compléter votre inscription.
+                {% endset %}
+                {{ macros.success_banner(banner_content)}}
+            {% endif %}
+
+            {% if flash_message.register_fail %}
+                {{ macros.error_banner("Vous ne pouvez pas créer un compte avec cette adresse e-mail.")}}
+            {% endif %}
+
+            {% if flash_message.register_duplicate %}
+                {% set banner_content %}
+                    Une inscription avec l'adresse <span class="font-bold">"{{ signin_email }}"</span> a déjà été enregistrée, veuillez attendre la validation de votre compte par un administrateur. Vous serez notifié(e) par e-mail lorsque votre inscription sera validée.
+                {% endset %}
+                {{ macros.warning_banner(banner_content)}}
+            {% endif %}
+
+            {{ macros.info_banner("Votre compte ne sera pas utilisable immédiatement. Il doit être approuvé par un administrateur et vous serez notifié(e) par e-mail.")}}
+        </div>
+        <form action="/inscription" method="post" novalidate>
+            <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
+
+            <div class="flex flex-col gap-3">
+                <div class="flex flex-col">
+                    <label for="email">Adresse e-mail</label>
+                    <input type="email" name="email" class="text-black" id="email">
+                </div>
+
+                <div class="flex flex-row justify-between mt-5">
+                    <div inert></div>
+                    <button type="submit" class="{{ primary_green_button_classes }}">
+                    S'inscrire
+                    {% include "includes/icons/next-arrow.svg" %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

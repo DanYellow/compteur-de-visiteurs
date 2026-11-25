@@ -1,7 +1,7 @@
 .calendar-wrapper {
     background: #fff;
     border-radius: 10px;
-    border: 1px solid #8894AA;
+    border: 1px solid #8894aa;
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
     position: absolute;
     position-anchor: --calendar-anchor;
@@ -64,7 +64,7 @@
 
                 &.open {
                     &::after {
-                        content: "";
+                        content: '';
                         display: block;
                         inset-inline: 0;
                         height: 3px;
@@ -91,6 +91,13 @@
                     a {
                         color: var(--color-gray-numixs);
                         background-color: var(--color-green-numixs);
+
+                        &:is(:hover, :focus) {
+                            color: var(--color-white-numixs);
+                            background-color: rgb(
+                                from var(--color-black-numixs) r g b / 80%
+                            );
+                        }
                     }
                 }
                 &.today {
@@ -108,6 +115,23 @@
                         );
                     }
                 }
+                &.exceptional-opening {
+                    &::after {
+                        content: 'Évènement(s)';
+                        display: block;
+                        pointer-events: none;
+                        /* inset-inline: 0.5rem; */
+                        left: 50%;
+                        translate: -50% 0%;
+                        padding-inline: 0.35rem;
+                        font-size: 0.65rem;
+                        color: var(--color-white-numixs);
+                        background-color: var(--color-gray-numixs);
+                        top: 0.4rem;
+                        position: absolute;
+                        border-radius: 0.5rem;
+                    }
+                }
             }
         }
     }
@@ -119,7 +143,7 @@
 
         [data-month] {
             display: none;
-            transition: opacity .15s ease, display .15s ease allow-discrete;
+            transition: opacity 0.15s ease, display 0.15s ease allow-discrete;
 
             @starting-style {
                 opacity: 0;
@@ -135,4 +159,32 @@
             }
         }
     }
+}
+
+.navigation-month-nav {
+    width: 2.85rem;
+    overflow-x: clip;
+    transition: width 0.35s ease;
+
+    [data-day] {
+        display: none;
+        transition: opacity 0.15s ease, display 0.15s ease allow-discrete;
+
+        @starting-style {
+            opacity: 0;
+        }
+    }
+
+    &:hover,
+    &:focus-visible {
+        width: max-content;
+        [data-day] {
+            display: initial;
+            opacity: 1;
+        }
+    }
+}
+
+.current-day {
+    anchor-name: --calendar-anchor;
 }

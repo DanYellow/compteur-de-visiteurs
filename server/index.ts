@@ -1,26 +1,30 @@
-import { fileURLToPath } from "url";
 import path from "path";
+import fs from "node:fs";
+import { loadEnvFile } from 'node:process';
+import type { CipherKey } from "node:crypto";
+
 import nunjucks from "nunjucks";
 import express from "express";
 import cors from "cors";
-import { WebSocketServer } from 'ws';
+import { WebSocketServer } from "ws";
 import { DateTime } from "luxon";
 import ip from "ip";
+import cookieParser from "cookie-parser";
+import session from "express-session";
 
-import config from "#config" with { type: "json" };
-
-import router from "./router/index.ts";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import router from "#server/router/index";
 
 const serverip = ip.address();
 
+loadEnvFile(`${process.cwd()}/.env.local`);
+
 const app = express();
 if (process.env.NODE_ENV === "development") {
-    const viteConfig = await import("../vite.config.ts");
+    const viteConfig = await import("../vite.config");
     const { createServer: createViteServer } = await import("vite");
-    const vite = await createViteServer(viteConfig);
+    const vite = await createViteServer({
+        ...viteConfig.default,
+    });
     app.use(vite.middlewares);
 }
 
@@ -30,10 +34,18 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.set("view engine", "nunjucks");
-app.set("views", path.join(__dirname, "..", "/src"));
+app.set("views", path.join(path.resolve(), "src"));
 
 app.use(express.static(publicPath));
-app.use(cors());
+app.use(
+    cors({
+        origin: "*",
+        allowedHeaders: ["Content-Type", "Authorization"],
+        methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    })
+);
+app.use(express.urlencoded());
+app.use(cookieParser());
 app.use(
     express.json({
         type: [
@@ -45,41 +57,94 @@ app.use(
     })
 );
 
+if (process.env.NODE_ENV === "development") {
+    app.use(
+        session({
+            secret: process.env.SESSION_SECRET,
+            resave: false,
+            saveUninitialized: false,
+        })
+    );
+} else {
+    const { RedisStore } = await import('connect-redis');
+    const { createClient: createRedisClient } = await import('redis');
+
+    let sessionOptions = {}
+
+    try {
+        const redisClient = createRedisClient({
+        url: 'redis://redis:6379',
+        password: process.env.REDIS_PASSWORD
+    });
+        await redisClient.connect();
+
+        const redisStore = new RedisStore({
+            client: redisClient,
+            prefix: "redis-visits:",
+        });
+
+        sessionOptions = {
+            store: redisStore,
+            
+        }
+    } catch (error) {
+        console.warn("\x1b[41m ----- NO REDIS. FALLBACK TO MEMORY ----- \x1b[0m")
+    } finally {
+        app.use(
+            session({
+                ...sessionOptions,
+                secret: process.env.SESSION_SECRET as CipherKey,
+                resave: false,
+                saveUninitialized: false,
+                cookie: {
+                    secure: true,      // HTTPS in production
+                    httpOnly: true,
+                    sameSite: 'strict',
+                    // maxAge: 24*60*60*1000
+                }
+            })
+        );
+    }
+}
+
 app.use((req, res, next) => {
+    const listFlashMessages = JSON.parse(req.cookies.flash_message || "[]")
+
     const context = {
         NODE_ENV: process.env.NODE_ENV,
-        PLACE: config.PLACE,
-        OPENING_HOURS: config.OPENING_HOURS,
+        admin_prefix: `/admin${process.env?.ADMIN_SUFFIX ? `-${process.env.ADMIN_SUFFIX}` : ""}`,
+        user_role: {},
+        flash_message: listFlashMessages.reduce((a: Record<string, string>, v: string) => ({ ...a, [v]: v }), {}),
     };
 
     res.locals = {
+        ...res.locals,
         ...context,
     };
 
     next();
 });
 
-app.all('/', function (req, res, next) {
+if (process.env.NODE_ENV === "production") {
+    const { rateLimit } = await import('express-rate-limit');
+
+    const limiter = rateLimit({
+        windowMs: 15 * 60 * 1000,
+        limit: 100,
+        standardHeaders: 'draft-8',
+        legacyHeaders: false,
+        ipv6Subnet: 56,
+    })
+    app.use(limiter);
+}
+
+app.all("/", function (_, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "X-Requested-With");
     next();
 });
 
 app.use(router);
-
-app.use(function (req, res, next) {
-    res.status(404);
-
-    if (req.accepts('html')) {
-        return res.render('pages/error.njk', { code: 404, message: "Page non trouvée" });
-    }
-
-    if (req.accepts('json')) {
-        return res.json({ error: "Page non trouvée" });
-    }
-
-    res.type('txt').send("Page non trouvée");
-});
 
 const nunjucksConfig = nunjucks.configure(app.get("views"), {
     autoescape: true,
@@ -91,41 +156,168 @@ const nunjucksConfig = nunjucks.configure(app.get("views"), {
 });
 
 nunjucksConfig.addFilter("date", (value, format) => {
-    if (typeof value === "object") {
-        value = value.toJSON()
+    if (!DateTime.fromISO(value).isValid) {
+        const date = DateTime.fromJSDate(new Date(value));
+        if (date.isValid) {
+            return date.setLocale("fr").toFormat(format);
+        }
+        return "";
     }
-    return DateTime.fromISO(value).setLocale('fr').toFormat(format);
+
+    return DateTime.fromISO(value).setLocale("fr").toFormat(format);
 });
 
 nunjucksConfig.addFilter("add_days", (value, days) => {
     return DateTime.fromISO(value).plus({ days });
 });
 
-const listDomains: string[] = process.env.IS_DOCKER?.toLowerCase() === "true" ? ["faclab.localhost"] : ["localhost", "0.0.0.0"];
-const port = Number(process.env.VITE_PORT || 3900);
-const server = app.listen(port, () => {
-    console.log("---------------------------");
-    console.log(
-        "Express server running at (ctrl/cmd + click to open in your browser):"
-    );
-    [serverip, ...listDomains]
-        .filter(Boolean)
-        .filter((item) => item !== "::")
-        .forEach((item) => {
-            let prefix = "Network";
-            if (item.includes("localhost")) {
-                prefix = "Local";
-            }
-            console.log(`\x1b[35m➜\x1b[0m  ${prefix}: \x1b[35mhttp://${item}:${port}/\x1b[0m`);
+nunjucksConfig.addFilter("uppercase", (value = "") => {
+    return String(value || "").toLocaleUpperCase();
+});
+
+nunjucksConfig.addFilter("pad", (value, char: string, nb: number) => {
+    return String(value).padStart(nb, char);
+});
+
+nunjucksConfig.addFilter("split", (value, char = ",") => {
+    return String(value)
+        .split(char)
+        .map((item) => `${item}<br />`)
+        .join("");
+});
+
+nunjucksConfig.addFilter("filter", (array, criteria) => {
+    const predicate = (item: Record<string, string | number>) =>
+        Object.entries(criteria).every(
+            ([k, v]) => item[k] === v
+        );
+
+    return array.filter(predicate);
+});
+
+nunjucksConfig.addFilter("find", (array, criteria) => {
+    const predicate = (item: Record<string, string | number>) =>
+        Object.entries(criteria).every(
+            ([k, v]) => item[k] === v
+        );
+
+    return array.find(predicate);
+});
+
+nunjucksConfig.addFilter("oxford_comma", (string) => {
+    return string.slice(0, -1).join(", ") + " et " + string.slice(-1);
+});
+
+nunjucksConfig.addFilter("json", (value, listKeysToDelete: string[] = []) => {
+    if (!Array.isArray(listKeysToDelete)) {
+        listKeysToDelete = [];
+    }
+
+    if (value instanceof nunjucks.runtime.SafeString) {
+        value = value.toString();
+    }
+
+    const jsonString = JSON.stringify(value);
+    return jsonString;
+});
+
+nunjucksConfig.addGlobal(
+    "formatQueryParams",
+    (obj: Record<string, string>, removeIfEmpty: boolean = false) => {
+        const params = new URLSearchParams(obj);
+        if (removeIfEmpty) {
+            Object.keys(obj).forEach((item) => {
+                if (!params.get(item)) {
+                    params.delete(item);
+                }
+            });
+        }
+
+        const stringifiedParams = params.toString();
+
+        return stringifiedParams.length ? `?${params.toString()}` : '?';
+    }
+);
+
+const listDomains: string[] =
+    process.env.IS_DOCKER?.toLowerCase() === "true" &&
+        process.env.NODE_ENV === "production"
+        ? ["faclab.localhost"]
+        : ["localhost", "0.0.0.0"];
+const port = Number(process.env.PORT || 3900);
+
+let server = null;
+
+if (false && process.env.NODE_ENV === "development") {
+    const https = await import("https");
+
+    const options = {
+        key: fs.readFileSync(path.join("localhost-key.pem")),
+        cert: fs.readFileSync(path.join("localhost.pem")),
+    };
+
+    server = https.createServer(options, app).listen(port, () => {
+        console.log("---------------------------");
+        console.log(
+            "HTTPS Express server running at (ctrl/cmd + click to open in your browser):"
+        );
+        [serverip, ...listDomains]
+            .filter(Boolean)
+            .filter((item) => item !== "::")
+            .forEach((item) => {
+                let prefix = "Network";
+                if (item.includes("localhost")) {
+                    prefix = "Local";
+                }
+                console.log(
+                    `\x1b[35m➜\x1b[0m  ${prefix}: \x1b[35mhttps://${item}:${port}/\x1b[0m`
+                );
+            });
+    });
+} else {
+    server = app.listen(port, () => {
+        console.log("---------------------------");
+        console.log(
+            "Express server running at (ctrl/cmd + click to open in your browser):"
+        );
+        [serverip, ...listDomains]
+            .filter(Boolean)
+            .filter((item) => item !== "::")
+            .forEach((item) => {
+                let prefix = "Network";
+                if (item.includes("localhost")) {
+                    prefix = "Local";
+                }
+                console.log(
+                    `\x1b[35m➜\x1b[0m  ${prefix}: \x1b[35mhttp://${item}:${port}/\x1b[0m`
+                );
+            });
+    });
+}
+
+app.use(function (req, res) {
+    res.status(404);
+
+    if (req.accepts("html")) {
+        return res.render("pages/error.njk", {
+            code: 404,
+            message: "Page non trouvée",
         });
+    }
+
+    if (req.accepts("json")) {
+        return res.json({ error: "Page non trouvée" });
+    }
+
+    res.type("txt").send("Page non trouvée");
 });
 
 export const wss = new WebSocketServer({
     server,
-})
+});
 
-wss.on('connection', (ws) => {
-    ws.on('error', console.error);
+wss.on("connection", (ws) => {
+    ws.on("error", console.error);
 
     // ws.on('message', function message(data) {
     //     console.log('received: %s', data);
@@ -133,3 +325,15 @@ wss.on('connection', (ws) => {
 
     // ws.send('something');
 });
+
+export const flashMessageCookieOptions = {
+    httpOnly: true,
+    maxAge: 1000,
+    sameSite: "strict" as const,
+};
+
+export const userLoggedCookiesOptions = {
+    httpOnly: true,
+    sameSite: "strict" as const,
+    secure: false,
+};

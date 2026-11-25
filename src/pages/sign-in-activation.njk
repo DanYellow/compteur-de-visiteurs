@@ -1,0 +1,137 @@
+{% extends "layouts/page.njk" %}
+
+{% set root_class = "register" %}
+
+{% block title %}
+Finalisation de compte
+{% endblock %}
+
+{% import "includes/macros.njk" as macros %}
+
+{% block scripts %}
+    {% if NODE_ENV == "development" %}
+        <script type="module" src="/src/assets/scripts/toggle-input-visibility.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/forms/sign-in-form-activation.ts" defer></script>
+    {% else %}
+        <script type="module" src="/{{ manifest['src/assets/scripts/toggle-input-visibility.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/forms/sign-in-form-activation.ts'].file }}" defer></script>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mt-8 px-3 mx-auto">
+        <div>
+            <img src="/images/logos/faclab-numixs.svg" class="w-20" alt="">
+            <h1 class="text-6xl title-font text-green-numixs">Finalisation de compte</h1>
+        </div>
+
+        <div class="flex flex-col gap-3 mb-4">
+            {% if flash_message.form_not_valid %}
+            {{ macros.error_banner("Veuillez correctement remplir le formulaire.")}}
+            {% endif %}
+
+            {% if flash_message.user_not_found %}
+            {{ macros.error_banner("Cette adresse e-mail n'est pas associée à un compte.")}}
+            {% endif %}
+
+            {% if flash_message.invalid_token or flash_message.expired_token or flash_message.missing_token %}
+            {{ macros.error_banner("Ce lien a expiré ou est invalide. Veuillez contacter un administrateur si le lien a expiré.")}}
+            {% endif %}
+
+            {% if flash_message.user_not_active %}
+            {{ macros.warning_banner("Votre compte n'a pas encore été activé.")}}
+            {% endif %}
+
+            {% if is_token_valid == false %}
+            {{ macros.info_banner("Assurez-vous d'avoir reçu votre e-mail d'activation de compte avant d'effectuer cette étape. Autrement, la complétion du formulaire entrainera un échec.")}}
+            {% endif %}
+        </div>
+
+        <form action="" method="post" novalidate>
+            <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
+
+            <div class="flex flex-col gap-3">
+                <div class="flex flex-col">
+                    <label for="email">Adresse e-mail</label>
+                    <input type="email" name="email" class="text-black-numixs readonly:text-black-numixs/80" value="{{ signin_email }}" readonly id="email">
+                </div>
+                <div class="grid md:grid-cols-[1fr_auto_1fr] gap-x-4 gap-y-2 items-center">
+                    <div class="flex flex-col gap-2">
+                        <div class="flex flex-col">
+                            <label for="password">Mot de passe</label>
+                            <input type="password" data-input-toggle-visibility name="password" id="password" class="text-black w-full" autocomplete="new-password">
+                            <p class="leading-none">Le mot de passe doit faire au minimum <span class="font-bold">six caractères</span> avec au minimum <span class="font-bold">un chiffre et un caractère spécial.</span></p>
+                        </div>
+                        <div class="flex flex-col">
+                            <label for="confirm_password">Confirmer mot de passe</label>
+                            <input type="password" data-input-toggle-visibility name="confirm_password" id="confirm_password" class="text-black w-full" autocomplete="new-password">
+                        </div>
+                    </div>
+                    <p class="text-lg text-center" data-passkey-toggle>ou</p>
+                    <div class="flex flex-col gap-4" data-passkey-toggle>
+                        <div class="has-inert:cursor-not-allowed">
+                            <button type="button" class="inert:opacity-60 p-3 border bg-green-numixs text-black-numixs border-transparent hocus:border-green-numixs hocus:bg-transparent hocus:text-green-numixs w-full" data-passkey-register>
+                                <div class="flex items-center justify-center gap-1.75">
+                                    {% include "includes/icons/passkey-icons.njk" %}
+                                    Créer un passkey
+                                </div>
+                                <p class="text-sm">Vous devez saisir une adresse email valide.</p>
+                            </button>
+                        </div>
+                        <button type="button" class="p-3 border border-white-numixs hocus:bg-white-numixs hocus:text-black-numixs" command="show-modal" commandfor="detail-passkey">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="size-5 inline">
+                                <path fill-rule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm11.378-3.917c-.89-.777-2.366-.777-3.255 0a.75.75 0 0 1-.988-1.129c1.454-1.272 3.776-1.272 5.23 0 1.513 1.324 1.513 3.518 0 4.842a3.75 3.75 0 0 1-.837.552c-.676.328-1.028.774-1.028 1.152v.75a.75.75 0 0 1-1.5 0v-.75c0-1.279 1.06-2.107 1.875-2.502.182-.088.351-.199.503-.331.83-.727.83-1.857 0-2.584ZM12 18a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z" clip-rule="evenodd"/>
+                            </svg>
+                            Qu'est-ce qu'un passkey ?
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-row justify-between mt-5">
+                    <div inert></div>
+                    <button type="submit" {{ "" if is_token_valid else "inert" }} class="{{ primary_green_button_classes }}">
+                    Créer compte
+                    {% include "includes/icons/next-arrow.svg" %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <dialog id="detail-passkey" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <div>
+                <p class="title-font text-4xl">Passkey</p>
+            </div>
+            <button type="button" command="close" commandfor="detail-passkey" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </header>
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <p>Un passkey est un mot de passe de moderne et infalsifiable. Il vient combler les limites des mots de passe traditionnels qui peuvent être volés. En effet, le passkey permet l'authentification biométrique (empreinte digitale, reconnaissance faciale, yubikey...), ainsi plus de mots de passe à retenir et mots de passe invulnérables à toute compromission de base de données.</p>
+        <p class="mt-2">Vous pouvez avoir plusieurs passkeys, il vous suffira de les gérer depuis votre espace "mon compte". Car chaque passkey est <span class="font-bold">associé à un appareil.</span> Toutefois, il existe des passkeys dit "synchronisés" qui sont liés à votre compte Apple, Google ou Microsoft.</p>
+        <p class="mt-2">
+            Note : Vous pouvez toujours utiliser un mot de passe traditionnel pour vous connecter et le définir plus tard.
+        </p>
+        <ul class="mt-3">
+            <li>
+                <a href="https://www.passkeys.com/fr/passkey-cest-quoi" target="_blank" rel="noopener noreferrer" class="underline hocus:no-underline">En savoir plus sur les Passkeys</a>
+            </li>
+        </ul>
+    </dialog>
+
+    <dialog id="error-email" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+        <header class="flex flex-row justify-between items-start">
+            <p class="title-font text-4xl">Erreur</p>
+        </header>
+        <hr class="pb-1 mt-1 border-green-numixs">
+        <p>Vous devez saisir une adresse e-mail pour créer un passkey.</p>
+        <footer class="mt-3">
+            <button type="button" command="close" commandfor="error-email" class="text-white-numixs bg-red-800 hocus:bg-red-900 cursor-pointer px-2 py-1 rounded-md">Fermer</button>
+        </footer>
+    </dialog>
+
+    {% include "includes/toggle-input-visibility.njk" %}
+{% endblock %}

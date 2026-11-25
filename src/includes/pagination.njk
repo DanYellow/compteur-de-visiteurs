@@ -1,0 +1,26 @@
+<ol class="flex flew-row items-center w-fit px-5 mx-auto gap-2 mt-5 border border-black/20 rounded-3xl outline-4 outline-green-numixs/30">
+    <li class="mr-2">
+        {% set previous_page_query_string = formatQueryParams({ lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "", page: (pagination.current_page | int) - 1 }, true) %}
+        <a class="p-2 relative pagination inline-flex inert:opacity-50 inert:cursor-none" href="{{ previous_page_query_string }}" {{ "" if pagination.has_prev == 1 else "inert" }}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 relative z-20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
+            </svg>
+        </a>
+    </li>
+    {% for i in range(1, pagination.total_pages + 1) %}
+        <li>
+            <a href="{{ formatQueryParams({ lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "", page: i }, true) }}" class="p-2 inline-flex {{ "pagination-active" if i == pagination.current_page else "pagination" }}">
+                <span class="relative z-10">{{ i }}</span>
+            </a>
+        </li>
+    {% endfor %}
+    <li class="ml-2">
+        {% set next_page_query_string = formatQueryParams({ lieu: lieu or "", date: current_date|date("yyyy-LL-dd") or "", page: (pagination.current_page | int + 1) }, true) %}
+
+        <a class="p-2 relative pagination inline-flex inert:opacity-50 inert:cursor-none" href="{{ next_page_query_string }}" {{ "" if pagination.has_next == 1 else "inert" }}>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4 relative z-20">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/>
+            </svg>
+        </a>
+    </li>
+</ol>

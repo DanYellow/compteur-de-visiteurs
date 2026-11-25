@@ -1,16 +1,22 @@
-{% macro switch (label, name = "", value = "", color = "", ring_color = "", options = {"children": null, "label_classes": "text-2xl"}) %}
-    {% set default_options = {"children": null, "label_classes": "text-2xl"} %}
-    <div class="w-full text-black switch-container title-font font-bold bg-[#F5F5F5] p-3 rounded-md h-fit">
-        <label class="w-full justify-between inline-flex items-center cursor-pointer {{ options.label_classes if options.label_classes else default_options.label_classes }}">
+{% macro switch (label, name = "", value = "", color = "", ring_color = "", options = {
+    "children": null,
+    "label_classes": "text-2xl"
+}) %}
+    {% set default_options = {
+        "children": null,
+        "label_classes": "text-2xl"
+    } %}
+    <div class="w-full text-black switch-container title-font font-bold bg-[#F5F5F5] rounded-md h-fit relative">
+        <label class="ripple-effect w-full p-3 justify-between inline-flex items-center cursor-pointer rounded-md {{ options.label_classes if options.label_classes else default_options.label_classes }}">
             <input type="checkbox" value="{{ value }}" name="{{ name }}" class="sr-only peer" data-input-switch-toggle="{{ name }}">
-            <span>{{ label }}</span>
-            <div class="switch relative border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 {{ ring_color }} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all {{ color }}"></div>
+            <span class="relative z-50">{{ label }}</span>
+            <div class="relative z-50 switch border-solid border-black-numixs/30 border w-11 h-6 bg-[#C3CAD8] peer-focus:outline-none peer-focus:ring-4 {{ ring_color }} rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:bg-black-numixs peer-checked:after:border-black-numixs after:content-[''] after:absolute after:border-black-numixs/30 after:top-[1px] after:start-[1px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all {{ color }}"></div>
         </label>
-        {% set children = options.children if options.children else default_options.children %}
+        {% set children = options.children if options.children else
+            default_options.children %}
         {{ children | safe }}
     </div>
 {% endmacro %}
-
 
 {% macro split_button(main_action, list_sub_actions = [], is_light = false) %}
     <div class="split-button {{ "light" if is_light else ""}} self-start md:self-center">
@@ -18,12 +24,15 @@
 
         <span class="popup-button z-50" aria-haspopup="true" aria-expanded="false" title="Cliquer pour plus de choix">
             <svg aria-hidden="true" viewBox="0 0 20 20" style="anchor-name: --split-button;">
-                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
+                <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"/>
             </svg>
             <script>
                 const popupButton = document.querySelector(".popup-button");
                 popupButton.addEventListener("click", (e) => {
-                    e.currentTarget.querySelector("a, button").focus();
+                    e
+                        .currentTarget
+                        .querySelector("a, button")
+                        .focus();
                 });
             </script>
             <ul class="split-popup bg-slate-50 shadow-2xl" title="">
@@ -35,4 +44,67 @@
             </ul>
         </span>
     </div>
+{% endmacro %}
+
+{% macro info_banner(text) %}
+    <p class="px-4 py-3 bg-blue-50 text-blue-800 border-1 border-t-4 border-blue-800/30 border-t-blue-800 rounded-md">
+        {{ text | safe }}
+    </p>
+{% endmacro %}
+
+{% macro warning_banner(text) %}
+    <p class="px-4 py-3 bg-amber-50 text-amber-800 border-1 border-t-4 border-amber-800/30 border-t-amber-800 rounded-md">
+        {{ text | safe }}
+    </p>
+{% endmacro %}
+
+{% macro error_banner(text) %}
+    <p class="px-4 py-3 bg-red-50 text-red-800 border-1 border-t-4 border-red-800/30 border-t-red-800 rounded-md">
+        {{ text | safe }}
+    </p>
+{% endmacro %}
+
+{% macro success_banner(text) %}
+    <p class="px-4 py-3 bg-green-50 text-green-800 border-1 border-t-4 border-green-800/30 border-t-green-800 rounded-md">
+        {{ text | safe }}
+    </p>
+{% endmacro %}
+
+{% macro download_chart_extensible_button(name) %}
+    <button
+        data-download-chart="{{ name }}"
+        type="button"
+        class="
+            hocus:text-green-numixs py-[0.1rem] hocus:px-[0.35rem] active:text-dark-green-numixs
+            border border-solid hocus:border-green-numixs
+            border-transparent rounded-xl
+            text-white-numixs cursor-pointer extensible-button bg-gray-numixs"
+        title="Télécharger graphique"
+    >
+        <span class="size-6">
+            {% include "includes/icons/download-fill-icon.svg" %}
+        </span>
+        <span class="inline-flex items-center">Télécharger graphique (.jpg)</span>
+    </button>
+{% endmacro %}
+
+{% macro zoom_chart_extensible_button(name, dialogId) %}
+    <button
+        data-details-chart="{{ name }}"
+        type="button"
+        command="show-modal"
+        commandfor="{{ dialogId }}"
+        title="Afficher la vue détaillée"
+        class="
+            hocus:text-green-numixs py-[0.1rem] hocus:px-[0.35rem] active:text-dark-green-numixs
+            border border-solid hocus:border-green-numixs
+            border-transparent rounded-xl
+            text-white-numixs cursor-pointer extensible-button bg-gray-numixs"
+        title="Télécharger graphique"
+    >
+        <span class="size-6">
+            {% include "includes/icons/zoom-icon.svg" %}
+        </span>
+        <span class="inline-flex items-center">Afficher la vue détaillée</span>
+    </button>
 {% endmacro %}

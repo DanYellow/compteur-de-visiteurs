@@ -1,0 +1,104 @@
+{% extends "layouts/page.njk" %}
+
+{% set root_class = "register" %}
+{% import "includes/macros.njk" as macros %}
+
+{% block title %}
+Connexion
+{% endblock %}
+
+{% block scripts %}
+    {% if NODE_ENV == "development" %}
+        <script type="module" src="/src/assets/scripts/toggle-input-visibility.ts" defer></script>
+        <script type="module" src="/src/assets/scripts/forms/login-form.ts" defer></script>
+    {% else %}
+        <script type="module" src="/{{ manifest['src/assets/scripts/toggle-input-visibility.ts'].file }}" defer></script>
+        <script type="module" src="/{{ manifest['src/assets/scripts/forms/login-form.ts'].file }}" defer></script>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="max-w-7xl mt-8 px-3 mx-auto">
+        <div>
+            <img src="/images/logos/faclab-numixs.svg" class="w-20" alt="">
+            <h1 class="text-6xl title-font text-green-numixs">Connexion</h1>
+        </div>
+        <div class="flex flex-col gap-3 mb-4">
+            {% if flash_message.account_created %}
+                {% set banner_content %}
+                    Votre compte a été confirmé, vous pouvez désormais vous connecter avec l'adresse e-mail <span class="font-bold">"{{ user_email }}"</span> et le mot de passe ou votre passkey définit précédemment.
+                {% endset %}
+                {{ macros.success_banner(banner_content) }}
+            {% endif %}
+
+            {% if flash_message.success_logout %}
+                {{ macros.success_banner("Vous avez été déconnecté(e) avec succès.") }}
+            {% endif %}
+
+            {% if flash_message.password_updated %}
+                {{ macros.success_banner("Votre mot de passe a été mis à jour, vous pouvez l'utiliser dès maintenant.") }}
+            {% endif %}
+
+            {% if flash_message.forced_logout %}
+                {{ macros.warning_banner("Une erreur est survenue, vous avez été déconnecté(e).") }}
+            {% endif %}
+
+            {% if flash_message.wrong_credentials or flash_message.user_not_found %}
+                {{ macros.error_banner("Identifiants incorrects.") }}
+            {% endif %}
+
+            {% if flash_message.passkey_not_found %}
+                {{ macros.error_banner("Passkey inconnu.") }}
+            {% endif %}
+
+            {% if flash_message.form_not_valid %}
+                {{ macros.error_banner("Veuillez remplir dûment le formulaire.") }}
+            {% endif %}
+
+            {% if flash_message.no_place %}
+                {{ macros.error_banner("Aucun lieu n'a été défini, vous ne pouvez pas enregistrer des visites. Après connexion, le navigateur vous redirigera vers le formulaire de création de lieu.") }}
+            {% endif %}
+
+            {% if flash_message.not_logged %}
+                {{ macros.error_banner("Vous devez vous connecter pour accéder à cette page.") }}
+            {% endif %}
+
+            {% if flash_message.user_exists %}
+                {{ macros.warning_banner("Ce compte a déjà été activé. Veuillez vous connecter avec le mot de passe que vous avez défini durant l'activation de votre compte dans le formulaire ci-dessous.") }}
+            {% endif %}
+        </div>
+
+        <form action="/connexion" method="post" novalidate>
+            <ul class="form-errors-list-container" role="alert" data-form-errors id="error-container"></ul>
+
+            <div class="grid md:grid-cols-[1fr_auto_1fr] gap-x-4 gap-y-2 items-center">
+                <div class="flex flex-col gap-3">
+                    <div class="flex flex-col">
+                        <label for="email">Identifiant</label>
+                        <input type="email" id="email" name="email" value="{{ user_email }}" autocomplete="username webauthn" class="text-black">
+                    </div>
+                    <div class="flex flex-col">
+                        <label for="mot_de_passe">Mot de passe</label>
+                        <input type="password" name="mot_de_passe" id="mot_de_passe" class="text-black w-full" autocomplete="current-password webauthn" data-input-toggle-visibility>
+                    </div>
+                    <div class="flex flex-col md:flex-row justify-between">
+                        <a href="/mot-de-passe-oublie" class="text-white-numixs hocus:text-white-numixs/80 w-fit title-font text-2xl py-3.5 font-bold">Mot de passe oublié ?</a>
+                        <button type="submit" class="{{ primary_green_button_classes }}">
+                            Se connecter
+                            {% include "includes/icons/next-arrow.svg" %}
+                        </button>
+                    </div>
+                </div>
+                <p class="text-lg text-center" data-passkey-toggle>ou</p>
+
+                <button type="button" data-passkey-login class="inert:!cursor-not-allowed inert:opacity-60 p-3 border bg-green-numixs text-black-numixs border-transparent hocus:border-green-numixs hocus:bg-transparent hocus:text-green-numixs" data-passkey-toggle>
+                    <div class="flex items-center justify-center gap-1.75">
+                        {% include "includes/icons/passkey-icons.njk" %}
+                        Se connecter avec un passkey
+                    </div>
+                </button>
+            </div>
+        </form>
+    </div>
+    {% include "includes/toggle-input-visibility.njk" %}
+{% endblock %}

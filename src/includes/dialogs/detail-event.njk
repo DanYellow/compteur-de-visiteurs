@@ -1,0 +1,45 @@
+{% import "includes/macros.njk" as macros %}
+
+<dialog id="detail-event" closedby="any" class="bg-black-numixs shadow-2xl rounded-md p-3 text-white-numixs backdrop:bg-black-numixs/35 -translate-1/2 left-1/2 top-1/2 w-11/12 max-w-3xl border border-solid border-green-numixs">
+    <header class="flex flex-row justify-between items-start">
+        <div>
+            <p class="text-xs -mb-1.5">Évènement</p>
+            <p class="title-font text-4xl" data-name></p>
+            <p class="text-sm">
+                    Le <time datetime="">14/11/2025 de 10:47:56 à 12:47:56</time>
+            </p>
+            <p class="text-sm" data-place-name></p>
+        </div>
+        <button type="button" command="close" commandfor="detail-event" class="text-white-numixs hocus:text-green-numixs cursor-pointer">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+    </header>
+
+    <hr class="pb-1 mt-1 border-green-numixs">
+    <p data-description=""></p>
+    <div class="p-3 rounded-2xl h-100 relative">
+        <menu class="absolute right-3 flex flex-col items-end gap-3">
+            <li>
+                {{ macros.download_chart_extensible_button("global-chart") }}
+            </li>
+            <li>
+                <a href="" id="data-download-csv-data" download class="
+                    hocus:text-green-numixs py-[0.1rem] hocus:px-[0.35rem] active:text-dark-green-numixs
+                    border border-solid hocus:border-green-numixs
+                    border-transparent rounded-xl
+                    text-white-numixs cursor-pointer extensible-button bg-gray-numixs
+                ">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0 1 12 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"/>
+                    </svg>
+                    <span class="inline-flex items-center">Télécharger csv</span>
+                </a>
+            </li>
+        </menu>
+        <canvas id="global-chart" class="w-full h-full"></canvas>
+    </div>
+    <p class="text-xl">Lieu(x) concerné(s)</p>
+    <ul class="list-disc list-inside columns-2"></ul>
+</dialog>

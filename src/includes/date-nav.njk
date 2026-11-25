@@ -1,4 +1,4 @@
-<a href="?current_date={{ current_date|add_days(-1)|date("yyyy-LL-dd") }}" title="Hier" class="navigation-month-2 py-2.5 px-3.5 border-black-numixs border rounded-md flex gap-2 items-center justify-center hocus:bg-green-numixs">
+<a href="{{ formatQueryParams({ date: current_date|add_days(-1)|date("yyyy-LL-dd"), lieu: lieu or "", filtre: query_params.filtre or "" }, true) }}" title="Hier" class="navigation-month-nav py-2.5 px-3.5 border-black-numixs border rounded-md flex gap-2 items-center justify-center hocus:bg-green-numixs">
     <span class="sr-only">Aller au {{ current_date|add_days(-1)|date("dd/LL/yyyy") }}</span>
     <span class="flex items-center justify-center w-3.5">
         {% include "includes/icons/arrow-icon.svg" %}
@@ -9,8 +9,13 @@
     {% include "includes/icons/calendar-icon.svg" %}
     <span class="pointer-events-none hidden sm:inline">{{ "Aujourd'hui" if is_today else current_date|date("EEEE dd LLLL yyyy") }}</span>
     <span class="pointer-events-none inline sm:hidden">{{ "Aujourd'hui" if is_today else current_date|date("dd/LL/yyyy") }}</span>
+    {# <span class="group-not-has-[#calendar:popover-open]/calendar:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="size-5">
+            <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
+        </svg>
+    </span> #}
 </button>
-<a href="?current_date={{ current_date|add_days(1)|date("yyyy-LL-dd") }}" title="Demain" class="navigation-month-2 py-2.5 px-3.5 border-black-numixs border rounded-md flex gap-2 items-center justify-center hocus:bg-green-numixs">
+<a href="{{ formatQueryParams({ date: current_date|add_days(1)|date("yyyy-LL-dd"), lieu: lieu or "", filtre: query_params.filtre or "" }, true) }}" title="Demain" class="navigation-month-nav py-2.5 px-3.5 border-black-numixs border rounded-md flex gap-2 items-center justify-center hocus:bg-green-numixs">
     <span class="sr-only">Aller au {{ current_date|add_days(1)|date("dd/LL/yyyy") }}</span>
     <time datetime="{{ current_date|add_days(1)|date("dd/LL/yyyy") }}" data-day>{{ current_date|add_days(1)|date("dd/LL/yyyy") }}</time>
     <span class="rotate-180 flex items-center justify-center w-3.5">

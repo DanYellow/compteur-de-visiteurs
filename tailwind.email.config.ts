@@ -1,0 +1,74 @@
+export default {
+    content: [
+        './src/emails/**/*.njk',
+        '!./src/pages/**/*.njk',
+        '!./src/includes/**/*.njk',
+        // '!./src/layouts/**/*.njk',
+        // './src/layouts/email.njk',
+    ],
+    theme: {
+        spacing: {
+            0: '0',
+            1: '4px',
+            2: '8px',
+            3: '12px',
+            4: '16px',
+            6: '24px',
+        },
+        colors: {
+            'dark-green-numixs': '#acb115',
+            'green-numixs': '#d5d916',
+            'white-numixs': '#f5f5f5',
+            'gray-numixs': '#312f2f',
+            amber: {
+                50: '#fffbeb',
+                800: '#973c00',
+            },
+        },
+        fontFamily: {
+            sans: ['Calibri', 'sans-serif'],
+            'title-font': ['Agency FB', 'sans-serif'],
+        },
+        borderWidth: {
+            DEFAULT: '1px', // default for 'border'
+            0: '0px',
+            1: '1px',
+            2: '2px',
+            3: '3px',
+            4: '4px',
+            6: '6px',
+            8: '8px',
+        },
+        width: {
+            14: "56px",
+        },
+        borderStyle: {
+            solid: 'solid',
+            none: 'none',
+        },
+        fontSize: {
+            base: "18px",
+            sm: "14px",
+            xs: "12px",
+        },
+        fontWeight: {
+            bold: "bold",
+        },
+        borderRadius: {
+            'md': '6px',
+        },
+        screens: {
+            sm: '640px',
+            md: '768px',
+            lg: '1024px',
+            xl: '1280px',
+        },
+
+        extend: {},
+    },
+    corePlugins: {
+        preflight: false,
+        gridTemplateColumns: false,
+    },
+};
+// https://tailwindcss.com/docs/upgrade-guide#using-a-javascript-config-file

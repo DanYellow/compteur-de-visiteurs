@@ -1,0 +1,19 @@
+<label for="place-dropdown" class="text-sm">Lieu</label>
+<select data-select-redirect="lieu" id="place-dropdown" class="py-1 custom-select !pr-10">
+    <button>
+        <selectedcontent></selectedcontent>
+    </button>
+    <option value="">Tous</option>
+    {% if list_places | length %}
+        <optgroup label="Lieux">
+            {% for place in list_places %}
+                <option {{ "selected" if place_selected == place.slug else "" }} value="{{ place.slug }}">
+                    <div class="flex gap-3 items-center">
+                        <img width="70" class="img" src="/images/logos/{{ place.logo }}" alt="">
+                        <span>{{ place.nom }}</span>
+                    </div>
+                </option>
+            {% endfor %}
+        </optgroup>
+    {% endif %}
+</select>
